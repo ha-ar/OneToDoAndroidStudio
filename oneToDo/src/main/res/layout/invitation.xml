@@ -1,0 +1,121 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container_inivit"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:clickable="true" >
+
+    <RelativeLayout
+        android:id="@+id/framedim_inivit"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#ffffff" >
+
+        <RelativeLayout
+            android:id="@+id/header_layout_inivit"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/active"
+            android:visibility="visible" >
+
+            <ImageView
+                android:id="@+id/header_logo_inivit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/back" />
+
+            <TextView
+                android:id="@+id/weather_inivit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/header_logo_inivit"
+                android:text="Invitations"
+                android:textColor="@android:color/white"
+                android:textSize="22.22sp" />
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/container_inner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/header_layout_inivit" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:id="@+id/header_inivit"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/active"
+                    android:orientation="vertical"
+                    android:paddingBottom="0.5dp" >
+
+                    <RelativeLayout
+                        android:id="@+id/search_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@color/active"
+                        android:visibility="gone" >
+
+                        <ImageView
+                            android:id="@+id/search_back"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="24dp"
+                            android:src="@drawable/back" />
+
+                        <EditText
+                            android:id="@+id/search_text"
+                            style="@style/EditTextCustomHolo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="5dp"
+                            android:ems="12"
+                            android:hint="Search ONE-todo"
+                            android:paddingLeft="20sp"
+                            android:singleLine="true"
+                            android:textColorHighlight="#88D2F0" >
+
+                            <requestFocus />
+                        </EditText>
+                    </RelativeLayout>
+
+                    <com.astuetz.PagerSlidingTabStrip
+                        android:id="@+id/tabs_invit"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_gravity="bottom"
+                        android:background="@color/active"
+                        app:pstsActivateTextColor="#FFFFFF"
+                        app:pstsDeactivateTextColor="#4DFFFFFF"
+                        app:pstsTabSwitch="true" >
+                    </com.astuetz.PagerSlidingTabStrip>
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/header_inivit"
+                    android:visibility="visible" >
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/pager_invit"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </FrameLayout>
+    </RelativeLayout>
+
+</FrameLayout>

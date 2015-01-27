@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/time_date_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        android:text="Time Format"
+        android:textSize="22.22sp" />
+
+    <RadioGroup
+        android:id="@+id/radio_time_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/time_date_title"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/radio_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/radio"
+            android:paddingLeft="15dp"
+            android:text="     12 H"
+            android:textColor="#777777"
+            android:textSize="17.78sp" />
+
+        <RadioButton
+            android:id="@+id/radio_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:button="@drawable/radio"
+            android:paddingLeft="15dp"
+            android:text="     24 H"
+            android:textColor="#777777"
+            android:textSize="17.78sp" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radio_time_date"
+        android:layout_marginTop="20dp"
+        android:layout_toLeftOf="@+id/ok"
+        android:padding="25dp"
+        android:layout_marginRight="20dp"
+        android:text="CANCEL"
+        android:textColor="#4d4d4d"
+        android:textSize="15.56sp" />
+
+    <TextView
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="25dp"
+        
+        android:layout_alignBaseline="@+id/cancel"
+        android:layout_alignBottom="@+id/cancel"
+        android:layout_alignParentRight="true"
+        android:padding="25dp"
+        android:text="OK"
+        android:textColor="#2196f3"
+        android:textSize="15.56sp" />
+
+</RelativeLayout>

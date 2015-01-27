@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.vector.onetodo.utils.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="45dp"
+    android:animateLayoutChanges="true"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
+    android:paddingLeft="15dp"
+    android:paddingRight="0dp"
+    android:weightSum="3" >
+
+    <CheckedTextView
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/blue_chechk_box"
+        android:checked="true" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|left"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="3.14"
+        android:checkMark="@drawable/blue_chechk_box"
+        android:padding="10dp"
+        android:text="Checking"
+        android:textColor="@color/_777777"
+        android:textSize="17.78sp" />
+
+   <!--  <ImageView
+        android:id="@+id/drag_handle"
+        android:layout_width="25dp"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:background="@drawable/drag"
+        android:gravity="left|center_vertical"
+        android:padding="5dp" /> -->
+
+    <!--
+         <ImageView
+        android:id="@+id/click_remove"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_weight="0"
+        android:background="@drawable/cross" />
+    -->
+
+</com.vector.onetodo.utils.CheckableLinearLayout>

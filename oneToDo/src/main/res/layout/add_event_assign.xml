@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title_event_layout"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_below="@+id/title_event_layout"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/input_fields_gray"
+    android:gravity="center_vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp" >
+
+    <ImageButton
+        android:id="@+id/assign_event_button"
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="2dp"
+        android:background="@drawable/invite1" />
+
+    <TextView
+        android:id="@+id/event_assign"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/imageView1"
+        android:layout_toRightOf="@id/assign_event_button"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:hint="Invitee"
+        android:paddingLeft="13dp"
+        android:paddingRight="20dp"
+        android:singleLine="true"
+        android:textColorHint="@color/_999999"
+        android:textSize="17.78sp" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/next_arrow" />
+
+</RelativeLayout>

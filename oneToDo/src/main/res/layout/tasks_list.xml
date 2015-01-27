@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/task_list_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="20dp"
+    android:background="@color/light_grey_color"
+    android:divider="@android:color/transparent"
+    android:dividerHeight="7dp"
+    android:scrollbars="none"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:descendantFocusability="blocksDescendants"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp">
+
+</ListView>

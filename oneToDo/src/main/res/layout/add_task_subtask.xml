@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notes_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:background="@drawable/underline_textview_lightgray"
+        android:paddingBottom="2dp"
+        android:text="SUBTASKS"
+        android:textColor="@color/active"
+        android:textSize="13.33sp"
+        android:typeface="monospace" />
+
+    <LinearLayout
+        android:id="@+id/notes_checklist_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_fields_gray"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp" >
+
+        <EditText
+            android:id="@+id/add_sub_task"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="-30dp"
+            android:layout_weight="3"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:hint="Add a subtask"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp"
+            android:textColor="#414242"
+            android:textSize="17.78sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/input_fields_gray"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/priority_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:gravity="right"
+            android:paddingBottom="5dp"
+            android:paddingRight="15dp"
+            android:paddingTop="5dp"
+            android:text="Priority"
+            android:textColor="@color/inactive"
+            android:textSize="17.78sp" />
+
+        <RadioGroup
+            android:id="@+id/priority_radio_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/priority_0"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="55dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/round_photo_buttons"
+                android:button="@null"
+                android:checked="true"
+                android:text="None"
+                android:textColor="@android:color/white" />
+
+            <RadioButton
+                android:id="@+id/priority_1"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="55dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical|right"
+                android:layout_marginLeft="-2dp"
+                android:background="@drawable/rounded_second"
+                android:button="@null"
+                android:text="!"
+                android:textColor="@color/deep_sky_blue"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/priority_2"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="55dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical|right"
+                android:layout_marginLeft="-2dp"
+                android:background="@drawable/rounded_second"
+                android:button="@null"
+                android:text="! !"
+                android:textColor="@color/deep_sky_blue"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/priority_3"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="55dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical|right"
+                android:layout_marginLeft="-2dp"
+                android:layout_toRightOf="@+id/Button02"
+                android:background="@drawable/rounded_last"
+                android:button="@null"
+                android:text="! ! !"
+                android:textColor="@color/deep_sky_blue"
+                android:textStyle="bold" />
+        </RadioGroup>
+    </LinearLayout>
+
+</LinearLayout>

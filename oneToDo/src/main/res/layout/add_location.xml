@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_dialog"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/add_location_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="10dp"
+        android:gravity="left|center_vertical"
+        android:padding="15dp"
+        android:text="Set location"
+        android:textColor="@color/_4d4d4d"
+        android:textSize="22.22sp" />
+
+    <EditText
+        android:id="@+id/home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:hint="Name the location e.g. Home, Work.."
+        android:lines="1"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColorHint="@color/inactive"
+        android:textSize="17.78sp" >
+
+        <requestFocus />
+    </EditText>
+
+    <AutoCompleteTextView
+        android:id="@+id/adress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:ellipsize="end"
+        android:hint="Enter Location"
+        android:lines="1"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:singleLine="true"
+        android:textColorHint="@color/inactive"
+        android:textSize="17.78sp" />
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp" />
+
+     <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:weightSum="2" >
+
+        <TextView
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="35dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="OK"
+            android:textColor="@color/active"
+            android:textSize="15.56sp" />
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="40dp"
+            android:layout_toLeftOf="@+id/save"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="CANCEL"
+            android:textSize="15.56sp" />
+    </RelativeLayout>
+
+
+</LinearLayout>

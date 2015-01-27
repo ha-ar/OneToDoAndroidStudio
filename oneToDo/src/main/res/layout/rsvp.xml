@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/time_date_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        android:text="RSVP"
+        android:textSize="22.22sp" />
+
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radio_time_date"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/ok"
+        android:padding="20dp"
+        android:text="CANCEL"
+        android:textColor="#4d4d4d"
+        android:textSize="15.56sp" />
+
+    <TextView
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/cancel"
+        android:layout_alignBottom="@+id/cancel"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:padding="20dp"
+        android:text="OK"
+        android:textColor="#2196f3"
+        android:textSize="15.56sp" />
+
+    <RadioGroup
+        android:id="@+id/radio_time_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_below="@+id/time_date_title"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical" >
+
+        <RadioButton
+            android:id="@+id/radio_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="20dp"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            android:gravity="left|center_vertical"
+            android:text="Yes"
+            android:textColor="#777777" />
+
+        <RadioButton
+            android:id="@+id/radio_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="20dp"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            android:gravity="left|center_vertical"
+            android:text="Maybe"
+            android:textColor="#777777" />
+
+        <RadioButton
+            android:id="@+id/radio_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="25dp"
+            android:paddingLeft="20dp"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            android:gravity="left|center_vertical"
+            android:text="No"
+            android:textColor="#777777" />
+    </RadioGroup>
+
+</RelativeLayout>

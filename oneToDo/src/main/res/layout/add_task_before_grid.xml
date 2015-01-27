@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <GridView
+        android:id="@+id/before_grid_view"
+        android:layout_width="fill_parent"
+        android:layout_height="85dp"
+        android:layout_marginTop="10dp"
+        android:listSelector="@drawable/round_buttons"
+        android:numColumns="5"
+        android:scrollbars="none"
+        android:stretchMode="columnWidth" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:paddingBottom="6dp"
+            android:paddingRight="15dp"
+            android:text="Alert :"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="17.78sp" />
+
+        <LinearLayout
+            android:id="@+id/forever_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/textView1"
+            android:orientation="horizontal"
+            android:padding="5dp" >
+
+            <CheckBox
+                android:id="@+id/notification_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:button="@drawable/blue_chechk_box"
+                android:checked="true"
+                android:paddingLeft="@dimen/check_box_padding"
+                android:paddingRight="0dp"
+                android:text=" Notification"
+                android:textColor="@color/_4d4d4d" />
+
+            <CheckBox
+                android:id="@+id/email_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:button="@drawable/blue_chechk_box"
+                android:paddingLeft="@dimen/check_box_padding"
+                android:paddingRight="0dp"
+                android:text=" Email"
+                android:textColor="@color/_4d4d4d" />
+        </LinearLayout>
+
+        <!--
+                 <TextView
+                android:id="@+id/forever"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/unchecked_blue"
+                android:padding="10dp"
+                android:text="Forever"
+                android:textColor="@color/dark_grey_color"
+                android:textColorHighlight="@color/light_grey_color"
+                android:textSize="18sp" />
+        -->
+
+    </RelativeLayout>
+
+</LinearLayout>

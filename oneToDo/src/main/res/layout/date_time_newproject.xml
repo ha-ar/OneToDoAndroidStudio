@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/date_time_picker_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animationCache="true"
+    android:background="@drawable/input_fields_normal"
+    android:orientation="horizontal" >
+
+    <net.simonvt.datepicker.DatePicker
+        android:id="@+id/date_picker_project"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-40dp"
+        android:layout_marginRight="-50dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:calendarViewShown="false" />
+
+     <net.simonvt.timepicker.TimePicker
+        android:id="@+id/time_picker_project"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-16dp"
+        android:layout_marginRight="-20dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8" />
+
+</LinearLayout>

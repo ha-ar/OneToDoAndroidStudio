@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_grey_color"
+    android:layerType="hardware" >
+
+    <FrameLayout
+        android:id="@+id/add_event_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <com.vector.onetodo.utils.CustomScrollView
+                android:id="@+id/main_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/comment_box"
+                android:layout_alignParentTop="true"
+                android:animateLayoutChanges="true"
+                android:background="@color/light_grey_color"
+                android:scrollbars="none" >
+
+                <GridLayout
+                    android:id="@+id/inner_event_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:animateLayoutChanges="true"
+                    android:background="@color/light_grey_color"
+                    android:columnCount="1"
+                    android:orientation="vertical"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="5dp"
+                    android:stretchMode="columnWidth" />
+            </com.vector.onetodo.utils.CustomScrollView>
+        </RelativeLayout>
+    </FrameLayout>
+
+</RelativeLayout>

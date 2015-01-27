@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/light_grey_color"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/menu_item1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/menu_buttonclick"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:text="Save and add new"
+        android:textColor="@color/_999999"
+        android:textSize="17.78sp" />
+
+    <TextView
+        android:id="@+id/menu_item2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/menu_buttonclick"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:text="Add comment"
+        android:textColor="@color/_999999"
+        android:textSize="17.78sp" />
+
+    <TextView
+        android:id="@+id/menu_item3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/menu_buttonclick"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:text="Show/hide fields"
+        android:textColor="@color/_4d4d4d"
+        android:textSize="17.78sp" />
+
+</LinearLayout>

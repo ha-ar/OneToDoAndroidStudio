@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EEEEEE" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logosb" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="-5dp"
+            android:lineSpacingExtra="-5dp"
+            android:text=""
+            android:textColor="@color/active"
+            android:textSize="26.67sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/title"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:background="@color/active" >
+
+            <TableLayout
+                android:id="@+id/table"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp" >
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/intro_1"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/intro_2"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/intro_3"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:id="@+id/intro_4"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow
+                    android:layout_gravity="center|left"
+                    android:layout_marginLeft="20dp" >
+
+                    <TextView
+                        android:layout_column="1"
+                        android:gravity="center"
+                        android:text="•"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/intro_5"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow android:layout_marginLeft="20dp" >
+
+                    <TextView
+                        android:layout_column="1"
+                        android:gravity="center"
+                        android:text="•"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/intro_6"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow android:layout_marginLeft="20dp" >
+
+                    <TextView
+                        android:layout_column="1"
+                        android:gravity="center"
+                        android:text="•"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/intro_7"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow android:layout_marginLeft="20dp" >
+
+                    <TextView
+                        android:layout_column="1"
+                        android:gravity="center"
+                        android:text="•"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/intro_8"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+
+                <TableRow android:layout_marginLeft="20dp" >
+
+                    <TextView
+                        android:layout_column="1"
+                        android:gravity="center"
+                        android:text="•"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <TextView
+                        android:id="@+id/intro_9"
+                        android:layout_width="wrap_content"
+                        android:layout_column="2"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:maxLines="2"
+                        android:text="First line"
+                        android:textColor="#ffffff"
+                        android:textSize="15.56sp" >
+                    </TextView>
+                </TableRow>
+            </TableLayout>
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="40dp"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:background="@color/_28708a"
+                android:text="Continue"
+                android:textColor="@android:color/white"
+                android:textSize="17.78sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</FrameLayout>
