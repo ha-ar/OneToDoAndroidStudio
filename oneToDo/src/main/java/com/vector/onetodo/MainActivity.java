@@ -1,27 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -100,6 +78,28 @@ import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
+
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import de.greenrobot.dao.query.QueryBuilder;
 
@@ -826,17 +826,17 @@ protected void onActivityResult(int requestCode, int responseCode,
 						.setBackgroundColor(Color.parseColor("#ffffff"));
 				aq.id(R.id.project_image).image(R.drawable.progress_black);
 				aq.id(R.id.project_text).textColor(Color.parseColor("#000000"));
-
-				Fragment fr = new Calender();
-				FragmentTransaction transaction = getSupportFragmentManager()
-						.beginTransaction(); //
-				/*
-				 * transaction.setCustomAnimations(R.anim.slide_in,
-				 * R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
-				 */
-				transaction.replace(R.id.container_inner, fr);
-				transaction.addToBackStack("CALENDAR");
-				transaction.commit();
+//
+//				Fragment fr = new Calender();
+//				FragmentTransaction transaction = getSupportFragmentManager()
+//						.beginTransaction(); //
+//				/*
+//				 * transaction.setCustomAnimations(R.anim.slide_in,
+//				 * R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
+//				 */
+//				transaction.replace(R.id.container_inner, fr);
+//				transaction.addToBackStack("CALENDAR");
+//				transaction.commit();
 
 			}
 		});
