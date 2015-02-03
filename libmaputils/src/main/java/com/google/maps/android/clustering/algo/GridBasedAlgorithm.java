@@ -1,15 +1,17 @@
 package com.google.maps.android.clustering.algo;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import android.util.SparseArray;
 
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.geometry.Point;
 import com.google.maps.android.projection.SphericalMercatorProjection;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Groups markers into a grid.
@@ -39,6 +41,7 @@ public class GridBasedAlgorithm<T extends ClusterItem> implements Algorithm<T> {
         mItems.remove(item);
     }
 
+    @NotNull
     @Override
     public Set<? extends Cluster<T>> getClusters(double zoom) {
         int numCells = (int) Math.ceil(256 * Math.pow(2, zoom) / GRID_SIZE);
@@ -64,6 +67,7 @@ public class GridBasedAlgorithm<T extends ClusterItem> implements Algorithm<T> {
         return clusters;
     }
 
+    @NotNull
     @Override
     public Collection<T> getItems() {
         return mItems;

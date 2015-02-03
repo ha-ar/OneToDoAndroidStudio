@@ -23,12 +23,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import bolts.AppLinks;
+
 import com.facebook.internal.AttributionIdentifiers;
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +54,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import bolts.AppLinks;
 
 
 /**
@@ -154,17 +159,23 @@ public class AppEventsLogger {
     private static final String SOURCE_APPLICATION_HAS_BEEN_SET_BY_THIS_INTENT = "_fbSourceApplicationHasBeenSet";
 
     // Instance member variables
+    @NotNull
     private final Context context;
+    @NotNull
     private final AccessTokenAppIdPair accessTokenAppId;
 
+    @NotNull
     private static Map<AccessTokenAppIdPair, SessionEventsState> stateMap =
             new ConcurrentHashMap<AccessTokenAppIdPair, SessionEventsState>();
     private static ScheduledThreadPoolExecutor backgroundExecutor;
     private static FlushBehavior flushBehavior = FlushBehavior.AUTO;
     private static boolean requestInFlight;
     private static Context applicationContext;
+    @NotNull
     private static Object staticLock = new Object();
+    @Nullable
     private static String hashedDeviceAndAppId;
+    @Nullable
     private static String sourceApplication;
     private static boolean isOpenedByApplink;
 
@@ -174,10 +185,11 @@ public class AppEventsLogger {
     // that have the same access token/app ID.
     private static class AccessTokenAppIdPair implements Serializable {
         private static final long serialVersionUID = 1L;
+        @Nullable
         private final String accessToken;
         private final String applicationId;
 
-        AccessTokenAppIdPair(Session session) {
+        AccessTokenAppIdPair(@NotNull Session session) {
             this(session.getAccessToken(), session.getApplicationId());
         }
 
@@ -186,6 +198,7 @@ public class AppEventsLogger {
             this.applicationId = applicationId;
         }
 
+        @Nullable
         String getAccessToken() {
             return accessToken;
         }
@@ -220,11 +233,13 @@ public class AppEventsLogger {
                 this.appId = appId;
             }
 
+            @NotNull
             private Object readResolve() {
                 return new AccessTokenAppIdPair(accessToken, appId);
             }
         }
 
+        @Nullable
         private Object writeReplace() {
             return new SerializationProxyV1(accessToken, applicationId);
         }
@@ -234,7 +249,7 @@ public class AppEventsLogger {
      * This method is deprecated.  Use {@link Settings#getLimitEventAndDataUsage(Context)} instead.
      */
     @Deprecated
-    public static boolean getLimitEventUsage(Context context) {
+    public static boolean getLimitEventUsage(@NotNull Context context) {
         return Settings.getLimitEventAndDataUsage(context);
     }
 
@@ -242,7 +257,7 @@ public class AppEventsLogger {
      * This method is deprecated.  Use {@link Settings#setLimitEventAndDataUsage(Context, boolean)} instead.
      */
     @Deprecated
-    public static void setLimitEventUsage(Context context, boolean limitEventUsage) {
+    public static void setLimitEventUsage(@NotNull Context context, boolean limitEventUsage) {
         Settings.setLimitEventAndDataUsage(context, limitEventUsage);
     }
 
@@ -255,7 +270,7 @@ public class AppEventsLogger {
      *
      * @param context Used to access the applicationId and the attributionId for non-authenticated users.
      */
-    public static void activateApp(Context context) {
+    public static void activateApp(@NotNull Context context) {
         Settings.sdkInitialize(context);
         activateApp(context, Utility.getMetadataApplicationId(context));
     }
@@ -268,7 +283,7 @@ public class AppEventsLogger {
      * @param applicationId The specific applicationId to report the activation for.
      */
     @SuppressWarnings("deprecation")
-    public static void activateApp(Context context, String applicationId) {
+    public static void activateApp(@Nullable Context context, @Nullable String applicationId) {
         if (context == null || applicationId == null) {
             throw new IllegalArgumentException("Both context and applicationId must be non-null");
         }
@@ -319,7 +334,7 @@ public class AppEventsLogger {
      * @param context       Used to access the attributionId for non-authenticated users.
      * @param applicationId The specific applicationId to track session information for.
      */
-    public static void deactivateApp(Context context, String applicationId) {
+    public static void deactivateApp(@Nullable Context context, @Nullable String applicationId) {
         if (context == null || applicationId == null) {
             throw new IllegalArgumentException("Both context and applicationId must be non-null");
         }
@@ -352,7 +367,8 @@ public class AppEventsLogger {
      * @param context Used to access the applicationId and the attributionId for non-authenticated users.
      * @return AppEventsLogger instance to invoke log* methods on.
      */
-    public static AppEventsLogger newLogger(Context context) {
+    @Nullable
+    public static AppEventsLogger newLogger(@NotNull Context context) {
         return new AppEventsLogger(context, null, null);
     }
 
@@ -365,7 +381,8 @@ public class AppEventsLogger {
      *                app ID specified via the app ID specified in the package metadata.
      * @return AppEventsLogger instance to invoke log* methods on.
      */
-    public static AppEventsLogger newLogger(Context context, Session session) {
+    @Nullable
+    public static AppEventsLogger newLogger(@NotNull Context context, Session session) {
         return new AppEventsLogger(context, null, session);
     }
 
@@ -380,7 +397,8 @@ public class AppEventsLogger {
      *                      app ID.
      * @return AppEventsLogger instance to invoke log* methods on.
      */
-    public static AppEventsLogger newLogger(Context context, String applicationId, Session session) {
+    @NotNull
+    public static AppEventsLogger newLogger(@NotNull Context context, String applicationId, Session session) {
         return new AppEventsLogger(context, applicationId, session);
     }
 
@@ -394,7 +412,8 @@ public class AppEventsLogger {
      *                      in the package metadata will be used.
      * @return AppEventsLogger instance to invoke log* methods on.
      */
-    public static AppEventsLogger newLogger(Context context, String applicationId) {
+    @Nullable
+    public static AppEventsLogger newLogger(@NotNull Context context, String applicationId) {
         return new AppEventsLogger(context, applicationId, null);
     }
 
@@ -526,7 +545,7 @@ public class AppEventsLogger {
      * @param parameters     Arbitrary additional information for describing this event.  Should have no more than
      *                       10 entries, and keys should be mostly consistent from one purchase event to the next.
      */
-    public void logPurchase(BigDecimal purchaseAmount, Currency currency, Bundle parameters) {
+    public void logPurchase(@Nullable BigDecimal purchaseAmount, @Nullable Currency currency, @Nullable Bundle parameters) {
 
         if (purchaseAmount == null) {
             notifyDeveloperError("purchaseAmount cannot be null");
@@ -565,7 +584,7 @@ public class AppEventsLogger {
         PersistedEvents.persistEvents(applicationContext, stateMap);
     }
 
-    boolean isValidForSession(Session session) {
+    boolean isValidForSession(@NotNull Session session) {
         AccessTokenAppIdPair other = new AccessTokenAppIdPair(session);
         return accessTokenAppId.equals(other);
     }
@@ -611,7 +630,7 @@ public class AppEventsLogger {
     /**
      * Constructor is private, newLogger() methods should be used to build an instance.
      */
-    private AppEventsLogger(Context context, String applicationId, Session session) {
+    private AppEventsLogger(@NotNull Context context, @Nullable String applicationId, @Nullable Session session) {
 
         Validate.notNull(context, "context");
         this.context = context;
@@ -699,7 +718,7 @@ public class AppEventsLogger {
         logEvent(context, event, accessTokenAppId);
     }
 
-    private static void logEvent(final Context context,
+    private static void logEvent(@NotNull final Context context,
                                  final AppEvent event,
                                  final AccessTokenAppIdPair accessTokenAppId) {
         Settings.getExecutor().execute(new Runnable() {
@@ -740,7 +759,8 @@ public class AppEventsLogger {
     }
 
     // Creates a new SessionEventsState if not already in the map.
-    private static SessionEventsState getSessionEventsState(Context context, AccessTokenAppIdPair accessTokenAppId) {
+    @Nullable
+    private static SessionEventsState getSessionEventsState(@NotNull Context context, AccessTokenAppIdPair accessTokenAppId) {
         // Do this work outside of the lock to prevent deadlocks in implementation of
         //  AdvertisingIdClient.getAdvertisingIdInfo, because that implementation blocks waiting on the main thread,
         //  which may also grab this staticLock.
@@ -768,7 +788,7 @@ public class AppEventsLogger {
         }
     }
 
-    private static void flush(final FlushReason reason) {
+    private static void flush(@NotNull final FlushReason reason) {
 
         Settings.getExecutor().execute(new Runnable() {
             @Override
@@ -778,7 +798,7 @@ public class AppEventsLogger {
         });
     }
 
-    private static void flushAndWait(final FlushReason reason) {
+    private static void flushAndWait(@NotNull final FlushReason reason) {
 
         Set<AccessTokenAppIdPair> keysToFlush;
         synchronized (staticLock) {
@@ -810,7 +830,8 @@ public class AppEventsLogger {
         }
     }
 
-    private static FlushStatistics buildAndExecuteRequests(FlushReason reason, Set<AccessTokenAppIdPair> keysToFlush) {
+    @Nullable
+    private static FlushStatistics buildAndExecuteRequests(@NotNull FlushReason reason, @NotNull Set<AccessTokenAppIdPair> keysToFlush) {
         FlushStatistics flushResults = new FlushStatistics();
 
         boolean limitEventUsage = Settings.getLimitEventAndDataUsage(applicationContext);
@@ -847,13 +868,15 @@ public class AppEventsLogger {
 
     private static class FlushStatistics {
         public int numEvents = 0;
+        @NotNull
         public FlushResult result = FlushResult.SUCCESS;
     }
 
-    private static Request buildRequestForSession(final AccessTokenAppIdPair accessTokenAppId,
-                                                  final SessionEventsState sessionEventsState,
+    @Nullable
+    private static Request buildRequestForSession(@NotNull final AccessTokenAppIdPair accessTokenAppId,
+                                                  @NotNull final SessionEventsState sessionEventsState,
                                                   final boolean limitEventUsage,
-                                                  final FlushStatistics flushState) {
+                                                  @NotNull final FlushStatistics flushState) {
         String applicationId = accessTokenAppId.getApplicationId();
 
         Utility.FetchedAppSettings fetchedAppSettings = Utility.queryAppSettings(applicationId, false);
@@ -885,7 +908,7 @@ public class AppEventsLogger {
 
         postRequest.setCallback(new Request.Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 handleResponse(accessTokenAppId, postRequest, response, sessionEventsState, flushState);
             }
         });
@@ -893,8 +916,8 @@ public class AppEventsLogger {
         return postRequest;
     }
 
-    private static void handleResponse(AccessTokenAppIdPair accessTokenAppId, Request request, Response response,
-                                       SessionEventsState sessionEventsState, FlushStatistics flushState) {
+    private static void handleResponse(AccessTokenAppIdPair accessTokenAppId, @NotNull Request request, @NotNull Response response,
+                                       @NotNull SessionEventsState sessionEventsState, @NotNull FlushStatistics flushState) {
         FacebookRequestError error = response.getError();
         String resultDescription = "Success";
 
@@ -976,7 +999,7 @@ public class AppEventsLogger {
     /**
      * Source Application setters and getters
      */
-    private static void setSourceApplication(Activity activity) {
+    private static void setSourceApplication(@NotNull Activity activity) {
 
         ComponentName callingApplication = activity.getCallingActivity();
         if (callingApplication != null) {
@@ -1027,6 +1050,7 @@ public class AppEventsLogger {
         isOpenedByApplink = openByAppLink;
     }
 
+    @NotNull
     static String getSourceApplication() {
         String openType = "Unclassified";
         if (isOpenedByApplink) {
@@ -1049,7 +1073,9 @@ public class AppEventsLogger {
 
 
     static class SessionEventsState {
+        @NotNull
         private List<AppEvent> accumulatedEvents = new ArrayList<AppEvent>();
+        @NotNull
         private List<AppEvent> inFlightEvents = new ArrayList<AppEvent>();
         private int numSkippedEventsDueToFullBuffer;
         private AttributionIdentifiers attributionIdentifiers;
@@ -1090,7 +1116,7 @@ public class AppEventsLogger {
             numSkippedEventsDueToFullBuffer = 0;
         }
 
-        public int populateRequest(Request request, boolean includeImplicitEvents,
+        public int populateRequest(@NotNull Request request, boolean includeImplicitEvents,
                                    boolean includeAttribution, boolean limitEventUsage) {
 
             int numSkipped;
@@ -1118,6 +1144,7 @@ public class AppEventsLogger {
             return jsonArray.length();
         }
 
+        @NotNull
         public synchronized List<AppEvent> getEventsToPersist() {
             // We will only persist accumulated events, not ones currently in-flight. This means if an in-flight
             // request fails, those requests will not be persisted and thus might be lost if the process terminates
@@ -1133,7 +1160,7 @@ public class AppEventsLogger {
             accumulatedEvents.addAll(events);
         }
 
-        private void populateRequest(Request request, int numSkipped, JSONArray events, boolean includeAttribution,
+        private void populateRequest(@NotNull Request request, int numSkipped, @NotNull JSONArray events, boolean includeAttribution,
                                      boolean limitEventUsage) {
             GraphObject publishParams = GraphObject.Factory.create();
             publishParams.setProperty("event", "CUSTOM_APP_EVENTS");
@@ -1173,7 +1200,8 @@ public class AppEventsLogger {
             request.setParameters(requestParameters);
         }
 
-        private byte[] getStringAsByteArray(String jsonString) {
+        @Nullable
+        private byte[] getStringAsByteArray(@NotNull String jsonString) {
             byte[] jsonUtf8 = null;
             try {
                 jsonUtf8 = jsonString.getBytes("UTF-8");
@@ -1188,6 +1216,7 @@ public class AppEventsLogger {
     static class AppEvent implements Serializable {
         private static final long serialVersionUID = 1L;
 
+        @Nullable
         private JSONObject jsonObject;
         private boolean isImplicit;
         private static final HashSet<String> validatedIdentifiers = new HashSet<String>();
@@ -1196,8 +1225,8 @@ public class AppEventsLogger {
         public AppEvent(
                 Context context,
                 String eventName,
-                Double valueToSum,
-                Bundle parameters,
+                @Nullable Double valueToSum,
+                @Nullable Bundle parameters,
                 boolean isImplicitlyLogged
         ) {
             try {
@@ -1275,12 +1304,13 @@ public class AppEventsLogger {
             return isImplicit;
         }
 
+        @Nullable
         public JSONObject getJSONObject() {
             return jsonObject;
         }
 
         // throw exception if not valid.
-        private void validateIdentifier(String identifier) throws FacebookException {
+        private void validateIdentifier(@Nullable String identifier) throws FacebookException {
 
             // Identifier should be 40 chars or less, and only have 0-9A-Za-z, underscore, hyphen, and space (but no
             // hyphen or space in the first position).
@@ -1327,11 +1357,13 @@ public class AppEventsLogger {
                 this.isImplicit = isImplicit;
             }
 
+            @NotNull
             private Object readResolve() throws JSONException {
                 return new AppEvent(jsonString, isImplicit);
             }
         }
 
+        @NotNull
         private Object writeReplace() {
             return new SerializationProxyV1(jsonObject.toString(), isImplicit);
         }
@@ -1360,7 +1392,7 @@ public class AppEventsLogger {
         };
 
         @SuppressWarnings("unchecked")
-        private static void restoreAppSessionInformation(Context context) {
+        private static void restoreAppSessionInformation(@NotNull Context context) {
             ObjectInputStream ois = null;
 
             synchronized (staticLock) {
@@ -1395,7 +1427,7 @@ public class AppEventsLogger {
             }
         }
 
-        static void saveAppSessionInformation(Context context) {
+        static void saveAppSessionInformation(@NotNull Context context) {
             ObjectOutputStream oos = null;
 
             synchronized (staticLock) {
@@ -1421,7 +1453,7 @@ public class AppEventsLogger {
         }
 
         static void onResume(
-                Context context,
+                @NotNull Context context,
                 AccessTokenAppIdPair accessTokenAppId,
                 AppEventsLogger logger,
                 long eventTime,
@@ -1435,7 +1467,7 @@ public class AppEventsLogger {
         }
 
         static void onSuspend(
-                Context context,
+                @NotNull Context context,
                 AccessTokenAppIdPair accessTokenAppId,
                 AppEventsLogger logger,
                 long eventTime
@@ -1447,8 +1479,9 @@ public class AppEventsLogger {
             }
         }
 
+        @Nullable
         private static FacebookTimeSpentData getTimeSpentData(
-                Context context,
+                @NotNull Context context,
                 AccessTokenAppIdPair accessTokenAppId
         ) {
             restoreAppSessionInformation(context);
@@ -1479,9 +1512,11 @@ public class AppEventsLogger {
     static class PersistedEvents {
         static final String PERSISTED_EVENTS_FILENAME = "AppEventsLogger.persistedevents";
 
+        @NotNull
         private static Object staticLock = new Object();
 
         private Context context;
+        @NotNull
         private HashMap<AccessTokenAppIdPair, List<AppEvent>> persistedEvents =
                 new HashMap<AccessTokenAppIdPair, List<AppEvent>>();
 
@@ -1489,6 +1524,7 @@ public class AppEventsLogger {
             this.context = context;
         }
 
+        @NotNull
         public static PersistedEvents readAndClearStore(Context context) {
             synchronized (staticLock) {
                 PersistedEvents persistedEvents = new PersistedEvents(context);
@@ -1507,7 +1543,7 @@ public class AppEventsLogger {
         }
 
         public static void persistEvents(Context context,
-                                         Map<AccessTokenAppIdPair, SessionEventsState> eventsToPersist) {
+                                         @NotNull Map<AccessTokenAppIdPair, SessionEventsState> eventsToPersist) {
             synchronized (staticLock) {
                 // Note that we don't track which instance of AppEventsLogger added a particular event to
                 // SessionEventsState; when a particular Context is being destroyed, we'll persist all accumulated
@@ -1528,6 +1564,7 @@ public class AppEventsLogger {
             }
         }
 
+        @NotNull
         public Set<AccessTokenAppIdPair> keySet() {
             return persistedEvents.keySet();
         }

@@ -19,12 +19,27 @@ package com.facebook.android;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.os.Bundle;
+
 import com.facebook.internal.Utility;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * Utility class supporting the Facebook Object.
@@ -53,8 +68,9 @@ public final class Util {
      * @param boundary the random string as boundary
      * @return a string of the post body
      */
+    @NotNull
     @Deprecated
-    public static String encodePostBody(Bundle parameters, String boundary) {
+    public static String encodePostBody(@Nullable Bundle parameters, String boundary) {
         if (parameters == null) return "";
         StringBuilder sb = new StringBuilder();
 
@@ -72,8 +88,9 @@ public final class Util {
         return sb.toString();
     }
 
+    @NotNull
     @Deprecated
-    public static String encodeUrl(Bundle parameters) {
+    public static String encodeUrl(@Nullable Bundle parameters) {
         if (parameters == null) {
             return "";
         }
@@ -93,8 +110,9 @@ public final class Util {
         return sb.toString();
     }
 
+    @NotNull
     @Deprecated
-    public static Bundle decodeUrl(String s) {
+    public static Bundle decodeUrl(@Nullable String s) {
         Bundle params = new Bundle();
         if (s != null) {
             String array[] = s.split("&");
@@ -122,6 +140,7 @@ public final class Util {
      * @param url the URL to parse
      * @return a dictionary bundle of keys and values
      */
+    @NotNull
     @Deprecated
     public static Bundle parseUrl(String url) {
         // hack to prevent MalformedURLException
@@ -150,8 +169,9 @@ public final class Util {
      * @throws MalformedURLException - if the URL format is invalid
      * @throws IOException - if a network problem occurs
      */
+    @NotNull
     @Deprecated
-    public static String openUrl(String url, String method, Bundle params)
+    public static String openUrl(String url, @NotNull String method, @NotNull Bundle params)
           throws MalformedURLException, IOException {
         // random string as boundary for multi-part http post
         String strBoundary = "3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
@@ -229,8 +249,9 @@ public final class Util {
         return response;
     }
 
+    @NotNull
     @Deprecated
-    private static String read(InputStream in) throws IOException {
+    private static String read(@NotNull InputStream in) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader r = new BufferedReader(new InputStreamReader(in), 1000);
         for (String line = r.readLine(); line != null; line = r.readLine()) {
@@ -255,8 +276,9 @@ public final class Util {
      * @throws JSONException - if the response is not valid JSON
      * @throws FacebookError - if an error condition is set
      */
+    @NotNull
     @Deprecated
-    public static JSONObject parseJson(String response)
+    public static JSONObject parseJson(@NotNull String response)
           throws JSONException, FacebookError {
         // Edge case: when sending a POST request to /[post_id]/likes
         // the return value is 'true' or 'false'. Unfortunately
@@ -305,7 +327,7 @@ public final class Util {
      *          Alert dialog message
      */
     @Deprecated
-    public static void showAlert(Context context, String title, String text) {
+    public static void showAlert(@NotNull Context context, String title, String text) {
         Builder alertBuilder = new Builder(context);
         alertBuilder.setTitle(title);
         alertBuilder.setMessage(text);

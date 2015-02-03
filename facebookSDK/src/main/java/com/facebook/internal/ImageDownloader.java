@@ -21,8 +21,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+
 import com.facebook.FacebookException;
 import com.facebook.android.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +42,9 @@ public class ImageDownloader {
     private static final int DOWNLOAD_QUEUE_MAX_CONCURRENT = WorkQueue.DEFAULT_MAX_CONCURRENT;
     private static final int CACHE_READ_QUEUE_MAX_CONCURRENT = 2;
     private static Handler handler;
+    @NotNull
     private static WorkQueue downloadQueue = new WorkQueue(DOWNLOAD_QUEUE_MAX_CONCURRENT);
+    @NotNull
     private static WorkQueue cacheReadQueue = new WorkQueue(CACHE_READ_QUEUE_MAX_CONCURRENT);
 
     private static final Map<RequestKey, DownloaderContext> pendingRequests = new HashMap<RequestKey, DownloaderContext>();
@@ -48,7 +54,7 @@ public class ImageDownloader {
      * If a callback is specified, it is guaranteed to be invoked on the calling thread.
      * @param request Request to process
      */
-    public static void downloadAsync(ImageRequest request) {
+    public static void downloadAsync(@Nullable ImageRequest request) {
         if (request == null) {
             return;
         }
@@ -71,7 +77,7 @@ public class ImageDownloader {
         }
     }
 
-    public static boolean cancelRequest(ImageRequest request) {
+    public static boolean cancelRequest(@NotNull ImageRequest request) {
         boolean cancelled = false;
         RequestKey key = new RequestKey(request.getImageUri(), request.getCallerTag());
         synchronized (pendingRequests) {
@@ -95,7 +101,7 @@ public class ImageDownloader {
         return cancelled;
     }
 
-    public static void prioritizeRequest(ImageRequest request) {
+    public static void prioritizeRequest(@NotNull ImageRequest request) {
         RequestKey key = new RequestKey(request.getImageUri(), request.getCallerTag());
         synchronized (pendingRequests) {
             DownloaderContext downloaderContext = pendingRequests.get(key);
@@ -110,7 +116,7 @@ public class ImageDownloader {
         UrlRedirectCache.clearCache(context);
     }
 
-    private static void enqueueCacheRead(ImageRequest request, RequestKey key, boolean allowCachedRedirects) {
+    private static void enqueueCacheRead(@NotNull ImageRequest request, RequestKey key, boolean allowCachedRedirects) {
         enqueueRequest(
                 request,
                 key,
@@ -118,7 +124,7 @@ public class ImageDownloader {
                 new CacheReadWorkItem(request.getContext(), key, allowCachedRedirects));
     }
 
-    private static void enqueueDownload(ImageRequest request, RequestKey key) {
+    private static void enqueueDownload(@NotNull ImageRequest request, RequestKey key) {
         enqueueRequest(
                 request,
                 key,
@@ -129,7 +135,7 @@ public class ImageDownloader {
     private static void enqueueRequest(
             ImageRequest request,
             RequestKey key,
-            WorkQueue workQueue,
+            @NotNull WorkQueue workQueue,
             Runnable workItem) {
         synchronized (pendingRequests) {
             DownloaderContext downloaderContext = new DownloaderContext();
@@ -174,7 +180,7 @@ public class ImageDownloader {
         }
     }
 
-    private static void readFromCache(RequestKey key, Context context, boolean allowCachedRedirects) {
+    private static void readFromCache(@NotNull RequestKey key, Context context, boolean allowCachedRedirects) {
         InputStream cachedStream = null;
         boolean isCachedRedirect = false;
         if (allowCachedRedirects) {
@@ -204,7 +210,7 @@ public class ImageDownloader {
         }
     }
 
-    private static void download(RequestKey key, Context context) {
+    private static void download(@NotNull RequestKey key, @NotNull Context context) {
         HttpURLConnection connection = null;
         InputStream stream = null;
         Exception error = null;
@@ -313,7 +319,7 @@ public class ImageDownloader {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             boolean isEqual = false;
 
             if (o != null && o instanceof RequestKey) {
@@ -327,6 +333,7 @@ public class ImageDownloader {
 
     private static class DownloaderContext {
         WorkQueue.WorkItem workItem;
+        @Nullable
         ImageRequest request;
         boolean isCancelled;
     }

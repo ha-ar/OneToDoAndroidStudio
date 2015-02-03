@@ -26,7 +26,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
 import com.facebook.android.R;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
@@ -52,6 +55,7 @@ public class ToolTipPopup {
     public static final long DEFAULT_POPUP_DISPLAY_TIME = 6000;
     
     private final String mText;
+    @NotNull
     private final WeakReference<View> mAnchorViewRef;
     private final Context mContext;
     private PopupContentView mPopupContent;
@@ -80,7 +84,7 @@ public class ToolTipPopup {
      * @param text The text to be displayed in the tool tip
      * @param anchor The view to anchor this tool tip to.
      */
-    public ToolTipPopup(String text, View anchor) {
+    public ToolTipPopup(String text, @NotNull View anchor) {
         mText = text;
         mAnchorViewRef = new WeakReference<View>(anchor);
         mContext = anchor.getContext();

@@ -2,6 +2,9 @@ package com.facebook.model;
 
 import com.facebook.internal.NativeProtocol;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +21,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the ID of the object.
      * @return the ID
      */
+    @NotNull
     String getId();
 
     /**
@@ -30,6 +34,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the type of the object, which is a string in the form "mynamespace:mytype".
      * @return the type
      */
+    @NotNull
     String getType();
 
     /**
@@ -42,6 +47,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the URL associated with the Open Graph object.
      * @return the URL
      */
+    @NotNull
     String getUrl();
 
     /**
@@ -54,6 +60,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the title of the Open Graph object.
      * @return the title
      */
+    @NotNull
     String getTitle();
 
     /**
@@ -67,6 +74,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the description of the Open Graph object.
      * @return the description
      */
+    @NotNull
     String getDescription();
 
     /**
@@ -79,6 +87,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the images associated with the Open Graph object.
      * @return the images
      */
+    @NotNull
     GraphObjectList<GraphObject> getImage();
 
     /**
@@ -100,6 +109,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the videos associated with the Open Graph object.
      * @return the videos
      */
+    @NotNull
     GraphObjectList<GraphObject> getVideo();
 
     /**
@@ -112,6 +122,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the audio associated with the Open Graph object.
      * @return the audio
      */
+    @NotNull
     GraphObjectList<GraphObject> getAudio();
 
     /**
@@ -125,6 +136,7 @@ public interface OpenGraphObject extends GraphObject {
      * appear before the title of the object.
      * @return the determiner string
      */
+    @NotNull
     String getDeterminer();
 
     /**
@@ -138,6 +150,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the list of related resources for the Open Graph object.
      * @return a list of URLs of related resources
      */
+    @NotNull
     List<String> getSeeAlso();
 
     /**
@@ -150,6 +163,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the name of the site hosting the Open Graph object, if any.
      * @return the name of the site
      */
+    @NotNull
     String getSiteName();
 
     /**
@@ -162,6 +176,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the date and time the Open Graph object was created.
      * @return the creation time
      */
+    @NotNull
     Date getCreatedTime();
 
     /**
@@ -174,6 +189,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the date and time the Open Graph object was last updated.
      * @return the update time
      */
+    @NotNull
     Date getUpdatedTime();
 
     /**
@@ -186,6 +202,7 @@ public interface OpenGraphObject extends GraphObject {
      * Gets the application that created this object.
      * @return the application
      */
+    @NotNull
     GraphObject getApplication();
 
     /**
@@ -211,6 +228,7 @@ public interface OpenGraphObject extends GraphObject {
      * object, otherwise null. The post action controls the privacy of this object.
      * @return the ID of the post action, if any, or null
      */
+    @NotNull
     String getPostActionId();
 
     /**
@@ -225,6 +243,7 @@ public interface OpenGraphObject extends GraphObject {
      * application-defined Open Graph object type will appear here.
      * @return a GraphObject containing the type-specific properties
      */
+    @NotNull
     GraphObject getData();
 
     /**
@@ -263,6 +282,7 @@ public interface OpenGraphObject extends GraphObject {
          * @param type the Open Graph object type for the object, or null if it will be specified later
          * @return an OpenGraphObject
          */
+        @NotNull
         public static OpenGraphObject createForPost(String type) {
             return createForPost(OpenGraphObject.class, type);
         }
@@ -274,7 +294,8 @@ public interface OpenGraphObject extends GraphObject {
          * @param type the Open Graph object type for the object, or null if it will be specified later
          * @return an OpenGraphObject
          */
-        public static <T extends OpenGraphObject> T createForPost(Class<T> graphObjectClass, String type) {
+        @NotNull
+        public static <T extends OpenGraphObject> T createForPost(@NotNull Class<T> graphObjectClass, String type) {
             return createForPost(graphObjectClass, type, null, null, null, null);
         }
 
@@ -289,8 +310,9 @@ public interface OpenGraphObject extends GraphObject {
          * @param description the description of the object, or null
          * @return an OpenGraphObject
          */
-        public static <T extends OpenGraphObject> T createForPost(Class<T> graphObjectClass, String type, String title,
-                String imageUrl, String url, String description) {
+        @NotNull
+        public static <T extends OpenGraphObject> T createForPost(@NotNull Class<T> graphObjectClass, @Nullable String type, @Nullable String title,
+                @Nullable String imageUrl, @Nullable String url, @Nullable String description) {
             T object = GraphObject.Factory.create(graphObjectClass);
 
             if (type != null) {

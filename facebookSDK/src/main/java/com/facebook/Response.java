@@ -17,12 +17,16 @@
 package com.facebook;
 
 import android.content.Context;
+
 import com.facebook.internal.CacheableRequestBatch;
 import com.facebook.internal.FileLruCache;
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphObjectList;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +70,7 @@ public class Response {
     private static final String RESPONSE_LOG_TAG = "Response";
 
     private static final String RESPONSE_CACHE_TAG = "ResponseCache";
+    @Nullable
     private static FileLruCache responseCache;
 
     Response(Request request, HttpURLConnection connection, String rawResponse, GraphObject graphObject, boolean isFromCache) {
@@ -116,7 +121,8 @@ public class Response {
      * @return the graph object returned, or null if none was returned (or if the result was a list)
      * @throws FacebookException If the passed in Class is not a valid GraphObject interface
      */
-    public final <T extends GraphObject> T getGraphObjectAs(Class<T> graphObjectClass) {
+    @Nullable
+    public final <T extends GraphObject> T getGraphObjectAs(@Nullable Class<T> graphObjectClass) {
         if (graphObject == null) {
             return null;
         }
@@ -142,6 +148,7 @@ public class Response {
      * @return the list of graph objects returned, or null if none was returned (or if the result was not a list)
      * @throws FacebookException If the passed in Class is not a valid GraphObject interface
      */
+    @Nullable
     public final <T extends GraphObject> GraphObjectList<T> getGraphObjectListAs(Class<T> graphObjectClass) {
         if (graphObjectList == null) {
             return null;
@@ -200,6 +207,7 @@ public class Response {
      * @return a Request that will retrieve the next page of results in the desired
      *         direction, or null if no paging information is available
      */
+    @Nullable
     public Request getRequestForPagedResults(PagingDirection direction) {
         String link = null;
         if (graphObject != null) {
@@ -236,6 +244,7 @@ public class Response {
     /**
      * Provides a debugging string for this response.
      */
+    @NotNull
     @Override
     public String toString() {
         String responseCode;
@@ -260,6 +269,7 @@ public class Response {
         return isFromCache;
     }
 
+    @Nullable
     static FileLruCache getResponseCache() {
         if (responseCache == null) {
             Context applicationContext = Session.getStaticContext();
@@ -271,8 +281,9 @@ public class Response {
         return responseCache;
     }
 
+    @NotNull
     @SuppressWarnings("resource")
-    static List<Response> fromHttpConnection(HttpURLConnection connection, RequestBatch requests) {
+    static List<Response> fromHttpConnection(@NotNull HttpURLConnection connection, RequestBatch requests) {
         InputStream stream = null;
 
         FileLruCache cache = null;
@@ -339,8 +350,9 @@ public class Response {
         }
     }
 
-    static List<Response> createResponsesFromStream(InputStream stream, HttpURLConnection connection,
-            RequestBatch requests, boolean isFromCache) throws FacebookException, JSONException, IOException {
+    @NotNull
+    static List<Response> createResponsesFromStream(@NotNull InputStream stream, HttpURLConnection connection,
+            @NotNull RequestBatch requests, boolean isFromCache) throws FacebookException, JSONException, IOException {
 
         String responseString = Utility.readStreamToString(stream);
         Logger.log(LoggingBehavior.INCLUDE_RAW_RESPONSES, RESPONSE_LOG_TAG,
@@ -350,8 +362,9 @@ public class Response {
         return createResponsesFromString(responseString, connection, requests, isFromCache);
     }
 
-    static List<Response> createResponsesFromString(String responseString, HttpURLConnection connection,
-            RequestBatch requests, boolean isFromCache) throws FacebookException, JSONException, IOException {
+    @NotNull
+    static List<Response> createResponsesFromString(@NotNull String responseString, HttpURLConnection connection,
+            @NotNull RequestBatch requests, boolean isFromCache) throws FacebookException, JSONException, IOException {
         JSONTokener tokener = new JSONTokener(responseString);
         Object resultObject = tokener.nextValue();
 
@@ -362,7 +375,8 @@ public class Response {
         return responses;
     }
 
-    private static List<Response> createResponsesFromObject(HttpURLConnection connection, List<Request> requests,
+    @NotNull
+    private static List<Response> createResponsesFromObject(@Nullable HttpURLConnection connection, @NotNull List<Request> requests,
             Object object, boolean isFromCache) throws FacebookException, JSONException {
         assert (connection != null) || isFromCache;
 
@@ -415,7 +429,8 @@ public class Response {
         return responses;
     }
 
-    private static Response createResponseFromObject(Request request, HttpURLConnection connection, Object object,
+    @Nullable
+    private static Response createResponseFromObject(@NotNull Request request, HttpURLConnection connection, Object object,
             boolean isFromCache, Object originalResult) throws JSONException {
         if (object instanceof JSONObject) {
             JSONObject jsonObject = (JSONObject) object;
@@ -454,7 +469,8 @@ public class Response {
         }
     }
 
-    static List<Response> constructErrorResponses(List<Request> requests, HttpURLConnection connection,
+    @NotNull
+    static List<Response> constructErrorResponses(@NotNull List<Request> requests, HttpURLConnection connection,
             FacebookException error) {
         int count = requests.size();
         List<Response> responses = new ArrayList<Response>(count);
@@ -466,14 +482,18 @@ public class Response {
     }
 
     interface PagingInfo extends GraphObject {
+        @NotNull
         String getNext();
 
+        @NotNull
         String getPrevious();
     }
 
     interface PagedResults extends GraphObject {
+        @NotNull
         GraphObjectList<GraphObject> getData();
 
+        @NotNull
         PagingInfo getPaging();
     }
 

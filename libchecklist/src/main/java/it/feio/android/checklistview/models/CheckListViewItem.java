@@ -1,12 +1,5 @@
 package it.feio.android.checklistview.models;
 
-import it.feio.android.checklistview.R;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-import it.feio.android.checklistview.interfaces.CheckListEventListener;
-import it.feio.android.checklistview.interfaces.Constants;
-import it.feio.android.checklistview.interfaces.EditTextEventListener;
-import it.feio.android.checklistview.utils.AlphaManager;
-import it.feio.android.checklistview.utils.DensityUtil;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -19,7 +12,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +26,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import it.feio.android.checklistview.R;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+import it.feio.android.checklistview.interfaces.CheckListEventListener;
+import it.feio.android.checklistview.interfaces.Constants;
+import it.feio.android.checklistview.interfaces.EditTextEventListener;
+import it.feio.android.checklistview.utils.AlphaManager;
+import it.feio.android.checklistview.utils.DensityUtil;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class CheckListViewItem extends LinearLayout implements
@@ -150,7 +153,7 @@ public class CheckListViewItem extends LinearLayout implements
 		return checkBox;
 	}
 
-	public void setCheckBox(CheckBox checkBox) {
+	public void setCheckBox(@NotNull CheckBox checkBox) {
 		for (int i = 0; i < getChildCount(); i++) {
 			if (getChildAt(i).equals(this.checkBox)) {
 				removeViewAt(i);
@@ -266,13 +269,13 @@ public class CheckListViewItem extends LinearLayout implements
 	}
 
 	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count,
+	public void beforeTextChanged(@NotNull CharSequence s, int start, int count,
 			int after) {
 		lenghtBeforeTextChanged = s.length();
 	}
 
 	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	public void onTextChanged(@NotNull CharSequence s, int start, int before, int count) {
 		// Checks if is the first text written here
 		if (lenghtBeforeTextChanged == 0) {
 			ViewGroup parent = (ViewGroup) getParent();
@@ -320,7 +323,7 @@ public class CheckListViewItem extends LinearLayout implements
 
 	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
-	public void cloneStyles(EditText v) {
+	public void cloneStyles(@Nullable EditText v) {
 
 		if (v != null) {
 			// Cloning background

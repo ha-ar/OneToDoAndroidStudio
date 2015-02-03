@@ -1,28 +1,5 @@
 package com.vector.onetodo;
 
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -61,6 +38,8 @@ import android.widget.ToggleButton;
 import com.androidquery.AQuery;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
+import com.vector.onetodo.appointment_fragments.AddAppoinmentBeforeFragment;
+import com.vector.onetodo.appointment_fragments.AddAppoinmentFragment;
 import com.vector.onetodo.db.gen.AssignDao;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
@@ -77,13 +56,45 @@ import com.vector.onetodo.db.gen.RepeatDao;
 import com.vector.onetodo.db.gen.ShareDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
+import com.vector.onetodo.event_fragments.AddEventBeforeFragment;
+import com.vector.onetodo.event_fragments.AddEventFragment;
+import com.vector.onetodo.project_fragments.AddProjectFragment;
+import com.vector.onetodo.schedule_fragments.AddScheduleBeforeFragment;
+import com.vector.onetodo.schedule_fragments.AddScheduleFragment;
+import com.vector.onetodo.task_fragments.AddTaskBeforeFragment;
+import com.vector.onetodo.task_fragments.AddTaskComment;
+import com.vector.onetodo.task_fragments.AddTaskFragment;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 import com.viewpagerindicator.CirclePageIndicator;
 import com.viewpagerindicator.PageIndicator;
 
-public class AddTask extends FragmentActivity {
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+
+public class BaseTaskFragment extends FragmentActivity {
 
 	SharedPreferences comment_pref;
 
@@ -91,7 +102,8 @@ public class AddTask extends FragmentActivity {
 	public static AQuery aq, aq_menu;
 	static Button btn;
 	int dayPosition;
-	static Long f2 = null;
+	@Nullable
+    static Long f2 = null;
 	ToDoDao tododao;
 	AssignDao assigndao;
 	CheckListDao checklistdao;
@@ -109,12 +121,15 @@ public class AddTask extends FragmentActivity {
 	ArrayAdapter<String> adapterTask, adapterEvent, adapterSchedule;
 	SQLiteDatabase db;
 	public static FrameLayout layout_MainMenu;
-	private ArrayList<String> assignedId = new ArrayList<String>();
-	String[] array = { "Assign", "Due date", "Location", "Reminder", "Repeat",
+	@NotNull
+    private ArrayList<String> assignedId = new ArrayList<String>();
+	@NotNull
+    String[] array = { "Assign", "Due date", "Location", "Reminder", "Repeat",
 			"Label", "Subtasks", "Notes", "Attachment" };
 
 	// *******************ADD DATA
-	String title = null, notes = null, label_name = null, r_location = null,
+    @NotNull
+    String title = null, notes = null, label_name = null, r_location = null,
 			locationtype = "None", start_date = null, end_date = null,
 			checklist_data = null, location = null, before = null,
 			repeat = null, givenDateString = null, location_tag = "",
@@ -122,7 +137,8 @@ public class AddTask extends FragmentActivity {
 	int MaxId, titlecheck = -1, is_locationtype = -1, Position = 0;
 	public static List<String> comment, commenttime;
 	static SharedPreferences pref, label, attach;
-	Boolean is_time = true, is_location = false, is_allday = false,
+	@NotNull
+    Boolean is_time = true, is_location = false, is_allday = false,
 			is_alertEmail = false, is_alertNotification = false,
 			is_priority = false, repeat_forever = false;
 	long r_time = 0, r_repeat = 0, todo_id = 0, startDateInMilli = 0,
@@ -132,13 +148,16 @@ public class AddTask extends FragmentActivity {
 	HttpClient client;
 	HttpPost post;
 	List<NameValuePair> pairs;
-	HttpResponse response = null;
-	add asyn;
+	@Nullable
+    HttpResponse response = null;
+	AddToServer asyn;
 
 	SimpleDateFormat sdf;
-	Date startDate = null, endDate = null;
+	@Nullable
+    Date startDate = null, endDate = null;
 
-	private DragSortListView.DropListener onDropTask = new DragSortListView.DropListener() {
+	@NotNull
+    private DragSortListView.DropListener onDropTask = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
 			if (from != to) {
@@ -150,7 +169,8 @@ public class AddTask extends FragmentActivity {
 		}
 	};
 
-	private DragSortListView.DropListener onDropEvent = new DragSortListView.DropListener() {
+	@NotNull
+    private DragSortListView.DropListener onDropEvent = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
 			if (from != to) {
@@ -162,7 +182,8 @@ public class AddTask extends FragmentActivity {
 		}
 	};
 
-	private DragSortListView.DropListener onDropSchedule = new DragSortListView.DropListener() {
+	@NotNull
+    private DragSortListView.DropListener onDropSchedule = new DragSortListView.DropListener() {
 		@Override
 		public void drop(int from, int to) {
 			if (from != to) {
@@ -271,13 +292,13 @@ public class AddTask extends FragmentActivity {
 		layout_MainMenu = (FrameLayout) findViewById(R.id.main_container);
 		layout_MainMenu.getForeground().setAlpha(0);
 
-		final LayoutInflater inflater = (LayoutInflater) AddTask.this
+		final LayoutInflater inflater = (LayoutInflater) BaseTaskFragment.this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final View view = inflater.inflate(R.layout.popup_menu, null, false);
 		TextView cancel = (TextView) view.findViewById(R.id.cancel);
 		TextView ok = (TextView) view.findViewById(R.id.ok);
 
-		final LayoutInflater inflater2 = (LayoutInflater) AddTask.this
+		final LayoutInflater inflater2 = (LayoutInflater) BaseTaskFragment.this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final View view2 = inflater2.inflate(R.layout.popup_menu_event, null,
 				false);
@@ -305,7 +326,7 @@ public class AddTask extends FragmentActivity {
 
 		listViewSchedule = (DragSortListView) viewS
 				.findViewById(R.id.list_schedule);
-		adapterSchedule = new ArrayAdapter<String>(AddTask.this,
+		adapterSchedule = new ArrayAdapter<String>(BaseTaskFragment.this,
 				R.layout.popup_menu_items_events, R.id.text, arrayListSchedule);
 
 		listViewSchedule.setAdapter(adapterSchedule);
@@ -315,7 +336,7 @@ public class AddTask extends FragmentActivity {
 			listViewSchedule.setItemChecked(i, true);
 
 		listViewEvent = (DragSortListView) view2.findViewById(R.id.list_event);
-		adapterEvent = new ArrayAdapter<String>(AddTask.this,
+		adapterEvent = new ArrayAdapter<String>(BaseTaskFragment.this,
 				R.layout.popup_menu_items_schedule, R.id.text, arrayListEvent);
 
 		listViewEvent.setAdapter(adapterEvent);
@@ -324,7 +345,7 @@ public class AddTask extends FragmentActivity {
 			listViewEvent.setItemChecked(i, true);
 
 		listViewTask = (DragSortListView) view.findViewById(R.id.list);
-		adapterTask = new ArrayAdapter<String>(AddTask.this,
+		adapterTask = new ArrayAdapter<String>(BaseTaskFragment.this,
 				R.layout.popup_menu_items, R.id.text, arrayList);
 
 		listViewTask.setAdapter(adapterTask);
@@ -519,7 +540,7 @@ public class AddTask extends FragmentActivity {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Utils.hidKeyboard(AddTask.this);
+				Utils.hidKeyboard(BaseTaskFragment.this);
 				if (Position == 0) {
 					if (popupWindowTask.isShowing())
 						popupWindowTask.dismiss();
@@ -736,38 +757,10 @@ public class AddTask extends FragmentActivity {
 		gridLayout.invalidate();
 	}
 
-	public class PageChangeListener implements OnPageChangeListener {
-
-		@Override
-		public void onPageScrollStateChanged(int arg0) {
-
-		}
-
-		@Override
-		public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-		}
-
-		@Override
-		public void onPageSelected(int position) {
-			if (position == 0) {
-				Position = position;
-				aq.id(R.id.menu_dots_task).visible();
-
-			} else if (position == 1) {
-				aq.id(R.id.page_title_header).text("Event");
-				Position = position;
-				aq.id(R.id.menu_dots_task).gone();
-			}
-
-		}
-
-	}
-
 	public class ListClickListenerTask implements OnItemClickListener {
 
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
+		public void onItemClick(AdapterView<?> parent, @NotNull View view, int position,
 				long id) {
 			position = position + 1;
 			if (position == 2) {
@@ -793,7 +786,7 @@ public class AddTask extends FragmentActivity {
 	public class ListClickListenerEvent implements OnItemClickListener {
 
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
+		public void onItemClick(AdapterView<?> parent, @NotNull View view, int position,
 				long id) {
 			position = position + 1;
 			if (position == 2) {
@@ -817,7 +810,7 @@ public class AddTask extends FragmentActivity {
 	public class ListClickListenerSchedule implements OnItemClickListener {
 
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
+		public void onItemClick(AdapterView<?> parent, @NotNull View view, int position,
 				long id) {
 			position = position + 1;
 			if (position == 2) {
@@ -848,7 +841,8 @@ public class AddTask extends FragmentActivity {
 			return 5; // just Add Task & Add Event
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -865,7 +859,8 @@ public class AddTask extends FragmentActivity {
 			return "";
 		}
 
-		@Override
+		@Nullable
+        @Override
 		public Fragment getItem(int position) {
 			if (position == 0)
 				return AddTaskFragment.newInstance(position, dayPosition);
@@ -1312,15 +1307,15 @@ public class AddTask extends FragmentActivity {
 			TaskListFragment.todayQuery();
 			TaskListFragment.todayAdapter.notifyDataSetChanged();
 
-			alarm.SetcustAlarm(this);
+			alarm.SetCustAlarm(this);
 
 			// ********************* Data add hit Asyntask
-			asyn = new add();
+			asyn = new AddToServer();
 			asyn.execute();
-			Toast.makeText(AddTask.this, "Added", Toast.LENGTH_SHORT).show();
+			Toast.makeText(BaseTaskFragment.this, "Added", Toast.LENGTH_SHORT).show();
 
 		} else
-			Toast.makeText(AddTask.this, "Please Enter Title",
+			Toast.makeText(BaseTaskFragment.this, "Please Enter Title",
 					Toast.LENGTH_SHORT).show();
 
 	}
@@ -1361,9 +1356,10 @@ public class AddTask extends FragmentActivity {
 		}
 	}
 
-	public class add extends AsyncTask<String, Integer, Void> {
+	public class AddToServer extends AsyncTask<String, Integer, Void> {
 
-		@Override
+		@Nullable
+        @Override
 		protected Void doInBackground(String... params) {
 
 			try {
@@ -1374,18 +1370,15 @@ public class AddTask extends FragmentActivity {
 
 			try {
 				response = client.execute(post);
-			} catch (ClientProtocolException e1) {
-				e1.printStackTrace();
-				asyn.cancel(true);
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 				asyn.cancel(true);
 			}
 			String temp = null;
 			try {
 				temp = EntityUtils.toString(response.getEntity());
 				Log.e("Task Added?", temp);
-			} catch (org.apache.http.ParseException | IOException e) {
+			} catch (@NotNull org.apache.http.ParseException | IOException e) {
 				e.printStackTrace();
 				asyn.cancel(true);
 			}
@@ -1407,7 +1400,7 @@ public class AddTask extends FragmentActivity {
 			dialog.show();
 			client = new DefaultHttpClient();
 			post = new HttpPost("http://api.heuristix.net/one_todo/v1/task/add");
-			pairs = new ArrayList<NameValuePair>();
+			pairs = new ArrayList<>();
 
 			pairs.add(new BasicNameValuePair("todo[user_id]", App.prefs
 					.getUserId() + ""));
@@ -1419,7 +1412,7 @@ public class AddTask extends FragmentActivity {
 			pairs.add(new BasicNameValuePair("todo[title]", title));
 
 			Log.e("start_date", start_date);
-			Log.e("end_date", end_date);
+//			Log.e("end_date", end_date);
 			if (start_date != null)
 				pairs.add(new BasicNameValuePair("todo[start_date]", start_date
 						+ ""));

@@ -21,7 +21,10 @@ import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.Button;
+
 import com.facebook.android.R;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -37,7 +40,7 @@ public class LikeButton extends Button {
      *
      * @see android.view.View#View(android.content.Context)
      */
-    public LikeButton(Context context, boolean isLiked) {
+    public LikeButton(@NotNull Context context, boolean isLiked) {
         super(context);
 
         this.isLiked = isLiked;

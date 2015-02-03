@@ -27,6 +27,9 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -50,8 +53,10 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         void onTabReselected(int position);
     }
 
+    @Nullable
     private Runnable mTabSelector;
 
+    @Nullable
     private final OnClickListener mTabClickListener = new OnClickListener() {
         public void onClick(View view) {
             TabView tabView = (TabView)view;
@@ -64,6 +69,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         }
     };
 
+    @NotNull
     private final IcsLinearLayout mTabLayout;
 
     private ViewPager mViewPager;
@@ -74,11 +80,11 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
 
     private OnTabReselectedListener mTabReselectedListener;
 
-    public TabPageIndicator(Context context) {
+    public TabPageIndicator(@NotNull Context context) {
         this(context, null);
     }
 
-    public TabPageIndicator(Context context, AttributeSet attrs) {
+    public TabPageIndicator(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
         setHorizontalScrollBarEnabled(false);
 
@@ -186,7 +192,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     }
 
     @Override
-    public void setViewPager(ViewPager view) {
+    public void setViewPager(@NotNull ViewPager view) {
         if (mViewPager == view) {
             return;
         }
@@ -229,7 +235,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     }
 
     @Override
-    public void setViewPager(ViewPager view, int initialPosition) {
+    public void setViewPager(@NotNull ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
@@ -261,7 +267,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     private class TabView extends TextView {
         private int mIndex;
 
-        public TabView(Context context) {
+        public TabView(@NotNull Context context) {
             super(context, null, R.attr.vpiTabPageIndicatorStyle);
         }
 

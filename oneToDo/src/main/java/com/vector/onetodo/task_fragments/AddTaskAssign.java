@@ -1,4 +1,4 @@
-package com.vector.onetodo;
+package com.vector.onetodo.task_fragments;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
@@ -21,7 +21,15 @@ import android.widget.PopupWindow.OnDismissListener;
 
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
+import com.vector.onetodo.AssignListFragment;
+import com.vector.onetodo.AssignMultipleFragment;
+import com.vector.onetodo.R;
+import com.vector.onetodo.project_fragments.ProjectsScrollHolder;
+import com.vector.onetodo.project_fragments.ProjectsTabHolder;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AddTaskAssign extends Fragment {
 
@@ -29,11 +37,13 @@ public class AddTaskAssign extends Fragment {
 	AQuery aqemail, aq, aq_menu,aq_selection,aq_invite;
 	public int check = 0, position = 0;
 	private TabPagerAdapter tabPagerAdapter;
-	LinearLayout last = null;
+	@Nullable
+    LinearLayout last = null;
 	private ViewPager pager;
 	private PopupWindow popupWindowTask;
 	
-	public static AddTaskAssign newInstance(int position) {
+	@NotNull
+    public static AddTaskAssign newInstance(int position) {
 		AddTaskAssign myFragment = new AddTaskAssign();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -43,11 +53,11 @@ public class AddTaskAssign extends Fragment {
  
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setRetainInstance(true);
 		View view = inflater
-				.inflate(R.layout.add_task_assign, container, false); 
+				.inflate(R.layout.add_task_assign, container, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -218,7 +228,8 @@ public class AddTaskAssign extends Fragment {
 			// return 3; // no. of tabs are Today, Tomorrow & Upcoming
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:

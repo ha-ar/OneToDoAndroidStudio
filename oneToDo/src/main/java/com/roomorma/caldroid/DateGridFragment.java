@@ -11,6 +11,8 @@ import android.widget.GridView;
 
 import com.vector.onetodo.R;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * DateGridFragment contains only 1 gridview with 7 columns to display all the
  * dates within a month.
@@ -56,7 +58,7 @@ public class DateGridFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		gridView = (GridView) inflater.inflate(R.layout.date_grid_fragment,
 				container, false);

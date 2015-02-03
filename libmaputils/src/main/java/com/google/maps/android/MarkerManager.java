@@ -1,16 +1,19 @@
 package com.google.maps.android;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import android.view.View;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Keeps track of collections of markers on the map. Delegates all Marker-related events to each
@@ -29,6 +32,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
         this.mMap = map;
     }
 
+    @NotNull
     public Collection newCollection() {
         return new Collection();
     }
@@ -37,6 +41,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
      * Create a new named collection, which can later be looked up by {@link #getCollection(String)}
      * @param id a unique id for this collection.
      */
+    @NotNull
     public Collection newCollection(String id) {
         if (mNamedCollections.get(id) != null) {
             throw new IllegalArgumentException("collection id is not unique: " + id);
@@ -54,6 +59,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
         return mNamedCollections.get(id);
     }
 
+    @Nullable
     @Override
     public View getInfoWindow(Marker marker) {
         Collection collection = mAllMarkers.get(marker);
@@ -63,6 +69,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
         return null;
     }
 
+    @Nullable
     @Override
     public View getInfoContents(Marker marker) {
         Collection collection = mAllMarkers.get(marker);
@@ -119,7 +126,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
      * @param marker the marker to remove.
      * @return true if the marker was removed.
      */
-    public boolean remove(Marker marker) {
+    public boolean remove(@NotNull Marker marker) {
         Collection collection = mAllMarkers.get(marker);
         return collection != null && collection.remove(marker);
     }
@@ -141,7 +148,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
             return marker;
         }
 
-        public boolean remove(Marker marker) {
+        public boolean remove(@NotNull Marker marker) {
             if (mMarkers.remove(marker)) {
                 mAllMarkers.remove(marker);
                 marker.remove();

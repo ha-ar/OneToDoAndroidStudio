@@ -16,6 +16,8 @@
 
 package com.google.maps.android.geometry;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents an area in the cartesian plane.
  */
@@ -43,7 +45,7 @@ public class Bounds {
         return minX <= x && x < maxX && minY <= y && y < maxY;
     }
 
-    public boolean contains(Point point) {
+    public boolean contains(@NotNull Point point) {
         return contains(point.x, point.y);
     }
 
@@ -51,11 +53,11 @@ public class Bounds {
         return minX < this.maxX && this.minX < maxX && minY < this.maxY && this.minY < maxY;
     }
 
-    public boolean intersects(Bounds bounds) {
+    public boolean intersects(@NotNull Bounds bounds) {
         return intersects(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY);
     }
 
-    public boolean contains(Bounds bounds) {
+    public boolean contains(@NotNull Bounds bounds) {
         return bounds.minX >= minX && bounds.maxX <= maxX && bounds.minY >= minY && bounds.maxY <= maxY;
     }
 }

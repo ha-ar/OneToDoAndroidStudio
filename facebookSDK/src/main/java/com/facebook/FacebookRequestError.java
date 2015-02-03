@@ -18,6 +18,9 @@ package com.facebook;
 
 import com.facebook.android.R;
 import com.facebook.internal.Utility;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,6 +98,7 @@ public final class FacebookRequestError {
 
     private final int userActionMessageId;
     private final boolean shouldNotifyUser;
+    @Nullable
     private final Category category;
     private final int requestStatusCode;
     private final int errorCode;
@@ -102,18 +106,20 @@ public final class FacebookRequestError {
     private final String errorType;
     private final String errorMessage;
     private final String errorUserTitle;
+    @Nullable
     private final String errorUserMessage;
     private final boolean errorIsTransient;
     private final JSONObject requestResult;
     private final JSONObject requestResultBody;
     private final Object batchRequestResult;
     private final HttpURLConnection connection;
+    @Nullable
     private final FacebookException exception;
 
     private FacebookRequestError(int requestStatusCode, int errorCode,
-            int subErrorCode, String errorType, String errorMessage, String errorUserTitle, String errorUserMessage,
+            int subErrorCode, String errorType, String errorMessage, String errorUserTitle, @Nullable String errorUserMessage,
             boolean errorIsTransient, JSONObject requestResultBody, JSONObject requestResult, Object batchRequestResult,
-            HttpURLConnection connection, FacebookException exception) {
+            HttpURLConnection connection, @Nullable FacebookException exception) {
         this.requestStatusCode = requestStatusCode;
         this.errorCode = errorCode;
         this.subErrorCode = subErrorCode;
@@ -237,6 +243,7 @@ public final class FacebookRequestError {
      *
      * @return the category in which the error belong
      */
+    @Nullable
     public Category getCategory() {
         return category;
     }
@@ -299,6 +306,7 @@ public final class FacebookRequestError {
      *
      * @return the error message returned from Facebook
      */
+    @Nullable
     public String getErrorUserMessage() {
         return errorUserMessage;
     }
@@ -370,10 +378,12 @@ public final class FacebookRequestError {
      *
      * @return the exception associated with this request
      */
+    @Nullable
     public FacebookException getException() {
         return exception;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return new StringBuilder("{HttpStatus: ")
@@ -388,7 +398,8 @@ public final class FacebookRequestError {
                 .toString();
     }
 
-    static FacebookRequestError checkResponseAndCreateError(JSONObject singleResult,
+    @Nullable
+    static FacebookRequestError checkResponseAndCreateError(@NotNull JSONObject singleResult,
             Object batchResult, HttpURLConnection connection) {
         try {
             if (singleResult.has(CODE_KEY)) {

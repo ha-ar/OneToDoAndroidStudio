@@ -18,11 +18,15 @@ package com.facebook.android;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import com.facebook.FacebookDialogException;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.android.Facebook.DialogListener;
 import com.facebook.widget.WebDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class is deprecated. See {@link com.facebook.widget.WebDialog}.
@@ -31,21 +35,21 @@ import com.facebook.widget.WebDialog;
 public class FbDialog extends WebDialog {
     private DialogListener mListener;
 
-    public FbDialog(Context context, String url, DialogListener listener) {
+    public FbDialog(@NotNull Context context, String url, DialogListener listener) {
         this(context, url, listener, DEFAULT_THEME);
     }
 
-    public FbDialog(Context context, String url, DialogListener listener, int theme) {
+    public FbDialog(@NotNull Context context, String url, DialogListener listener, int theme) {
         super(context, url, theme);
         setDialogListener(listener);
     }
 
-    public FbDialog(Context context, String action, Bundle parameters, DialogListener listener) {
+    public FbDialog(@NotNull Context context, String action, Bundle parameters, DialogListener listener) {
         super(context, action, parameters, DEFAULT_THEME, null);
         setDialogListener(listener);
     }
 
-    public FbDialog(Context context, String action, Bundle parameters, DialogListener listener,
+    public FbDialog(@NotNull Context context, String action, Bundle parameters, DialogListener listener,
             int theme) {
         super(context, action, parameters, theme, null);
         setDialogListener(listener);
@@ -61,7 +65,7 @@ public class FbDialog extends WebDialog {
         });
     }
 
-    private void callDialogListener(Bundle values, FacebookException error) {
+    private void callDialogListener(@Nullable Bundle values, FacebookException error) {
         if (mListener == null) {
             return;
         }

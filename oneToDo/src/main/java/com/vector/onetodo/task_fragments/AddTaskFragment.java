@@ -1,34 +1,4 @@
-package com.vector.onetodo;
-
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
+package com.vector.onetodo.task_fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,7 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,8 +35,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -76,7 +43,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -94,11 +60,45 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.Object;
+import com.vector.onetodo.PlacesAutoCompleteAdapter;
+import com.vector.onetodo.R;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
+
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddTaskFragment extends Fragment {
 
@@ -109,12 +109,11 @@ public class AddTaskFragment extends Fragment {
 		aq.id(R.id.addtask_header).getView().setVisibility(View.GONE);
 	}
 
-	HttpPost post;
 	List<NameValuePair> pairs;
-	HttpResponse response = null;
 	Uri filename;
 	Editor editor, editorattach;
-	String plabel = null;
+	@Nullable
+    String plabel = null;
 	int pposition = -1;
 	int itempos = -1;
 	int MaxId = -1;
@@ -127,9 +126,12 @@ public class AddTaskFragment extends Fragment {
 	static LinearLayout ll_iner;
 
 	static int FragmentCheck = 0;
-	static String repeatdate = "";
-	static String checkedId2 = null, title = null;
-	View label_view = null, viewl;
+	@NotNull
+    static String repeatdate = "";
+	@Nullable
+    static String checkedId2 = null, title = null;
+	@Nullable
+    View label_view = null, viewl;
 	static Dialog add_new_label_alert, assig_alert, share_alert,
 			date_time_alert, attach, location_del, label_edit;
 
@@ -139,19 +141,23 @@ public class AddTaskFragment extends Fragment {
 	int dayPosition;
 	private String currentDay, currentMon, setmon1;
 
-	private int[] collapsingViews = { R.id.title_task_layout1,
+	@NotNull
+    private int[] collapsingViews = { R.id.title_task_layout1,
 			R.id.date_time_include, R.id.before_grid_view_linear,
 			R.id.repeat_linear_layout, R.id.label_grid_view3 };
 
-	private int[] allViews = { R.id.task_title1, R.id.time_date,
+	@NotNull
+    private int[] allViews = { R.id.task_title1, R.id.time_date,
 			R.id.location_task, R.id.before1, R.id.repeat_task_lay,
 			R.id.spinner_labels_task };
 
 	public static EditText taskTitle;
-	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+	@NotNull
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
 
 	static ImageView img;
-	EditText label_field = null;
+	@Nullable
+    EditText label_field = null;
 
 	protected static final int RESULT_CODE = 123;
 
@@ -163,19 +169,22 @@ public class AddTaskFragment extends Fragment {
 
 	private Uri imageUri;
 
-	public static View allView;
+	@Nullable
+    public static View allView;
 
 	public static Activity act;
 
 	private static View previousSelected;
 
-	public static String assignedSelectedID = "";
+	@NotNull
+    public static String assignedSelectedID = "";
 
 	public static String assignedSelectedName = "";
 
 	private int lastCheckedId = -1;
 
-	public static AddTaskFragment newInstance(int position, int dayPosition) {
+	@NotNull
+    public static AddTaskFragment newInstance(int position, int dayPosition) {
 		AddTaskFragment myFragment = new AddTaskFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -184,14 +193,21 @@ public class AddTaskFragment extends Fragment {
 		return myFragment;
 	}
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Keep this Fragment around even during config changes
+        setRetainInstance(true);
+    }
+
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
 		View view = inflater.inflate(R.layout.add_task_fragment, container,
 				false);
-		editor = AddTask.label.edit();
-		editorattach = AddTask.attach.edit();
+		editor = BaseTaskFragment.label.edit();
+		editorattach = BaseTaskFragment.attach.edit();
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
 		return view;
@@ -233,9 +249,6 @@ public class AddTaskFragment extends Fragment {
 		inflatingLayouts.put(8, R.layout.add_task_subtask);
 		inflatingLayouts.put(9, R.layout.add_task_notes);
 		inflatingLayouts.put(10, R.layout.add_task_attach);
-		
-		
-
 		inflateLayouts();
 		aqa = aq;
 		aq.id(R.id.task_assign).clicked(new OnClickListener() {
@@ -278,30 +291,30 @@ public class AddTaskFragment extends Fragment {
 		aq.id(R.id.time_date)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-				.clicked(new GeneralOnClickListner());
+				.clicked(new GeneralOnClickListener());
 
 		aq.id(R.id.task_title1)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-				.clicked(new GeneralOnClickListner());
+				.clicked(new GeneralOnClickListener());
 
 		aq.id(R.id.location_task)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-				.clicked(new GeneralOnClickListner());
+				.clicked(new GeneralOnClickListener());
 		AutoCompleteTextView locationTextView = (AutoCompleteTextView)aq.id(R.id.location_task).getView();
 		locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 
-		aq.id(R.id.spinner_label_layout).clicked(new GeneralOnClickListner());
+		aq.id(R.id.spinner_label_layout).clicked(new GeneralOnClickListener());
 
-		aq.id(R.id.before1).clicked(new GeneralOnClickListner());
+		aq.id(R.id.before1).clicked(new GeneralOnClickListener());
 
-		aq.id(R.id.repeat_task_lay).clicked(new GeneralOnClickListner());
+		aq.id(R.id.repeat_task_lay).clicked(new GeneralOnClickListener());
 
 		aq.id(R.id.grid_text)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-				.clicked(new GeneralOnClickListner());
+				.clicked(new GeneralOnClickListener());
 		final View view12 = getActivity().getLayoutInflater().inflate(
 				R.layout.landing_menu, null, false);
 		aq_menu = new AQuery(getActivity(), view12);
@@ -345,7 +358,7 @@ public class AddTaskFragment extends Fragment {
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+					BaseTaskFragment.btn.setAlpha(1);
 
 				aq.id(R.id.completed_task).textColorId(R.color.active);
 
@@ -430,7 +443,6 @@ public class AddTaskFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO Auto-generated method stub
 
 				ImageView img = (ImageView) view;
 				if (last != null) {
@@ -458,8 +470,6 @@ public class AddTaskFragment extends Fragment {
 
 					@Override
 					public void onDismiss(DialogInterface arg0) {
-						// TODO Auto-generated method stub
-
 						label_text.setText("");
 					}
 				});
@@ -512,7 +522,8 @@ public class AddTaskFragment extends Fragment {
 								R.layout.grid_layout_label_text_view,
 								Constants.labels_array) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
@@ -548,7 +559,7 @@ public class AddTaskFragment extends Fragment {
 				.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
+					public void onItemClick(AdapterView<?> parent, @NotNull View view,
 							int position, long id) {
 						itempos = position;
 						label_view = view;
@@ -607,7 +618,6 @@ public class AddTaskFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				label_edit.dismiss();
 				location_del.show();
 			}
@@ -617,9 +627,6 @@ public class AddTaskFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub=
-				// aqd.id(R.id.add_label_text).text(((TextView)
-				// viewl).getText().)
 				aqd.id(R.id.label_title).text("Edit");
 				aqd.id(R.id.save).text("Save");
 				label_view = viewl;
@@ -634,7 +641,7 @@ public class AddTaskFragment extends Fragment {
 
 		/**
 		 * View pager for before and location
-		 * 
+		 *
 		 */
 		ViewPager pager = (ViewPager) aq.id(R.id.add_task_before_pager)
 				.getView();
@@ -664,7 +671,8 @@ public class AddTaskFragment extends Fragment {
 
 				R.layout.grid_layout_textview, Constants.repeatArray) {
 
-					@Override
+					@NotNull
+                    @Override
 					public View getView(int position, View convertView,
 							ViewGroup parent) {
 
@@ -687,7 +695,7 @@ public class AddTaskFragment extends Fragment {
 		aq.id(R.id.repeat_grid_view).itemClicked(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
+			public void onItemClick(AdapterView<?> parent, @NotNull View view,
 					int position, long id) {
 
 				if (((TextView) previousSelected).getText().toString()
@@ -789,7 +797,6 @@ public class AddTaskFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				if (aq.id(R.id.repeat).getText().toString() == "Never") {
 				} else {
 					aq.id(R.id.repeat).text(
@@ -838,7 +845,6 @@ public class AddTaskFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				LinearLayout lll = (LinearLayout) arg0;
 				Toast.makeText(getActivity(), lll.getChildCount() + "",
 						Toast.LENGTH_LONG).show();
@@ -910,7 +916,7 @@ public class AddTaskFragment extends Fragment {
 				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 					@Override
-					public void onCheckedChanged(RadioGroup group, int checkedId) {
+					public void onCheckedChanged(@NotNull RadioGroup group, int checkedId) {
 						((RadioButton) group.findViewById(lastCheckedId))
 								.setTextColor(getResources().getColor(
 										R.color.deep_sky_blue));
@@ -920,13 +926,13 @@ public class AddTaskFragment extends Fragment {
 						String abc = ((RadioButton) group
 								.findViewById(checkedId)).getText().toString();
 						if (abc.equals("None"))
-							AddTask.priority = 0;
+							BaseTaskFragment.priority = 0;
 						else if (abc.equals("!"))
-							AddTask.priority = 1;
+							BaseTaskFragment.priority = 1;
 						else if (abc.equals("! !"))
-							AddTask.priority = 2;
+							BaseTaskFragment.priority = 2;
 						else if (abc.equals("! ! !"))
-							AddTask.priority = 3;
+							BaseTaskFragment.priority = 3;
 						lastCheckedId = checkedId;
 					}
 				});
@@ -937,7 +943,7 @@ public class AddTaskFragment extends Fragment {
 		aq.id(R.id.image_menu).clicked(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(@NotNull View arg0) {
 				Toast.makeText(getActivity(), "" + arg0.getId(),
 						Toast.LENGTH_LONG).show();
 			}
@@ -1036,8 +1042,7 @@ public class AddTaskFragment extends Fragment {
 		repeatdate = currentYear + "-" + (currentMonDigit + 1) + "-"
 				+ currentDayDigit + " 00:00:00";
 	}
-
-	public static void inflateLayouts() {
+	private void inflateLayouts() {
 		GridLayout gridLayout = (GridLayout) allView
 				.findViewById(R.id.inner_container);
 		gridLayout.removeAllViews();
@@ -1054,58 +1059,13 @@ public class AddTaskFragment extends Fragment {
 		}
 	}
 
-	public static void swapInflatedLayouts(int from, int to) {
-		if (from < to) {
-			for (int i = from; i < to; i++) {
-				Integer temp = inflatingLayouts.get(i);
-				inflatingLayouts.put(i, inflatingLayouts.get(i + 1));
-				inflatingLayouts.put(i + 1, temp);
-			}
-		} else {
-			for (int i = from; i > to; i--) {
-				Integer temp = inflatingLayouts.get(i);
-				inflatingLayouts.put(i, inflatingLayouts.get(i - 1));
-				inflatingLayouts.put(i - 1, temp);
-			}
 
-		}
 
-	}
 
-	public void slideUpDown(final View view) {
-		if (!isPanelShown(view)) {
-			// Show the panel
-			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_up);
-
-			view.startAnimation(bottomUp);
-			view.setVisibility(View.VISIBLE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					R.color.dim_background));
-			((FrameLayout) aq.id(R.id.add_task_frame).getView())
-					.setForeground(tintColor);
-		} else {
-			// Hide the Panel
-			Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_down);
-
-			view.startAnimation(bottomDown);
-			view.setVisibility(View.GONE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					android.R.color.transparent));
-			((FrameLayout) aq.id(R.id.add_task_frame).getView())
-					.setForeground(tintColor);
-		}
-	}
-
-	private boolean isPanelShown(View view) {
-		return view.getVisibility() == View.VISIBLE;
-	}
-
-	private class GeneralOnClickListner implements OnClickListener {
+	private class GeneralOnClickListener implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 			v.setFocusableInTouchMode(true);
 			v.requestFocus();
 			showCurrentView(v);
@@ -1120,7 +1080,7 @@ public class AddTaskFragment extends Fragment {
 
 	}
 
-	private void setAllOtherFocusableFalse(View v) {
+	private void setAllOtherFocusableFalse(@NotNull View v) {
 		for (int id : allViews)
 			if (v.getId() != id) {
 				try {
@@ -1132,7 +1092,7 @@ public class AddTaskFragment extends Fragment {
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
@@ -1165,7 +1125,7 @@ public class AddTaskFragment extends Fragment {
 		}
 	}
 
-	private void showImageURI(Uri selectedImage) {
+	private void showImageURI(@NotNull Uri selectedImage) {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
@@ -1194,7 +1154,7 @@ public class AddTaskFragment extends Fragment {
 				imagemenu.setOnClickListener(new OnClickListener() {
 
 					@Override
-					public void onClick(View arg0) {
+					public void onClick(@NotNull View arg0) {
 						// TODO Auto-generated method stub
 						Toast.makeText(getActivity(),
 								arg0.getId() + "     " + arg0.getTag(),
@@ -1246,7 +1206,7 @@ public class AddTaskFragment extends Fragment {
 				File myFile = new File(selectedImage.toString());
 
 				myFile.getAbsolutePath();
-				imageupload();
+				imageUpload();
 				if (selectedImage.getLastPathSegment().contains(".")) {
 					text.setText(selectedImage.getLastPathSegment());
 
@@ -1293,7 +1253,7 @@ public class AddTaskFragment extends Fragment {
 				R.drawable.input_fields_gray);
 	}
 
-	private void showCurrentView(View v) {
+	private void showCurrentView(@NotNull View v) {
 
 		hideAll();
 
@@ -1380,7 +1340,8 @@ public class AddTaskFragment extends Fragment {
 			this.mobileValues = mobileValues;
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View gridView;
@@ -1403,8 +1364,9 @@ public class AddTaskFragment extends Fragment {
 			return mobileValues.length;
 		}
 
-		@Override
-		public Object getItem(int position) {
+		@Nullable
+        @Override
+		public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 
@@ -1425,7 +1387,8 @@ public class AddTaskFragment extends Fragment {
 			return 2; // just Add Task & Add Event
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -1447,7 +1410,7 @@ public class AddTaskFragment extends Fragment {
 	private class LabelEditClickListener implements OnItemLongClickListener {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+		public boolean onItemLongClick(AdapterView<?> arg0, @NotNull final View arg1,
 				int position, long arg3) {
 			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
@@ -1469,7 +1432,7 @@ public class AddTaskFragment extends Fragment {
 		}
 	}
 
-	public void imageupload() {
+	public void imageUpload() {
 
 		HttpEntity entity = null;
 
@@ -1478,10 +1441,8 @@ public class AddTaskFragment extends Fragment {
 			bm = MediaStore.Images.Media.getBitmap(getActivity()
 					.getContentResolver(), filename);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1494,9 +1455,6 @@ public class AddTaskFragment extends Fragment {
 		try {
 			entity = new UrlEncodedFormEntity(pairs, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			// TODO
-			// Auto-generated
-			// catch block
 			e.printStackTrace();
 		}
 
@@ -1506,7 +1464,7 @@ public class AddTaskFragment extends Fragment {
 		aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
-					public void callback(String url, JSONObject json,
+					public void callback(String url, @NotNull JSONObject json,
 							AjaxStatus status) {
 						String path = null;
 						try {
@@ -1516,13 +1474,13 @@ public class AddTaskFragment extends Fragment {
 						} catch (Exception e) {
 						}
 
-						Loadattachmax();
+						loadAttachMax();
 						if (MaxId == 0) {
 							MaxId = 1;
 						} else {
 							MaxId = MaxId + 1;
 						}
-						Saveattach(MaxId, path, "type");
+						SaveAttach(MaxId, path, "type");
 						Log.v("Response", json.toString());
 
 					}
@@ -1539,11 +1497,11 @@ public class AddTaskFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(1 + "key_label" + id, null); // getting
+		plabel = BaseTaskFragment.label.getString(1 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(1 + "key_color_position" + id, 0); // getting
+		pposition = BaseTaskFragment.label.getInt(1 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
@@ -1553,7 +1511,7 @@ public class AddTaskFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void Saveattach(int id, String path, String type) {
+	public void SaveAttach(int id, String path, String type) {
 		// 0 - for private mode
 		editorattach.putInt("Max", id);
 		editorattach.putString(1 + "path" + id, path);
@@ -1561,13 +1519,13 @@ public class AddTaskFragment extends Fragment {
 		editorattach.commit();
 	}
 
-	public void Loadattachmax() {
-		MaxId = AddTask.attach.getInt("Max", 0);
+	public void loadAttachMax() {
+		MaxId = BaseTaskFragment.attach.getInt("Max", 0);
 	}
 
 	public void Loadattach(int id) {
-		AddTask.attach.getString(1 + "path" + id, null);
-		AddTask.attach.getString(1 + "type" + id, null); // getting String
+		BaseTaskFragment.attach.getString(1 + "path" + id, null);
+		BaseTaskFragment.attach.getString(1 + "type" + id, null); // getting String
 	}
 
 	public void Removeattach(int id) {
@@ -1587,7 +1545,8 @@ public class AddTaskFragment extends Fragment {
 			return 10;
 		}
 
-		public Object getItem(int position) {
+		@Nullable
+        public Object getItem(int position) {
 			return null;
 		}
 
@@ -1596,7 +1555,8 @@ public class AddTaskFragment extends Fragment {
 		}
 
 		// create a new ImageView for each item referenced by the Adapter
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			ImageView imageView;
 			if (convertView == null) {
 				imageView = new ImageView(mContext);

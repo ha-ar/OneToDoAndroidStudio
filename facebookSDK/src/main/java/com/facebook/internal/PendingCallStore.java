@@ -1,8 +1,11 @@
 package com.facebook.internal;
 
-import android.content.Context;
 import android.os.Bundle;
+
 import com.facebook.widget.FacebookDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ public class PendingCallStore {
 
     private static PendingCallStore mInstance;
 
+    @NotNull
     private Map<String, FacebookDialog.PendingCall> pendingCallMap = new HashMap<String, FacebookDialog.PendingCall>();
 
     public static PendingCallStore getInstance() {
@@ -36,26 +40,27 @@ public class PendingCallStore {
         }
     }
 
-    public void trackPendingCall(FacebookDialog.PendingCall pendingCall) {
+    public void trackPendingCall(@Nullable FacebookDialog.PendingCall pendingCall) {
         if (pendingCall != null) {
             pendingCallMap.put(pendingCall.getCallId().toString(), pendingCall);
         }
     }
 
-    public void stopTrackingPendingCall(UUID callId) {
+    public void stopTrackingPendingCall(@Nullable UUID callId) {
         if (callId != null) {
             pendingCallMap.remove(callId.toString());
         }
     }
 
-    public FacebookDialog.PendingCall getPendingCallById(UUID callId) {
+    @Nullable
+    public FacebookDialog.PendingCall getPendingCallById(@Nullable UUID callId) {
         if (callId == null) {
             return null;
         }
         return pendingCallMap.get(callId.toString());
     }
 
-    public void saveInstanceState(Bundle outState) {
+    public void saveInstanceState(@NotNull Bundle outState) {
         ArrayList<String> callIds = new ArrayList<String>(pendingCallMap.keySet());
         outState.putStringArrayList(CALL_ID_ARRAY_KEY, callIds);
 
@@ -65,7 +70,7 @@ public class PendingCallStore {
         }
     }
 
-    public void restoreFromSavedInstanceState(Bundle savedInstanceState) {
+    public void restoreFromSavedInstanceState(@NotNull Bundle savedInstanceState) {
         ArrayList<String> callIds = savedInstanceState.getStringArrayList(CALL_ID_ARRAY_KEY);
         if (callIds != null) {
             for (String callId : callIds) {
@@ -79,6 +84,7 @@ public class PendingCallStore {
         }
     }
 
+    @NotNull
     private String getSavedStateKeyForPendingCallId(String pendingCallId) {
         return CALL_KEY_PREFIX + pendingCallId;
     }

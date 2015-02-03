@@ -1,10 +1,5 @@
 package com.vector.onetodo;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +8,13 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.vector.onetodo.db.gen.ToDo;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class TaskListAdapter extends BaseAdapter {
 
@@ -29,7 +31,8 @@ public class TaskListAdapter extends BaseAdapter {
 		return listToShow.size();
 	}
 
-	@Override
+	@Nullable
+    @Override
 	public Object getItem(int position) {
 		return null;
 	}

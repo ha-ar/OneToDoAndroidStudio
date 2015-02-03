@@ -20,7 +20,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -28,17 +36,20 @@ import android.os.*;
  * any time.
  */
 abstract public class PlatformServiceClient implements ServiceConnection {
+    @NotNull
     private final Context context;
+    @NotNull
     private final Handler handler;
     private CompletedListener listener;
     private boolean running;
+    @Nullable
     private Messenger sender;
     private int requestMessage;
     private int replyMessage;
     private final String applicationId;
     private final int protocolVersion;
 
-    public PlatformServiceClient(Context context, int requestMessage, int replyMessage, int protocolVersion,
+    public PlatformServiceClient(@NotNull Context context, int requestMessage, int replyMessage, int protocolVersion,
             String applicationId) {
         Context applicationContext = context.getApplicationContext();
 
@@ -50,7 +61,7 @@ abstract public class PlatformServiceClient implements ServiceConnection {
 
         handler = new Handler() {
             @Override
-            public void handleMessage(Message message) {
+            public void handleMessage(@NotNull Message message) {
                 PlatformServiceClient.this.handleMessage(message);
             }
         };
@@ -60,6 +71,7 @@ abstract public class PlatformServiceClient implements ServiceConnection {
         this.listener = listener;
     }
 
+    @NotNull
     protected Context getContext() {
         return context;
     }
@@ -124,7 +136,7 @@ abstract public class PlatformServiceClient implements ServiceConnection {
 
     protected abstract void populateRequestBundle(Bundle data);
 
-    protected void handleMessage(Message message) {
+    protected void handleMessage(@NotNull Message message) {
         if (message.what == replyMessage) {
             Bundle extras = message.getData();
             String errorType = extras.getString(NativeProtocol.STATUS_ERROR_TYPE);

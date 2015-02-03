@@ -16,6 +16,8 @@
 
 package com.facebook.model;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Provides a strongly-typed representation of a Location as defined by the Graph API.
  *
@@ -28,6 +30,7 @@ public interface GraphLocation extends GraphObject {
      * 
      * @return the street component of the location, or null
      */
+    @NotNull
     public String getStreet();
 
     /**
@@ -43,6 +46,7 @@ public interface GraphLocation extends GraphObject {
      * 
      * @return the city component of the location
      */
+    @NotNull
     public String getCity();
 
     /**
@@ -58,6 +62,7 @@ public interface GraphLocation extends GraphObject {
      * 
      * @return the state component of the location
      */
+    @NotNull
     public String getState();
 
     /**
@@ -73,6 +78,7 @@ public interface GraphLocation extends GraphObject {
      * 
      * @return the country component of the location
      */
+    @NotNull
     public String getCountry();
 
     /**
@@ -88,6 +94,7 @@ public interface GraphLocation extends GraphObject {
      * 
      * @return the postal code component of the location
      */
+    @NotNull
     public String getZip();
 
     /**

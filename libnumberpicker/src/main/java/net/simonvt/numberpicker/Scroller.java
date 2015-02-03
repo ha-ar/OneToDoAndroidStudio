@@ -23,6 +23,8 @@ import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
+import org.jetbrains.annotations.NotNull;
+
 
 /**
  * This class encapsulates scrolling.  The duration of the scroll
@@ -103,7 +105,7 @@ public class Scroller  {
     /**
      * Create a Scroller with the default duration and interpolator.
      */
-    public Scroller(Context context) {
+    public Scroller(@NotNull Context context) {
         this(context, null);
     }
 
@@ -112,7 +114,7 @@ public class Scroller  {
      * null, the default (viscous) interpolator will be used. "Flywheel" behavior will
      * be in effect for apps targeting Honeycomb or newer.
      */
-    public Scroller(Context context, Interpolator interpolator) {
+    public Scroller(@NotNull Context context, Interpolator interpolator) {
         this(context, interpolator, true);
     }
 
@@ -121,7 +123,7 @@ public class Scroller  {
      * null, the default (viscous) interpolator will be used. Specify whether or
      * not to support progressive "flywheel" behavior in flinging.
      */
-    public Scroller(Context context, Interpolator interpolator, boolean flywheel) {
+    public Scroller(@NotNull Context context, Interpolator interpolator, boolean flywheel) {
         mFinished = true;
         mInterpolator = interpolator;
         mPpi = context.getResources().getDisplayMetrics().density * 160.0f;

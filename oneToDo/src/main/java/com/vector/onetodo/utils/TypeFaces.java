@@ -1,17 +1,21 @@
 package com.vector.onetodo.utils;
 
-import java.util.Hashtable;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Hashtable;
 
 public class TypeFaces {
 	private static final String TAG = "Typefaces";
 
 	private static final Hashtable<String, Typeface> cache = new Hashtable<String, Typeface>();
 
-	public static Typeface get(Context c, String assetPath) {
+	@Nullable
+    public static Typeface get(@NotNull Context c, String assetPath) {
 		synchronized (cache) {
 			if (!cache.containsKey(assetPath)) {
 				try {

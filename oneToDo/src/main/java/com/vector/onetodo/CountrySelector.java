@@ -1,18 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -42,6 +29,21 @@ import com.vector.onetodo.db.gen.AssignDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.Utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class CountrySelector extends Fragment {
 
 	private AQuery aq;
@@ -52,9 +54,11 @@ public class CountrySelector extends Fragment {
 	private int position = 0;
 	public static View view;
 	private InputMethodManager imm;
-	private ArrayList<String> contactsList = new ArrayList<String>();
+	@NotNull
+    private ArrayList<String> contactsList = new ArrayList<String>();
 	private AssignDao assignDao;
-	String phoneNumber = null;
+	@Nullable
+    String phoneNumber = null;
 
 	@Override
 	public void onResume() {
@@ -75,7 +79,7 @@ public class CountrySelector extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.about, container, false);
 		aq = new AQuery(getActivity(), view);
@@ -233,7 +237,7 @@ public class CountrySelector extends Fragment {
 				"http://api.heuristix.net/one_todo/v1/user/register", params,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
-					public void callback(String url, JSONObject json,
+					public void callback(String url, @NotNull JSONObject json,
 							AjaxStatus status) {
 						int id = -1;
 						try {
@@ -274,7 +278,7 @@ public class CountrySelector extends Fragment {
 		aq.ajax("http://api.heuristix.net/one_todo/v1/user/addContacts",
 				params, JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
-					public void callback(String url, JSONObject json,
+					public void callback(String url, @NotNull JSONObject json,
 							AjaxStatus status) {
 						try {
 							if (!json.getBoolean("error")
@@ -297,7 +301,7 @@ public class CountrySelector extends Fragment {
 				+ App.prefs.getUserId(), String.class,
 				new AjaxCallback<String>() {
 					@Override
-					public void callback(String url, String json,
+					public void callback(String url, @Nullable String json,
 							AjaxStatus status) {
 						if (json != null) {
 							Gson gson = new Gson();

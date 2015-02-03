@@ -1,7 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.List;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +7,19 @@ import android.widget.BaseAdapter;
 
 import com.vector.onetodo.db.gen.ToDo;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
 public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
 	
     protected boolean dataValid;
+    @Nullable
     protected List<ToDo> lazyList;
     protected Context context;
 
-    public LazyListAdapter(Context context, List<ToDo> lazyList) {
+    public LazyListAdapter(Context context, @Nullable List<ToDo> lazyList) {
     	this.lazyList = lazyList;
         this.dataValid = lazyList != null;
         this.context = context;
@@ -25,6 +29,7 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
      * Returns the list.
      * @return the list.
      */
+    @Nullable
     public List<ToDo> getLazyList() {
         return lazyList;
     }
@@ -43,6 +48,7 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
     /**
      * @see android.widget.ListAdapter#getItem(int)
      */
+    @Nullable
     @Override
     public ToDo getItem(int position) {
         if (dataValid && lazyList != null) {
@@ -75,7 +81,8 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
     /**
      * @see android.widget.ListAdapter#getView(int, View, ViewGroup)
      */
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @Nullable
+    public View getView(int position, @Nullable View convertView, ViewGroup parent) {
     	
         if (!dataValid) {
             throw new IllegalStateException("this should only be called when lazylist is populated");
@@ -95,8 +102,9 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
         bindView(v, context, item);
         return v;
     }
+    @Nullable
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, @Nullable View convertView, ViewGroup parent) {
     	
         if (dataValid) {
         	ToDo item = lazyList.get(position);
@@ -120,6 +128,7 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
      * @param parent The parent to which the new view is attached to
      * @return the newly created view.
      */
+    @NotNull
     public abstract View newView(Context context, ToDo item, ViewGroup parent);
     /**
      * Makes a new drop down view to hold the data contained in the item.
@@ -128,6 +137,7 @@ public abstract class LazyListAdapter<T extends ToDo> extends BaseAdapter {
      * @param parent The parent to which the new view is attached to
      * @return the newly created view.
      */
+    @NotNull
     public View newDropDownView(Context context, ToDo item, ViewGroup parent) {
         return newView(context, item, parent);
     }

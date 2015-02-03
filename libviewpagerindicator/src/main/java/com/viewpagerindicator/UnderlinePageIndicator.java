@@ -31,6 +31,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Draws a line for each page. The current page line is colored differently
  * than the unselected page lines.
@@ -70,15 +72,15 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
       }
     };
 
-    public UnderlinePageIndicator(Context context) {
+    public UnderlinePageIndicator(@NotNull Context context) {
         this(context, null);
     }
 
-    public UnderlinePageIndicator(Context context, AttributeSet attrs) {
+    public UnderlinePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs) {
         this(context, attrs, R.attr.vpiUnderlinePageIndicatorStyle);
     }
 
-    public UnderlinePageIndicator(Context context, AttributeSet attrs, int defStyle) {
+    public UnderlinePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         if (isInEditMode()) return;
 
@@ -153,7 +155,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         if (mViewPager == null) {
@@ -178,7 +180,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
         canvas.drawRect(left, top, right, bottom, mPaint);
     }
 
-    public boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(@NotNull MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
         }
@@ -262,7 +264,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager viewPager) {
+    public void setViewPager(@NotNull ViewPager viewPager) {
         if (mViewPager == viewPager) {
             return;
         }
@@ -286,7 +288,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager view, int initialPosition) {
+    public void setViewPager(@NotNull ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
@@ -360,6 +362,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
         requestLayout();
     }
 
+    @NotNull
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -375,24 +378,26 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
             super(superState);
         }
 
-        private SavedState(Parcel in) {
+        private SavedState(@NotNull Parcel in) {
             super(in);
             currentPage = in.readInt();
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NotNull Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @NotNull
             @Override
-            public SavedState createFromParcel(Parcel in) {
+            public SavedState createFromParcel(@NotNull Parcel in) {
                 return new SavedState(in);
             }
 
+            @NotNull
             @Override
             public SavedState[] newArray(int size) {
                 return new SavedState[size];

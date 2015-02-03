@@ -6,6 +6,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout.LayoutParams;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ScaleAnimToHide extends ScaleAnimation {
 
 	private View mView;
@@ -17,7 +19,7 @@ public class ScaleAnimToHide extends ScaleAnimation {
 	private boolean mVanishAfter = false;
 
 	public ScaleAnimToHide(float fromX, float toX, float fromY, float toY,
-			int duration, View view, boolean vanishAfter) {
+			int duration, @NotNull View view, boolean vanishAfter) {
 		super(fromX, toX, fromY, toY);
 		setDuration(duration);
 //		openLayout = null;
@@ -37,7 +39,7 @@ public class ScaleAnimToHide extends ScaleAnimation {
 
 	@Override
 	protected void applyTransformation(float interpolatedTime,
-			Transformation t) {
+			@NotNull Transformation t) {
 		super.applyTransformation(interpolatedTime, t);
 		if (interpolatedTime < 1.0f) {
 			int newMarginBottom = mMarginBottomFromY

@@ -18,16 +18,25 @@ package com.facebook;
 
 import android.net.Uri;
 import android.os.Bundle;
-import bolts.AppLink;
-import bolts.AppLinkResolver;
-import bolts.Continuation;
-import bolts.Task;
+
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import bolts.AppLink;
+import bolts.AppLinkResolver;
+import bolts.Continuation;
+import bolts.Task;
 
 /**
  * Provides an implementation for the {@link AppLinkResolver AppLinkResolver} interface that uses the Facebook App Link
@@ -63,7 +72,7 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
 
         return resolveTask.onSuccess(new Continuation<Map<Uri, AppLink>, AppLink>() {
             @Override
-            public AppLink then(Task<Map<Uri, AppLink>> resolveUrisTask) throws Exception {
+            public AppLink then(@NotNull Task<Map<Uri, AppLink>> resolveUrisTask) throws Exception {
                 return resolveUrisTask.getResult().get(uri);
             }
         });
@@ -77,7 +86,7 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
      * resolved into an App Link. Uris that could not be resolved into App Links will not be present in the Map.
      * In the case of general server errors, the task will be completed with the corresponding error.
      */
-    public Task<Map<Uri, AppLink>> getAppLinkFromUrlsInBackground(List<Uri> uris) {
+    public Task<Map<Uri, AppLink>> getAppLinkFromUrlsInBackground(@NotNull List<Uri> uris) {
         final Map<Uri, AppLink> appLinkResults = new HashMap<Uri, AppLink>();
         final HashSet<Uri> urisToRequest = new HashSet<Uri>();
         StringBuilder graphRequestFields = new StringBuilder();
@@ -120,7 +129,7 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
                 null, /* HttpMethod */
                 new Request.Callback() { /* Callback */
                     @Override
-                    public void onCompleted(Response response) {
+                    public void onCompleted(@NotNull Response response) {
                         FacebookRequestError error = response.getError();
                         if (error != null) {
                             taskCompletionSource.setError(error.getException());
@@ -179,7 +188,8 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         return taskCompletionSource.getTask();
     }
 
-    private static AppLink.Target getAndroidTargetFromJson(JSONObject targetJson) {
+    @Nullable
+    private static AppLink.Target getAndroidTargetFromJson(@NotNull JSONObject targetJson) {
         String packageName = tryGetStringFromJson(targetJson, APP_LINK_TARGET_PACKAGE_KEY, null);
         if (packageName == null) {
             // Package name is mandatory for each Android target
@@ -196,7 +206,8 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         return new AppLink.Target(packageName, className, targetUri, appName);
     }
 
-    private static Uri getWebFallbackUriFromJson(Uri sourceUrl, JSONObject urlData) {
+    @Nullable
+    private static Uri getWebFallbackUriFromJson(Uri sourceUrl, @NotNull JSONObject urlData) {
         // Try and get a web target. This is best effort. Any failures results in null being returned.
         try {
             JSONObject webTarget = urlData.getJSONObject(APP_LINK_WEB_TARGET_KEY);
@@ -220,7 +231,7 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         }
     }
 
-    private static String tryGetStringFromJson(JSONObject json, String propertyName, String defaultValue) {
+    private static String tryGetStringFromJson(@NotNull JSONObject json, String propertyName, String defaultValue) {
         try {
             return json.getString(propertyName);
         } catch(JSONException e) {
@@ -228,7 +239,7 @@ public class FacebookAppLinkResolver implements AppLinkResolver {
         }
     }
 
-    private static boolean tryGetBooleanFromJson(JSONObject json, String propertyName, boolean defaultValue) {
+    private static boolean tryGetBooleanFromJson(@NotNull JSONObject json, String propertyName, boolean defaultValue) {
         try {
             return json.getBoolean(propertyName);
         } catch (JSONException e) {

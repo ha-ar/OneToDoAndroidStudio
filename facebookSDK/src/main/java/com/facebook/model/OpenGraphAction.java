@@ -16,6 +16,8 @@
 
 package com.facebook.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.util.Date;
@@ -33,6 +35,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the ID of the action.
      * @return the ID
      */
+    @NotNull
     String getId();
 
     /**
@@ -45,6 +48,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the type of the action, which is a string in the form "mynamespace:mytype".
      * @return the type
      */
+    @NotNull
     String getType();
 
     /**
@@ -57,6 +61,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the start time of the action.
      * @return the start time
      */
+    @NotNull
     Date getStartTime();
 
     /**
@@ -69,6 +74,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the end time of the action.
      * @return the end time
      */
+    @NotNull
     Date getEndTime();
 
     /**
@@ -81,6 +87,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the time the action was published, if any.
      * @return the publish time
      */
+    @NotNull
     Date getPublishTime();
 
     /**
@@ -93,6 +100,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the time the action was created.
      * @return the creation time
      */
+    @NotNull
     public Date getCreatedTime();
 
     /**
@@ -105,6 +113,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the time the action expires at.
      * @return the expiration time
      */
+    @NotNull
     public Date getExpiresTime();
 
     /**
@@ -118,6 +127,7 @@ public interface OpenGraphAction extends GraphObject {
      * when a user clicks through this action on Facebook.
      * @return the ref string
      */
+    @NotNull
     String getRef();
 
     /**
@@ -131,6 +141,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the message assoicated with the action.
      * @return the message
      */
+    @NotNull
     String getMessage();
 
     /**
@@ -143,6 +154,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the place where the action took place.
      * @return the place
      */
+    @NotNull
     GraphPlace getPlace();
 
     /**
@@ -155,6 +167,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the list of profiles that were tagged in the action.
      * @return the profiles that were tagged in the action
      */
+    @NotNull
     GraphObjectList<GraphObject> getTags();
 
     /**
@@ -167,6 +180,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the images that were associated with the action.
      * @return the images
      */
+    @NotNull
     List<JSONObject> getImage();
 
     /**
@@ -188,6 +202,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the from-user associated with the action.
      * @return the user
      */
+    @NotNull
     GraphUser getFrom();
 
     /**
@@ -200,6 +215,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the 'likes' that have been performed on this action.
      * @return the likes
      */
+    @NotNull
     public JSONObject getLikes();
 
     /**
@@ -212,6 +228,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the application that created this action.
      * @return the application
      */
+    @NotNull
     GraphObject getApplication();
 
     /**
@@ -224,6 +241,7 @@ public interface OpenGraphAction extends GraphObject {
      * Gets the comments that have been made on this action.
      * @return the comments
      */
+    @NotNull
     public JSONObject getComments();
 
     /**
@@ -237,6 +255,7 @@ public interface OpenGraphAction extends GraphObject {
      * referencing Open Graph objects will appear under here.
      * @return a GraphObject representing the type-specific data
      */
+    @NotNull
     GraphObject getData();
 
     /**
@@ -273,6 +292,7 @@ public interface OpenGraphAction extends GraphObject {
          * Creates an OpenGraphAction suitable for posting via, e.g., a native Share dialog.
          * @return an OpenGraphAction
          */
+        @NotNull
         @Deprecated
         public static OpenGraphAction createForPost() {
             return createForPost(OpenGraphAction.class, null);
@@ -283,6 +303,7 @@ public interface OpenGraphAction extends GraphObject {
          * @param type the Open Graph action type for the action, or null if it will be specified later
          * @return an OpenGraphAction
          */
+        @NotNull
         public static OpenGraphAction createForPost(String type) {
             return createForPost(OpenGraphAction.class, type);
         }
@@ -293,7 +314,8 @@ public interface OpenGraphAction extends GraphObject {
          * @param graphObjectClass the OpenGraphAction-derived type to return
          * @return an OpenGraphAction
          */
-        public static <T extends OpenGraphAction> T createForPost(Class<T> graphObjectClass, String type) {
+        @NotNull
+        public static <T extends OpenGraphAction> T createForPost(@NotNull Class<T> graphObjectClass, @Nullable String type) {
             T object = GraphObject.Factory.create(graphObjectClass);
 
             if (type != null) {

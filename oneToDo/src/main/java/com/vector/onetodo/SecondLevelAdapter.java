@@ -1,7 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.Arrays;
-
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.Log;
@@ -13,17 +11,26 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+
 public class SecondLevelAdapter extends BaseExpandableListAdapter {
 
 	public Object child;
 	Context mContext;
 	LayoutInflater inflater;
 
-	String[] quickAccess = { "Delayed", "Assigned", "Shared", "Completed",
+	@NotNull
+    String[] quickAccess = { "Delayed", "Assigned", "Shared", "Completed",
 			"Deleted", "None" };
-	String[] thirdLevelFormat = { "DD/MM/YY", "MM/DD/YY" };
-	String[] timeFormat = { "12H", "24H" };
-	String[] weekStart = { "Monday", "Sunday" };
+	@NotNull
+    String[] thirdLevelFormat = { "DD/MM/YY", "MM/DD/YY" };
+	@NotNull
+    String[] timeFormat = { "12H", "24H" };
+	@NotNull
+    String[] weekStart = { "Monday", "Sunday" };
 
 	public SecondLevelAdapter(Object child, Context context) {
 		this.child = child;
@@ -142,7 +149,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public void unregisterDataSetObserver(DataSetObserver observer) {
+	public void unregisterDataSetObserver(@Nullable DataSetObserver observer) {
 		Log.d("SecondLevelAdapter", "Unregistering observer");
 		if (observer != null) {
 			super.unregisterDataSetObserver(observer);

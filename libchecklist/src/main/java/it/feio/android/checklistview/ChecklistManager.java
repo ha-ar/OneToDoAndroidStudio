@@ -1,13 +1,5 @@
 package it.feio.android.checklistview;
 
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-import it.feio.android.checklistview.interfaces.Constants;
-import it.feio.android.checklistview.models.CheckListView;
-import it.feio.android.checklistview.models.CheckListViewItem;
-
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Build;
@@ -16,6 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.regex.Pattern;
+
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+import it.feio.android.checklistview.interfaces.Constants;
+import it.feio.android.checklistview.models.CheckListView;
+import it.feio.android.checklistview.models.CheckListViewItem;
 
 public class ChecklistManager {
 
@@ -27,17 +30,19 @@ public class ChecklistManager {
 	private String newEntryHint = "";
 	private int moveCheckedOnBottom = Constants.CHECKED_HOLD;
 
-	private static ChecklistManager instance = null;
+	@Nullable
+    private static ChecklistManager instance = null;
 	private Activity mActivity;
 	private TextWatcher mTextWatcher;
 	private CheckListChangedListener mCheckListChangedListener;
 
-	private ChecklistManager(Activity mActivity) {
+	private ChecklistManager(@NotNull Activity mActivity) {
 		this.mActivity = mActivity;
 		mActivity.getLayoutInflater();
 	}
 
-	public static synchronized ChecklistManager getInstance(Activity mActivity) {
+	@Nullable
+    public static synchronized ChecklistManager getInstance(@NotNull Activity mActivity) {
 		if (instance == null) {
 			instance = new ChecklistManager(mActivity);
 		}
@@ -51,7 +56,7 @@ public class ChecklistManager {
 	 * @param linesSeparator
 	 *            String separator
 	 */
-	public void setLinesSeparator(String linesSeparator) {
+	public void setLinesSeparator(@NotNull String linesSeparator) {
 		this.linesSeparator = linesSeparator.length() == 0 ? Constants.LINES_SEPARATOR : linesSeparator;
 	}
 
@@ -130,7 +135,8 @@ public class ChecklistManager {
 		this.newEntryHint = newEntryHint;
 	}
 
-	public View convert(View v) throws ViewNotSupportedException {
+	@Nullable
+    public View convert(@NotNull View v) throws ViewNotSupportedException {
 		if (EditText.class.isAssignableFrom(v.getClass())) {
 			return convert((EditText) v);
 		} else if (LinearLayout.class.isAssignableFrom(v.getClass())) {
@@ -147,7 +153,8 @@ public class ChecklistManager {
 	 *            EditText view
 	 * @return converted view to replace
 	 */
-	private View convert(EditText v) {
+	@NotNull
+    private View convert(@NotNull EditText v) {
 
 		CheckListView mCheckListView = new CheckListView(mActivity);
 		mCheckListView.setMoveCheckedOnBottom(moveCheckedOnBottom);
@@ -204,9 +211,10 @@ public class ChecklistManager {
 	 *            CheckListView to be re-converted
 	 * @return EditText
 	 */
-	@SuppressWarnings("deprecation")
+	@NotNull
+    @SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
-	private View convert(CheckListView v) {
+	private View convert(@NotNull CheckListView v) {
 		EditText returnView = new EditText(mActivity);
 
 		StringBuilder sb = new StringBuilder();
@@ -255,7 +263,7 @@ public class ChecklistManager {
 	 * @param oldView
 	 * @param newView
 	 */
-	public void replaceViews(View oldView, View newView) {
+	public void replaceViews(@Nullable View oldView, @Nullable View newView) {
 		if (oldView == null || newView == null)
 			return;
 

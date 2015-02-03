@@ -1,31 +1,33 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vector.onetodo.db.gen.Assign;
 import com.vector.onetodo.db.gen.AssignDao;
+import com.vector.onetodo.event_fragments.AddEventFragment;
+import com.vector.onetodo.project_fragments.ProjectsTabHolder;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class AssignMultipleFragment extends ProjectsTabHolder {
 
@@ -37,7 +39,8 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 	private List<Assign> contactsList = new ArrayList<Assign>();
 	private ImageView img;
 
-	public static AssignMultipleFragment newInstance(int position) {
+	@NotNull
+    public static AssignMultipleFragment newInstance(int position) {
 		AssignMultipleFragment myFragment = new AssignMultipleFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -52,7 +55,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater
 				.inflate(R.layout.invitation_list, container, false);
@@ -88,7 +91,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View view,
+			public void onItemClick(AdapterView<?> arg0, @NotNull View view,
 					int position, long arg3) {
 				toggleSelection(view.findViewById(R.id.item_image), position);
 				if(AddEventFragment.selectedInvitees.size() > 0){
@@ -109,7 +112,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 
 	}
 	
-	private void toggleSelection(View view, int position){
+	private void toggleSelection(@NotNull View view, int position){
 		if(view.getVisibility() == View.GONE){
 			view.setVisibility(View.VISIBLE);
 			AddEventFragment.selectedInvitees.add(String.valueOf(contactsList.get(position).getFriends_id()));
@@ -135,7 +138,8 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 			return contactsList.size();
 		}
 
-		@Override
+		@Nullable
+        @Override
 		public Object getItem(int position) {
 			return null;
 		}
@@ -176,7 +180,6 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 		ContactsAdapter adapter = new ContactsAdapter(getActivity());
 		listView.setAdapter(adapter);
 	}
-
 	@Override
 	public void adjustScroll(int scrollHeight) {
 		

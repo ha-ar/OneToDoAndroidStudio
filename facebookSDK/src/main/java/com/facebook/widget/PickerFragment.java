@@ -31,7 +31,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.AlphaAnimation;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.facebook.FacebookException;
 import com.facebook.Request;
 import com.facebook.Session;
@@ -40,7 +48,15 @@ import com.facebook.android.R;
 import com.facebook.internal.SessionTracker;
 import com.facebook.model.GraphObject;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides functionality common to SDK UI elements that allow the user to pick one or more
@@ -92,6 +108,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     private boolean showPictures = true;
     private boolean showTitleBar = true;
     private ListView listView;
+    @NotNull
     HashSet<String> extraFields = new HashSet<String>();
     GraphObjectAdapter<T> adapter;
     private final Class<T> graphObjectClass;
@@ -100,11 +117,14 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     private Set<String> selectionHint;
     private ProgressBar activityCircle;
     private SessionTracker sessionTracker;
+    @Nullable
     private String titleText;
     private String doneButtonText;
     private TextView titleTextView;
     private Button doneButton;
+    @Nullable
     private Drawable titleBarBackground;
+    @Nullable
     private Drawable doneButtonBackground;
     private boolean appEventsLogged;
 
@@ -129,7 +149,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
     @Override
-    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+    public void onInflate(@NotNull Activity activity, @NotNull AttributeSet attrs, Bundle savedInstanceState) {
         super.onInflate(activity, attrs, savedInstanceState);
         TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.com_facebook_picker_fragment);
 
@@ -149,8 +169,9 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         a.recycle();
     }
 
+    @NotNull
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup view = (ViewGroup) inflater.inflate(layout, container, false);
 
         listView = (ListView) view.findViewById(R.id.com_facebook_picker_list_view);
@@ -181,12 +202,12 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         sessionTracker = new SessionTracker(getActivity(), new Session.StatusCallback() {
             @Override
-            public void call(Session session, SessionState state, Exception exception) {
+            public void call(@NotNull Session session, SessionState state, Exception exception) {
                 if (!session.isOpened()) {
                     // When a session is closed, we want to clear out our data so it is not visible to subsequent users
                     clearResults();
@@ -230,7 +251,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         saveSettingsToBundle(outState);
@@ -400,6 +421,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
      *
      * @return the extra fields to request
      */
+    @NotNull
     public Set<String> getExtraFields() {
         return new HashSet<String>(extraFields);
     }
@@ -409,7 +431,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
      *
      * @param fields the extra fields to request
      */
-    public void setExtraFields(Collection<String> fields) {
+    public void setExtraFields(@Nullable Collection<String> fields) {
         extraFields = new HashSet<String>();
         if (fields != null) {
             extraFields.addAll(fields);
@@ -451,6 +473,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
      *
      * @return the text to show in the title bar
      */
+    @Nullable
     public String getTitleText() {
         if (titleText == null) {
             titleText = getDefaultTitleText();
@@ -531,7 +554,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         return adapter.getGraphObjectsById(selectionStrategy.getSelectedIds());
     }
 
-    void setSelectedGraphObjects(List<String> objectIds) {
+    void setSelectedGraphObjects(@NotNull List<String> objectIds) {
         for(String objectId : objectIds) {
             if(!this.selectionStrategy.isSelected(objectId)) {
                 this.selectionStrategy.toggleSelection(objectId);
@@ -539,7 +562,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
     }
 
-    void saveSettingsToBundle(Bundle outState) {
+    void saveSettingsToBundle(@NotNull Bundle outState) {
         outState.putBoolean(SHOW_PICTURES_BUNDLE_KEY, showPictures);
         if (!extraFields.isEmpty()) {
             outState.putString(EXTRA_FIELDS_BUNDLE_KEY, TextUtils.join(",", extraFields));
@@ -560,6 +583,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     void onLoadingData() {
     }
 
+    @Nullable
     String getDefaultTitleText() {
         return null;
     }
@@ -603,7 +627,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     void logAppEvents(boolean doneButtonClicked) {
     }
 
-    private static void setAlpha(View view, float alpha) {
+    private static void setAlpha(@NotNull View view, float alpha) {
         // Set the alpha appropriately (setAlpha is API >= 11, this technique works on all API levels).
         AlphaAnimation alphaAnimation = new AlphaAnimation(alpha, alpha);
         alphaAnimation.setDuration(0);
@@ -612,7 +636,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
 
-    private void setPickerFragmentSettingsFromBundle(Bundle inState) {
+    private void setPickerFragmentSettingsFromBundle(@Nullable Bundle inState) {
         // We do this in a separate non-overridable method so it is safe to call from the constructor.
         if (inState != null) {
             showPictures = inState.getBoolean(SHOW_PICTURES_BUNDLE_KEY, showPictures);
@@ -639,7 +663,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
     }
 
-    private void inflateTitleBar(ViewGroup view) {
+    private void inflateTitleBar(@NotNull ViewGroup view) {
         ViewStub stub = (ViewStub) view.findViewById(R.id.com_facebook_picker_title_bar_stub);
         if (stub != null) {
             View titleBar = stub.inflate();
@@ -686,7 +710,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
     }
 
-    private void onListItemClick(ListView listView, View v, int position) {
+    private void onListItemClick(@NotNull ListView listView, View v, int position) {
         @SuppressWarnings("unchecked")
         T graphObject = (T) listView.getItemAtPosition(position);
         String id = adapter.getIdOfGraphObject(graphObject);
@@ -727,7 +751,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
     }
 
-    void updateAdapter(SimpleGraphObjectCursor<T> data) {
+    void updateAdapter(@Nullable SimpleGraphObjectCursor<T> data) {
         if (adapter != null) {
             // As we fetch additional results and add them to the table, we do not
             // want the items displayed jumping around seemingly at random, frustrating the user's
@@ -801,6 +825,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
     }
 
+    @NotNull
     private ListView.OnScrollListener onScrollListener = new ListView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -876,12 +901,15 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     abstract class LoadingStrategy {
         protected final static int CACHED_RESULT_REFRESH_DELAY = 2 * 1000;
 
+        @Nullable
         protected GraphObjectPagingLoader<T> loader;
+        @Nullable
         protected GraphObjectAdapter<T> adapter;
 
         public void attach(GraphObjectAdapter<T> adapter) {
             loader = (GraphObjectPagingLoader<T>) getLoaderManager().initLoader(0, null,
                     new LoaderManager.LoaderCallbacks<SimpleGraphObjectCursor<T>>() {
+                        @NotNull
                         @Override
                         public Loader<SimpleGraphObjectCursor<T>> onCreateLoader(int id, Bundle args) {
                             return LoadingStrategy.this.onCreateLoader();
@@ -954,6 +982,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
             return !adapter.isEmpty() || loader.isLoading();
         }
 
+        @NotNull
         protected GraphObjectPagingLoader<T> onCreateLoader() {
             return new GraphObjectPagingLoader<T>(getActivity(), graphObjectClass);
         }
@@ -980,6 +1009,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
 
         abstract void toggleSelection(String id);
 
+        @NotNull
         abstract Collection<String> getSelectedIds();
 
         abstract void clear();
@@ -994,14 +1024,16 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
     class SingleSelectionStrategy extends SelectionStrategy {
+        @Nullable
         private String selectedId;
 
+        @NotNull
         public Collection<String> getSelectedIds() {
             return Arrays.asList(new String[]{selectedId});
         }
 
         @Override
-        boolean isSelected(String id) {
+        boolean isSelected(@Nullable String id) {
             return selectedId != null && id != null && selectedId.equals(id);
         }
 
@@ -1015,14 +1047,14 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
 
         @Override
-        void saveSelectionToBundle(Bundle outBundle, String key) {
+        void saveSelectionToBundle(@NotNull Bundle outBundle, String key) {
             if (!TextUtils.isEmpty(selectedId)) {
                 outBundle.putString(key, selectedId);
             }
         }
 
         @Override
-        void readSelectionFromBundle(Bundle inBundle, String key) {
+        void readSelectionFromBundle(@Nullable Bundle inBundle, String key) {
             if (inBundle != null) {
                 selectedId = inBundle.getString(key);
             }
@@ -1045,19 +1077,21 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
     }
 
     class MultiSelectionStrategy extends SelectionStrategy {
+        @NotNull
         private Set<String> selectedIds = new HashSet<String>();
 
+        @NotNull
         public Collection<String> getSelectedIds() {
             return selectedIds;
         }
 
         @Override
-        boolean isSelected(String id) {
+        boolean isSelected(@Nullable String id) {
             return id != null && selectedIds.contains(id);
         }
 
         @Override
-        void toggleSelection(String id) {
+        void toggleSelection(@Nullable String id) {
             if (id != null) {
                 if (selectedIds.contains(id)) {
                     selectedIds.remove(id);
@@ -1068,7 +1102,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
 
         @Override
-        void saveSelectionToBundle(Bundle outBundle, String key) {
+        void saveSelectionToBundle(@NotNull Bundle outBundle, String key) {
             if (!selectedIds.isEmpty()) {
                 String ids = TextUtils.join(",", selectedIds);
                 outBundle.putString(key, ids);
@@ -1076,7 +1110,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
 
         @Override
-        void readSelectionFromBundle(Bundle inBundle, String key) {
+        void readSelectionFromBundle(@Nullable Bundle inBundle, String key) {
             if (inBundle != null) {
                 String ids = inBundle.getString(key);
                 if (ids != null) {
@@ -1114,7 +1148,7 @@ public abstract class PickerFragment<T extends GraphObject> extends Fragment {
         }
 
         @Override
-        void updateCheckboxState(CheckBox checkBox, boolean graphObjectSelected) {
+        void updateCheckboxState(@NotNull CheckBox checkBox, boolean graphObjectSelected) {
             checkBox.setChecked(graphObjectSelected);
             int visible = (graphObjectSelected || selectionStrategy
                     .shouldShowCheckBoxIfUnselected()) ? View.VISIBLE : View.GONE;

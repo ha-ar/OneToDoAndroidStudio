@@ -1,14 +1,5 @@
-package com.vector.onetodo;
+package com.vector.onetodo.project_fragments;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -55,11 +46,27 @@ import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.devspark.appmsg.AppMsg;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.R;
+import com.vector.onetodo.task_fragments.AddTaskFragment;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
+
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class AddProjectFragment extends Fragment {
 
@@ -72,7 +79,8 @@ public class AddProjectFragment extends Fragment {
 	int Label_postion = -1;
 	private int lastCheckedId = -1;
 	ImageView last;
-	String plabel = null;
+	@Nullable
+    String plabel = null;
 	int pposition = -1;
 	int itempos = -1;
 	int MaxId = -1;
@@ -80,10 +88,12 @@ public class AddProjectFragment extends Fragment {
 
 	static List<java.lang.Object> names;
 
-	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+	@NotNull
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
 
 	private String currentDay, currentMon;
-	static String checkedId2 = null;
+	@Nullable
+    static String checkedId2 = null;
 	private Uri imageUri;
 	public static final int RESULT_GALLERY = 0;
 
@@ -100,22 +110,27 @@ public class AddProjectFragment extends Fragment {
 
 	int Month, Year;
 
-	private int[] collapsingViews = { R.id.date_time_include,
+	@NotNull
+    private int[] collapsingViews = { R.id.date_time_include,
 			R.id.label_project_grid_view };
 
-	private int[] allViews = { R.id.time_date, R.id.spinner_label_layout };
+	@NotNull
+    private int[] allViews = { R.id.time_date, R.id.spinner_label_layout };
 
 	int dayPosition;
 	Editor editor;
-	EditText label_field = null;
+	@Nullable
+    EditText label_field = null;
 
 	protected static final int RESULT_CODE = 123;
 
-	public static View allView;
+	@Nullable
+    public static View allView;
 
 	public static Activity act;
 
-	public static AddProjectFragment newInstance(int position, int dayPosition) {
+	@NotNull
+    public static AddProjectFragment newInstance(int position, int dayPosition) {
 		AddProjectFragment myFragment = new AddProjectFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -125,7 +140,7 @@ public class AddProjectFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.project_fragment, container,
 				false);
@@ -142,7 +157,7 @@ public class AddProjectFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		allView = getView();
-		editor = AddTask.label.edit();
+		editor = BaseTaskFragment.label.edit();
 		dayPosition = getArguments().getInt("dayPosition", 0);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -170,7 +185,7 @@ public class AddProjectFragment extends Fragment {
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+					BaseTaskFragment.btn.setAlpha(1);
 
 				aq.id(R.id.completed_project).textColorId(R.color.active);
 
@@ -349,7 +364,8 @@ public class AddProjectFragment extends Fragment {
 								R.layout.grid_layout_label_text_view,
 								Constants.labels_array) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
@@ -387,7 +403,7 @@ public class AddProjectFragment extends Fragment {
 				.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
+					public void onItemClick(AdapterView<?> parent, @NotNull View view,
 							int position, long id) {
 
 						itempos = position;
@@ -471,7 +487,7 @@ public class AddProjectFragment extends Fragment {
 		}
 	}
 
-	private void setAllOtherFocusableFalse(View v) {
+	private void setAllOtherFocusableFalse(@NotNull View v) {
 		for (int id : allViews)
 			if (v.getId() != id) {
 				try {
@@ -496,7 +512,7 @@ public class AddProjectFragment extends Fragment {
 		
 	}
 
-	private void showCurrentView(View v) {
+	private void showCurrentView(@NotNull View v) {
 
 		hideAll();
 
@@ -536,7 +552,7 @@ public class AddProjectFragment extends Fragment {
 	private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 			v.setFocusableInTouchMode(true);
 			v.requestFocus();
 			showCurrentView(v);
@@ -550,7 +566,7 @@ public class AddProjectFragment extends Fragment {
 
 	}
 
-	public void slideUpDown(final View view) {
+	public void slideUpDown(@NotNull final View view) {
 		if (!isPanelShown(view)) {
 			// Show the panel
 			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
@@ -574,12 +590,12 @@ public class AddProjectFragment extends Fragment {
 		}
 	}
 
-	private boolean isPanelShown(View view) {
+	private boolean isPanelShown(@NotNull View view) {
 		return view.getVisibility() == View.VISIBLE;
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
@@ -612,7 +628,7 @@ public class AddProjectFragment extends Fragment {
 		}
 	}
 
-	private void showImageURI(Uri selectedImage) {
+	private void showImageURI(@NotNull Uri selectedImage) {
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
 		Bitmap bitmap;
@@ -669,7 +685,7 @@ public class AddProjectFragment extends Fragment {
 	private class LabelEditClickListener implements OnItemLongClickListener {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+		public boolean onItemLongClick(AdapterView<?> arg0, @NotNull final View arg1,
 				int position, long arg3) {
 			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
@@ -702,7 +718,8 @@ public class AddProjectFragment extends Fragment {
 			return 10;
 		}
 
-		public Object getItem(int position) {
+		@Nullable
+        public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 
@@ -711,7 +728,8 @@ public class AddProjectFragment extends Fragment {
 		}
 
 		// create a new ImageView for each item referenced by the Adapter
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			ImageView imageView;
 			if (convertView == null) { // if it's not recycled, initialize some
 										// attributes
@@ -744,11 +762,11 @@ public class AddProjectFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(5 + "key_label" + id, null); // getting
+		plabel = BaseTaskFragment.label.getString(5 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(5 + "key_color_position" + id, 0); // getting
+		pposition = BaseTaskFragment.label.getInt(5 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 

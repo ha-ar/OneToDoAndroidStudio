@@ -19,6 +19,8 @@ package com.facebook.android;
 import android.content.Context;
 import android.os.Bundle;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -81,7 +83,7 @@ public class AsyncFacebookRunner {
      */
     @Deprecated
     public void logout(final Context context,
-                       final RequestListener listener,
+                       @NotNull final RequestListener listener,
                        final Object state) {
         new Thread() {
             @Override public void run() {
@@ -105,7 +107,7 @@ public class AsyncFacebookRunner {
     }
 
     @Deprecated
-    public void logout(final Context context, final RequestListener listener) {
+    public void logout(final Context context, @NotNull final RequestListener listener) {
         logout(context, listener, /* state */ null);
     }
 
@@ -141,14 +143,14 @@ public class AsyncFacebookRunner {
      *            itself.
      */
     @Deprecated
-    public void request(Bundle parameters,
-                        RequestListener listener,
+    public void request(@NotNull Bundle parameters,
+                        @NotNull RequestListener listener,
                         final Object state) {
         request(null, parameters, "GET", listener, state);
     }
 
     @Deprecated
-    public void request(Bundle parameters, RequestListener listener) {
+    public void request(@NotNull Bundle parameters, @NotNull RequestListener listener) {
         request(null, parameters, "GET", listener, /* state */ null);
     }
 
@@ -177,13 +179,13 @@ public class AsyncFacebookRunner {
      */
     @Deprecated
     public void request(String graphPath,
-                        RequestListener listener,
+                        @NotNull RequestListener listener,
                         final Object state) {
         request(graphPath, new Bundle(), "GET", listener, state);
     }
 
     @Deprecated
-    public void request(String graphPath, RequestListener listener) {
+    public void request(String graphPath, @NotNull RequestListener listener) {
         request(graphPath, new Bundle(), "GET", listener, /* state */ null);
     }
 
@@ -218,16 +220,16 @@ public class AsyncFacebookRunner {
      */
     @Deprecated
     public void request(String graphPath,
-                        Bundle parameters,
-                        RequestListener listener,
+                        @NotNull Bundle parameters,
+                        @NotNull RequestListener listener,
                         final Object state) {
         request(graphPath, parameters, "GET", listener, state);
     }
 
     @Deprecated
     public void request(String graphPath,
-                        Bundle parameters,
-                        RequestListener listener) {
+                        @NotNull Bundle parameters,
+                        @NotNull RequestListener listener) {
         request(graphPath, parameters, "GET", listener, /* state */ null);
     }
 
@@ -265,9 +267,9 @@ public class AsyncFacebookRunner {
      */
     @Deprecated
     public void request(final String graphPath,
-                        final Bundle parameters,
-                        final String httpMethod,
-                        final RequestListener listener,
+                        @NotNull final Bundle parameters,
+                        @NotNull final String httpMethod,
+                        @NotNull final RequestListener listener,
                         final Object state) {
         new Thread() {
             @Override public void run() {

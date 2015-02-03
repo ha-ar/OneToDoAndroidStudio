@@ -18,19 +18,28 @@ package com.facebook;
 
 import android.os.Handler;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * RequestBatch contains a list of Request objects that can be sent to Facebook in a single round-trip.
  */
 public class RequestBatch extends AbstractList<Request> {
+    @NotNull
     private static AtomicInteger idGenerator = new AtomicInteger();
 
     private Handler callbackHandler;
+    @NotNull
     private List<Request> requests = new ArrayList<Request>();
     private int timeoutInMilliseconds = 0;
     private final String id = Integer.valueOf(idGenerator.incrementAndGet()).toString();
+    @NotNull
     private List<Callback> callbacks = new ArrayList<Callback>();
     private String batchApplicationId;
 
@@ -61,7 +70,7 @@ public class RequestBatch extends AbstractList<Request> {
      * Constructor.
      * @param requests the requests to add to the batch
      */
-    public RequestBatch(RequestBatch requests) {
+    public RequestBatch(@NotNull RequestBatch requests) {
         this.requests = new ArrayList<Request>(requests);
         this.callbackHandler = requests.callbackHandler;
         this.timeoutInMilliseconds = requests.timeoutInMilliseconds;
@@ -154,10 +163,12 @@ public class RequestBatch extends AbstractList<Request> {
         this.callbackHandler = callbackHandler;
     }
 
+    @NotNull
     final List<Request> getRequests() {
         return requests;
     }
 
+    @NotNull
     final List<Callback> getCallbacks() {
         return callbacks;
     }
@@ -200,6 +211,7 @@ public class RequestBatch extends AbstractList<Request> {
      * @throws IllegalArgumentException if this batch is empty
      * @throws NullPointerException if any of the contents of this batch are null
      */
+    @NotNull
     public final RequestAsyncTask executeAsync() {
         return executeAsyncImpl();
     }
@@ -237,6 +249,7 @@ public class RequestBatch extends AbstractList<Request> {
         return Request.executeBatchAndWait(this);
     }
 
+    @NotNull
     RequestAsyncTask executeAsyncImpl() {
         return Request.executeBatchAsync(this);
     }

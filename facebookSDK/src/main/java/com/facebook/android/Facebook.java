@@ -18,16 +18,38 @@ package com.facebook.android;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
 import android.net.Uri;
-import android.os.*;
-import com.facebook.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+
+import com.facebook.AccessTokenSource;
+import com.facebook.FacebookAuthorizationException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.LegacyHelper;
+import com.facebook.Request;
+import com.facebook.Session;
 import com.facebook.Session.StatusCallback;
+import com.facebook.SessionLoginBehavior;
+import com.facebook.SessionState;
+import com.facebook.Settings;
+import com.facebook.TokenCachingStrategy;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -81,27 +103,37 @@ public class Facebook {
     private static final int DEFAULT_AUTH_ACTIVITY_CODE = 32665;
 
     // Facebook server endpoints: may be modified in a subclass for testing
+    @NotNull
     @Deprecated
     protected static String DIALOG_BASE_URL = "https://m.facebook.com/dialog/";
+    @NotNull
     @Deprecated
     protected static String GRAPH_BASE_URL = "https://graph.facebook.com/";
+    @NotNull
     @Deprecated
     protected static String RESTSERVER_URL = "https://api.facebook.com/restserver.php";
 
     private final Object lock = new Object();
 
+    @Nullable
     private String accessToken = null;
     private long accessExpiresMillisecondsAfterEpoch = 0;
     private long lastAccessUpdateMillisecondsAfterEpoch = 0;
+    @Nullable
     private String mAppId;
 
+    @Nullable
     private Activity pendingAuthorizationActivity;
+    @Nullable
     private String[] pendingAuthorizationPermissions;
+    @Nullable
     private Session pendingOpeningSession;
 
+    @Nullable
     private volatile Session session; // must synchronize this.sync to write
     private boolean sessionInvalidated; // must synchronize this.sync to access
     private SetterTokenCachingStrategy tokenCache;
+    @Nullable
     private volatile Session userSetSession;
 
     // If the last time we extended the access token was more than 24 hours ago
@@ -116,7 +148,7 @@ public class Facebook {
      *            www.facebook.com/developers/apps.php.
      */
     @Deprecated
-    public Facebook(String appId) {
+    public Facebook(@Nullable String appId) {
         if (appId == null) {
             throw new IllegalArgumentException("You must specify your application ID when instantiating "
                     + "a Facebook object. See README for details.");
@@ -132,7 +164,7 @@ public class Facebook {
      * This method is deprecated.  See {@link Facebook} and {@link Session} for more info.
      */
     @Deprecated
-    public void authorize(Activity activity, final DialogListener listener) {
+    public void authorize(Activity activity, @NotNull final DialogListener listener) {
         authorize(activity, new String[]{}, DEFAULT_AUTH_ACTIVITY_CODE, SessionLoginBehavior.SSO_WITH_FALLBACK,
                 listener);
     }
@@ -145,7 +177,7 @@ public class Facebook {
      * This method is deprecated.  See {@link Facebook} and {@link Session} for more info.
      */
     @Deprecated
-    public void authorize(Activity activity, String[] permissions, final DialogListener listener) {
+    public void authorize(Activity activity, String[] permissions, @NotNull final DialogListener listener) {
         authorize(activity, permissions, DEFAULT_AUTH_ACTIVITY_CODE, SessionLoginBehavior.SSO_WITH_FALLBACK, listener);
     }
 
@@ -214,7 +246,7 @@ public class Facebook {
      *            canceled.
      */
     @Deprecated
-    public void authorize(Activity activity, String[] permissions, int activityCode, final DialogListener listener) {
+    public void authorize(Activity activity, String[] permissions, int activityCode, @NotNull final DialogListener listener) {
         SessionLoginBehavior behavior = (activityCode >= 0) ? SessionLoginBehavior.SSO_WITH_FALLBACK
                 : SessionLoginBehavior.SUPPRESS_SSO;
 
@@ -287,8 +319,8 @@ public class Facebook {
      *            the authentication dialog has completed, failed, or been
      *            canceled.
      */
-    private void authorize(Activity activity, String[] permissions, int activityCode,
-                          SessionLoginBehavior behavior, final DialogListener listener) {
+    private void authorize(Activity activity, @Nullable String[] permissions, int activityCode,
+                          SessionLoginBehavior behavior, @NotNull final DialogListener listener) {
         checkUserSession("authorize");
         pendingOpeningSession = new Session.Builder(activity).
                 setApplicationId(mAppId).
@@ -299,7 +331,7 @@ public class Facebook {
 
         StatusCallback callback = new StatusCallback() {
             @Override
-            public void call(Session callbackSession, SessionState state, Exception exception) {
+            public void call(@NotNull Session callbackSession, SessionState state, Exception exception) {
                 // Invoke user-callback.
                 onSessionCallback(callbackSession, state, exception, listener);
             }
@@ -313,7 +345,7 @@ public class Facebook {
         openSession(pendingOpeningSession, openRequest, pendingAuthorizationPermissions.length > 0);
     }
 
-    private void openSession(Session session, Session.OpenRequest openRequest, boolean isPublish) {
+    private void openSession(@NotNull Session session, @NotNull Session.OpenRequest openRequest, boolean isPublish) {
         openRequest.setIsLegacy(true);
         if (isPublish) {
             session.openForPublish(openRequest);
@@ -323,8 +355,8 @@ public class Facebook {
     }
 
     @SuppressWarnings("deprecation")
-    private void onSessionCallback(Session callbackSession, SessionState state, Exception exception,
-            DialogListener listener) {
+    private void onSessionCallback(@NotNull Session callbackSession, SessionState state, @Nullable Exception exception,
+            @NotNull DialogListener listener) {
         Bundle extras = callbackSession.getAuthorizationBundle();
 
         if (state == SessionState.OPENED) {
@@ -369,7 +401,7 @@ public class Facebook {
      * @return true if the service intent resolution happens successfully and
      *         the signatures match.
      */
-    private boolean validateServiceIntent(Context context, Intent intent) {
+    private boolean validateServiceIntent(@NotNull Context context, Intent intent) {
         ResolveInfo resolveInfo = context.getPackageManager().resolveService(intent, 0);
         if (resolveInfo == null) {
             return false;
@@ -386,7 +418,7 @@ public class Facebook {
      * @param packageName
      * @return true if the app's signature matches the expected signature.
      */
-    private boolean validateAppSignatureForPackage(Context context, String packageName) {
+    private boolean validateAppSignatureForPackage(@NotNull Context context, String packageName) {
 
         PackageInfo packageInfo;
         try {
@@ -454,7 +486,7 @@ public class Facebook {
      * @return true if the binding to the RefreshToken Service was created
      */
     @Deprecated
-    public boolean extendAccessToken(Context context, ServiceListener serviceListener) {
+    public boolean extendAccessToken(@NotNull Context context, ServiceListener serviceListener) {
         checkUserSession("extendAccessToken");
         Intent intent = new Intent();
 
@@ -480,7 +512,7 @@ public class Facebook {
      *         refreshing, true otherwise
      */
     @Deprecated
-    public boolean extendAccessTokenIfNeeded(Context context, ServiceListener serviceListener) {
+    public boolean extendAccessTokenIfNeeded(@NotNull Context context, ServiceListener serviceListener) {
         checkUserSession("extendAccessTokenIfNeeded");
         if (shouldExtendAccessToken()) {
             return extendAccessToken(context, serviceListener);
@@ -515,6 +547,7 @@ public class Facebook {
         final ServiceListener serviceListener;
         final Context applicationsContext;
 
+        @Nullable
         Messenger messageSender = null;
 
         public TokenRefreshServiceConnection(Context applicationsContext, ServiceListener serviceListener) {
@@ -573,7 +606,7 @@ public class Facebook {
 
         @Override
         @SuppressWarnings("deprecation")
-        public void handleMessage(Message msg) {
+        public void handleMessage(@NotNull Message msg) {
             Facebook facebook = facebookWeakReference.get();
             TokenRefreshServiceConnection connection = connectionWeakReference.get();
             if (facebook == null || connection == null) {
@@ -641,11 +674,13 @@ public class Facebook {
      * @return JSON string representation of the auth.expireSession response
      *         ("true" if successful)
      */
+    @NotNull
     @Deprecated
     public String logout(Context context) throws MalformedURLException, IOException {
         return logoutImpl(context);
     }
 
+    @NotNull
     String logoutImpl(Context context) throws MalformedURLException, IOException  {
         checkUserSession("logout");
         Bundle b = new Bundle();
@@ -701,8 +736,9 @@ public class Facebook {
      *             if one of the parameters is not "method"
      * @return JSON string representation of the response
      */
+    @NotNull
     @Deprecated
-    public String request(Bundle parameters) throws MalformedURLException, IOException {
+    public String request(@NotNull Bundle parameters) throws MalformedURLException, IOException {
         if (!parameters.containsKey("method")) {
             throw new IllegalArgumentException("API method must be specified. "
                     + "(parameters must contain key \"method\" and value). See"
@@ -729,6 +765,7 @@ public class Facebook {
      * @throws MalformedURLException
      * @return JSON string representation of the response
      */
+    @NotNull
     @Deprecated
     public String request(String graphPath) throws MalformedURLException, IOException {
         return requestImpl(graphPath, new Bundle(), "GET");
@@ -758,8 +795,9 @@ public class Facebook {
      * @throws MalformedURLException
      * @return JSON string representation of the response
      */
+    @NotNull
     @Deprecated
-    public String request(String graphPath, Bundle parameters) throws MalformedURLException, IOException {
+    public String request(String graphPath, @NotNull Bundle parameters) throws MalformedURLException, IOException {
         return requestImpl(graphPath, parameters, "GET");
     }
 
@@ -790,15 +828,17 @@ public class Facebook {
      * @throws MalformedURLException
      * @return JSON string representation of the response
      */
+    @NotNull
     @Deprecated
-    public String request(String graphPath, Bundle params, String httpMethod) throws FileNotFoundException,
+    public String request(String graphPath, @NotNull Bundle params, @NotNull String httpMethod) throws FileNotFoundException,
             MalformedURLException, IOException {
         return requestImpl(graphPath, params, httpMethod);
     }
 
     // Internal call to avoid deprecated warnings.
+    @NotNull
     @SuppressWarnings("deprecation")
-    String requestImpl(String graphPath, Bundle params, String httpMethod) throws FileNotFoundException,
+    String requestImpl(@Nullable String graphPath, @NotNull Bundle params, @NotNull String httpMethod) throws FileNotFoundException,
             MalformedURLException, IOException {
         params.putString("format", "json");
         if (isSessionValid()) {
@@ -826,7 +866,7 @@ public class Facebook {
      *            has completed.
      */
     @Deprecated
-    public void dialog(Context context, String action, DialogListener listener) {
+    public void dialog(@NotNull Context context, @NotNull String action, DialogListener listener) {
         dialog(context, action, new Bundle(), listener);
     }
 
@@ -850,7 +890,7 @@ public class Facebook {
      *            has completed.
      */
     @Deprecated
-    public void dialog(Context context, String action, Bundle parameters, final DialogListener listener) {
+    public void dialog(@NotNull Context context, @NotNull String action, @NotNull Bundle parameters, final DialogListener listener) {
         parameters.putString("display", "touch");
         parameters.putString("redirect_uri", REDIRECT_URI);
 
@@ -893,7 +933,7 @@ public class Facebook {
      * @param session the Session object to use, cannot be null
      */
     @Deprecated
-    public void setSession(Session session) {
+    public void setSession(@Nullable Session session) {
         if (session == null) {
             throw new IllegalArgumentException("session cannot be null");
         }
@@ -914,6 +954,7 @@ public class Facebook {
      * 
      * @return Session - underlying session
      */
+    @Nullable
     @Deprecated
     public final Session getSession() {
         while (true) {
@@ -988,6 +1029,7 @@ public class Facebook {
      *
      * @return String - access token
      */
+    @Nullable
     @Deprecated
     public String getAccessToken() {
         Session s = getSession();
@@ -1093,7 +1135,7 @@ public class Facebook {
      *            - duration in seconds (or 0 if the session doesn't expire)
      */
     @Deprecated
-    public void setAccessExpiresIn(String expiresInSecsFromNow) {
+    public void setAccessExpiresIn(@Nullable String expiresInSecsFromNow) {
         checkUserSession("setAccessExpiresIn");
         if (expiresInSecsFromNow != null) {
             long expires = expiresInSecsFromNow.equals("0") ? 0 : System.currentTimeMillis()
@@ -1107,6 +1149,7 @@ public class Facebook {
      *
      * @return the String representing application ID
      */
+    @Nullable
     @Deprecated
     public String getAppId() {
         return mAppId;
@@ -1135,7 +1178,8 @@ public class Facebook {
         return tokenCache;
     }
 
-    private static String[] stringArray(List<String> list) {
+    @NotNull
+    private static String[] stringArray(@Nullable List<String> list) {
         int size = (list != null) ? list.size() : 0;
         String[] array = new String[size];
 
@@ -1148,7 +1192,8 @@ public class Facebook {
         return array;
     }
 
-    private static List<String> stringList(String[] array) {
+    @NotNull
+    private static List<String> stringList(@Nullable String[] array) {
         if (array != null) {
             return Arrays.asList(array);
         } else {
@@ -1158,6 +1203,7 @@ public class Facebook {
 
     private class SetterTokenCachingStrategy extends TokenCachingStrategy {
 
+        @NotNull
         @Override
         public Bundle load() {
             Bundle bundle = new Bundle();

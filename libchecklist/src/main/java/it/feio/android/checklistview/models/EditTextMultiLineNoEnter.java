@@ -1,12 +1,15 @@
 package it.feio.android.checklistview.models;
 
-import it.feio.android.checklistview.interfaces.EditTextEventListener;
 import android.content.Context;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
+
+import org.jetbrains.annotations.NotNull;
+
+import it.feio.android.checklistview.interfaces.EditTextEventListener;
 
 /**
  * Class used to avoid carriage return in multi-line EditText.
@@ -16,12 +19,13 @@ public class EditTextMultiLineNoEnter extends EditText {
 	
 	private EditTextEventListener mEditTextEventListener;
 
-	public EditTextMultiLineNoEnter(Context context) {
+	public EditTextMultiLineNoEnter(@NotNull Context context) {
 		super(context);
 	}
 
-	@Override
-	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+	@NotNull
+    @Override
+	public InputConnection onCreateInputConnection(@NotNull EditorInfo outAttrs) {
 		InputConnection connection = super.onCreateInputConnection(outAttrs);
 		// By default setting android:inputType="textMultiLine" will remove any
 		// imeAction like NEXT, DONE...
@@ -54,7 +58,7 @@ public class EditTextMultiLineNoEnter extends EditText {
         }
 
         @Override
-        public boolean sendKeyEvent(KeyEvent event) {
+        public boolean sendKeyEvent(@NotNull KeyEvent event) {
             if (event.getAction() == KeyEvent.ACTION_DOWN
                     && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
 //            	onKeyDown(KeyEvent.KEYCODE_DEL, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));

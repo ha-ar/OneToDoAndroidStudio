@@ -9,6 +9,8 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.vector.onetodo.utils.Constants;
 
+import org.jetbrains.annotations.NotNull;
+
 public class NotificationHandler {
 	// Notification handler singleton
 	private static NotificationHandler nHandler;
@@ -19,7 +21,7 @@ public class NotificationHandler {
 	 * Singleton pattern implementation
 	 * @return
 	 */
-	public static  NotificationHandler getInstance(Context context) {
+	public static  NotificationHandler getInstance(@NotNull Context context) {
 		if(nHandler == null) {
 			nHandler = new NotificationHandler();
 			mNotificationManager =

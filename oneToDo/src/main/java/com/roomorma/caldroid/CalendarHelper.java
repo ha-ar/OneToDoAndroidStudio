@@ -1,6 +1,7 @@
 package com.roomorma.caldroid;
 
-import hirondelle.date4j.DateTime;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import hirondelle.date4j.DateTime;
 
 /**
  * Convenient helper to work with date, JODA DateTime and String
@@ -17,10 +20,12 @@ import java.util.Locale;
  */
 public class CalendarHelper {
 
-	public static SimpleDateFormat yyyyMMddFormat = new SimpleDateFormat(
+	@NotNull
+    public static SimpleDateFormat yyyyMMddFormat = new SimpleDateFormat(
 			"yyyy-MM-dd", Locale.ENGLISH);
 
-	public static SimpleDateFormat MMMFormat = new SimpleDateFormat("MMM",
+	@NotNull
+    public static SimpleDateFormat MMMFormat = new SimpleDateFormat("MMM",
 			Locale.getDefault());
 
 	/**
@@ -33,7 +38,8 @@ public class CalendarHelper {
 	 *            : calendar can start from customized date instead of Sunday
 	 * @return
 	 */
-	public static ArrayList<DateTime> getFullWeeks(int month, int year,
+	@NotNull
+    public static ArrayList<DateTime> getFullWeeks(int month, int year,
 			int startDayOfWeek, boolean sixWeeksInCalendar) {
 		ArrayList<DateTime> datetimeList = new ArrayList<DateTime>();
 
@@ -107,7 +113,8 @@ public class CalendarHelper {
 	 * @param date
 	 * @return
 	 */
-	public static DateTime convertDateToDateTime(Date date) {
+	@NotNull
+    public static DateTime convertDateToDateTime(Date date) {
 		// Get year, javaMonth, date
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear();
@@ -121,7 +128,7 @@ public class CalendarHelper {
 		return new DateTime(year, javaMonth + 1, day, 0, 0, 0, 0);
 	}
 
-	public static Date convertDateTimeToDate(DateTime dateTime) {
+	public static Date convertDateTimeToDate(@NotNull DateTime dateTime) {
 		int year = dateTime.getYear();
 		int datetimeMonth = dateTime.getMonth();
 		int day = dateTime.getDay();
@@ -143,7 +150,7 @@ public class CalendarHelper {
 	 * @return
 	 * @throws ParseException
 	 */
-	public static Date getDateFromString(String dateString, String dateFormat)
+	public static Date getDateFromString(String dateString, @Nullable String dateFormat)
 			throws ParseException {
 		SimpleDateFormat formatter;
 		if (dateFormat == null) {
@@ -163,7 +170,8 @@ public class CalendarHelper {
 	 * @param dateFormat
 	 * @return
 	 */
-	public static DateTime getDateTimeFromString(String dateString,
+	@Nullable
+    public static DateTime getDateTimeFromString(String dateString,
 			String dateFormat) {
 		Date date;
 		try {
@@ -176,8 +184,9 @@ public class CalendarHelper {
 		return null;
 	}
 
-	public static ArrayList<String> convertToStringList(
-			ArrayList<DateTime> dateTimes) {
+	@NotNull
+    public static ArrayList<String> convertToStringList(
+			@NotNull ArrayList<DateTime> dateTimes) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (DateTime dateTime : dateTimes) {
 			list.add(dateTime.format("YYYY-MM-DD"));
@@ -185,7 +194,8 @@ public class CalendarHelper {
 		return list;
 	}
 
-	public static ArrayList<String> getCurrentWeek() {
+	@NotNull
+    public static ArrayList<String> getCurrentWeek() {
 		SimpleDateFormat format = new SimpleDateFormat("dd");
 		Calendar calendar = Calendar.getInstance();
 		calendar.setFirstDayOfWeek(Calendar.SUNDAY);

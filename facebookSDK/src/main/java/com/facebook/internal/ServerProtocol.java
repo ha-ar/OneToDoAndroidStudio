@@ -19,13 +19,16 @@ package com.facebook.internal;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.facebook.LoggingBehavior;
 import com.facebook.Settings;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -85,6 +88,7 @@ public final class ServerProtocol {
         return String.format(GRAPH_VIDEO_URL_FORMAT, Settings.getFacebookDomain());
     }
 
+    @NotNull
     public static final String getAPIVersion() {
         if (Settings.getPlatformCompatibilityEnabled()) {
             return LEGACY_API_VERSION;
@@ -92,6 +96,7 @@ public final class ServerProtocol {
         return GRAPH_API_VERSION;
     }
 
+    @Nullable
     public static Bundle getQueryParamsForPlatformActivityIntentWebFallback(
             Context context,
             String callId,

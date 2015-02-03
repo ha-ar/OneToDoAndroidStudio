@@ -1,5 +1,7 @@
 package net.simonvt.datepicker;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Array;
 
 class CVArrays {
@@ -19,8 +21,9 @@ class CVArrays {
      * @throws NullPointerException if {@code original == null}
      * @since 1.6
      */
+    @NotNull
     @SuppressWarnings("unchecked")
-    public static <T> T[] copyOfRange(T[] original, int start, int end) {
+    public static <T> T[] copyOfRange(@NotNull T[] original, int start, int end) {
         int originalLength = original.length; // For exception priority compatibility.
         if (start > end) {
             throw new IllegalArgumentException();

@@ -25,13 +25,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.facebook.*;
+
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionDefaultAudience;
+import com.facebook.SessionLoginBehavior;
+import com.facebook.SessionState;
 import com.facebook.android.R;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.ImageDownloader;
 import com.facebook.internal.ImageRequest;
 import com.facebook.internal.ImageResponse;
 import com.facebook.model.GraphUser;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,16 +68,19 @@ public class UserSettingsFragment extends FacebookFragment {
     private static final String REQUEST_FIELDS = TextUtils.join(",", new String[] {ID, NAME, PICTURE});
 
     private LoginButton loginButton;
+    @NotNull
     private LoginButton.LoginButtonProperties loginButtonProperties = new LoginButton.LoginButtonProperties();
     private TextView connectedStateLabel;
+    @Nullable
     private GraphUser user;
+    @Nullable
     private Session userInfoSession; // the Session used to fetch the current user info
     private Drawable userProfilePic;
     private String userProfilePicID;
     private Session.StatusCallback sessionStatusCallback;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.com_facebook_usersettingsfragment, container, false);
         loginButton = (LoginButton) view.findViewById(R.id.com_facebook_usersettingsfragment_login_button);
         loginButton.setProperties(loginButtonProperties);
@@ -335,6 +347,7 @@ public class UserSettingsFragment extends FacebookFragment {
     }
 
     // For Testing Only
+    @Nullable
     List<String> getPermissions() {
         return loginButtonProperties.getPermissions();
     }
@@ -345,7 +358,7 @@ public class UserSettingsFragment extends FacebookFragment {
             if (currentSession != userInfoSession) {
                 Request request = Request.newMeRequest(currentSession, new Request.GraphUserCallback() {
                     @Override
-                    public void onCompleted(GraphUser me, Response response) {
+                    public void onCompleted(GraphUser me, @NotNull Response response) {
                         if (currentSession == getSession()) {
                             user = me;
                             updateUI();
@@ -410,6 +423,7 @@ public class UserSettingsFragment extends FacebookFragment {
         }
     }
 
+    @Nullable
     private ImageRequest getImageRequest() {
         ImageRequest request = null;
         try {
@@ -434,7 +448,7 @@ public class UserSettingsFragment extends FacebookFragment {
         return request;
     }
 
-    private void processImageResponse(String id, ImageResponse response) {
+    private void processImageResponse(String id, @Nullable ImageResponse response) {
         if (response != null) {
             Bitmap bitmap = response.getBitmap();
             if (bitmap != null) {

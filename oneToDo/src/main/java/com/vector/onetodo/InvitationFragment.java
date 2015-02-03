@@ -1,9 +1,5 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +16,13 @@ import android.widget.Toast;
 
 import com.vector.onetodo.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class InvitationFragment extends Invitationtabholder implements
 		OnScrollListener {
 
@@ -29,7 +32,8 @@ public class InvitationFragment extends Invitationtabholder implements
 	private static long[] Currentdate;
  
 
-	public static InvitationFragment newInstance(int position) {
+	@NotNull
+    public static InvitationFragment newInstance(int position) {
 		InvitationFragment myFragment = new InvitationFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -44,7 +48,7 @@ public class InvitationFragment extends Invitationtabholder implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater
 				.inflate(R.layout.invitation_list, container, false);
@@ -93,7 +97,8 @@ public class InvitationFragment extends Invitationtabholder implements
 			return 2;
 		}
 
-		@Override
+		@Nullable
+        @Override
 		public Object getItem(int position) {
 			return null;
 		}

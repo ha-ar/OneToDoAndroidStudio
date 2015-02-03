@@ -1,8 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
@@ -20,18 +17,27 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements
 		Filterable {
 
-	private String PLACES_API_KEY = "AIzaSyB1k1X5cGfk1Wma3ewD2Xg-FmFSOOnK_J4";
+	@NotNull
+    private String PLACES_API_KEY = "AIzaSyB1k1X5cGfk1Wma3ewD2Xg-FmFSOOnK_J4";
 
 	private HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
-	private JsonFactory JSON_FACTORY = new JacksonFactory();;
+	@NotNull
+    private JsonFactory JSON_FACTORY = new JacksonFactory();;
 
-	private String PLACES_AUTOCOMPLETE_API = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+	@NotNull
+    private String PLACES_AUTOCOMPLETE_API = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
 	private ArrayList<String> resultList;
 
-	public PlacesAutoCompleteAdapter(Context context, int textViewResourceId) {
+	public PlacesAutoCompleteAdapter(@NotNull Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 	}
 
@@ -45,11 +51,13 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements
 		return resultList.get(index);
 	}
 
-	@Override
+	@Nullable
+    @Override
 	public Filter getFilter() {
 		Filter filter = new Filter() {
-			@Override
-			protected FilterResults performFiltering(CharSequence constraint) {
+			@NotNull
+            @Override
+			protected FilterResults performFiltering(@Nullable CharSequence constraint) {
 				FilterResults filterResults = new FilterResults();
 				if (constraint != null) {
 					// Retrieve the autocomplete results.
@@ -64,7 +72,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements
 
 			@Override
 			protected void publishResults(CharSequence constraint,
-					FilterResults results) {
+					@Nullable FilterResults results) {
 				if (results != null && results.count > 0) {
 					notifyDataSetChanged();
 				} else {
@@ -75,14 +83,15 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements
 		return filter;
 	}
 
-	private ArrayList<String> autoComplete(String input) {
+	@NotNull
+    private ArrayList<String> autoComplete(String input) {
 
 		ArrayList<String> resultList = new ArrayList<String>();
 		try {
 			HttpRequestFactory requestFactory = HTTP_TRANSPORT
 					.createRequestFactory(new HttpRequestInitializer() {
 						@Override
-						public void initialize(HttpRequest request) {
+						public void initialize(@NotNull HttpRequest request) {
 							request.setParser(new JsonObjectParser(JSON_FACTORY));
 						}
 					});

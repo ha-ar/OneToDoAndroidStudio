@@ -33,7 +33,15 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import com.facebook.*;
+
+import com.facebook.AppEventsLogger;
+import com.facebook.FacebookException;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionDefaultAudience;
+import com.facebook.SessionLoginBehavior;
+import com.facebook.SessionState;
 import com.facebook.android.R;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.SessionAuthorizationType;
@@ -41,6 +49,9 @@ import com.facebook.internal.SessionTracker;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Utility.FetchedAppSettings;
 import com.facebook.model.GraphUser;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,9 +89,12 @@ public class LoginButton extends Button {
     }
 
     private static final String TAG = LoginButton.class.getName();
+    @Nullable
     private String applicationId = null;
     private SessionTracker sessionTracker;
+    @Nullable
     private GraphUser user = null;
+    @Nullable
     private Session userInfoSession = null; // the Session used to fetch the current user info
     private boolean confirmLogout;
     private boolean fetchUserInfo;
@@ -95,11 +109,14 @@ public class LoginButton extends Button {
     private ToolTipPopup.Style nuxStyle = ToolTipPopup.Style.BLUE;
     private ToolTipMode nuxMode = ToolTipMode.DEFAULT;
     private long nuxDisplayTime = ToolTipPopup.DEFAULT_POPUP_DISPLAY_TIME;
+    @Nullable
     private ToolTipPopup nuxPopup;
 
     static class LoginButtonProperties {
         private SessionDefaultAudience defaultAudience = SessionDefaultAudience.FRIENDS;
+        @Nullable
         private List<String> permissions = Collections.<String>emptyList();
+        @Nullable
         private SessionAuthorizationType authorizationType = null;
         private OnErrorListener onErrorListener;
         private SessionLoginBehavior loginBehavior = SessionLoginBehavior.SSO_WITH_FALLBACK;
@@ -144,7 +161,7 @@ public class LoginButton extends Button {
         }
 
         private boolean validatePermissions(List<String> permissions,
-                SessionAuthorizationType authType, Session currentSession) {
+                SessionAuthorizationType authType, @Nullable Session currentSession) {
             if (SessionAuthorizationType.PUBLISH.equals(authType)) {
                 if (Utility.isNullOrEmpty(permissions)) {
                     throw new IllegalArgumentException("Permissions for publish actions cannot be null or empty.");
@@ -159,6 +176,7 @@ public class LoginButton extends Button {
             return true;
         }
 
+        @Nullable
         List<String> getPermissions() {
             return permissions;
         }
@@ -214,7 +232,7 @@ public class LoginButton extends Button {
      *
      * @see View#View(Context)
      */
-    public LoginButton(Context context) {
+    public LoginButton(@NotNull Context context) {
         super(context);
         initializeActiveSessionWithCachedToken(context);
         // since onFinishInflate won't be called, we need to finish initialization ourselves
@@ -226,7 +244,7 @@ public class LoginButton extends Button {
      *
      * @see View#View(Context, AttributeSet)
      */
-    public LoginButton(Context context, AttributeSet attrs) {
+    public LoginButton(@NotNull Context context, @NotNull AttributeSet attrs) {
         super(context, attrs);
 
         if (attrs.getStyleAttribute() == 0) {
@@ -266,7 +284,7 @@ public class LoginButton extends Button {
      *
      * @see View#View(Context, AttributeSet, int)
      */
-    public LoginButton(Context context, AttributeSet attrs, int defStyle) {
+    public LoginButton(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         parseAttributes(attrs);
         initializeActiveSessionWithCachedToken(context);
@@ -641,7 +659,7 @@ public class LoginButton extends Button {
     }
     
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         if (!nuxChecked && nuxMode != ToolTipMode.NEVER_DISPLAY && !isInEditMode()) {
@@ -650,7 +668,7 @@ public class LoginButton extends Button {
         }
     }
     
-    private void showNuxPerSettings(FetchedAppSettings settings) {
+    private void showNuxPerSettings(@Nullable FetchedAppSettings settings) {
         if (settings != null && settings.getNuxEnabled() && getVisibility() == View.VISIBLE) {
             String nuxString = settings.getNuxContent();
             displayNux(nuxString);
@@ -707,6 +725,7 @@ public class LoginButton extends Button {
     }
 
     // For testing purposes only
+    @Nullable
     List<String> getPermissions() {
         return properties.getPermissions();
     }
@@ -719,7 +738,7 @@ public class LoginButton extends Button {
         loginLogoutEventName = eventName;
     }
 
-    private void parseAttributes(AttributeSet attrs) {
+    private void parseAttributes(@NotNull AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.com_facebook_login_view);
         confirmLogout = a.getBoolean(R.styleable.com_facebook_login_view_confirm_logout, true);
         fetchUserInfo = a.getBoolean(R.styleable.com_facebook_login_view_fetch_user_info, true);
@@ -738,7 +757,7 @@ public class LoginButton extends Button {
         }
     }
 
-    private boolean initializeActiveSessionWithCachedToken(Context context) {
+    private boolean initializeActiveSessionWithCachedToken(@Nullable Context context) {
         if (context == null) {
             return false;
         }
@@ -763,7 +782,7 @@ public class LoginButton extends Button {
                 if (currentSession != userInfoSession) {
                     Request request = Request.newMeRequest(currentSession, new Request.GraphUserCallback() {
                         @Override
-                        public void onCompleted(GraphUser me,  Response response) {
+                        public void onCompleted(GraphUser me,  @NotNull Response response) {
                             if (currentSession == sessionTracker.getOpenSession()) {
                                 user = me;
                                 if (userInfoChangedCallback != null) {
@@ -875,7 +894,7 @@ public class LoginButton extends Button {
     private class LoginButtonCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state,
-                         Exception exception) {
+                         @Nullable Exception exception) {
             fetchUserInfo();
             setButtonText();
 

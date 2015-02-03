@@ -5,12 +5,14 @@ import android.util.AttributeSet;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 public class CheckableLinearLayout extends LinearLayout implements Checkable {
 
     private static final int CHECKABLE_CHILD_INDEX = 0;
     private Checkable child;
 
-    public CheckableLinearLayout(Context context, AttributeSet attrs) {
+    public CheckableLinearLayout(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

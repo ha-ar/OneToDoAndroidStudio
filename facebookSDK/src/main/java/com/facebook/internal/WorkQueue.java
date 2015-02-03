@@ -18,17 +18,22 @@ package com.facebook.internal;
 
 import com.facebook.Settings;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.Executor;
 
 class WorkQueue {
     public static final int DEFAULT_MAX_CONCURRENT = 8;
 
     private final Object workLock = new Object();
+    @Nullable
     private WorkNode pendingJobs;
 
     private final int maxConcurrent;
     private final Executor executor;
 
+    @Nullable
     private WorkNode runningJobs = null;
     private int runningCount = 0;
 
@@ -45,10 +50,12 @@ class WorkQueue {
         this.executor = executor;
     }
 
+    @NotNull
     WorkItem addActiveWorkItem(Runnable callback) {
         return addActiveWorkItem(callback, true);
     }
 
+    @NotNull
     WorkItem addActiveWorkItem(Runnable callback, boolean addToFront) {
         WorkNode node = new WorkNode(callback);
         synchronized (workLock) {
@@ -81,7 +88,7 @@ class WorkQueue {
         finishItemAndStartNew(null);
     }
 
-    private void finishItemAndStartNew(WorkNode finished) {
+    private void finishItemAndStartNew(@Nullable WorkNode finished) {
         WorkNode ready = null;
 
         synchronized (workLock) {
@@ -110,7 +117,7 @@ class WorkQueue {
         }
     }
 
-    private void execute(final WorkNode node) {
+    private void execute(@NotNull final WorkNode node) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -125,7 +132,9 @@ class WorkQueue {
 
     private class WorkNode implements WorkItem {
         private final Runnable callback;
+        @Nullable
         private WorkNode next;
+        @Nullable
         private WorkNode prev;
         private boolean isRunning;
 
@@ -164,6 +173,7 @@ class WorkQueue {
             return callback;
         }
 
+        @Nullable
         WorkNode getNext() {
             return next;
         }
@@ -172,7 +182,8 @@ class WorkQueue {
             this.isRunning = isRunning;
         }
 
-        WorkNode addToList(WorkNode list, boolean addToFront) {
+        @Nullable
+        WorkNode addToList(@Nullable WorkNode list, boolean addToFront) {
             assert next == null;
             assert prev == null;
 

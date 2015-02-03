@@ -1,15 +1,20 @@
 package com.vector.model;
 
-import java.util.ArrayList;
-
 import com.google.gson.annotations.SerializedName;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class TaskData {
 
-	public static TaskData taskdata = null;
+	@Nullable
+    public static TaskData taskdata = null;
 
 
-	public static TaskData getInstance() {
+	@Nullable
+    public static TaskData getInstance() {
 		if (taskdata == null) {
 			taskdata = new TaskData();
 		}
@@ -21,7 +26,8 @@ public class TaskData {
 	}
 
 	
-		@SerializedName("todos")
+		@NotNull
+        @SerializedName("todos")
 		public ArrayList<Todos> todos=new ArrayList<TaskData.Todos>();
 
 		public class Todos {

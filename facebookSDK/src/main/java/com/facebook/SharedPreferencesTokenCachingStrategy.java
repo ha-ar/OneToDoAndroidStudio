@@ -20,9 +20,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,7 +88,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
      *
      * @throws NullPointerException if the passed in Context is null
      */
-    public SharedPreferencesTokenCachingStrategy(Context context) {
+    public SharedPreferencesTokenCachingStrategy(@NotNull Context context) {
         this(context, null);
     }
 
@@ -100,7 +104,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
      *
      * @throws NullPointerException if the passed in Context is null
      */
-    public SharedPreferencesTokenCachingStrategy(Context context, String cacheKey) {
+    public SharedPreferencesTokenCachingStrategy(@NotNull Context context, String cacheKey) {
         Validate.notNull(context, "context");
 
         this.cacheKey = Utility.isNullOrEmpty(cacheKey) ? DEFAULT_CACHE_KEY : cacheKey;
@@ -121,6 +125,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
      *
      * @return A Bundle with the information contained in this cache
      */
+    @Nullable
     public Bundle load() {
         Bundle settings = new Bundle();
 
@@ -147,7 +152,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
      * @param bundle
      *          The Bundle containing information to be cached
      */
-    public void save(Bundle bundle) {
+    public void save(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
 
         SharedPreferences.Editor editor = cache.edit();
@@ -173,7 +178,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
         cache.edit().clear().apply();
     }
 
-    private void serializeKey(String key, Bundle bundle, SharedPreferences.Editor editor)
+    private void serializeKey(String key, @NotNull Bundle bundle, @NotNull SharedPreferences.Editor editor)
         throws JSONException {
         Object value = bundle.get(key);
         if (value == null) {
@@ -287,7 +292,7 @@ public class SharedPreferencesTokenCachingStrategy extends TokenCachingStrategy 
         }
     }
 
-    private void deserializeKey(String key, Bundle bundle)
+    private void deserializeKey(String key, @NotNull Bundle bundle)
             throws JSONException {
         String jsonString = cache.getString(key, "{}");
         JSONObject json = new JSONObject(jsonString);

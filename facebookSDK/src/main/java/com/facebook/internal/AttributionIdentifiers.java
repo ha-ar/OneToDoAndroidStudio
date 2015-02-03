@@ -24,6 +24,9 @@ import android.util.Log;
 
 import com.facebook.FacebookException;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Method;
 
 /**
@@ -45,12 +48,14 @@ public class AttributionIdentifiers {
     private static final long IDENTIFIER_REFRESH_INTERVAL_MILLIS = 3600 * 1000;
 
     private String attributionId;
+    @Nullable
     private String androidAdvertiserId;
     private boolean limitTracking;
     private long fetchTime;
 
     private static AttributionIdentifiers recentlyFetchedIdentifiers;
 
+    @NotNull
     private static AttributionIdentifiers getAndroidId(Context context) {
         AttributionIdentifiers identifiers = new AttributionIdentifiers();
         try {
@@ -101,7 +106,8 @@ public class AttributionIdentifiers {
         return identifiers;
     }
 
-    public static AttributionIdentifiers getAttributionIdentifiers(Context context) {
+    @Nullable
+    public static AttributionIdentifiers getAttributionIdentifiers(@NotNull Context context) {
         if (recentlyFetchedIdentifiers != null &&
             System.currentTimeMillis() - recentlyFetchedIdentifiers.fetchTime < IDENTIFIER_REFRESH_INTERVAL_MILLIS) {
             return recentlyFetchedIdentifiers;
@@ -142,6 +148,7 @@ public class AttributionIdentifiers {
         return attributionId;
     }
 
+    @Nullable
     public String getAndroidAdvertiserId() {
         return androidAdvertiserId;
     }

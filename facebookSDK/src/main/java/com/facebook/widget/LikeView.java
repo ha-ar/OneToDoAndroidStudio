@@ -32,8 +32,16 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.facebook.android.R;
-import com.facebook.internal.*;
+import com.facebook.internal.AnalyticsEvents;
+import com.facebook.internal.LikeActionController;
+import com.facebook.internal.LikeBoxCountView;
+import com.facebook.internal.LikeButton;
+import com.facebook.internal.Utility;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class provides the UI for displaying the Facebook Like button and its associated components.
@@ -67,8 +75,10 @@ public class LikeView extends FrameLayout {
          */
         BOX_COUNT("box_count", 2);
 
+        @NotNull
         static Style DEFAULT = STANDARD;
 
+        @Nullable
         static Style fromInt(int enumValue) {
             for (Style style : values()) {
                 if (style.getValue() == enumValue) {
@@ -119,8 +129,10 @@ public class LikeView extends FrameLayout {
          */
         RIGHT("right", 2);
 
+        @NotNull
         static HorizontalAlignment DEFAULT = CENTER;
 
+        @Nullable
         static HorizontalAlignment fromInt(int enumValue) {
             for (HorizontalAlignment horizontalAlignment : values()) {
                 if (horizontalAlignment.getValue() == enumValue) {
@@ -174,8 +186,10 @@ public class LikeView extends FrameLayout {
          */
         TOP("top", 2);
 
+        @NotNull
         static AuxiliaryViewPosition DEFAULT = BOTTOM;
 
+        @Nullable
         static AuxiliaryViewPosition fromInt(int enumValue) {
             for (AuxiliaryViewPosition auxViewPosition : values()) {
                 if (auxViewPosition.getValue() == enumValue) {
@@ -210,13 +224,19 @@ public class LikeView extends FrameLayout {
     private LikeButton likeButton;
     private LikeBoxCountView likeBoxCountView;
     private TextView socialSentenceView;
+    @Nullable
     private LikeActionController likeActionController;
     private OnErrorListener onErrorListener;
+    @Nullable
     private BroadcastReceiver broadcastReceiver;
+    @Nullable
     private LikeActionControllerCreationCallback creationCallback;
 
+    @Nullable
     private Style likeViewStyle = Style.DEFAULT;
+    @Nullable
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.DEFAULT;
+    @Nullable
     private AuxiliaryViewPosition auxiliaryViewPosition = AuxiliaryViewPosition.DEFAULT;
     private int foregroundColor = NO_FOREGROUND_COLOR;
 
@@ -246,7 +266,7 @@ public class LikeView extends FrameLayout {
      *
      * @param context Context for this View
      */
-    public LikeView(Context context) {
+    public LikeView(@NotNull Context context) {
         super(context);
         initialize(context);
     }
@@ -257,7 +277,7 @@ public class LikeView extends FrameLayout {
      * @param context Context for this View
      * @param attrs   AttributeSet for this View.
      */
-    public LikeView(Context context, AttributeSet attrs) {
+    public LikeView(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
         parseAttributes(attrs);
         initialize(context);
@@ -353,7 +373,7 @@ public class LikeView extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
-    private void parseAttributes(AttributeSet attrs) {
+    private void parseAttributes(@Nullable AttributeSet attrs) {
         if (attrs == null || getContext() == null) {
             return;
         }
@@ -391,7 +411,7 @@ public class LikeView extends FrameLayout {
     }
 
     // If attributes were present, parseAttributes MUST be called before initialize() to ensure proper behavior
-    private void initialize(Context context) {
+    private void initialize(@NotNull Context context) {
         edgePadding = getResources().getDimensionPixelSize(R.dimen.com_facebook_likeview_edge_padding);
         internalPadding = getResources().getDimensionPixelSize(R.dimen.com_facebook_likeview_internal_padding);
         if (foregroundColor == NO_FOREGROUND_COLOR) {
@@ -438,7 +458,7 @@ public class LikeView extends FrameLayout {
         likeButton.setLayoutParams(buttonLayout);
     }
 
-    private void initializeSocialSentenceView(Context context) {
+    private void initializeSocialSentenceView(@NotNull Context context) {
         socialSentenceView = new TextView(context);
         socialSentenceView.setTextSize(
                 TypedValue.COMPLEX_UNIT_PX,
@@ -469,6 +489,7 @@ public class LikeView extends FrameLayout {
         }
     }
 
+    @NotNull
     private Bundle getAnalyticsParameters() {
         Bundle params = new Bundle();
         params.putString(AnalyticsEvents.PARAMETER_LIKE_VIEW_STYLE, likeViewStyle.toString());
@@ -642,7 +663,7 @@ public class LikeView extends FrameLayout {
 
     private class LikeControllerBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, @NotNull Intent intent) {
             String intentAction = intent.getAction();
             Bundle extras = intent.getExtras();
             boolean shouldRespond = true;

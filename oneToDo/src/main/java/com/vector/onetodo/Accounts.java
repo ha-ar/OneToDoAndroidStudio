@@ -1,10 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -35,6 +30,14 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 import com.vector.onetodo.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Accounts extends Fragment {
 
 	AQuery aq, aq_attach, aq_onetodoinfo, aq_buypro, aq_phone, aq_changephone,
@@ -49,7 +52,7 @@ public class Accounts extends Fragment {
 	private ActionBar actionBar;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.account, container, false);
 		imageEvent = (CircularImageView) view.findViewById(R.id.image_event);
@@ -67,14 +70,14 @@ public class Accounts extends Fragment {
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.plain, menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(@NotNull MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			getActivity().getSupportFragmentManager().popBackStack();
@@ -158,7 +161,7 @@ public class Accounts extends Fragment {
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
-			public void onItemSelected(AdapterView<?> arg0, View view,
+			public void onItemSelected(AdapterView<?> arg0, @NotNull View view,
 					int position, long Id) {
 				String code = ((TextView) view.findViewById(R.id.country_code))
 						.getText().toString();
@@ -403,7 +406,7 @@ public class Accounts extends Fragment {
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {

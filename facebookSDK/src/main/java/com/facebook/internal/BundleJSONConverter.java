@@ -17,11 +17,17 @@
 package com.facebook.internal;
 
 import android.os.Bundle;
+
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -39,47 +45,47 @@ public class BundleJSONConverter {
 
     static {
         SETTERS.put(Boolean.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 bundle.putBoolean(key, (Boolean) value);
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 json.put(key, value);
             }
         });
         SETTERS.put(Integer.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 bundle.putInt(key, (Integer) value);
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 json.put(key, value);
             }
         });
         SETTERS.put(Long.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 bundle.putLong(key, (Long) value);
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 json.put(key, value);
             }
         });
         SETTERS.put(Double.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 bundle.putDouble(key, (Double) value);
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 json.put(key, value);
             }
         });
         SETTERS.put(String.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 bundle.putString(key, (String) value);
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 json.put(key, value);
             }
         });
@@ -88,7 +94,7 @@ public class BundleJSONConverter {
                 throw new IllegalArgumentException("Unexpected type from JSON");
             }
 
-            public void setOnJSON(JSONObject json, String key, Object value)  throws JSONException {
+            public void setOnJSON(@NotNull JSONObject json, String key, Object value)  throws JSONException {
                 JSONArray jsonArray = new JSONArray();
                 for (String stringValue : (String[])value) {
                     jsonArray.put(stringValue);
@@ -98,7 +104,7 @@ public class BundleJSONConverter {
         });
 
         SETTERS.put(JSONArray.class, new Setter() {
-            public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
+            public void setOnBundle(@NotNull Bundle bundle, String key, Object value) throws JSONException {
                 JSONArray jsonArray = (JSONArray)value;
                 ArrayList<String> stringArrayList = new ArrayList<String>();
                 // Empty list, can't even figure out the type, assume an ArrayList<String>
@@ -131,7 +137,8 @@ public class BundleJSONConverter {
         public void setOnJSON(JSONObject json, String key, Object value) throws JSONException;
     }
 
-    public static JSONObject convertToJSON(Bundle bundle) throws JSONException {
+    @NotNull
+    public static JSONObject convertToJSON(@NotNull Bundle bundle) throws JSONException {
         JSONObject json = new JSONObject();
 
         for(String key : bundle.keySet()) {
@@ -169,7 +176,8 @@ public class BundleJSONConverter {
         return json;
     }
 
-    public static Bundle convertToBundle(JSONObject jsonObject) throws JSONException {
+    @NotNull
+    public static Bundle convertToBundle(@NotNull JSONObject jsonObject) throws JSONException {
         Bundle bundle = new Bundle();
         @SuppressWarnings("unchecked")
         Iterator<String> jsonIterator = jsonObject.keys();

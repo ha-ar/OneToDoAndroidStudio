@@ -12,16 +12,22 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 public class ParallaxListView extends ListView implements OnScrollListener {
 
     public final static double NO_ZOOM = 1;
+    @NotNull
     private ArrayList<net.appkraft.parallax.OnOverScrollByListener> mOnOverScrollByList = new ArrayList<net.appkraft.parallax.OnOverScrollByListener>();
+    @NotNull
     private ArrayList<OnTouchEventListener> mOnTouchEventList = new ArrayList<OnTouchEventListener>();
     private ImageView mImageView;
     private int mDrawableMaxHeight = -1;
     private int mImageViewHeight = -1;
+    @NotNull
     private OnOverScrollByListener scrollByListener = new OnOverScrollByListener() {
         @Override
         public boolean overScrollBy(int deltaX, int deltaY, int scrollX,
@@ -50,9 +56,10 @@ public class ParallaxListView extends ListView implements OnScrollListener {
             return false;
         }
     };
+    @NotNull
     private OnTouchEventListener touchListener = new OnTouchEventListener() {
         @Override
-        public void onTouchEvent(MotionEvent ev) {
+        public void onTouchEvent(@NotNull MotionEvent ev) {
             if (ev.getAction() == MotionEvent.ACTION_UP) {
                 if (mImageViewHeight - 1 < mImageView.getHeight()) {
                     ResetAnimimation animation = new ResetAnimimation(
@@ -63,6 +70,7 @@ public class ParallaxListView extends ListView implements OnScrollListener {
             }
         }
     };
+    @NotNull
     private net.appkraft.parallax.OnOverScrollByListener onScroll = new net.appkraft.parallax.OnOverScrollByListener() {
 
         @Override
@@ -108,10 +116,11 @@ public class ParallaxListView extends ListView implements OnScrollListener {
 
         }
     };
+    @NotNull
     private OnTouchEventListener onTouched = new OnTouchEventListener() {
 
         @Override
-        public void onTouchEvent(MotionEvent ev) {
+        public void onTouchEvent(@NotNull MotionEvent ev) {
 
             if (ev.getAction() == MotionEvent.ACTION_UP) {
 
@@ -128,18 +137,18 @@ public class ParallaxListView extends ListView implements OnScrollListener {
     };
     private double mZoomRatio = 1;
 
-    public ParallaxListView(Context context, AttributeSet attrs,
+    public ParallaxListView(@NotNull Context context, AttributeSet attrs,
                             int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs);
     }
 
-    public ParallaxListView(Context context, AttributeSet attrs) {
+    public ParallaxListView(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public ParallaxListView(Context context) {
+    public ParallaxListView(@NotNull Context context) {
         super(context);
         init(context, null);
     }
@@ -158,7 +167,7 @@ public class ParallaxListView extends ListView implements OnScrollListener {
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(@NotNull Context context, @Nullable AttributeSet attrs) {
 
         if (attrs != null) {
 
@@ -205,7 +214,7 @@ public class ParallaxListView extends ListView implements OnScrollListener {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(@NotNull MotionEvent ev) {
 
         for (int i = 0; i < mOnTouchEventList.size(); i++) {
 
@@ -224,7 +233,7 @@ public class ParallaxListView extends ListView implements OnScrollListener {
      * @param view - An {@link ImageView} that will have the parallax effect.
      */
 
-    public void setImageViewToParallax(ImageView imageView) {
+    public void setImageViewToParallax(@NotNull ImageView imageView) {
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
@@ -292,7 +301,7 @@ public class ParallaxListView extends ListView implements OnScrollListener {
         int extraHeight;
         View mView;
 
-        protected ResetAnimimation(View view, int targetHeight) {
+        protected ResetAnimimation(@NotNull View view, int targetHeight) {
             this.mView = view;
             this.targetHeight = targetHeight;
             originalHeight = view.getHeight();

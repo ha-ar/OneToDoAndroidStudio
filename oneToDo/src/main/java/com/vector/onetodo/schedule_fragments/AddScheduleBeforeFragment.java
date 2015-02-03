@@ -1,6 +1,5 @@
-package com.vector.onetodo;
+package com.vector.onetodo.schedule_fragments;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -24,18 +23,28 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.PlacesAutoCompleteAdapter;
+import com.vector.onetodo.R;
+
+import net.simonvt.numberpicker.NumberPicker;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AddScheduleBeforeFragment extends Fragment {
 
 	int position;
 	AQuery aq, aq_del, aq_edit, aqd;
 
-	String padress = null, pname = null;
+	@Nullable
+    String padress = null, pname = null;
 	Editor editor;
 	public static View viewP, viewl;
 
 	private static View previousSelectedLocation;
-	View button = null;
+	@Nullable
+    View button = null;
 	TextView before;
 	AlertDialog alert, location, label,location_edit,location_del;
 	static final String[] beforeArray = new String[] { "On Time", "15 Mins",
@@ -44,7 +53,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 			"Months", "Years" };
 	private static View previousSelected;
 
-	public static AddScheduleBeforeFragment newInstance(int position) {
+	@NotNull
+    public static AddScheduleBeforeFragment newInstance(int position) {
 		AddScheduleBeforeFragment myFragment = new AddScheduleBeforeFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -53,11 +63,11 @@ public class AddScheduleBeforeFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		position = getArguments().getInt("position", 0);
 
-		editor = AddTask.pref.edit();
+		editor = BaseTaskFragment.pref.edit();
 		before = (TextView) getActivity().findViewById(R.id.before_schedule);
 		View view;
 		if (position == 0)
@@ -96,7 +106,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 					.setOnClickListener(new OnClickListener() {
 
 						@Override
-						public void onClick(View arg0) {
+						public void onClick(@NotNull View arg0) {
 							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.notification_radio_sch).textColor(
@@ -114,7 +124,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 					.setOnClickListener(new OnClickListener() {
 
 						@Override
-						public void onClick(View arg0) {
+						public void onClick(@NotNull View arg0) {
 							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio_sch).textColor(
@@ -134,7 +144,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 							new ArrayAdapter<String>(getActivity(),
 									R.layout.grid_layout_textview, beforeArray) {
 
-								@Override
+								@NotNull
+                                @Override
 								public View getView(int position,
 										View convertView, ViewGroup parent) {
 
@@ -182,7 +193,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 						@Override
 						public void onItemClick(AdapterView<?> parent,
-								View view, int position, long id) {
+								@NotNull View view, int position, long id) {
 
 							if (((TextView) previousSelected).getText()
 									.toString().equals("15 Mins")) {
@@ -253,7 +264,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 			set();
 			// ***************************location dialog
 
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) AddTask.dialoglayout5
+			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.adress);
 			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
 					getActivity(),
@@ -261,7 +272,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 			AlertDialog.Builder builder5 = new AlertDialog.Builder(
 					getActivity());
 
-			builder5.setView(AddTask.dialoglayout5);
+			builder5.setView(BaseTaskFragment.dialoglayout5);
 			location = builder5.create();
 
 			location.setOnDismissListener(new OnDismissListener() {
@@ -274,9 +285,9 @@ public class AddScheduleBeforeFragment extends Fragment {
 					aqd.id(R.id.home).getTextView().setFocusable(true);
 				}
 			});
-			aqd = new AQuery(AddTask.dialoglayout5);
+			aqd = new AQuery(BaseTaskFragment.dialoglayout5);
 
-			TextView save1 = (TextView) AddTask.dialoglayout5
+			TextView save1 = (TextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.save);
 			save1.setOnClickListener(new OnClickListener() {
 
@@ -312,7 +323,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) AddTask.dialoglayout5
+			TextView cancel1 = (TextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
@@ -396,7 +407,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 						@Override
-						public void onCheckedChanged(RadioGroup group,
+						public void onCheckedChanged(@NotNull RadioGroup group,
 								int checkedId) {
 							if (previousSelectedLocation != null) {
 								((RadioButton) previousSelectedLocation)
@@ -423,7 +434,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 	private class LocationTagClickListener implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 
 			load(v.getId());
 
@@ -450,7 +461,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 	private class LocationEditClickListener implements OnLongClickListener {
 
 		@Override
-		public boolean onLongClick(final View view) {
+		public boolean onLongClick(@NotNull final View view) {
 			// TODO Auto-generated method stu
 			if (((TextView) view).getText().toString().equals("New")) {
 
@@ -480,9 +491,9 @@ public class AddScheduleBeforeFragment extends Fragment {
 	}
 
 	public void load(long id) {
-		pname = AddTask.pref.getString(3 + "key_name" + id, null); // getting
+		pname = BaseTaskFragment.pref.getString(3 + "key_name" + id, null); // getting
 																	// String
-		padress = AddTask.pref.getString(3 + "key_location" + id, null); // getting
+		padress = BaseTaskFragment.pref.getString(3 + "key_location" + id, null); // getting
 																			// String
 	}
 
@@ -494,7 +505,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 	public void set() {
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = BaseTaskFragment.pref.getString(
 				3 + "key_name" + aq.id(R.id.pre_defined_11).getView().getId(),
 				null);
 		if (pname != null) {
@@ -506,7 +517,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = BaseTaskFragment.pref.getString(
 				3 + "key_name" + aq.id(R.id.pre_defined_21).getView().getId(),
 				null);
 		if (pname != null) {
@@ -518,7 +529,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = BaseTaskFragment.pref.getString(
 				3 + "key_name" + aq.id(R.id.pre_defined_31).getView().getId(),
 				null);
 		if (pname != null) {
@@ -530,7 +541,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = BaseTaskFragment.pref.getString(
 				3 + "key_name" + aq.id(R.id.pre_defined_41).getView().getId(),
 				null);
 		if (pname != null) {

@@ -17,13 +17,19 @@
 package com.facebook.internal;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import com.facebook.android.R;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -40,6 +46,7 @@ public class LikeBoxCountView extends FrameLayout {
     }
 
     private TextView likeCountLabel;
+    @NotNull
     private LikeBoxCountViewCaretPosition caretPosition = LikeBoxCountViewCaretPosition.LEFT;
 
     private float caretHeight;
@@ -54,7 +61,7 @@ public class LikeBoxCountView extends FrameLayout {
      *
      * @param context Context for this View
      */
-    public LikeBoxCountView(Context context) {
+    public LikeBoxCountView(@NotNull Context context) {
         super(context);
         initialize(context);
     }
@@ -71,7 +78,7 @@ public class LikeBoxCountView extends FrameLayout {
      * Sets the caret's position. This will trigger a layout of the view.
      * @param caretPosition
      */
-    public void setCaretPosition(LikeBoxCountViewCaretPosition caretPosition) {
+    public void setCaretPosition(@NotNull LikeBoxCountViewCaretPosition caretPosition) {
         this.caretPosition = caretPosition;
 
         // Since the presence of a caret will move that edge closer to the text, let's add
@@ -94,7 +101,7 @@ public class LikeBoxCountView extends FrameLayout {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         int top = getPaddingTop(), left = getPaddingLeft();
@@ -118,7 +125,7 @@ public class LikeBoxCountView extends FrameLayout {
         drawBorder(canvas, left, top, right, bottom);
     }
 
-    private void initialize(Context context) {
+    private void initialize(@NotNull Context context) {
         setWillNotDraw(false); // Required for the onDraw() method to be called on a FrameLayout
         caretHeight = getResources().getDimension(R.dimen.com_facebook_likeboxcountview_caret_height);
         caretWidth = getResources().getDimension(R.dimen.com_facebook_likeboxcountview_caret_width);
@@ -136,7 +143,7 @@ public class LikeBoxCountView extends FrameLayout {
         setCaretPosition(this.caretPosition);
     }
 
-    private void initializeLikeCountLabel(Context context) {
+    private void initializeLikeCountLabel(@NotNull Context context) {
         likeCountLabel = new TextView(context);
         LayoutParams likeCountLabelLayoutParams = new LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -161,7 +168,7 @@ public class LikeBoxCountView extends FrameLayout {
                 textPadding + bottom);
     }
 
-    private void drawBorder(Canvas canvas, float left, float top, float right, float bottom) {
+    private void drawBorder(@NotNull Canvas canvas, float left, float top, float right, float bottom) {
         Path borderPath = new Path();
 
         float ovalSize = 2.0f * borderRadius;

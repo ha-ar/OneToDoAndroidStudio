@@ -17,8 +17,11 @@
 package com.facebook.internal;
 
 import android.util.Log;
+
 import com.facebook.LoggingBehavior;
 import com.facebook.Settings;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +36,7 @@ public class Logger {
     private static final HashMap<String, String> stringsToReplace = new HashMap<String, String>();
 
     private final LoggingBehavior behavior;
+    @NotNull
     private final String tag;
     private StringBuilder contents;
     private int priority = Log.DEBUG;
@@ -49,18 +53,18 @@ public class Logger {
         }
     }
 
-    public static void log(LoggingBehavior behavior, String tag, String string) {
+    public static void log(LoggingBehavior behavior, @NotNull String tag, String string) {
         log(behavior, Log.DEBUG, tag, string);
     }
 
-    public static void log(LoggingBehavior behavior, String tag, String format, Object... args) {
+    public static void log(LoggingBehavior behavior, @NotNull String tag, @NotNull String format, Object... args) {
         if (Settings.isLoggingBehaviorEnabled(behavior)) {
             String string = String.format(format, args);
             log(behavior, Log.DEBUG, tag, string);
         }
     }
 
-    public static void log(LoggingBehavior behavior, int priority, String tag, String string) {
+    public static void log(LoggingBehavior behavior, int priority, @NotNull String tag, String string) {
         if (Settings.isLoggingBehaviorEnabled(behavior)) {
             string = replaceStrings(string);
             if (tag.startsWith(LOG_TAG_BASE) == false) {
@@ -128,7 +132,7 @@ public class Logger {
         }
     }
 
-    public void append(String format, Object... args) {
+    public void append(@NotNull String format, Object... args) {
         if (shouldLog()) {
             contents.append(String.format(format, args));
         }

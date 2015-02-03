@@ -30,11 +30,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
+
 import com.facebook.android.BuildConfig;
 import com.facebook.internal.AttributionIdentifiers;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +49,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -56,6 +65,7 @@ public final class Settings {
     private static final String TAG = Settings.class.getCanonicalName();
     private static final HashSet<LoggingBehavior> loggingBehaviors =
             new HashSet<LoggingBehavior>(Arrays.asList(LoggingBehavior.DEVELOPER_ERRORS));
+    @Nullable
     private static volatile Executor executor;
     private static volatile boolean shouldAutoPublishInstall;
     private static volatile String appVersion;
@@ -64,6 +74,7 @@ public final class Settings {
     private static volatile boolean defaultsLoaded = false;
     private static final String FACEBOOK_COM = "facebook.com";
     private static volatile String facebookDomain = FACEBOOK_COM;
+    @NotNull
     private static AtomicLong onProgressThreshold = new AtomicLong(65536);
     private static volatile boolean platformCompatibilityEnabled;
     private static volatile boolean isDebugEnabled = BuildConfig.DEBUG;
@@ -90,6 +101,7 @@ public final class Settings {
     private static final ThreadFactory DEFAULT_THREAD_FACTORY = new ThreadFactory() {
         private final AtomicInteger counter = new AtomicInteger(0);
 
+        @NotNull
         public Thread newThread(Runnable runnable) {
             return new Thread(runnable, "FacebookSdk #" + counter.incrementAndGet());
         }
@@ -106,6 +118,7 @@ public final class Settings {
      */
     public static final String CLIENT_TOKEN_PROPERTY = "com.facebook.sdk.ClientToken";
 
+    @NotNull
     private static Boolean sdkInitialized = false;
 
     /**
@@ -113,7 +126,7 @@ public final class Settings {
      * This function will be called once in the application, it is tried to be called as early as possible;
      * This is the place to register broadcast listeners.
      */
-    public static synchronized void sdkInitialize(Context context) {
+    public static synchronized void sdkInitialize(@NotNull Context context) {
         if (sdkInitialized == true) {
           return;
         }
@@ -238,6 +251,7 @@ public final class Settings {
      *
      * @return an Executor used by the SDK.  This will never be null.
      */
+    @Nullable
     public static Executor getExecutor() {
         synchronized (LOCK) {
             if (Settings.executor == null) {
@@ -290,6 +304,7 @@ public final class Settings {
         Settings.facebookDomain = facebookDomain;
     }
 
+    @Nullable
     private static Executor getAsyncTaskExecutor() {
         Field executorField = null;
         try {
@@ -316,8 +331,8 @@ public final class Settings {
         return (Executor) executorObject;
     }
 
-    static void publishInstallAsync(final Context context, final String applicationId,
-        final Request.Callback callback) {
+    static void publishInstallAsync(@NotNull final Context context, final String applicationId,
+        @Nullable final Request.Callback callback) {
         // grab the application context ahead of time, since we will return to the caller immediately.
         final Context applicationContext = context.getApplicationContext();
         Settings.getExecutor().execute(new Runnable() {
@@ -362,9 +377,10 @@ public final class Settings {
         return shouldAutoPublishInstall;
     }
 
+    @Nullable
     static Response publishInstallAndWaitForResponse(
-            final Context context,
-            final String applicationId,
+            @Nullable final Context context,
+            @Nullable final String applicationId,
             final boolean isAutoPublish) {
         try {
             if (context == null || applicationId == null) {
@@ -445,7 +461,8 @@ public final class Settings {
      * Acquire the current attribution id from the facebook app.
      * @return returns null if the facebook app is not present on the phone.
      */
-    public static String getAttributionId(ContentResolver contentResolver) {
+    @Nullable
+    public static String getAttributionId(@NotNull ContentResolver contentResolver) {
         try {
             String [] projection = {ATTRIBUTION_ID_COLUMN_NAME};
             Cursor c = contentResolver.query(ATTRIBUTION_ID_CONTENT_URI, projection, null, null, null);
@@ -496,7 +513,7 @@ public final class Settings {
      *
      * @param context   Used to read the value.
      */
-    public static boolean getLimitEventAndDataUsage(Context context) {
+    public static boolean getLimitEventAndDataUsage(@NotNull Context context) {
         SharedPreferences preferences = context.getSharedPreferences(APP_EVENT_PREFERENCES, Context.MODE_PRIVATE);
         return preferences.getBoolean("limitEventUsage", false);
     }
@@ -509,7 +526,7 @@ public final class Settings {
      *
      * @param context   Used to persist this value across app runs.
      */
-    public static void setLimitEventAndDataUsage(Context context, boolean limitEventUsage) {
+    public static void setLimitEventAndDataUsage(@NotNull Context context, boolean limitEventUsage) {
         context.getSharedPreferences(APP_EVENT_PREFERENCES, Context.MODE_PRIVATE)
             .edit()
             .putBoolean("limitEventUsage", limitEventUsage)
@@ -560,7 +577,7 @@ public final class Settings {
      * settings are currently loaded from metadata: APPLICATION_ID_PROPERTY, CLIENT_TOKEN_PROPERTY
      * @param context the Context to use for loading metadata
      */
-    public static void loadDefaultsFromMetadata(Context context) {
+    public static void loadDefaultsFromMetadata(@Nullable Context context) {
         defaultsLoaded = true;
 
         if (context == null) {
@@ -593,7 +610,8 @@ public final class Settings {
         }
     }
 
-    public static String getApplicationSignature(Context context) {
+    @Nullable
+    public static String getApplicationSignature(@Nullable Context context) {
         if (context == null) {
             return null;
         }

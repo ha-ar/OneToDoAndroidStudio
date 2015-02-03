@@ -22,19 +22,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.SectionIndexer;
+import android.widget.TextView;
+
 import com.facebook.FacebookException;
 import com.facebook.android.R;
 import com.facebook.internal.ImageDownloader;
 import com.facebook.internal.ImageRequest;
 import com.facebook.internal.ImageResponse;
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.Collator;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements SectionIndexer {
     private static final int DISPLAY_SECTIONS_THRESHOLD = 1;
@@ -48,9 +66,13 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
     private static final String PICTURE = "picture";
 
     private final Map<String, ImageRequest> pendingRequests = new HashMap<String, ImageRequest>();
+    @NotNull
     private final LayoutInflater inflater;
+    @NotNull
     private List<String> sectionKeys = new ArrayList<String>();
+    @NotNull
     private Map<String, ArrayList<T>> graphObjectsBySection = new HashMap<String, ArrayList<T>>();
+    @NotNull
     private Map<String, T> graphObjectsById = new HashMap<String, T>();
     private boolean displaySections;
     private List<String> sortFields;
@@ -61,7 +83,9 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
     private DataNeededListener dataNeededListener;
     private GraphObjectCursor<T> cursor;
     private Context context;
+    @NotNull
     private Map<String, ImageResponse> prefetchedPictureCache = new HashMap<String, ImageResponse>();
+    @NotNull
     private ArrayList<String> prefetchedProfilePictureIds = new ArrayList<String>();
     private OnErrorListener onErrorListener;
 
@@ -88,6 +112,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
             this.graphObject = graphObject;
         }
 
+        @NotNull
         public Type getType() {
             if (sectionKey == null) {
                 return Type.ACTIVITY_CIRCLE;
@@ -103,7 +128,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         boolean includeItem(T graphObject);
     }
 
-    public GraphObjectAdapter(Context context) {
+    public GraphObjectAdapter(@NotNull Context context) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
@@ -238,7 +263,8 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         }
     }
 
-    protected String getSectionKeyOfGraphObject(T graphObject) {
+    @Nullable
+    protected String getSectionKeyOfGraphObject(@NotNull T graphObject) {
         String result = null;
 
         if (groupByField != null) {
@@ -251,15 +277,18 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return (result != null) ? result : "";
     }
 
-    protected CharSequence getTitleOfGraphObject(T graphObject) {
+    @NotNull
+    protected CharSequence getTitleOfGraphObject(@NotNull T graphObject) {
         return (String) graphObject.getProperty(NAME);
     }
 
+    @Nullable
     protected CharSequence getSubTitleOfGraphObject(T graphObject) {
         return null;
     }
 
-    protected URI getPictureUriOfGraphObject(T graphObject) {
+    @Nullable
+    protected URI getPictureUriOfGraphObject(@NotNull T graphObject) {
         String uri = null;
         Object o = graphObject.getProperty(PICTURE);
         if (o instanceof String) {
@@ -281,6 +310,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return null;
     }
 
+    @NotNull
     protected View getSectionHeaderView(String sectionHeader, View convertView, ViewGroup parent) {
         TextView result = (TextView) convertView;
 
@@ -293,7 +323,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return result;
     }
 
-    protected View getGraphObjectView(T graphObject, View convertView, ViewGroup parent) {
+    protected View getGraphObjectView(@NotNull T graphObject, View convertView, ViewGroup parent) {
         View result = convertView;
 
         if (result == null) {
@@ -348,7 +378,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return result;
     }
 
-    protected void populateGraphObjectView(View view, T graphObject) {
+    protected void populateGraphObjectView(@NotNull View view, @NotNull T graphObject) {
         String id = getIdOfGraphObject(graphObject);
         view.setTag(id);
 
@@ -395,7 +425,8 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
     /**
      * @throws FacebookException if the GraphObject doesn't have an ID.
      */
-    String getIdOfGraphObject(T graphObject) {
+    @NotNull
+    String getIdOfGraphObject(@NotNull T graphObject) {
         if (graphObject.asMap().containsKey(ID)) {
             Object obj = graphObject.getProperty(ID);
             if (obj instanceof String) {
@@ -425,6 +456,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         // Default is no-op
     }
 
+    @Nullable
     String getPictureFieldSpecifier() {
         // How big is our image?
         View view = createGraphObjectView(null);
@@ -482,7 +514,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
             for (List<T> section : graphObjectsBySection.values()) {
                 Collections.sort(section, new Comparator<GraphObject>() {
                     @Override
-                    public int compare(GraphObject a, GraphObject b) {
+                    public int compare(@NotNull GraphObject a, @NotNull GraphObject b) {
                         return compareGraphObjects(a, b, sortFields, collator);
                     }
                 });
@@ -494,6 +526,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         displaySections = sectionKeys.size() > 1 && objectsAdded > DISPLAY_SECTIONS_THRESHOLD;
     }
 
+    @Nullable
     SectionAndItem<T> getSectionAndItem(int position) {
         if (sectionKeys.size() == 0) {
             return null;
@@ -541,7 +574,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         }
     }
 
-    int getPosition(String sectionKey, T graphObject) {
+    int getPosition(String sectionKey, @Nullable T graphObject) {
         int position = 0;
         boolean found = false;
 
@@ -620,6 +653,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return sectionAndItem.getType() == SectionAndItem.Type.GRAPH_OBJECT;
     }
 
+    @Nullable
     @Override
     public Object getItem(int position) {
         SectionAndItem<T> sectionAndItem = getSectionAndItem(position);
@@ -684,6 +718,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         }
     }
 
+    @NotNull
     @Override
     public Object[] getSections() {
         if (displaySections) {
@@ -714,6 +749,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return 0;
     }
 
+    @NotNull
     public List<T> getGraphObjectsById(Collection<String> ids) {
         Set<String> idSet = new HashSet<String>();
         idSet.addAll(ids);
@@ -729,7 +765,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         return result;
     }
 
-    private void downloadProfilePicture(final String profileId, URI pictureURI, final ImageView imageView) {
+    private void downloadProfilePicture(@NotNull final String profileId, @Nullable URI pictureURI, @Nullable final ImageView imageView) {
         if (pictureURI == null) {
             return;
         }
@@ -752,7 +788,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
                     .setCallback(
                             new ImageRequest.Callback() {
                                 @Override
-                                public void onCompleted(ImageResponse response) {
+                                public void onCompleted(@NotNull ImageResponse response) {
                                     processImageResponse(response, profileId, imageView);
                                 }
                             });
@@ -773,7 +809,7 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         }
     }
 
-    private void processImageResponse(ImageResponse response, String graphObjectId, ImageView imageView) {
+    private void processImageResponse(@NotNull ImageResponse response, @NotNull String graphObjectId, @Nullable ImageView imageView) {
         pendingRequests.remove(graphObjectId);
         if (response.getError() != null) {
             callOnErrorListener(response.getError());
@@ -800,8 +836,8 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
         }
     }
 
-    private static int compareGraphObjects(GraphObject a, GraphObject b, Collection<String> sortFields,
-            Collator collator) {
+    private static int compareGraphObjects(@NotNull GraphObject a, @NotNull GraphObject b, @NotNull Collection<String> sortFields,
+            @NotNull Collator collator) {
         for (String sortField : sortFields) {
             String sa = (String) a.getProperty(sortField);
             String sb = (String) b.getProperty(sortField);
@@ -821,11 +857,13 @@ class GraphObjectAdapter<T extends GraphObject> extends BaseAdapter implements S
 
     // Graph object type to navigate the JSON that sometimes comes back instead of a URL string
     private interface ItemPicture extends GraphObject {
+        @NotNull
         ItemPictureData getData();
     }
 
     // Graph object type to navigate the JSON that sometimes comes back instead of a URL string
     private interface ItemPictureData extends GraphObject {
+        @NotNull
         String getUrl();
     }
 }

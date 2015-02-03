@@ -4,9 +4,11 @@ import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.vector.onetodo.db.gen.DaoMaster;
-import com.vector.onetodo.db.gen.DaoSession;
 import com.vector.onetodo.db.gen.DaoMaster.DevOpenHelper;
+import com.vector.onetodo.db.gen.DaoSession;
 import com.vector.onetodo.utils.AppPrefs;
+
+import org.jetbrains.annotations.Nullable;
 
 public class App extends Application{
 	
@@ -14,6 +16,7 @@ public class App extends Application{
      * Application preferences *
      */
     public static AppPrefs prefs;
+    @Nullable
     public static DevOpenHelper ex_database_helper_obj;
 	public static SQLiteDatabase ex_db;
 	public static DaoSession daoSession;

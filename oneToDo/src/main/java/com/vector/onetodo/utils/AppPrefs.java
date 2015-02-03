@@ -5,24 +5,38 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import org.jetbrains.annotations.NotNull;
+
 public class AppPrefs {
 	private SharedPreferences appSharedPrefs;
 	private SharedPreferences.Editor prefsEditor;
 
-	private String PREFS_NAME = "pref";
-	private String SHARED_NAME = "com.vector.onetodo";
-	private String GCMID = "gcmid";
-	private String USER_ID = "user_id";
-	private String INITIALS = "initials";
-	private String USER_NAME = "user_name";
-	private String USER_NUMBER = "user_number";
-	private String USER_EMAIL = "user_email";
-	private String DATE_FORMAT = "date_format";
-	private String TIME_FORMAT = "time_format";
-	private String STARTING_DAY = "starting_day";
-	private String COUNTRY_CODE = "country_code";
+	@NotNull
+    private String PREFS_NAME = "pref";
+	@NotNull
+    private String SHARED_NAME = "com.vector.onetodo";
+	@NotNull
+    private String GCMID = "gcmid";
+	@NotNull
+    private String USER_ID = "user_id";
+	@NotNull
+    private String INITIALS = "initials";
+	@NotNull
+    private String USER_NAME = "user_name";
+	@NotNull
+    private String USER_NUMBER = "user_number";
+	@NotNull
+    private String USER_EMAIL = "user_email";
+	@NotNull
+    private String DATE_FORMAT = "date_format";
+	@NotNull
+    private String TIME_FORMAT = "time_format";
+	@NotNull
+    private String STARTING_DAY = "starting_day";
+	@NotNull
+    private String COUNTRY_CODE = "country_code";
 
-	public AppPrefs(Context context) {
+	public AppPrefs(@NotNull Context context) {
 		this.appSharedPrefs = context.getSharedPreferences(SHARED_NAME,
 				Activity.MODE_PRIVATE);
 		this.prefsEditor = appSharedPrefs.edit();
@@ -40,7 +54,7 @@ public class AppPrefs {
 	 * @param sharedPrefTitle
 	 * @return
 	 */
-	public String getSharedPrefValue(Context mContext, String sharedPrefTitle) {
+	public String getSharedPrefValue(@NotNull Context mContext, String sharedPrefTitle) {
 		SharedPreferences settings = mContext.getSharedPreferences(PREFS_NAME,
 				0);
 		return settings.getString(sharedPrefTitle, null);
@@ -53,7 +67,7 @@ public class AppPrefs {
 	 * @param sharedPrefTitle
 	 * @param sharedPrefValue
 	 */
-	public void saveSharedPrefValue(Context mContext, String sharedPrefTitle,
+	public void saveSharedPrefValue(@NotNull Context mContext, String sharedPrefTitle,
 			String sharedPrefValue) {
 		try {
 			SharedPreferences settings = mContext.getSharedPreferences(
@@ -72,7 +86,7 @@ public class AppPrefs {
 	 * @param mContext
 	 * @param sharedPrefTitle
 	 */
-	public void removeSharedPrefValue(Context mContext, String sharedPrefTitle) {
+	public void removeSharedPrefValue(@NotNull Context mContext, String sharedPrefTitle) {
 		try {
 			SharedPreferences settings = mContext.getSharedPreferences(
 					PREFS_NAME, 0);

@@ -16,6 +16,8 @@
 
 package com.google.maps.android.geometry;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Point {
     public final double x;
     public final double y;
@@ -25,6 +27,7 @@ public class Point {
         this.y = y;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "Point{" +

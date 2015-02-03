@@ -19,6 +19,8 @@ package com.facebook.internal;
 import android.content.Context;
 import android.net.Uri;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -48,6 +50,7 @@ public class ImageRequest {
     private boolean allowCachedRedirects;
     private Object callerTag;
 
+    @NotNull
     public static URI getProfilePictureUrl(
             String userId,
             int width,
@@ -78,7 +81,7 @@ public class ImageRequest {
         return new URI(builder.toString());
     }
 
-    private ImageRequest(Builder builder) {
+    private ImageRequest(@NotNull Builder builder) {
         this.context = builder.context;
         this.imageUri = builder.imageUrl;
         this.callback = builder.callback;
@@ -122,21 +125,25 @@ public class ImageRequest {
             this.imageUrl = imageUrl;
         }
 
+        @NotNull
         public Builder setCallback(Callback callback) {
             this.callback = callback;
             return this;
         }
 
+        @NotNull
         public Builder setCallerTag(Object callerTag) {
             this.callerTag = callerTag;
             return this;
         }
 
+        @NotNull
         public Builder setAllowCachedRedirects(boolean allowCachedRedirects) {
             this.allowCachedRedirects = allowCachedRedirects;
             return this;
         }
 
+        @NotNull
         public ImageRequest build() {
             return new ImageRequest(this);
         }

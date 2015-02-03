@@ -16,6 +16,13 @@
 
 package com.google.maps.android;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
 import static com.google.maps.android.MathUtil.EARTH_RADIUS;
 import static com.google.maps.android.MathUtil.arcHav;
 import static com.google.maps.android.MathUtil.havDistance;
@@ -30,10 +37,6 @@ import static java.lang.Math.tan;
 import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 
-import java.util.List;
-
-import com.google.android.gms.maps.model.LatLng;
-
 public class SphericalUtil {
 
     private SphericalUtil() {}
@@ -43,7 +46,7 @@ public class SphericalUtil {
      * expressed in degrees clockwise from North within the range [-180,180).
      * @return The heading in degrees clockwise from north.
      */
-    public static double computeHeading(LatLng from, LatLng to) {
+    public static double computeHeading(@NotNull LatLng from, @NotNull LatLng to) {
         // http://williams.best.vwh.net/avform.htm#Crs
         double fromLat = toRadians(from.latitude);
         double fromLng = toRadians(from.longitude);
@@ -63,7 +66,8 @@ public class SphericalUtil {
      * @param distance The distance to travel.
      * @param heading  The heading in degrees clockwise from north.
      */
-    public static LatLng computeOffset(LatLng from, double distance, double heading) {
+    @NotNull
+    public static LatLng computeOffset(@NotNull LatLng from, double distance, double heading) {
         distance /= EARTH_RADIUS;
         heading = toRadians(heading);
         // http://williams.best.vwh.net/avform.htm#LL
@@ -89,7 +93,8 @@ public class SphericalUtil {
      * @param distance The distance travelled, in meters.
      * @param heading  The heading in degrees clockwise from north.
      */
-    public static LatLng computeOffsetOrigin(LatLng to, double distance, double heading) {
+    @Nullable
+    public static LatLng computeOffsetOrigin(@NotNull LatLng to, double distance, double heading) {
         heading = toRadians(heading);
         distance /= EARTH_RADIUS;
         // http://lists.maptools.org/pipermail/proj/2008-October/003939.html
@@ -132,7 +137,8 @@ public class SphericalUtil {
      * @param fraction A fraction of the distance to travel.
      * @return The interpolated LatLng.
      */
-    public static LatLng interpolate(LatLng from, LatLng to, double fraction) {
+    @NotNull
+    public static LatLng interpolate(@NotNull LatLng from, @NotNull LatLng to, double fraction) {
         // http://en.wikipedia.org/wiki/Slerp
         double fromLat = toRadians(from.latitude);
         double fromLng = toRadians(from.longitude);
@@ -172,7 +178,7 @@ public class SphericalUtil {
      * Returns the angle between two LatLngs, in radians. This is the same as the distance
      * on the unit sphere.
      */
-    static double computeAngleBetween(LatLng from, LatLng to) {
+    static double computeAngleBetween(@NotNull LatLng from, @NotNull LatLng to) {
         return distanceRadians(toRadians(from.latitude), toRadians(from.longitude),
                                toRadians(to.latitude), toRadians(to.longitude));
     }
@@ -180,14 +186,14 @@ public class SphericalUtil {
     /**
      * Returns the distance between two LatLngs, in meters.
      */
-    public static double computeDistanceBetween(LatLng from, LatLng to) {
+    public static double computeDistanceBetween(@NotNull LatLng from, @NotNull LatLng to) {
         return computeAngleBetween(from, to) * EARTH_RADIUS;
     }
 
     /**
      * Returns the length of the given path, in meters, on Earth.
      */
-    public static double computeLength(List<LatLng> path) {
+    public static double computeLength(@NotNull List<LatLng> path) {
         if (path.size() < 2) {
             return 0;
         }
@@ -210,7 +216,7 @@ public class SphericalUtil {
      * @param path A closed path.
      * @return The path's area in square meters.
      */
-    public static double computeArea(List<LatLng> path) {
+    public static double computeArea(@NotNull List<LatLng> path) {
         return abs(computeSignedArea(path));
     }
 
@@ -221,7 +227,7 @@ public class SphericalUtil {
      * @param path A closed path.
      * @return The loop's area in square meters.
      */
-    public static double computeSignedArea(List<LatLng> path) {
+    public static double computeSignedArea(@NotNull List<LatLng> path) {
         return computeSignedArea(path, EARTH_RADIUS);
     }
 
@@ -230,7 +236,7 @@ public class SphericalUtil {
      * The computed area uses the same units as the radius squared.
      * Used by SphericalUtilTest.
      */
-    static double computeSignedArea(List<LatLng> path, double radius) {
+    static double computeSignedArea(@NotNull List<LatLng> path, double radius) {
         int size = path.size();
         if (size < 3) { return 0; }
         double total = 0;

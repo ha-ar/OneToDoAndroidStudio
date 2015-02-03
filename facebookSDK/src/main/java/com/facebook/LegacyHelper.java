@@ -18,6 +18,8 @@ package com.facebook;
 
 import android.os.Bundle;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * LegacyHelper is solely for the use of other packages within the Facebook SDK for Android. Use of
  * any of the methods in this class is unsupported, and they may be modified or removed without warning at
@@ -25,7 +27,7 @@ import android.os.Bundle;
  */
 public class LegacyHelper {
     @Deprecated
-    public static void extendTokenCompleted(Session session, Bundle bundle) {
+    public static void extendTokenCompleted(@NotNull Session session, Bundle bundle) {
         session.extendTokenCompleted(bundle);
     }
 }

@@ -36,6 +36,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 /**
@@ -85,6 +88,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
             this.value = value;
         }
 
+        @Nullable
         public static IndicatorStyle fromValue(int value) {
             for (IndicatorStyle style : IndicatorStyle.values()) {
                 if (style.value == value) {
@@ -104,6 +108,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
             this.value = value;
         }
 
+        @Nullable
         public static LinePosition fromValue(int value) {
             for (LinePosition position : LinePosition.values()) {
                 if (position.value == value) {
@@ -123,10 +128,13 @@ public class TitlePageIndicator extends View implements PageIndicator {
     private boolean mBoldText;
     private int mColorText;
     private int mColorSelected;
+    @NotNull
     private Path mPath = new Path();
     private final Rect mBounds = new Rect();
     private final Paint mPaintFooterLine = new Paint();
+    @Nullable
     private IndicatorStyle mFooterIndicatorStyle;
+    @Nullable
     private LinePosition mLinePosition;
     private final Paint mPaintFooterIndicator = new Paint();
     private float mFooterIndicatorHeight;
@@ -148,15 +156,15 @@ public class TitlePageIndicator extends View implements PageIndicator {
     private OnCenterItemClickListener mCenterItemClickListener;
 
 
-    public TitlePageIndicator(Context context) {
+    public TitlePageIndicator(@NotNull Context context) {
         this(context, null);
     }
 
-    public TitlePageIndicator(Context context, AttributeSet attrs) {
+    public TitlePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs) {
         this(context, attrs, R.attr.vpiTitlePageIndicatorStyle);
     }
 
-    public TitlePageIndicator(Context context, AttributeSet attrs, int defStyle) {
+    public TitlePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         if (isInEditMode()) return;
 
@@ -254,6 +262,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
+    @Nullable
     public IndicatorStyle getFooterIndicatorStyle() {
         return mFooterIndicatorStyle;
     }
@@ -263,6 +272,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
+    @Nullable
     public LinePosition getLinePosition() {
         return mLinePosition;
     }
@@ -351,7 +361,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         if (mViewPager == null) {
@@ -541,7 +551,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
         }
     }
 
-    public boolean onTouchEvent(android.view.MotionEvent ev) {
+    public boolean onTouchEvent(@NotNull android.view.MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
         }
@@ -644,7 +654,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
      * @param curViewWidth
      *            width of the view.
      */
-    private void clipViewOnTheRight(Rect curViewBound, float curViewWidth, int right) {
+    private void clipViewOnTheRight(@NotNull Rect curViewBound, float curViewWidth, int right) {
         curViewBound.right = (int) (right - mClipPadding);
         curViewBound.left = (int) (curViewBound.right - curViewWidth);
     }
@@ -657,7 +667,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
      * @param curViewWidth
      *            width of the view.
      */
-    private void clipViewOnTheLeft(Rect curViewBound, float curViewWidth, int left) {
+    private void clipViewOnTheLeft(@NotNull Rect curViewBound, float curViewWidth, int left) {
         curViewBound.left = (int) (left + mClipPadding);
         curViewBound.right = (int) (mClipPadding + curViewWidth);
     }
@@ -668,7 +678,8 @@ public class TitlePageIndicator extends View implements PageIndicator {
      * @param paint
      * @return
      */
-    private ArrayList<Rect> calculateAllBounds(Paint paint) {
+    @NotNull
+    private ArrayList<Rect> calculateAllBounds(@NotNull Paint paint) {
         ArrayList<Rect> list = new ArrayList<Rect>();
         //For each views (If no values then add a fake one)
         final int count = mViewPager.getAdapter().getCount();
@@ -695,7 +706,8 @@ public class TitlePageIndicator extends View implements PageIndicator {
      * @param paint
      * @return
      */
-    private Rect calcBounds(int index, Paint paint) {
+    @NotNull
+    private Rect calcBounds(int index, @NotNull Paint paint) {
         //Calculate the text bounds
         Rect bounds = new Rect();
         CharSequence title = getTitle(index);
@@ -705,7 +717,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager view) {
+    public void setViewPager(@NotNull ViewPager view) {
         if (mViewPager == view) {
             return;
         }
@@ -721,7 +733,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager view, int initialPosition) {
+    public void setViewPager(@NotNull ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
@@ -820,6 +832,7 @@ public class TitlePageIndicator extends View implements PageIndicator {
         requestLayout();
     }
 
+    @NotNull
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -835,24 +848,26 @@ public class TitlePageIndicator extends View implements PageIndicator {
             super(superState);
         }
 
-        private SavedState(Parcel in) {
+        private SavedState(@NotNull Parcel in) {
             super(in);
             currentPage = in.readInt();
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NotNull Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @NotNull
             @Override
-            public SavedState createFromParcel(Parcel in) {
+            public SavedState createFromParcel(@NotNull Parcel in) {
                 return new SavedState(in);
             }
 
+            @NotNull
             @Override
             public SavedState[] newArray(int size) {
                 return new SavedState[size];

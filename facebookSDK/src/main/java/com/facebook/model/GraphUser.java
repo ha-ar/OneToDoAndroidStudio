@@ -16,6 +16,8 @@
 
 package com.facebook.model;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Provides a strongly-typed representation of a User as defined by the Graph API.
  *
@@ -27,6 +29,7 @@ public interface GraphUser extends GraphObject {
      * Returns the ID of the user.
      * @return the ID of the user
      */
+    @NotNull
     public String getId();
     /**
      * Sets the ID of the user.
@@ -38,6 +41,7 @@ public interface GraphUser extends GraphObject {
      * Returns the name of the user.
      * @return the name of the user
      */
+    @NotNull
     public String getName();
     /**
      * Sets the name of the user.
@@ -49,6 +53,7 @@ public interface GraphUser extends GraphObject {
      * Returns the first name of the user.
      * @return the first name of the user
      */
+    @NotNull
     public String getFirstName();
     /**
      * Sets the first name of the user.
@@ -60,6 +65,7 @@ public interface GraphUser extends GraphObject {
      * Returns the middle name of the user.
      * @return the middle name of the user
      */
+    @NotNull
     public String getMiddleName();
     /**
      * Sets the middle name of the user.
@@ -71,6 +77,7 @@ public interface GraphUser extends GraphObject {
      * Returns the last name of the user.
      * @return the last name of the user
      */
+    @NotNull
     public String getLastName();
     /**
      * Sets the last name of the user.
@@ -82,6 +89,7 @@ public interface GraphUser extends GraphObject {
      * Returns the Facebook URL of the user.
      * @return the Facebook URL of the user
      */
+    @NotNull
     public String getLink();
     /**
      * Sets the Facebook URL of the user.
@@ -93,6 +101,7 @@ public interface GraphUser extends GraphObject {
      * Returns the Facebook username of the user.
      * @return the Facebook username of the user
      */
+    @NotNull
     public String getUsername();
     /**
      * Sets the Facebook username of the user.
@@ -104,6 +113,7 @@ public interface GraphUser extends GraphObject {
      * Returns the birthday of the user.
      * @return the birthday of the user
      */
+    @NotNull
     public String getBirthday();
     /**
      * Sets the birthday of the user.
@@ -115,6 +125,7 @@ public interface GraphUser extends GraphObject {
      * Returns the current place of the user.
      * @return the current place of the user
      */
+    @NotNull
     public GraphPlace getLocation();
 
     /**

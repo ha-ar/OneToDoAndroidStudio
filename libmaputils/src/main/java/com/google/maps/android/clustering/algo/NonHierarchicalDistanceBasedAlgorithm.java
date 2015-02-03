@@ -1,5 +1,15 @@
 package com.google.maps.android.clustering.algo;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.geometry.Bounds;
+import com.google.maps.android.geometry.Point;
+import com.google.maps.android.projection.SphericalMercatorProjection;
+import com.google.maps.android.quadtree.PointQuadTree;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,14 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.geometry.Bounds;
-import com.google.maps.android.geometry.Point;
-import com.google.maps.android.projection.SphericalMercatorProjection;
-import com.google.maps.android.quadtree.PointQuadTree;
 
 /**
  * A simple clustering algorithm with O(nlog n) performance. Resulting clusters are not
@@ -46,7 +48,7 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
     private static final SphericalMercatorProjection PROJECTION = new SphericalMercatorProjection(1);
 
     @Override
-    public void addItem(T item) {
+    public void addItem(@NotNull T item) {
         final QuadItem<T> quadItem = new QuadItem<T>(item);
         synchronized (mQuadTree) {
             mItems.add(quadItem);
@@ -55,7 +57,7 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
     }
 
     @Override
-    public void addItems(Collection<T> items) {
+    public void addItems(@NotNull Collection<T> items) {
         for (T item : items) {
             addItem(item);
         }
@@ -75,6 +77,7 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
         throw new UnsupportedOperationException("NonHierarchicalDistanceBasedAlgorithm.remove not implemented");
     }
 
+    @NotNull
     @Override
     public Set<? extends Cluster<T>> getClusters(double zoom) {
         final int discreteZoom = (int) zoom;
@@ -127,6 +130,7 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
         return results;
     }
 
+    @NotNull
     @Override
     public Collection<T> getItems() {
         final List<T> items = new ArrayList<T>();
@@ -138,11 +142,12 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
         return items;
     }
 
-    private double distanceSquared(Point a, Point b) {
+    private double distanceSquared(@NotNull Point a, @NotNull Point b) {
         return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
     }
 
-    private Bounds createBoundsFromSpan(Point p, double span) {
+    @NotNull
+    private Bounds createBoundsFromSpan(@NotNull Point p, double span) {
         // TODO: Use a span that takes into account the visual size of the marker, not just its
         // LatLng.
         double halfSpan = span / 2;
@@ -152,12 +157,13 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
     }
 
     private static class QuadItem<T extends ClusterItem> implements PointQuadTree.Item, Cluster<T> {
+        @NotNull
         private final T mClusterItem;
         private final Point mPoint;
         private final LatLng mPosition;
         private Set<T> singletonSet;
 
-        private QuadItem(T item) {
+        private QuadItem(@NotNull T item) {
             mClusterItem = item;
             mPosition = item.getPosition();
             mPoint = PROJECTION.toPoint(mPosition);

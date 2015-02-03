@@ -21,7 +21,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import com.facebook.android.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This Activity is a necessary part of the overall Facebook login process
@@ -47,12 +51,14 @@ public class LoginActivity extends Activity {
     private static final String SAVED_AUTH_CLIENT = "authorizationClient";
     private static final String EXTRA_REQUEST = "request";
 
+    @Nullable
     private String callingPackage;
     private AuthorizationClient authorizationClient;
+    @Nullable
     private AuthorizationClient.AuthorizationRequest request;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.com_facebook_login_activity_layout);
 
@@ -68,7 +74,7 @@ public class LoginActivity extends Activity {
         authorizationClient.setContext(this);
         authorizationClient.setOnCompletedListener(new AuthorizationClient.OnCompletedListener() {
             @Override
-            public void onCompleted(AuthorizationClient.Result outcome) {
+            public void onCompleted(@NotNull AuthorizationClient.Result outcome) {
                 onAuthClientCompleted(outcome);
             }
         });
@@ -85,7 +91,7 @@ public class LoginActivity extends Activity {
         });
     }
 
-    private void onAuthClientCompleted(AuthorizationClient.Result outcome) {
+    private void onAuthClientCompleted(@NotNull AuthorizationClient.Result outcome) {
         request = null;
 
         int resultCode = (outcome.code == AuthorizationClient.Result.Code.CANCEL) ?
@@ -126,7 +132,7 @@ public class LoginActivity extends Activity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putString(SAVED_CALLING_PKG_KEY, callingPackage);
@@ -138,6 +144,7 @@ public class LoginActivity extends Activity {
         authorizationClient.onActivityResult(requestCode, resultCode, data);
     }
 
+    @NotNull
     static Bundle populateIntentExtras(AuthorizationClient.AuthorizationRequest request) {
         Bundle extras = new Bundle();
         extras.putSerializable(EXTRA_REQUEST, request);

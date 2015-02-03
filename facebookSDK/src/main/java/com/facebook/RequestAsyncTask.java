@@ -16,10 +16,12 @@
 
 package com.facebook;
 
-import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -131,6 +133,7 @@ public class RequestAsyncTask extends AsyncTask<Void, Void, List<Response>> {
         return requests;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return new StringBuilder().append("{RequestAsyncTask: ").append(" connection: ").append(connection)
@@ -156,6 +159,7 @@ public class RequestAsyncTask extends AsyncTask<Void, Void, List<Response>> {
         }
     }
 
+    @Nullable
     @Override
     protected List<Response> doInBackground(Void... params) {
         try {
@@ -170,6 +174,7 @@ public class RequestAsyncTask extends AsyncTask<Void, Void, List<Response>> {
         }
     }
 
+    @NotNull
     RequestAsyncTask executeOnSettingsExecutor() {
         if (executeOnExecutorMethod != null) {
             try {

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import org.jetbrains.annotations.NotNull;
+
 public class DensityUtil {
 	/**
 	 * This method converts dp unit to equivalent pixels, depending on device
@@ -17,7 +19,7 @@ public class DensityUtil {
 	 * @return A float value to represent px equivalent to dp depending on
 	 *         device density
 	 */
-	public static int convertDpToPixel(float dp, Context context) {
+	public static int convertDpToPixel(float dp, @NotNull Context context) {
 		Resources resources = context.getResources();
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float px = dp * (metrics.densityDpi / 160f);
@@ -34,7 +36,7 @@ public class DensityUtil {
 	 *            Context to get resources and device specific display metrics
 	 * @return A float value to represent dp equivalent to px value
 	 */
-	public static int convertPixelsToDp(float px, Context context) {
+	public static int convertPixelsToDp(float px, @NotNull Context context) {
 		Resources resources = context.getResources();
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float dp = px / (metrics.densityDpi / 160f);

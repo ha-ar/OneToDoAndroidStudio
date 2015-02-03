@@ -24,11 +24,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.facebook.internal.LikeActionController;
 import com.facebook.internal.NativeProtocol;
 import com.facebook.internal.PendingCallStore;
-import com.facebook.internal.Utility;
 import com.facebook.widget.FacebookDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -50,14 +53,18 @@ public class UiLifecycleHelper {
 
     private final static String ACTIVITY_NULL_MESSAGE = "activity cannot be null";
 
+    @Nullable
     private final Activity activity;
     private final Session.StatusCallback callback;
+    @NotNull
     private final BroadcastReceiver receiver;
     private final LocalBroadcastManager broadcastManager;
     // Members related to handling FacebookDialog calls
+    @Nullable
     private UUID pendingFacebookDialogCallId;
     private PendingCallStore pendingFacebookDialogCallStore;
 
+    @Nullable
     private AppEventsLogger appEventsLogger;
 
     /**
@@ -67,7 +74,7 @@ public class UiLifecycleHelper {
      *                 use {@link android.support.v4.app.Fragment#getActivity()}
      * @param callback the callback for Session status changes, can be null
      */
-    public UiLifecycleHelper(Activity activity, Session.StatusCallback callback) {
+    public UiLifecycleHelper(@Nullable Activity activity, Session.StatusCallback callback) {
         if (activity == null) {
             throw new IllegalArgumentException(ACTIVITY_NULL_MESSAGE);
         }
@@ -87,7 +94,7 @@ public class UiLifecycleHelper {
      *
      * @param savedInstanceState the previously saved state
      */
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         Session session = Session.getActiveSession();
         if (session == null) {
             if (savedInstanceState != null) {
@@ -170,7 +177,7 @@ public class UiLifecycleHelper {
      *
      * @param outState the bundle to save state in
      */
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         Session.saveSession(Session.getActiveSession(), outState);
         if (pendingFacebookDialogCallId != null) {
             outState.putString(DIALOG_CALL_ID_SAVE_KEY, pendingFacebookDialogCallId.toString());
@@ -213,7 +220,7 @@ public class UiLifecycleHelper {
      * at a time; attempting to track another one will cancel the first one.
      * @param appCall an PendingCall object containing the call ID
      */
-    public void trackPendingDialogCall(FacebookDialog.PendingCall pendingCall) {
+    public void trackPendingDialogCall(@Nullable FacebookDialog.PendingCall pendingCall) {
         if (pendingFacebookDialogCallId != null) {
             // If one is already pending, cancel it; we don't allow multiple pending calls.
             Log.i("Facebook", "Tracking new app call while one is still pending; canceling pending call.");
@@ -236,6 +243,7 @@ public class UiLifecycleHelper {
      *
      * @return an AppEventsLogger to use for logging app events
      */
+    @Nullable
     public AppEventsLogger getAppEventsLogger() {
         Session session = Session.getActiveSession();
         if (session == null) {
@@ -260,7 +268,7 @@ public class UiLifecycleHelper {
      */
     private class ActiveSessionBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, @NotNull Intent intent) {
             if (Session.ACTION_ACTIVE_SESSION_SET.equals(intent.getAction())) {
                 Session session = Session.getActiveSession();
                 if (session != null && callback != null) {
@@ -275,7 +283,7 @@ public class UiLifecycleHelper {
         }
     }
 
-    private boolean handleFacebookDialogActivityResult(int requestCode, int resultCode, Intent data,
+    private boolean handleFacebookDialogActivityResult(int requestCode, int resultCode, @Nullable Intent data,
             FacebookDialog.Callback facebookDialogCallback) {
         if (pendingFacebookDialogCallId == null) {
             return false;
@@ -310,7 +318,7 @@ public class UiLifecycleHelper {
         return true;
     }
 
-    private void cancelPendingAppCall(FacebookDialog.Callback facebookDialogCallback) {
+    private void cancelPendingAppCall(@Nullable FacebookDialog.Callback facebookDialogCallback) {
         if (pendingFacebookDialogCallId == null) {
             return;
         }

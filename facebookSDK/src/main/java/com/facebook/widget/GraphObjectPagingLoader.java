@@ -19,16 +19,27 @@ package com.facebook.widget;
 import android.content.Context;
 import android.os.Handler;
 import android.support.v4.content.Loader;
-import com.facebook.*;
+
+import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
+import com.facebook.Request;
+import com.facebook.RequestBatch;
+import com.facebook.Response;
 import com.facebook.internal.CacheableRequestBatch;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphObjectList;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphObjectCursor<T>> {
     private final Class<T> graphObjectClass;
     private boolean skipRoundtripIfCached;
+    @Nullable
     private Request originalRequest;
+    @Nullable
     private Request currentRequest;
+    @Nullable
     private Request nextRequest;
     private OnErrorListener onErrorListener;
     private SimpleGraphObjectCursor<T> cursor;
@@ -89,7 +100,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
 
             currentRequest.setCallback(new Request.Callback() {
                 @Override
-                public void onCompleted(Response response) {
+                public void onCompleted(@NotNull Response response) {
                     requestCompleted(response);
                 }
             });
@@ -130,7 +141,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
         currentRequest = request;
         currentRequest.setCallback(new Request.Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 requestCompleted(response);
             }
         });
@@ -153,6 +164,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
         }
     }
 
+    @NotNull
     private CacheableRequestBatch putRequestIntoBatch(Request request, boolean skipRoundtripIfCached) {
         // We just use the request URL as the cache key.
         CacheableRequestBatch batch = new CacheableRequestBatch(request);
@@ -161,7 +173,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
         return batch;
     }
 
-    private void requestCompleted(Response response) {
+    private void requestCompleted(@NotNull Response response) {
         Request request = response.getRequest();
         if (request != currentRequest) {
             return;
@@ -187,7 +199,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
         }
     }
 
-    private void addResults(Response response) {
+    private void addResults(@NotNull Response response) {
         SimpleGraphObjectCursor<T> cursorToModify = (cursor == null || !appendResults) ? new SimpleGraphObjectCursor<T>() :
                 new SimpleGraphObjectCursor<T>(cursor);
 
@@ -225,6 +237,7 @@ class GraphObjectPagingLoader<T extends GraphObject> extends Loader<SimpleGraphO
     }
 
     interface PagedResults extends GraphObject {
+        @NotNull
         GraphObjectList<GraphObject> getData();
     }
 }

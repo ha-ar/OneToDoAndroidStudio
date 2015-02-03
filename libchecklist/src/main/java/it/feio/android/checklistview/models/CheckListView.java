@@ -1,8 +1,5 @@
 package it.feio.android.checklistview.models;
 
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-import it.feio.android.checklistview.interfaces.CheckListEventListener;
-import it.feio.android.checklistview.interfaces.Constants;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +12,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+import it.feio.android.checklistview.interfaces.CheckListEventListener;
+import it.feio.android.checklistview.interfaces.Constants;
 
 public class CheckListView extends LinearLayout implements Constants, CheckListEventListener {
 	
@@ -90,7 +94,8 @@ public class CheckListView extends LinearLayout implements Constants, CheckListE
 	 * Retrieve the edittext of a child line to be used to copy the typography
 	 * @return
 	 */
-	public EditText getEditText() {
+	@Nullable
+    public EditText getEditText() {
 		EditText res = null;
 		CheckListViewItem child = (CheckListViewItem)getChildAt(0);
 		if (child != null)
@@ -100,7 +105,7 @@ public class CheckListView extends LinearLayout implements Constants, CheckListE
 
 	
 	@Override
-	public void onItemChecked(CheckListViewItem checked, boolean isChecked) {
+	public void onItemChecked(@NotNull CheckListViewItem checked, boolean isChecked) {
 		if (isChecked) {
 			// If is not selected to HOLD checked items on position then the checked
 			// item will be moved on bottom of the list
@@ -180,7 +185,7 @@ public class CheckListView extends LinearLayout implements Constants, CheckListE
 	
 
 	@Override
-	public void onEditorActionPerformed(CheckListViewItem mCheckListViewItem, int actionId, KeyEvent event) {
+	public void onEditorActionPerformed(@NotNull CheckListViewItem mCheckListViewItem, int actionId, KeyEvent event) {
 
 		if (actionId != EditorInfo.IME_ACTION_NEXT)
 			return;
@@ -267,7 +272,7 @@ public class CheckListView extends LinearLayout implements Constants, CheckListE
 	 * Add a new item into the checklist at specific index
 	 * @param text String to be inserted as item text
 	 */
-	public void addItem(String text, boolean isChecked, Integer index){
+	public void addItem(String text, boolean isChecked, @Nullable Integer index){
 		
 		save(loadMax()+1);
 		saved(text, isChecked);
@@ -356,7 +361,7 @@ public class CheckListView extends LinearLayout implements Constants, CheckListE
 
 
 
-	private void focusView(View v, int focusDirection) {
+	private void focusView(@NotNull View v, int focusDirection) {
 		EditTextMultiLineNoEnter focusableEditText = (EditTextMultiLineNoEnter) v.focusSearch(focusDirection);
 		if (focusableEditText != null) {
 			focusableEditText.requestFocus();

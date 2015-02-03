@@ -17,14 +17,31 @@
 package com.facebook.internal;
 
 import android.app.Activity;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import com.facebook.*;
+
+import com.facebook.AppEventsLogger;
+import com.facebook.FacebookRequestError;
+import com.facebook.HttpMethod;
+import com.facebook.LoggingBehavior;
+import com.facebook.Request;
+import com.facebook.RequestBatch;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.Settings;
 import com.facebook.widget.FacebookDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,7 +102,9 @@ public class LikeActionController {
     private static FileLruCache controllerDiskCache;
     private static final ConcurrentHashMap<String, LikeActionController> cache =
             new ConcurrentHashMap<String, LikeActionController>();
+    @NotNull
     private static WorkQueue mruCacheWorkQueue = new WorkQueue(1); // This MUST be 1 for proper synchronization
+    @NotNull
     private static WorkQueue diskIOWorkQueue = new WorkQueue(1); // This MUST be 1 for proper synchronization
     private static Handler handler;
     private static String objectIdForPendingController;
@@ -101,6 +120,7 @@ public class LikeActionController {
     private String likeCountStringWithoutLike;
     private String socialSentenceWithLike;
     private String socialSentenceWithoutLike;
+    @Nullable
     private String unlikeToken;
 
     private String verifiedObjectId;
@@ -109,8 +129,10 @@ public class LikeActionController {
 
     private boolean isPendingLikeOrUnlike;
 
+    @Nullable
     private UUID pendingCallId;
 
+    @Nullable
     private Bundle pendingCallAnalyticsBundle;
 
     private AppEventsLogger appEventsLogger;
@@ -125,7 +147,7 @@ public class LikeActionController {
      * @param data From the originating call to onActivityResult
      * @return Indication of whether the Intent was handled
      */
-    public static boolean handleOnActivityResult(Context context,
+    public static boolean handleOnActivityResult(@NotNull Context context,
                                                  final int requestCode,
                                                  final int resultCode,
                                                  final Intent data) {
@@ -155,7 +177,7 @@ public class LikeActionController {
                 objectIdForPendingController,
                 new CreationCallback() {
                     @Override
-                    public void onComplete(LikeActionController likeActionController) {
+                    public void onComplete(@NotNull LikeActionController likeActionController) {
                         likeActionController.onActivityResult(requestCode, resultCode, data, callId);
                     }
                 });
@@ -170,7 +192,7 @@ public class LikeActionController {
      * @return A LikeActionController for the specified object id
      */
     public static void getControllerForObjectId(
-            Context context,
+            @NotNull Context context,
             String objectId,
             CreationCallback callback) {
         if (!isInitialized) {
@@ -228,7 +250,7 @@ public class LikeActionController {
         invokeCallbackWithController(callback, controllerToRefresh);
     }
 
-    private synchronized static void performFirstInitialize(Context context) {
+    private synchronized static void performFirstInitialize(@NotNull Context context) {
         if (isInitialized) {
             return;
         }
@@ -247,7 +269,7 @@ public class LikeActionController {
         isInitialized = true;
     }
 
-    private static void invokeCallbackWithController(final CreationCallback callback, final LikeActionController controller) {
+    private static void invokeCallbackWithController(@Nullable final CreationCallback callback, final LikeActionController controller) {
         if (callback == null) {
             return;
         }
@@ -274,7 +296,7 @@ public class LikeActionController {
 
         broadcastManager.registerReceiver(new BroadcastReceiver() {
             @Override
-            public void onReceive(Context receiverContext, Intent intent) {
+            public void onReceive(Context receiverContext, @NotNull Intent intent) {
                 if (isPendingBroadcastReset) {
                     return;
                 }
@@ -343,7 +365,7 @@ public class LikeActionController {
     // Disk caching code
     //
 
-    private static void serializeToDiskAsync(LikeActionController controller) {
+    private static void serializeToDiskAsync(@NotNull LikeActionController controller) {
         String controllerJson = serializeToJson(controller);
         String cacheKey = getCacheKeyForObjectId(controller.objectId);
 
@@ -356,7 +378,7 @@ public class LikeActionController {
      * NOTE: This MUST be called ONLY via the SerializeToDiskWorkItem class to ensure that it happens on the
      * right thread, at the right time.
      */
-    private static void serializeToDiskSynchronously(String cacheKey, String controllerJson) {
+    private static void serializeToDiskSynchronously(@NotNull String cacheKey, @NotNull String controllerJson) {
         OutputStream outputStream = null;
         try {
             outputStream = controllerDiskCache.openPutStream(cacheKey);
@@ -374,6 +396,7 @@ public class LikeActionController {
      * NOTE: This MUST be called ONLY via the CreateLikeActionControllerWorkItem class to ensure that it happens on the
      * right thread, at the right time.
      */
+    @Nullable
     private static LikeActionController deserializeFromDiskSynchronously(
             Context context,
             String objectId) {
@@ -401,6 +424,7 @@ public class LikeActionController {
         return controller;
     }
 
+    @Nullable
     private static LikeActionController deserializeFromJson(Context context, String controllerJsonString) {
         LikeActionController controller;
 
@@ -441,7 +465,8 @@ public class LikeActionController {
         return controller;
     }
 
-    private static String serializeToJson(LikeActionController controller) {
+    @Nullable
+    private static String serializeToJson(@NotNull LikeActionController controller) {
         JSONObject controllerJson = new JSONObject();
         try {
             controllerJson.put(JSON_INT_VERSION_KEY, LIKE_ACTION_CONTROLLER_VERSION);
@@ -492,11 +517,11 @@ public class LikeActionController {
     // Broadcast handling code
     //
 
-    private static void broadcastAction(Context context, LikeActionController controller, String action) {
+    private static void broadcastAction(@NotNull Context context, LikeActionController controller, String action) {
         broadcastAction(context, controller, action, null);
     }
 
-    private static void broadcastAction(Context context, LikeActionController controller, String action, Bundle data) {
+    private static void broadcastAction(@NotNull Context context, @Nullable LikeActionController controller, String action, @Nullable Bundle data) {
         Intent broadcastIntent = new Intent(action);
         if (controller != null) {
             if (data == null) {
@@ -679,10 +704,11 @@ public class LikeActionController {
         return true;
     }
 
-    private FacebookDialog.Callback getFacebookDialogCallback(final Bundle analyticsParameters) {
+    @Nullable
+    private FacebookDialog.Callback getFacebookDialogCallback(@Nullable final Bundle analyticsParameters) {
         return new FacebookDialog.Callback() {
             @Override
-            public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
+            public void onComplete(@NotNull FacebookDialog.PendingCall pendingCall, @NotNull Bundle data) {
                 if (!data.containsKey(LIKE_DIALOG_RESPONSE_OBJECT_IS_LIKED_KEY)) {
                     // This is an empty result that we can't handle. Don't lose like state.
                     return;
@@ -707,7 +733,7 @@ public class LikeActionController {
             }
 
             @Override
-            public void onError(FacebookDialog.PendingCall pendingCall, Exception error, Bundle data) {
+            public void onError(@NotNull FacebookDialog.PendingCall pendingCall, Exception error, Bundle data) {
                 Logger.log(LoggingBehavior.REQUESTS, TAG, "Like Dialog failed with error : %s", error);
 
                 Bundle logParams = analyticsParameters == null ? new Bundle() : analyticsParameters;
@@ -721,7 +747,7 @@ public class LikeActionController {
         };
     }
 
-    private void trackPendingCall(FacebookDialog.PendingCall pendingCall, Bundle analyticsParameters) {
+    private void trackPendingCall(@NotNull FacebookDialog.PendingCall pendingCall, Bundle analyticsParameters) {
         PendingCallStore.getInstance().trackPendingCall(pendingCall);
 
         // Save off the call id for processing the response
@@ -917,7 +943,7 @@ public class LikeActionController {
 
         LikeStatusClient.CompletedListener callback = new LikeStatusClient.CompletedListener() {
             @Override
-            public void completed(Bundle result) {
+            public void completed(@Nullable Bundle result) {
                 if (result == null || !result.containsKey(NativeProtocol.EXTRA_OBJECT_IS_LIKED)) {
                     // Don't lose old state if the service response is incomplete.
                     return;
@@ -949,7 +975,7 @@ public class LikeActionController {
         }
     }
 
-    private void fetchVerifiedObjectId(final RequestCompletionCallback completionHandler) {
+    private void fetchVerifiedObjectId(@Nullable final RequestCompletionCallback completionHandler) {
         if (!Utility.isNullOrEmpty(verifiedObjectId)) {
             if (completionHandler != null) {
                 completionHandler.onComplete();
@@ -991,7 +1017,7 @@ public class LikeActionController {
         requestBatch.executeAsync();
     }
 
-    private void logAppEventForError(String action, Bundle parameters) {
+    private void logAppEventForError(String action, @NotNull Bundle parameters) {
         Bundle logParams = new Bundle(parameters);
         logParams.putString(AnalyticsEvents.PARAMETER_LIKE_VIEW_OBJECT_ID, objectId);
         logParams.putString(AnalyticsEvents.PARAMETER_LIKE_VIEW_CURRENT_ACTION, action);
@@ -999,7 +1025,7 @@ public class LikeActionController {
         appEventsLogger.logSdkEvent(AnalyticsEvents.EVENT_LIKE_VIEW_ERROR, null, logParams);
     }
 
-    private void logAppEventForError(String action, FacebookRequestError error) {
+    private void logAppEventForError(String action, @Nullable FacebookRequestError error) {
         Bundle logParams = new Bundle();
         if (error != null) {
             JSONObject requestResult = error.getRequestResult();
@@ -1046,7 +1072,7 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processError(FacebookRequestError error) {
+        protected void processError(@NotNull FacebookRequestError error) {
             // If this object Id is for a Page, an error will be received for this request
             // We will then rely on the other request to come through.
             if (error.getErrorMessage().contains("og_object")) {
@@ -1059,7 +1085,7 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processSuccess(Response response) {
+        protected void processSuccess(@NotNull Response response) {
             JSONObject results = Utility.tryGetJSONObjectFromResponse(response.getGraphObject(), objectId);
             if (results != null) {
                 // See if we can get the OG object Id out
@@ -1086,7 +1112,7 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processSuccess(Response response) {
+        protected void processSuccess(@NotNull Response response) {
             JSONObject results = Utility.tryGetJSONObjectFromResponse(response.getGraphObject(), objectId);
             if (results != null) {
                 verifiedObjectId = results.optString("id");
@@ -1115,12 +1141,12 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processSuccess(Response response) {
+        protected void processSuccess(@NotNull Response response) {
             unlikeToken = Utility.safeGetStringFromResponse(response.getGraphObject(), "id");
         }
 
         @Override
-        protected void processError(FacebookRequestError error) {
+        protected void processError(@NotNull FacebookRequestError error) {
             int errorCode = error.getErrorCode();
             if (errorCode == ERROR_CODE_OBJECT_ALREADY_LIKED) {
                 // This isn't an error for us. Client was just out of sync with server
@@ -1176,7 +1202,7 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processSuccess(Response response) {
+        protected void processSuccess(@NotNull Response response) {
             JSONArray dataSet = Utility.tryGetJSONArrayFromResponse(response.getGraphObject(), "data");
             if (dataSet != null) {
                 for (int i = 0; i < dataSet.length(); i++) {
@@ -1225,7 +1251,7 @@ public class LikeActionController {
         }
 
         @Override
-        protected void processSuccess(Response response) {
+        protected void processSuccess(@NotNull Response response) {
             JSONObject engagementResults = Utility.tryGetJSONObjectFromResponse(response.getGraphObject(), "engagement");
             if (engagementResults != null) {
                 likeCountStringWithLike = engagementResults.optString("count_string_with_like");
@@ -1248,23 +1274,24 @@ public class LikeActionController {
         private Request request;
         protected String objectId;
 
+        @Nullable
         FacebookRequestError error;
 
         protected AbstractRequestWrapper(String objectId) {
             this.objectId = objectId;
         }
 
-        void addToBatch(RequestBatch batch) {
+        void addToBatch(@NotNull RequestBatch batch) {
             batch.add(request);
         }
 
-        protected void setRequest(Request request) {
+        protected void setRequest(@NotNull Request request) {
             this.request = request;
             // Make sure that our requests are hitting the latest version of the API known to this sdk.
             request.setVersion(ServerProtocol.GRAPH_API_VERSION);
             request.setCallback(new Request.Callback() {
                 @Override
-                public void onCompleted(Response response) {
+                public void onCompleted(@NotNull Response response) {
                     error = response.getError();
                     if (error != null) {
                         processError(error);
@@ -1294,6 +1321,7 @@ public class LikeActionController {
             this.minVersion = minVersion;
         }
 
+        @NotNull
         public String getAction() {
             return NativeProtocol.ACTION_LIKE_DIALOG;
         }
@@ -1317,6 +1345,7 @@ public class LikeActionController {
             return EnumSet.of(LikeDialogFeature.LIKE_DIALOG);
         }
 
+        @NotNull
         @Override
         protected Bundle getMethodArguments() {
             Bundle methodArgs = new Bundle();
@@ -1326,6 +1355,7 @@ public class LikeActionController {
             return methodArgs;
         }
 
+        @NotNull
         public FacebookDialog.PendingCall getAppCall() {
             return appCall;
         }
@@ -1334,6 +1364,7 @@ public class LikeActionController {
             return applicationId;
         }
 
+        @Nullable
         public String getWebFallbackUrl() {
             return getWebFallbackUrlInternal();
         }
@@ -1343,6 +1374,7 @@ public class LikeActionController {
     // ** NOTE ** It is expected that only _ONE_ MRUCacheWorkItem is ever running. This is enforced by
     // setting the concurrency of the WorkQueue to 1. Changing the concurrency will most likely lead to errors.
     private static class MRUCacheWorkItem implements Runnable {
+        @NotNull
         private static ArrayList<String> mruCachedItems = new ArrayList<String>();
         private String cacheItem;
         private boolean shouldTrim;

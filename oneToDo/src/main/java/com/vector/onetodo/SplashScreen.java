@@ -1,7 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -18,11 +16,18 @@ import com.androidquery.AQuery;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.vector.onetodo.utils.Constants;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+
 public class SplashScreen extends BaseActivity {
 
 	AQuery aq;
-	static GoogleCloudMessaging gcm = null;
-	public static String country = null, code = null;
+	@Nullable
+    static GoogleCloudMessaging gcm = null;
+	@Nullable
+    public static String country = null, code = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +118,8 @@ public class SplashScreen extends BaseActivity {
 
 		 
 	        new AsyncTask<Void, Void, String>() {
-	            @Override
+	            @NotNull
+                @Override
 	            protected String doInBackground(Void... params) {
 	                String msg = "";
 	                try {

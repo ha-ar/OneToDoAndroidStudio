@@ -26,6 +26,9 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -34,18 +37,20 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * across different configurations or circumstances.
  */
 public class IconPageIndicator extends HorizontalScrollView implements PageIndicator {
+    @NotNull
     private final IcsLinearLayout mIconsLayout;
 
     private ViewPager mViewPager;
     private OnPageChangeListener mListener;
+    @Nullable
     private Runnable mIconSelector;
     private int mSelectedIndex;
 
-    public IconPageIndicator(Context context) {
+    public IconPageIndicator(@NotNull Context context) {
         this(context, null);
     }
 
-    public IconPageIndicator(Context context, AttributeSet attrs) {
+    public IconPageIndicator(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
         setHorizontalScrollBarEnabled(false);
 
@@ -108,7 +113,7 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
     }
 
     @Override
-    public void setViewPager(ViewPager view) {
+    public void setViewPager(@NotNull ViewPager view) {
         if (mViewPager == view) {
             return;
         }
@@ -141,7 +146,7 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
     }
 
     @Override
-    public void setViewPager(ViewPager view, int initialPosition) {
+    public void setViewPager(@NotNull ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }

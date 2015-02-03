@@ -1,34 +1,4 @@
-package com.vector.onetodo;
-
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
+package com.vector.onetodo.event_fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -90,20 +60,53 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.Object;
+import com.vector.onetodo.PlacesAutoCompleteAdapter;
+import com.vector.onetodo.R;
+import com.vector.onetodo.task_fragments.AddTaskAssign;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+
 public class AddEventFragment extends Fragment {
 
 	public AQuery aq, AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
 
 	// HttpClient client;
-	HttpPost post;
 	List<NameValuePair> pairs;
-	HttpResponse response = null;
 	static int FragmentCheck = 0;
 	Uri filename;
 	static EditText taskTitle;
@@ -111,16 +114,17 @@ public class AddEventFragment extends Fragment {
 	private PopupWindow popupWindowAttach;
 	static LinearLayout ll_iner;
 	private static View previousSelected;
-	static String checkedId2 = null, setmon1;
+	static String  setmon1;
 	View label_view, viewl;;
-	GradientDrawable label_color;
 	int Label_postion = -1;
 	int dayPosition;
 	private int lastCheckedId = -1;
 	ImageView last;
-	String plabel = null;
+	@Nullable
+    String plabel = null;
 
-	static String repeatdate = "";
+	@NotNull
+    static String repeatdate = "";
 	int pposition = -1;
 	int itempos = -1;
 	int MaxId = -1;
@@ -133,19 +137,18 @@ public class AddEventFragment extends Fragment {
 
 	private String currentDay, currentMon, endEventDay, endEventMon, title;
 
-	private int[] collapsingViews = { R.id.date_time_include_to,
+	@NotNull
+    private int[] collapsingViews = { R.id.date_time_include_to,
 			R.id.date_time_include_from, R.id.before_grid_view_linear_event,
 			R.id.repeat_linear_layout, R.id.label_grid_view3 };
 
-	private int[] allViews = { R.id.event_title, R.id.time_date_to,
+	@NotNull
+    private int[] allViews = { R.id.event_title, R.id.time_date_to,
 			R.id.time_date_from, R.id.before_event_lay, R.id.repeat_event_lay,
 			R.id.spinner_labels_event, R.id.spinner_label_layout };
 
-	public static HashMap<Integer, Integer> inflatingLayoutsEvents = new HashMap<Integer, Integer>();
-
-	public static View parentView;
-
-	protected static final int RESULT_CODE = 123;
+	@NotNull
+    public static HashMap<Integer, Integer> inflatingLayoutsEvents = new HashMap<>();
 
 	private static final int TAKE_PICTURE = 1;
 
@@ -155,13 +158,16 @@ public class AddEventFragment extends Fragment {
 
 	private Uri imageUri;
 
-	public static View allView;
+	@Nullable
+    public static View allView;
 
 	public static Activity act;
 	
-	public static ArrayList<String> selectedInvitees = new ArrayList<String>();
+	@NotNull
+    public static ArrayList<String> selectedInvitees = new ArrayList<String>();
 
-	public static AddEventFragment newInstance(int position, int dayPosition) {
+	@NotNull
+    public static AddEventFragment newInstance(int position, int dayPosition) {
 		AddEventFragment myFragment = new AddEventFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -170,15 +176,23 @@ public class AddEventFragment extends Fragment {
 		return myFragment;
 	}
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // Keep this Fragment around even during config changes
+        setRetainInstance(true);
+    }
+
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.add_event_fragment, container,
 				false);
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
-		editor = AddTask.label.edit();
-		editorattach = AddTask.attach.edit();
+		editor = BaseTaskFragment.label.edit();
+		editorattach = BaseTaskFragment.attach.edit();
 		return view;
 	}
 
@@ -199,20 +213,18 @@ public class AddEventFragment extends Fragment {
 		inflatingLayoutsEvents.put(0, R.layout.add_event_title);
 		inflatingLayoutsEvents.put(1, R.layout.add_event_assign);
 		inflatingLayoutsEvents.put(2, R.layout.add_event_details);
-
 		inflatingLayoutsEvents.put(3, R.layout.add_event_time_date);
 		inflatingLayoutsEvents.put(4, R.layout.add_event_location1);
 		inflatingLayoutsEvents.put(5, R.layout.add_event_before);
 		inflatingLayoutsEvents.put(6, R.layout.add_event_repeat);
 		inflatingLayoutsEvents.put(7, R.layout.add_event_label);
 		inflatingLayoutsEvents.put(8, R.layout.add_event_subtask);
-
 		inflatingLayoutsEvents.put(9, R.layout.add_event_notes);
 		inflatingLayoutsEvents.put(10, R.layout.add_event_image);
-		
+
 		inflateLayouts();
 
-		
+
 		aq.id(R.id.event_assign).clicked(new OnClickListener() {
 
 			@Override
@@ -313,11 +325,11 @@ public class AddEventFragment extends Fragment {
 		taskTitle.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
+			public void onTextChanged(@NotNull CharSequence s, int start, int before,
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+					BaseTaskFragment.btn.setAlpha(1);
 
 				for (String words : Constants.CONTACTS_EVOKING_WORDS) {
 					String[] typedWords = s.toString().split(" ");
@@ -487,7 +499,8 @@ public class AddEventFragment extends Fragment {
 								R.layout.grid_layout_textview,
 								Constants.repeatArray) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 
@@ -512,7 +525,7 @@ public class AddEventFragment extends Fragment {
 		aq.id(R.id.repeat_grid_view).itemClicked(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
+			public void onItemClick(AdapterView<?> parent, @NotNull View view,
 					int position, long id) {
 
 				if (((TextView) previousSelected).getText().toString()
@@ -758,7 +771,8 @@ public class AddEventFragment extends Fragment {
 								R.layout.grid_layout_label_text_view,
 								Constants.labels_array) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
@@ -796,7 +810,7 @@ public class AddEventFragment extends Fragment {
 				.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
+					public void onItemClick(AdapterView<?> parent, @NotNull View view,
 							int position, long id) {
 
 						itempos = position;
@@ -973,7 +987,7 @@ public class AddEventFragment extends Fragment {
 
 		/**
 		 * View pager for before and location
-		 * 
+		 *
 		 */
 		ViewPager pager = (ViewPager) aq.id(R.id.add_event_before_pager)
 				.getView();
@@ -1035,7 +1049,7 @@ public class AddEventFragment extends Fragment {
 				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 					@Override
-					public void onCheckedChanged(RadioGroup group, int checkedId) {
+					public void onCheckedChanged(@NotNull RadioGroup group, int checkedId) {
 						((RadioButton) group.findViewById(lastCheckedId))
 								.setTextColor(getResources().getColor(
 										R.color.deep_sky_blue));
@@ -1132,13 +1146,14 @@ public class AddEventFragment extends Fragment {
 	 */
 	static int checklistCount = 0;
 
-	static List<View> checklistViews = new ArrayList<View>();
+	@NotNull
+    static List<View> checklistViews = new ArrayList<View>();
 	EditText editTextCurrent;
 
 	private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 			v.setFocusableInTouchMode(true);
 			v.requestFocus();
 			showCurrentView(v);
@@ -1151,7 +1166,7 @@ public class AddEventFragment extends Fragment {
 
 	}
 
-	private void setAllOtherFocusableFalse(View v) {
+	private void setAllOtherFocusableFalse(@NotNull View v) {
 		for (int id : allViews)
 			if (v.getId() != id) {
 				aq.id(id).getView().setFocusableInTouchMode(false);
@@ -1160,7 +1175,7 @@ public class AddEventFragment extends Fragment {
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
@@ -1193,7 +1208,7 @@ public class AddEventFragment extends Fragment {
 		}
 	}
 
-	private void showImageURI(Uri selectedImage) {
+	private void showImageURI(@NotNull Uri selectedImage) {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
@@ -1225,7 +1240,7 @@ public class AddEventFragment extends Fragment {
 				imagemenu.setOnClickListener(new OnClickListener() {
 
 					@Override
-					public void onClick(View arg0) {
+					public void onClick(@NotNull View arg0) {
 						// TODO Auto-generated method stub
 						Toast.makeText(getActivity(),
 								arg0.getId() + "     " + arg0.getTag(),
@@ -1325,7 +1340,7 @@ public class AddEventFragment extends Fragment {
 				R.drawable.input_fields_gray);
 	}
 
-	private void showCurrentView(View v) {
+	private void showCurrentView(@NotNull View v) {
 
 		hideAll();
 
@@ -1428,7 +1443,8 @@ public class AddEventFragment extends Fragment {
 			this.mobileValues = mobileValues;
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			View gridView;
@@ -1452,8 +1468,9 @@ public class AddEventFragment extends Fragment {
 			return mobileValues.length;
 		}
 
-		@Override
-		public Object getItem(int position) {
+		@Nullable
+        @Override
+		public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 
@@ -1474,7 +1491,8 @@ public class AddEventFragment extends Fragment {
 			return 2;
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -1556,7 +1574,7 @@ public class AddEventFragment extends Fragment {
 	private class LabelEditClickListener implements OnItemLongClickListener {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+		public boolean onItemLongClick(AdapterView<?> arg0, @NotNull final View arg1,
 				int position, long arg3) {
 			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
@@ -1588,11 +1606,11 @@ public class AddEventFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(2 + "key_label" + id, null); // getting
+		plabel = BaseTaskFragment.label.getString(2 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(2 + "key_color_position" + id, 0); // getting
+		pposition = BaseTaskFragment.label.getInt(2 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
@@ -1613,7 +1631,8 @@ public class AddEventFragment extends Fragment {
 			return 10;
 		}
 
-		public Object getItem(int position) {
+		@Nullable
+        public Object getItem(int position) {
 			return null;
 		}
 
@@ -1622,7 +1641,8 @@ public class AddEventFragment extends Fragment {
 		}
 
 		// create a new ImageView for each item referenced by the Adapter
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			ImageView imageView;
 			if (convertView == null) { // if it's not recycled, initialize some
 										// attributes
@@ -1690,7 +1710,7 @@ public class AddEventFragment extends Fragment {
 		aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
-					public void callback(String url, JSONObject json,
+					public void callback(String url, @NotNull JSONObject json,
 							AjaxStatus status) {
 						String path = null;
 						try {
@@ -1723,12 +1743,12 @@ public class AddEventFragment extends Fragment {
 	}
 
 	public void Loadattachmax() {
-		MaxId = AddTask.attach.getInt("2Max", 0);
+		MaxId = BaseTaskFragment.attach.getInt("2Max", 0);
 	}
 
 	public void Loadattach(int id) {
-		AddTask.attach.getString(2 + "path" + id, null);
-		AddTask.attach.getString(2 + "type" + id, null); // getting String
+		BaseTaskFragment.attach.getString(2 + "path" + id, null);
+		BaseTaskFragment.attach.getString(2 + "type" + id, null); // getting String
 	}
 
 	public void Removeattach(int id) {

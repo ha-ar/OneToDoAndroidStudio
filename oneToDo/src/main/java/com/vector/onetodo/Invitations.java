@@ -21,6 +21,8 @@ import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.vector.onetodo.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 
 public class Invitations extends Fragment implements InvitationScrollHolder {
 
@@ -33,7 +35,7 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 	Point size;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.invitation, container, false);
@@ -128,7 +130,8 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 			// return 3; // no. of tabs are Today, Tomorrow & Upcoming
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -148,7 +151,8 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 			return mScrollTabHolders;
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public Fragment getItem(int position) {
 			Invitationtabholder fragment = 
 					(Invitationtabholder) InvitationFragment.newInstance(position);

@@ -20,6 +20,8 @@ package com.facebook.internal;
 import android.content.Context;
 import android.os.Bundle;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
  * any of the classes in this package is unsupported, and they may be modified or removed without warning at
@@ -40,7 +42,7 @@ final class LikeStatusClient extends PlatformServiceClient {
     }
 
     @Override
-    protected void populateRequestBundle(Bundle data) {
+    protected void populateRequestBundle(@NotNull Bundle data) {
         // Only thing we need to pass in is the object id.
         data.putString(NativeProtocol.EXTRA_OBJECT_ID, objectId);
     }

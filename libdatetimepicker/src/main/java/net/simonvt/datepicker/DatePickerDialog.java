@@ -26,6 +26,8 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
 
 /**
@@ -41,6 +43,7 @@ public class DatePickerDialog extends AlertDialog implements OnClickListener,
     private static final String MONTH = "month";
     private static final String DAY = "day";
 
+    @NotNull
     private final DatePicker mDatePicker;
     private final OnDateSetListener mCallBack;
     private final Calendar mCalendar;
@@ -69,7 +72,7 @@ public class DatePickerDialog extends AlertDialog implements OnClickListener,
      * @param monthOfYear The initial month of the dialog.
      * @param dayOfMonth The initial day of the dialog.
      */
-    public DatePickerDialog(Context context,
+    public DatePickerDialog(@NotNull Context context,
             OnDateSetListener callBack,
             int year,
             int monthOfYear,
@@ -85,7 +88,7 @@ public class DatePickerDialog extends AlertDialog implements OnClickListener,
      * @param monthOfYear The initial month of the dialog.
      * @param dayOfMonth The initial day of the dialog.
      */
-    public DatePickerDialog(Context context,
+    public DatePickerDialog(@NotNull Context context,
             int theme,
             OnDateSetListener callBack,
             int year,
@@ -125,6 +128,7 @@ public class DatePickerDialog extends AlertDialog implements OnClickListener,
      *
      * @return The calendar view.
      */
+    @NotNull
     public DatePicker getDatePicker() {
         return mDatePicker;
     }
@@ -180,7 +184,7 @@ public class DatePickerDialog extends AlertDialog implements OnClickListener,
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(@NotNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         int year = savedInstanceState.getInt(YEAR);
         int month = savedInstanceState.getInt(MONTH);

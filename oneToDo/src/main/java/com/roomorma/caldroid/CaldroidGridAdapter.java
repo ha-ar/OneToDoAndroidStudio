@@ -1,11 +1,5 @@
 package com.roomorma.caldroid;
 
-import hirondelle.date4j.DateTime;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -15,10 +9,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.roomorma.caldroid.CaldroidFragment;
-import com.roomorma.caldroid.CalendarHelper;
 import com.vector.onetodo.R;
 import com.vector.onetodo.R.color;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import hirondelle.date4j.DateTime;
 
 /**
  * The CaldroidGridAdapter provides customized view for the dates gridview
@@ -36,8 +37,10 @@ public class CaldroidGridAdapter extends BaseAdapter {
 
 	// Use internally, to make the search for date faster instead of using
 	// indexOf methods on ArrayList
-	protected HashMap<DateTime, Integer> disableDatesMap = new HashMap<DateTime, Integer>();
-	protected HashMap<DateTime, Integer> selectedDatesMap = new HashMap<DateTime, Integer>();
+	@NotNull
+    protected HashMap<DateTime, Integer> disableDatesMap = new HashMap<DateTime, Integer>();
+	@NotNull
+    protected HashMap<DateTime, Integer> selectedDatesMap = new HashMap<DateTime, Integer>();
 
 	protected DateTime minDateTime;
 	protected DateTime maxDateTime;
@@ -55,7 +58,7 @@ public class CaldroidGridAdapter extends BaseAdapter {
 	 */
 	protected HashMap<String, Object> extraData;
 
-	public void setAdapterDateTime(DateTime dateTime) {
+	public void setAdapterDateTime(@NotNull DateTime dateTime) {
 		this.month = dateTime.getMonth();
 		this.year = dateTime.getYear();
 		this.datetimeList = CalendarHelper.getFullWeeks(this.month, this.year,
@@ -127,7 +130,7 @@ public class CaldroidGridAdapter extends BaseAdapter {
 	 * @param caldroidData
 	 * @param extraData
 	 */
-	public CaldroidGridAdapter(Context context, int month, int year,
+	public CaldroidGridAdapter(@NotNull Context context, int month, int year,
 			HashMap<String, Object> caldroidData,
 			HashMap<String, Object> extraData) {
 		super();
@@ -186,8 +189,8 @@ public class CaldroidGridAdapter extends BaseAdapter {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void setCustomResources(DateTime dateTime, View backgroundView,
-			TextView textView) {
+	protected void setCustomResources(DateTime dateTime, @NotNull View backgroundView,
+			@NotNull TextView textView) {
 		// Set custom background resource
 		HashMap<DateTime, Integer> backgroundForDateTimeMap = (HashMap<DateTime, Integer>) caldroidData
 				.get(CaldroidFragment._BACKGROUND_FOR_DATETIME_MAP);
@@ -226,7 +229,7 @@ public class CaldroidGridAdapter extends BaseAdapter {
 	 * @param position
 	 * @param cellView
 	 */
-	protected void customizeTextView(int position, TextView cellView) {
+	protected void customizeTextView(int position, @NotNull TextView cellView) {
 		
 		
 		/*LayoutParams params = cellView.getLayoutParams();
@@ -302,7 +305,8 @@ public class CaldroidGridAdapter extends BaseAdapter {
 		return this.datetimeList.size();
 	}
 
-	@Override
+	@Nullable
+    @Override
 	public Object getItem(int arg0) {
 		// TODO Auto-generated method stub
 		return null;
@@ -314,8 +318,9 @@ public class CaldroidGridAdapter extends BaseAdapter {
 		return 0;
 	}
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	@Nullable
+    @Override
+	public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		TextView cellView = (TextView) convertView;

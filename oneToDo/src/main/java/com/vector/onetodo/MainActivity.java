@@ -86,6 +86,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -142,7 +144,8 @@ public class MainActivity extends BaseActivity implements
 
 	// ************** Phone COntacts
 
-	String phoneNumber = null;
+	@Nullable
+    String phoneNumber = null;
 	Cursor cursor;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +191,7 @@ public class MainActivity extends BaseActivity implements
 					+ Constants.user_id, JSONObject.class,
 					new AjaxCallback<JSONObject>() {
 						@Override
-						public void callback(String url, JSONObject json,
+						public void callback(String url, @Nullable JSONObject json,
 								AjaxStatus status) {
 							if (json != null) {
 								Gson gson = new Gson();
@@ -212,7 +215,7 @@ public class MainActivity extends BaseActivity implements
 	Menu menu;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(@NotNull Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		menu.clear();
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -250,7 +253,7 @@ public class MainActivity extends BaseActivity implements
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(@NotNull MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
@@ -334,7 +337,7 @@ public class MainActivity extends BaseActivity implements
 		}
 	}
 	@Override
-	public void onConnectionFailed(ConnectionResult result) {
+	public void onConnectionFailed(@NotNull ConnectionResult result) {
 		if (!result.hasResolution()) {
 			GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
 					0).show();
@@ -362,7 +365,8 @@ public class MainActivity extends BaseActivity implements
 		//mGoogleApiClient.connect();
 	}
 	
-	public String getProfileInformation() {
+	@Nullable
+    public String getProfileInformation() {
 		String name = null;
 		try {			
 			if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
@@ -380,12 +384,15 @@ public class MainActivity extends BaseActivity implements
 	}
 	
 	class GetGoogleCalendarEvents extends AsyncTask<Void, Void, String> {
-		String ok  = getProfileInformation();
-		String url = "https://www.googleapis.com/calendar/v3/users/me/calendarList?userId="+ok;
+		@Nullable
+        String ok  = getProfileInformation();
+		@NotNull
+        String url = "https://www.googleapis.com/calendar/v3/users/me/calendarList?userId="+ok;
 		        String sResponse;
 
 		        // private ProgressDialog dialog;
-		        private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+		        @NotNull
+                private ProgressDialog dialog = new ProgressDialog(MainActivity.this);
 
 		        @Override
 		        protected void onPreExecute() {
@@ -393,7 +400,8 @@ public class MainActivity extends BaseActivity implements
 		            dialog.show();
 		        }
 
-		        @Override
+		        @Nullable
+                @Override
 		        protected String doInBackground(Void... params) {
 		            try {
 		                HttpClient httpclient = new DefaultHttpClient();
@@ -439,7 +447,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 
 	            @SuppressWarnings("deprecation")
 				@Override
-	            public void call(final Session session, SessionState state,
+	            public void call(@NotNull final Session session, SessionState state,
 	                    Exception exception) {
 
 	                if (session.isOpened()) {
@@ -448,7 +456,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 	                            new Request.GraphUserCallback() {
 
 									@Override
-									public void onCompleted(GraphUser user,
+									public void onCompleted(@Nullable GraphUser user,
 											Response response) {
 										// TODO Auto-generated method stub
 										 if (user != null) {
@@ -460,7 +468,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 											            new Request.Callback() {
 
 											                @Override
-											                public void onCompleted(Response response) {
+											                public void onCompleted(@NotNull Response response) {
 											                    Log.e("Result:" ,response.toString());
 											                        try {
 											                            FileWriter file = new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/videocvname");
@@ -773,7 +781,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 		aq.id(R.id.todo_layout).clicked(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(@NotNull View arg0) {
 				// // TextView title = (TextView) findViewById(R.id.weather);
 				// title.setText("To-do's");
 				getSupportFragmentManager().popBackStack();
@@ -801,7 +809,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 		aq.id(R.id.calendar_layout).clicked(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(@NotNull View arg0) {
 				aq_menu.id(R.id.menu_item1).text("Invitations");
 				aq_menu.id(R.id.menu_item2).text("Visible calenders");
 				aq_menu.id(R.id.menu_item3).text("Go to")
@@ -844,7 +852,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 		aq.id(R.id.project_layout).clicked(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(@NotNull View arg0) {
 				getSupportFragmentManager().popBackStack();
 				// TextView title = (TextView) findViewById(R.id.weather);
 				// title.setText("Projects");
@@ -926,7 +934,7 @@ protected void onActivityResult(int requestCode, int responseCode,
 			@Override
 			public void onClick(View v) {
 
-				Intent intent = new Intent(MainActivity.this, AddTask.class);
+				Intent intent = new Intent(MainActivity.this, BaseTaskFragment.class);
 				intent.putExtra("position", pager.getCurrentItem());
 				startActivity(intent);
 				overridePendingTransition(R.anim.slide_in1, R.anim.slide_out1);
@@ -1002,7 +1010,8 @@ protected void onActivityResult(int requestCode, int responseCode,
 				return typeName.get(position);
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public Fragment getItem(int position) {
 			ScrollTabHolderFragment fragment = (ScrollTabHolderFragment) TaskListFragment
 					.newInstance(position);
@@ -1093,7 +1102,8 @@ protected void onActivityResult(int requestCode, int responseCode,
 			return 10;
 		}
 
-		@Override
+		@Nullable
+        @Override
 		public java.lang.Object getItem(int arg0) {
 			return null;
 		}
@@ -1103,8 +1113,9 @@ protected void onActivityResult(int requestCode, int responseCode,
 			return arg0;
 		}
 
-		@Override
-		public View getView(int position, View view, ViewGroup arg2) {
+		@Nullable
+        @Override
+		public View getView(int position, @Nullable View view, ViewGroup arg2) {
 
 			Holder holder = null;
 			if (view == null) {
@@ -1157,7 +1168,8 @@ protected void onActivityResult(int requestCode, int responseCode,
 									+ ") ASC");
 		}
 
-		@Override
+		@Nullable
+        @Override
 		protected Void doInBackground(Void... params) {
 
 			if (cursor.getCount() > 0) {

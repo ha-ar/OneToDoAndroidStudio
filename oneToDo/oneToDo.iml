@@ -112,6 +112,15 @@
     <orderEntry type="module" module-name="liblistviwlibrary" exported="" />
     <orderEntry type="module" module-name="libmaputils" exported="" />
     <orderEntry type="module" module-name="androidappMsg" exported="" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

@@ -16,6 +16,8 @@
 
 package com.facebook.model;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Defines a GraphObject that represents the result of a query that returns multiple GraphObjects
  * nested under a "data" property.
@@ -28,5 +30,6 @@ public interface GraphMultiResult extends GraphObject {
      * Provides access to the GraphObjects that make up the result set.
      * @return a list of GraphObjects
      */
+    @NotNull
     public GraphObjectList<GraphObject> getData();
 }

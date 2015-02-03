@@ -47,7 +47,7 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
-            android:name="com.vector.onetodo.AddTask"
+            android:name=".BaseTaskFragment"
             android:alwaysRetainTaskState="true"
             android:hardwareAccelerated="true"
             android:label="@string/title_activity_main"

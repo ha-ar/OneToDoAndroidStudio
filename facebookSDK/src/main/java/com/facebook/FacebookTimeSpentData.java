@@ -5,6 +5,8 @@ import android.text.format.DateUtils;
 
 import com.facebook.internal.Logger;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 class FacebookTimeSpentData implements Serializable {
@@ -79,6 +81,7 @@ class FacebookTimeSpentData implements Serializable {
             this.interruptionCount = interruptionCount;
         }
 
+        @NotNull
         private Object readResolve() {
             return new FacebookTimeSpentData(
                 lastResumeTime,
@@ -136,6 +139,7 @@ class FacebookTimeSpentData implements Serializable {
             this.firstOpenSourceApplication = firstOpenSourceApplication;
         }
 
+        @NotNull
         private Object readResolve() {
             return new FacebookTimeSpentData(
                     lastResumeTime,
@@ -168,6 +172,7 @@ class FacebookTimeSpentData implements Serializable {
         this.firstOpenSourceApplication = firstOpenSourceApplication;
     }
 
+    @NotNull
     private Object writeReplace() {
         return new SerializationProxyV2(
                 lastResumeTime,
@@ -195,7 +200,7 @@ class FacebookTimeSpentData implements Serializable {
         isAppActive = false;
     }
 
-    void onResume(AppEventsLogger logger, long eventTime, String sourceApplicationInfo) {
+    void onResume(@NotNull AppEventsLogger logger, long eventTime, String sourceApplicationInfo) {
         long now = eventTime;
 
         // Retain old behavior for activated app event - log the event if the event hasn't
@@ -246,7 +251,7 @@ class FacebookTimeSpentData implements Serializable {
         isAppActive = true;
     }
 
-    private void logAppDeactivatedEvent(AppEventsLogger logger,
+    private void logAppDeactivatedEvent(@NotNull AppEventsLogger logger,
                                         long interruptionDurationMillis) {
         // Log the old session information and clear the data
         Bundle eventParams = new Bundle();

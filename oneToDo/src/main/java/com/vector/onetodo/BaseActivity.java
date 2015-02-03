@@ -1,14 +1,14 @@
 package com.vector.onetodo;
 
-import java.util.HashMap;
-
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
 import com.androidquery.AQuery;
-import com.vector.onetodo.db.gen.DaoMaster;
-import com.vector.onetodo.db.gen.DaoSession;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
 /*
 import com.vector.onetodo.db.gen.LabelName;
 import com.vector.onetodo.db.gen.LabelNameDao;*/
@@ -16,7 +16,8 @@ import com.vector.onetodo.db.gen.LabelNameDao;*/
 public abstract class BaseActivity extends ActionBarActivity {
 
 	public static AQuery aq, aqd, aq_menu;
-	public static HashMap<Integer, String> pageName = new HashMap<Integer, String>(),
+	@NotNull
+    public static HashMap<Integer, String> pageName = new HashMap<Integer, String>(),
 			pagename2 = new HashMap<Integer, String>(),
 			typeName = new HashMap<Integer, String>();
 	public static int ONE_DAY = 1000 * 60 * 60 * 24;
@@ -25,7 +26,8 @@ public abstract class BaseActivity extends ActionBarActivity {
 			Home = 1, Personal = 2, Studies = 3, Meetups = 4, Games = 5;
 
  
-	Long id = null;
+	@Nullable
+    Long id = null;
 	static int check = 0;
 
 	@Override

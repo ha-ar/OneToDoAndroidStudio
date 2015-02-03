@@ -22,6 +22,7 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+
 import com.facebook.AppEventsLogger;
 import com.facebook.FacebookException;
 import com.facebook.Request;
@@ -30,7 +31,14 @@ import com.facebook.android.R;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.model.GraphUser;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides a Fragment that displays a list of a user's friends and allows one or more of the
@@ -85,6 +93,7 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
     // default to Friends for backwards compatibility
     private FriendPickerType friendPickerType = FriendPickerType.FRIENDS;
 
+    @NotNull
     private List<String> preSelectedFriendIds = new ArrayList<String>();
 
     /**
@@ -178,7 +187,7 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
      * Sets the list of friends for pre selection. These friends will be selected by default.
      * @param graphUsers list of friends as GraphUsers
      */
-    public void setSelection(List<GraphUser> graphUsers) {
+    public void setSelection(@NotNull List<GraphUser> graphUsers) {
         List<String> userIds = new ArrayList<String>();
         for(GraphUser graphUser: graphUsers) {
             userIds.add(graphUser.getId());
@@ -195,7 +204,7 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
     }
 
     @Override
-    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+    public void onInflate(@NotNull Activity activity, @NotNull AttributeSet attrs, Bundle savedInstanceState) {
         super.onInflate(activity, attrs, savedInstanceState);
         TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.com_facebook_friend_picker_fragment);
 
@@ -209,13 +218,14 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
         setFriendPickerSettingsFromBundle(inState);
     }
 
-    void saveSettingsToBundle(Bundle outState) {
+    void saveSettingsToBundle(@NotNull Bundle outState) {
         super.saveSettingsToBundle(outState);
 
         outState.putString(USER_ID_BUNDLE_KEY, userId);
         outState.putBoolean(MULTI_SELECT_BUNDLE_KEY, multiSelect);
     }
 
+    @NotNull
     @Override
     PickerFragmentAdapter<GraphUser> createAdapter() {
         PickerFragmentAdapter<GraphUser> adapter = new PickerFragmentAdapter<GraphUser>(
@@ -240,11 +250,13 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
         return adapter;
     }
 
+    @NotNull
     @Override
     LoadingStrategy createLoadingStrategy() {
         return new ImmediateLoadingStrategy();
     }
 
+    @NotNull
     @Override
     SelectionStrategy createSelectionStrategy() {
         return multiSelect ? new MultiSelectionStrategy() : new SingleSelectionStrategy();
@@ -309,7 +321,7 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
         return request;
     }
 
-    private void setFriendPickerSettingsFromBundle(Bundle inState) {
+    private void setFriendPickerSettingsFromBundle(@Nullable Bundle inState) {
         // We do this in a separate non-overridable method so it is safe to call from the constructor.
         if (inState != null) {
             if (inState.containsKey(USER_ID_BUNDLE_KEY)) {
@@ -328,8 +340,8 @@ public class FriendPickerFragment extends PickerFragment<GraphUser> {
 
     private class ImmediateLoadingStrategy extends LoadingStrategy {
         @Override
-        protected void onLoadFinished(GraphObjectPagingLoader<GraphUser> loader,
-                SimpleGraphObjectCursor<GraphUser> data) {
+        protected void onLoadFinished(@NotNull GraphObjectPagingLoader<GraphUser> loader,
+                @Nullable SimpleGraphObjectCursor<GraphUser> data) {
             super.onLoadFinished(loader, data);
 
             // We could be called in this state if we are clearing data or if we are being re-attached

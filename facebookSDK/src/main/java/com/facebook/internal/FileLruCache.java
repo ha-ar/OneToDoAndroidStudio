@@ -18,13 +18,26 @@ package com.facebook.internal;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.facebook.LoggingBehavior;
 import com.facebook.Settings;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.InvalidParameterException;
 import java.util.Date;
 import java.util.PriorityQueue;
@@ -63,16 +76,20 @@ public final class FileLruCache {
 
     private static final AtomicLong bufferIndex = new AtomicLong();
 
+    @NotNull
     private final String tag;
     private final Limits limits;
+    @NotNull
     private final File directory;
     private boolean isTrimPending;
     private boolean isTrimInProgress;
+    @NotNull
     private final Object lock;
+    @NotNull
     private AtomicLong lastClearCacheTime = new AtomicLong(0);
 
     // The value of tag should be a final String that works as a directory name.
-    public FileLruCache(Context context, String tag, Limits limits) {
+    public FileLruCache(@NotNull Context context, @NotNull String tag, Limits limits) {
         this.tag = tag;
         this.limits = limits;
         this.directory = new File(context.getCacheDir(), tag);
@@ -111,11 +128,13 @@ public final class FileLruCache {
         return total;
     }
 
-    public InputStream get(String key) throws IOException {
+    @Nullable
+    public InputStream get(@NotNull String key) throws IOException {
         return get(key, null);
     }
 
-    public InputStream get(String key, String contentTag) throws IOException {
+    @Nullable
+    public InputStream get(@NotNull String key, @Nullable String contentTag) throws IOException {
         File file = new File(this.directory, Utility.md5hash(key));
 
         FileInputStream input = null;
@@ -160,11 +179,13 @@ public final class FileLruCache {
         }
     }
 
-    OutputStream openPutStream(final String key) throws IOException {
+    @Nullable
+    OutputStream openPutStream(@NotNull final String key) throws IOException {
         return openPutStream(key, null);
     }
 
-    public OutputStream openPutStream(final String key, String contentTag) throws IOException {
+    @Nullable
+    public OutputStream openPutStream(@NotNull final String key, String contentTag) throws IOException {
         final File buffer = BufferFile.newFile(this.directory);
         buffer.delete();
         if (!buffer.createNewFile()) {
@@ -236,7 +257,7 @@ public final class FileLruCache {
         }
     }
 
-    private void renameToTargetAndTrim(String key, File buffer) {
+    private void renameToTargetAndTrim(@NotNull String key, @NotNull File buffer) {
         final File target = new File(directory, Utility.md5hash(key));
 
         // This is triggered by close().  By the time close() returns, the file should be cached, so this needs to
@@ -254,11 +275,13 @@ public final class FileLruCache {
     // Opens an output stream for the key, and creates an input stream wrapper to copy
     // the contents of input into the new output stream.  The effect is to store a
     // copy of input, and associate that data with key.
-    public InputStream interceptAndPut(String key, InputStream input) throws IOException {
+    @NotNull
+    public InputStream interceptAndPut(@NotNull String key, InputStream input) throws IOException {
         OutputStream output = openPutStream(key);
         return new CopyingInputStream(input, output);
     }
 
+    @NotNull
     public String toString() {
         return "{FileLruCache:" + " tag:" + this.tag + " file:" + this.directory.getName() + "}";
     }
@@ -319,18 +342,18 @@ public final class FileLruCache {
         private static final String FILE_NAME_PREFIX = "buffer";
         private static final FilenameFilter filterExcludeBufferFiles = new FilenameFilter() {
             @Override
-            public boolean accept(File dir, String filename) {
+            public boolean accept(File dir, @NotNull String filename) {
                 return !filename.startsWith(FILE_NAME_PREFIX);
             }
         };
         private static final FilenameFilter filterExcludeNonBufferFiles = new FilenameFilter() {
             @Override
-            public boolean accept(File dir, String filename) {
+            public boolean accept(File dir, @NotNull String filename) {
                 return filename.startsWith(FILE_NAME_PREFIX);
             }
         };
 
-        static void deleteAll(final File root) {
+        static void deleteAll(@NotNull final File root) {
             File[] filesToDelete = root.listFiles(excludeNonBufferFiles());
             if (filesToDelete != null) {
                 for (File file : filesToDelete) {
@@ -339,14 +362,17 @@ public final class FileLruCache {
             }
         }
 
+        @NotNull
         static FilenameFilter excludeBufferFiles() {
             return filterExcludeBufferFiles;
         }
 
+        @NotNull
         static FilenameFilter excludeNonBufferFiles() {
             return filterExcludeNonBufferFiles;
         }
 
+        @NotNull
         static File newFile(final File root) {
             String name = FILE_NAME_PREFIX + Long.valueOf(bufferIndex.incrementAndGet()).toString();
             return new File(root, name);
@@ -366,7 +392,7 @@ public final class FileLruCache {
     private static final class StreamHeader {
         private static final int HEADER_VERSION = 0;
 
-        static void writeHeader(OutputStream stream, JSONObject header) throws IOException {
+        static void writeHeader(@NotNull OutputStream stream, @NotNull JSONObject header) throws IOException {
             String headerString = header.toString();
             byte[] headerBytes = headerString.getBytes();
 
@@ -379,7 +405,8 @@ public final class FileLruCache {
             stream.write(headerBytes);
         }
 
-        static JSONObject readHeader(InputStream stream) throws IOException {
+        @Nullable
+        static JSONObject readHeader(@NotNull InputStream stream) throws IOException {
             int version = stream.read();
             if (version != HEADER_VERSION) {
                 return null;
@@ -452,12 +479,12 @@ public final class FileLruCache {
         }
 
         @Override
-        public void write(byte[] buffer, int offset, int count) throws IOException {
+        public void write(@NotNull byte[] buffer, int offset, int count) throws IOException {
             this.innerStream.write(buffer, offset, count);
         }
 
         @Override
-        public void write(byte[] buffer) throws IOException {
+        public void write(@NotNull byte[] buffer) throws IOException {
             this.innerStream.write(buffer);
         }
 
@@ -507,7 +534,7 @@ public final class FileLruCache {
         }
 
         @Override
-        public int read(byte[] buffer) throws IOException {
+        public int read(@NotNull byte[] buffer) throws IOException {
             int count = input.read(buffer);
             if (count > 0) {
                 output.write(buffer, 0, count);
@@ -525,7 +552,7 @@ public final class FileLruCache {
         }
 
         @Override
-        public int read(byte[] buffer, int offset, int length) throws IOException {
+        public int read(@NotNull byte[] buffer, int offset, int length) throws IOException {
             int count = input.read(buffer, offset, length);
             if (count > 0) {
                 output.write(buffer, offset, count);
@@ -597,14 +624,16 @@ public final class FileLruCache {
         private static final int HASH_SEED = 29; // Some random prime number
         private static final int HASH_MULTIPLIER = 37; // Some random prime number
 
+        @NotNull
         private final File file;
         private final long modified;
 
-        ModifiedFile(File file) {
+        ModifiedFile(@NotNull File file) {
             this.file = file;
             this.modified = file.lastModified();
         }
 
+        @NotNull
         File getFile() {
             return file;
         }
@@ -614,7 +643,7 @@ public final class FileLruCache {
         }
 
         @Override
-        public int compareTo(ModifiedFile another) {
+        public int compareTo(@NotNull ModifiedFile another) {
             if (getModified() < another.getModified()) {
                 return -1;
             } else if (getModified() > another.getModified()) {

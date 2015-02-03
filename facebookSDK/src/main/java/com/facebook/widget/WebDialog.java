@@ -29,19 +29,33 @@ import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.*;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.facebook.*;
+
+import com.facebook.FacebookDialogException;
+import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookRequestError;
+import com.facebook.FacebookServiceException;
+import com.facebook.Session;
 import com.facebook.android.R;
 import com.facebook.internal.Logger;
 import com.facebook.internal.ServerProtocol;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class provides a mechanism for displaying Facebook Web dialogs inside a Dialog. Helper
@@ -105,7 +119,7 @@ public class WebDialog extends Dialog {
      * @param url     the URL of the Web Dialog to display; no validation is done on this URL, but it should
      *                be a valid URL pointing to a Facebook Web Dialog
      */
-    public WebDialog(Context context, String url) {
+    public WebDialog(@NotNull Context context, String url) {
         this(context, url, DEFAULT_THEME);
     }
 
@@ -117,7 +131,7 @@ public class WebDialog extends Dialog {
      *                be a valid URL pointing to a Facebook Web Dialog
      * @param theme   identifier of a theme to pass to the Dialog class
      */
-    public WebDialog(Context context, String url, int theme) {
+    public WebDialog(@NotNull Context context, String url, int theme) {
         super(context, theme);
         this.url = url;
     }
@@ -131,7 +145,7 @@ public class WebDialog extends Dialog {
      * @param theme      identifier of a theme to pass to the Dialog class
      * @param listener the listener to notify, or null if no notification is desired
      */
-    public WebDialog(Context context, String action, Bundle parameters, int theme, OnCompleteListener listener) {
+    public WebDialog(@NotNull Context context, String action, @Nullable Bundle parameters, int theme, OnCompleteListener listener) {
         super(context, theme);
 
         if (parameters == null) {
@@ -400,7 +414,7 @@ public class WebDialog extends Dialog {
     private class DialogWebViewClient extends WebViewClient {
         @Override
         @SuppressWarnings("deprecation")
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, @NotNull String url) {
             Utility.logd(LOG_TAG, "Redirect URL: " + url);
             if (url.startsWith(WebDialog.this.expectedRedirectUrl)) {
                 Bundle values = parseResponseUri(url);
@@ -457,7 +471,7 @@ public class WebDialog extends Dialog {
         }
 
         @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        public void onReceivedSslError(WebView view, @NotNull SslErrorHandler handler, SslError error) {
             if (DISABLE_SSL_CHECK_FOR_TESTING) {
                 handler.proceed();
             } else {
@@ -496,10 +510,12 @@ public class WebDialog extends Dialog {
     private static class BuilderBase<CONCRETE extends BuilderBase<?>> {
         private Context context;
         private Session session;
+        @Nullable
         private String applicationId;
         private String action;
         private int theme = DEFAULT_THEME;
         private OnCompleteListener listener;
+        @Nullable
         private Bundle parameters;
 
         protected BuilderBase(Context context, String action) {
@@ -518,7 +534,7 @@ public class WebDialog extends Dialog {
             finishInit(context, action, null);
         }
 
-        protected BuilderBase(Context context, Session session, String action, Bundle parameters) {
+        protected BuilderBase(Context context, @NotNull Session session, String action, Bundle parameters) {
             Validate.notNull(session, "session");
             if (!session.isOpened()) {
                 throw new FacebookException("Attempted to use a Session that was not open.");
@@ -528,7 +544,7 @@ public class WebDialog extends Dialog {
             finishInit(context, action, parameters);
         }
 
-        protected BuilderBase(Context context, String applicationId, String action, Bundle parameters) {
+        protected BuilderBase(Context context, @Nullable String applicationId, String action, Bundle parameters) {
             if (applicationId == null) {
                 applicationId = Utility.getMetadataApplicationId(context);
             }
@@ -544,6 +560,7 @@ public class WebDialog extends Dialog {
          * @param theme a theme identifier which will be passed to the Dialog class
          * @return the builder
          */
+        @NotNull
         public CONCRETE setTheme(int theme) {
             this.theme = theme;
             @SuppressWarnings("unchecked")
@@ -557,6 +574,7 @@ public class WebDialog extends Dialog {
          * @param listener the listener to notify, or null if no notification is desired
          * @return the builder
          */
+        @NotNull
         public CONCRETE setOnCompleteListener(OnCompleteListener listener) {
             this.listener = listener;
             @SuppressWarnings("unchecked")
@@ -570,6 +588,7 @@ public class WebDialog extends Dialog {
          *
          * @return the WebDialog
          */
+        @Nullable
         public WebDialog build() {
             if (session != null && session.isOpened()) {
                 parameters.putString(ServerProtocol.DIALOG_PARAM_APP_ID, session.getApplicationId());
@@ -581,6 +600,7 @@ public class WebDialog extends Dialog {
             return new WebDialog(context, action, parameters, theme, listener);
         }
 
+        @Nullable
         protected String getApplicationId() {
             return applicationId;
         }
@@ -593,6 +613,7 @@ public class WebDialog extends Dialog {
             return theme;
         }
 
+        @Nullable
         protected Bundle getParameters() {
             return parameters;
         }
@@ -601,7 +622,7 @@ public class WebDialog extends Dialog {
             return listener;
         }
 
-        private void finishInit(Context context, String action, Bundle parameters) {
+        private void finishInit(Context context, String action, @Nullable Bundle parameters) {
             this.context = context;
             this.action = action;
             if (parameters != null) {
@@ -638,7 +659,7 @@ public class WebDialog extends Dialog {
          *               See https://developers.facebook.com/docs/reference/dialogs/ for details.
          * @param parameters a Bundle containing parameters to pass as part of the URL.
          */
-        public Builder(Context context, Session session, String action, Bundle parameters) {
+        public Builder(Context context, @NotNull Session session, String action, Bundle parameters) {
             super(context, session, action, parameters);
         }
 
@@ -688,7 +709,7 @@ public class WebDialog extends Dialog {
          * @param session the Session representing an authenticating user to use for
          *                showing the dialog; must not be null, and must be opened.
          */
-        public FeedDialogBuilder(Context context, Session session) {
+        public FeedDialogBuilder(Context context, @NotNull Session session) {
             super(context, session, FEED_DIALOG, null);
         }
 
@@ -704,7 +725,7 @@ public class WebDialog extends Dialog {
          *                   see <a href="https://developers.facebook.com/docs/reference/dialogs/feed/">
          *                   https://developers.facebook.com/docs/reference/dialogs/feed/</a>.
          */
-        public FeedDialogBuilder(Context context, Session session, Bundle parameters) {
+        public FeedDialogBuilder(Context context, @NotNull Session session, Bundle parameters) {
             super(context, session, FEED_DIALOG, parameters);
         }
 
@@ -732,6 +753,7 @@ public class WebDialog extends Dialog {
          * @param id Facebook ID of the profile to post from
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setFrom(String id) {
             getParameters().putString(FROM_PARAM, id);
             return this;
@@ -745,6 +767,7 @@ public class WebDialog extends Dialog {
          * @param id Facebook ID of the profile to post to
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setTo(String id) {
             getParameters().putString(TO_PARAM, id);
             return this;
@@ -756,6 +779,7 @@ public class WebDialog extends Dialog {
          * @param link the URL
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setLink(String link) {
             getParameters().putString(LINK_PARAM, link);
             return this;
@@ -767,6 +791,7 @@ public class WebDialog extends Dialog {
          * @param picture the URL of the picture
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setPicture(String picture) {
             getParameters().putString(PICTURE_PARAM, picture);
             return this;
@@ -779,6 +804,7 @@ public class WebDialog extends Dialog {
          * @param source the URL of the media file
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setSource(String source) {
             getParameters().putString(SOURCE_PARAM, source);
             return this;
@@ -790,6 +816,7 @@ public class WebDialog extends Dialog {
          * @param name the name
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setName(String name) {
             getParameters().putString(NAME_PARAM, name);
             return this;
@@ -801,6 +828,7 @@ public class WebDialog extends Dialog {
          * @param caption the caption
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setCaption(String caption) {
             getParameters().putString(CAPTION_PARAM, caption);
             return this;
@@ -812,6 +840,7 @@ public class WebDialog extends Dialog {
          * @param description the description
          * @return the builder
          */
+        @NotNull
         public FeedDialogBuilder setDescription(String description) {
             getParameters().putString(DESCRIPTION_PARAM, description);
             return this;
@@ -846,7 +875,7 @@ public class WebDialog extends Dialog {
          * @param session the Session representing an authenticating user to use for
          *                showing the dialog; must not be null, and must be opened.
          */
-        public RequestsDialogBuilder(Context context, Session session) {
+        public RequestsDialogBuilder(Context context, @NotNull Session session) {
             super(context, session, APPREQUESTS_DIALOG, null);
         }
 
@@ -862,7 +891,7 @@ public class WebDialog extends Dialog {
          *                   see <a href="https://developers.facebook.com/docs/reference/dialogs/requests/">
          *                   https://developers.facebook.com/docs/reference/dialogs/requests/</a>.
          */
-        public RequestsDialogBuilder(Context context, Session session, Bundle parameters) {
+        public RequestsDialogBuilder(Context context, @NotNull Session session, Bundle parameters) {
             super(context, session, APPREQUESTS_DIALOG, parameters);
         }
 
@@ -889,6 +918,7 @@ public class WebDialog extends Dialog {
          * @param message the message
          * @return the builder
          */
+        @NotNull
         public RequestsDialogBuilder setMessage(String message) {
             getParameters().putString(MESSAGE_PARAM, message);
             return this;
@@ -902,6 +932,7 @@ public class WebDialog extends Dialog {
          * @param id the id or user name to send the request to
          * @return the builder
          */
+        @NotNull
         public RequestsDialogBuilder setTo(String id) {
             getParameters().putString(TO_PARAM, id);
             return this;
@@ -914,6 +945,7 @@ public class WebDialog extends Dialog {
          * @param data the data
          * @return the builder
          */
+        @NotNull
         public RequestsDialogBuilder setData(String data) {
             getParameters().putString(DATA_PARAM, data);
             return this;
@@ -925,6 +957,7 @@ public class WebDialog extends Dialog {
          * @param title the title
          * @return the builder
          */
+        @NotNull
         public RequestsDialogBuilder setTitle(String title) {
             getParameters().putString(TITLE_PARAM, title);
             return this;

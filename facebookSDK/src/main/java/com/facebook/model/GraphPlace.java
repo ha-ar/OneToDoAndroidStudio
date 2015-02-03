@@ -16,6 +16,8 @@
 
 package com.facebook.model;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Provides a strongly-typed representation of a Place as defined by the Graph API.
  *
@@ -27,6 +29,7 @@ public interface GraphPlace extends GraphObject {
      * Returns the ID of the place.
      * @return the ID of the place
      */
+    @NotNull
     public String getId();
     /**
      * Sets the ID of the place.
@@ -38,6 +41,7 @@ public interface GraphPlace extends GraphObject {
      * Returns the name of the place.
      * @return the name of the place
      */
+    @NotNull
     public String getName();
     /**
      * Sets the name of the place.
@@ -49,6 +53,7 @@ public interface GraphPlace extends GraphObject {
      * Returns the category of the place.
      * @return the category of the place
      */
+    @NotNull
     public String getCategory();
     /**
      * Sets the category of the place.
@@ -60,6 +65,7 @@ public interface GraphPlace extends GraphObject {
      * Returns the location of the place.
      * @return the location of the place
      */
+    @NotNull
     public GraphLocation getLocation();
     /**
      * Sets the location of the place.

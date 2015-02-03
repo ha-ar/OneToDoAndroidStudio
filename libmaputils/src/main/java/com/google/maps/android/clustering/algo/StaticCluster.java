@@ -1,12 +1,14 @@
 package com.google.maps.android.clustering.algo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A cluster whose center is determined upon creation.
@@ -32,6 +34,7 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
         return mItems.remove(t);
     }
 
+    @NotNull
     @Override
     public Collection<T> getItems() {
         return mItems;
@@ -42,6 +45,7 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
         return mItems.size();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "StaticCluster{" +

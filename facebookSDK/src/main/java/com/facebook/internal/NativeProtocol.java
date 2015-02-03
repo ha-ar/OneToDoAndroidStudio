@@ -19,18 +19,34 @@ package com.facebook.internal;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.*;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.Signature;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.SessionDefaultAudience;
 import com.facebook.Settings;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -236,6 +252,7 @@ public final class NativeProtocol {
     private static final String PLATFORM_PROVIDER_VERSION_COLUMN = "version";
 
     private static abstract class NativeAppInfo {
+        @NotNull
         abstract protected String getPackage();
 
         private static final String FBI_HASH = "a4b7452e2ed8f5f191058ca7bbfd26b0d3214bfc";
@@ -244,6 +261,7 @@ public final class NativeProtocol {
 
         private static final HashSet<String> validAppSignatureHashes = buildAppSignatureHashes();
 
+        @NotNull
         private static HashSet<String> buildAppSignatureHashes() {
             HashSet<String> set = new HashSet<String>();
             set.add(FBR_HASH);
@@ -252,7 +270,7 @@ public final class NativeProtocol {
             return set;
         }
 
-        public boolean validateSignature(Context context, String packageName) {
+        public boolean validateSignature(@NotNull Context context, String packageName) {
             String brand = Build.BRAND;
             int applicationFlags = context.getApplicationInfo().flags;
             if (brand.startsWith("generic") && (applicationFlags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
@@ -282,6 +300,7 @@ public final class NativeProtocol {
     private static class KatanaAppInfo extends NativeAppInfo {
         static final String KATANA_PACKAGE = "com.facebook.katana";
 
+        @NotNull
         @Override
         protected String getPackage() {
             return KATANA_PACKAGE;
@@ -291,6 +310,7 @@ public final class NativeProtocol {
     private static class MessengerAppInfo extends NativeAppInfo {
         static final String MESSENGER_PACKAGE = "com.facebook.orca";
 
+        @NotNull
         @Override
         protected String getPackage() {
             return MESSENGER_PACKAGE;
@@ -300,6 +320,7 @@ public final class NativeProtocol {
     private static class WakizashiAppInfo extends NativeAppInfo {
         static final String WAKIZASHI_PACKAGE = "com.facebook.wakizashi";
 
+        @NotNull
         @Override
         protected String getPackage() {
             return WAKIZASHI_PACKAGE;
@@ -307,9 +328,12 @@ public final class NativeProtocol {
     }
 
     private static final NativeAppInfo FACEBOOK_APP_INFO = new KatanaAppInfo();
+    @NotNull
     private static List<NativeAppInfo> facebookAppInfoList = buildFacebookAppList();
+    @NotNull
     private static Map<String, List<NativeAppInfo>> actionToAppInfoMap = buildActionToAppInfoMap();
 
+    @NotNull
     private static List<NativeAppInfo> buildFacebookAppList() {
         List<NativeAppInfo> list = new ArrayList<NativeAppInfo>();
 
@@ -320,6 +344,7 @@ public final class NativeProtocol {
         return list;
     }
 
+    @NotNull
     private static Map<String, List<NativeAppInfo>> buildActionToAppInfoMap() {
         Map<String, List<NativeAppInfo>> map = new HashMap<String, List<NativeAppInfo>>();
 
@@ -336,7 +361,8 @@ public final class NativeProtocol {
         return map;
     }
 
-    static Intent validateActivityIntent(Context context, Intent intent, NativeAppInfo appInfo) {
+    @Nullable
+    static Intent validateActivityIntent(@NotNull Context context, @Nullable Intent intent, @NotNull NativeAppInfo appInfo) {
         if (intent == null) {
             return null;
         }
@@ -353,7 +379,8 @@ public final class NativeProtocol {
         return intent;
     }
 
-    static Intent validateServiceIntent(Context context, Intent intent, NativeAppInfo appInfo) {
+    @Nullable
+    static Intent validateServiceIntent(@NotNull Context context, @Nullable Intent intent, @NotNull NativeAppInfo appInfo) {
         if (intent == null) {
             return null;
         }
@@ -370,8 +397,9 @@ public final class NativeProtocol {
         return intent;
     }
 
-    public static Intent createProxyAuthIntent(Context context, String applicationId, List<String> permissions,
-            String e2e, boolean isRerequest, SessionDefaultAudience defaultAudience) {
+    @Nullable
+    public static Intent createProxyAuthIntent(@NotNull Context context, String applicationId, @NotNull List<String> permissions,
+            String e2e, boolean isRerequest, @NotNull SessionDefaultAudience defaultAudience) {
         for (NativeAppInfo appInfo : facebookAppInfoList) {
             Intent intent = new Intent()
                     .setClassName(appInfo.getPackage(), FACEBOOK_PROXY_AUTH_ACTIVITY)
@@ -407,7 +435,8 @@ public final class NativeProtocol {
         return null;
     }
 
-    public static Intent createTokenRefreshIntent(Context context) {
+    @Nullable
+    public static Intent createTokenRefreshIntent(@NotNull Context context) {
         for (NativeAppInfo appInfo : facebookAppInfoList) {
             Intent intent = new Intent()
                     .setClassName(appInfo.getPackage(), FACEBOOK_TOKEN_REFRESH_ACTIVITY);
@@ -438,7 +467,8 @@ public final class NativeProtocol {
                     PROTOCOL_VERSION_20121101
             );
 
-    private static Intent findActivityIntent(Context context, String activityAction, String internalAction) {
+    @Nullable
+    private static Intent findActivityIntent(@NotNull Context context, String activityAction, String internalAction) {
         List<NativeAppInfo> list = actionToAppInfoMap.get(internalAction);
         if (list == null) {
             return null;
@@ -463,13 +493,14 @@ public final class NativeProtocol {
         return KNOWN_PROTOCOL_VERSIONS.contains(version) && version >= PROTOCOL_VERSION_20140701;
     }
 
+    @Nullable
     public static Intent createPlatformActivityIntent(
-            Context context,
+            @NotNull Context context,
             String callId,
             String action,
             int version,
             String applicationName,
-            Bundle extras) {
+            @Nullable Bundle extras) {
         Intent intent = findActivityIntent(context, INTENT_ACTION_PLATFORM_ACTIVITY, action);
         if (intent == null) {
             return null;
@@ -500,7 +531,8 @@ public final class NativeProtocol {
         return intent;
     }
 
-    public static Intent createPlatformServiceIntent(Context context) {
+    @Nullable
+    public static Intent createPlatformServiceIntent(@NotNull Context context) {
         for (NativeAppInfo appInfo : facebookAppInfoList) {
             Intent intent = new Intent(INTENT_ACTION_PLATFORM_SERVICE)
                     .setPackage(appInfo.getPackage())
@@ -513,11 +545,12 @@ public final class NativeProtocol {
         return null;
     }
 
-    public static int getProtocolVersionFromIntent(Intent intent) {
+    public static int getProtocolVersionFromIntent(@NotNull Intent intent) {
         return intent.getIntExtra(EXTRA_PROTOCOL_VERSION, 0);
     }
 
-    public static UUID getCallIdFromIntent(Intent intent) {
+    @Nullable
+    public static UUID getCallIdFromIntent(@Nullable Intent intent) {
         if (intent == null) {
             return null;
         }
@@ -542,7 +575,8 @@ public final class NativeProtocol {
         return callId;
     }
 
-    public static Bundle getBridgeArgumentsFromIntent(Intent intent) {
+    @Nullable
+    public static Bundle getBridgeArgumentsFromIntent(@NotNull Intent intent) {
         int version = getProtocolVersionFromIntent(intent);
         if (!isVersionCompatibleWithBucketedIntent(version)) {
             return null;
@@ -551,7 +585,7 @@ public final class NativeProtocol {
         return intent.getBundleExtra(EXTRA_PROTOCOL_BRIDGE_ARGS);
     }
 
-    public static Bundle getSuccessResultsFromIntent(Intent resultIntent) {
+    public static Bundle getSuccessResultsFromIntent(@NotNull Intent resultIntent) {
         int version = getProtocolVersionFromIntent(resultIntent);
         Bundle extras = resultIntent.getExtras();
         if (!isVersionCompatibleWithBucketedIntent(version) || extras == null) {
@@ -561,7 +595,7 @@ public final class NativeProtocol {
         return extras.getBundle(EXTRA_PROTOCOL_METHOD_RESULTS);
     }
 
-    public static boolean isErrorResult(Intent resultIntent) {
+    public static boolean isErrorResult(@NotNull Intent resultIntent) {
         Bundle bridgeArgs = getBridgeArgumentsFromIntent(resultIntent);
         if (bridgeArgs != null) {
             return bridgeArgs.containsKey(BRIDGE_ARG_ERROR_BUNDLE);
@@ -570,7 +604,8 @@ public final class NativeProtocol {
         }
     }
 
-    public static Bundle getErrorDataFromResultIntent(Intent resultIntent) {
+    @Nullable
+    public static Bundle getErrorDataFromResultIntent(@NotNull Intent resultIntent) {
         if (!isErrorResult(resultIntent)) {
             return null;
         }
@@ -585,7 +620,8 @@ public final class NativeProtocol {
         return resultIntent.getExtras();
     }
 
-    public static Exception getExceptionFromErrorData(Bundle errorData) {
+    @Nullable
+    public static Exception getExceptionFromErrorData(@Nullable Bundle errorData) {
         if (errorData == null) {
             return null;
         }
@@ -603,18 +639,18 @@ public final class NativeProtocol {
         return new FacebookException(description);
     }
 
-    public static int getLatestAvailableProtocolVersionForService(Context context, final int minimumVersion) {
+    public static int getLatestAvailableProtocolVersionForService(@NotNull Context context, final int minimumVersion) {
         // Services are currently always against the Facebook App
         return getLatestAvailableProtocolVersionForAppInfoList(context, facebookAppInfoList, new int[] {minimumVersion});
     }
 
-    public static int getLatestAvailableProtocolVersionForAction(Context context, String action, int[] versionSpec) {
+    public static int getLatestAvailableProtocolVersionForAction(@NotNull Context context, String action, @NotNull int[] versionSpec) {
         List<NativeAppInfo> appInfoList = actionToAppInfoMap.get(action);
         return getLatestAvailableProtocolVersionForAppInfoList(context, appInfoList, versionSpec);
     }
 
-    private static int getLatestAvailableProtocolVersionForAppInfoList(Context context, List<NativeAppInfo> appInfoList,
-            int[] versionSpec) {
+    private static int getLatestAvailableProtocolVersionForAppInfoList(@NotNull Context context, @Nullable List<NativeAppInfo> appInfoList,
+            @NotNull int[] versionSpec) {
         if (appInfoList == null) {
             return NO_PROTOCOL_AVAILABLE;
         }
@@ -631,16 +667,17 @@ public final class NativeProtocol {
     }
 
     private static int getLatestAvailableProtocolVersionForAppInfo(
-            Context context,
-            NativeAppInfo appInfo,
-            int[] versionSpec) {
+            @NotNull Context context,
+            @NotNull NativeAppInfo appInfo,
+            @NotNull int[] versionSpec) {
         TreeSet<Integer> fbAppVersions = getAllAvailableProtocolVersionsForAppInfo(context, appInfo);
         return computeLatestAvailableVersionFromVersionSpec(fbAppVersions, getLatestKnownVersion(), versionSpec);
     }
 
+    @NotNull
     private static TreeSet<Integer> getAllAvailableProtocolVersionsForAppInfo(
-            Context context,
-            NativeAppInfo appInfo) {
+            @NotNull Context context,
+            @NotNull NativeAppInfo appInfo) {
         TreeSet<Integer> allAvailableVersions = new TreeSet<Integer>();
 
         ContentResolver contentResolver = context.getContentResolver();
@@ -670,9 +707,9 @@ public final class NativeProtocol {
      * notice.
      */
     public static int computeLatestAvailableVersionFromVersionSpec(
-            TreeSet<Integer> allAvailableFacebookAppVersions,
+            @NotNull TreeSet<Integer> allAvailableFacebookAppVersions,
             int latestSdkVersion,
-            int[] versionSpec) {
+            @NotNull int[] versionSpec) {
         // Remember that these ranges are sorted in ascending order and can be unbounded. So we are starting
         // from the end of the version-spec array and working backwards, to try get the newest possible version
         int versionSpecIndex = versionSpec.length - 1;
@@ -712,7 +749,8 @@ public final class NativeProtocol {
         return NO_PROTOCOL_AVAILABLE;
     }
 
-    private static Uri buildPlatformProviderVersionURI(NativeAppInfo appInfo) {
+    @NotNull
+    private static Uri buildPlatformProviderVersionURI(@NotNull NativeAppInfo appInfo) {
         return Uri.parse(CONTENT_SCHEME + appInfo.getPackage() + PLATFORM_PROVIDER_VERSIONS);
     }
 }

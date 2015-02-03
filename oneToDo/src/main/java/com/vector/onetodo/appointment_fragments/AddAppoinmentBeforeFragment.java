@@ -1,6 +1,5 @@
-package com.vector.onetodo;
+package com.vector.onetodo.appointment_fragments;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -24,24 +23,37 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.vector.onetodo.utils.Constants;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.PlacesAutoCompleteAdapter;
+import com.vector.onetodo.R;
 
-public class AddTaskBeforeFragment extends Fragment {
+import net.simonvt.numberpicker.NumberPicker;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+public class AddAppoinmentBeforeFragment extends Fragment {
 
 	int position;
 	AQuery aq, aqd, aq_edit, aq_del;
 	TextView before;
 	Editor editor;
-	AlertDialog alert,location,location_del,location_edit;
-	
-	static View viewP, viewl, button = null;
-	String Title, pname = null, padress = null;
+	AlertDialog alert, location, label,location_edit ,location_del;
+	static final String[] beforeArray = new String[] { "On Time", "15 Mins",
+			"30 Mins", "2 Hours", "Custom" };
+	static final String[] values = { "Mins", "Hours", "Days", "Weeks",
+			"Months", "Years" };
+	@Nullable
+    static View viewP, viewl, button = null, temp;
+	@Nullable
+    String Title, pname = null, padress = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
 
-	public static AddTaskBeforeFragment newInstance(int position) {
-		
-		AddTaskBeforeFragment myFragment = new AddTaskBeforeFragment();
+	@NotNull
+    public static AddAppoinmentBeforeFragment newInstance(int position) {
+		AddAppoinmentBeforeFragment myFragment = new AddAppoinmentBeforeFragment();
+
 		Bundle args = new Bundle();
 		args.putInt("position", position);
 		myFragment.setArguments(args);
@@ -49,18 +61,19 @@ public class AddTaskBeforeFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		editor = AddTask.pref.edit();
+
+		editor = BaseTaskFragment.pref.edit();
 		position = getArguments().getInt("position", 0);
-		before = (TextView) getActivity().findViewById(R.id.before);
+		before = (TextView) getActivity().findViewById(R.id.before_appoinment);
 		View view;
 		if (position == 0)
-			view = inflater.inflate(R.layout.add_task_before_grid, container,
-					false);
+			view = inflater.inflate(R.layout.add_appoinment_before_grid,
+					container, false);
 		else
-			view = inflater.inflate(R.layout.add_task_location, container,
-					false);
+			view = inflater.inflate(R.layout.add_appoinment_location,
+					container, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -68,6 +81,7 @@ public class AddTaskBeforeFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setRetainInstance(true);
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
 		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
@@ -84,39 +98,39 @@ public class AddTaskBeforeFragment extends Fragment {
 		builder7.setView(dialoglayout7);
 		location_del = builder7.create();
 
-		if (position == 0) { 
+		if (position == 0) {
 
-			aq.id(R.id.notification_radio).getCheckBox()
+			aq.id(R.id.notification_radio_appoin).getCheckBox()
 					.setOnClickListener(new OnClickListener() {
 
 						@Override
-						public void onClick(View arg0) {
+						public void onClick(@NotNull View arg0) {
 							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
-								aq.id(R.id.notification_radio).textColor(
+								aq.id(R.id.notification_radio_appoin).textColor(
 										getResources()
 												.getColor(R.color._4d4d4d));
 							} else {
 
-								aq.id(R.id.notification_radio).textColor(
+								aq.id(R.id.notification_radio_appoin).textColor(
 										Color.parseColor("#bababa"));
 							}
 						}
 					});
 
-			aq.id(R.id.email_radio).getCheckBox()
+			aq.id(R.id.email_radio_appoin).getCheckBox()
 					.setOnClickListener(new OnClickListener() {
 
 						@Override
-						public void onClick(View arg0) {
+						public void onClick(@NotNull View arg0) {
 							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
-								aq.id(R.id.email_radio).textColor(
+								aq.id(R.id.email_radio_appoin).textColor(
 										getResources()
 												.getColor(R.color._4d4d4d));
 							} else {
 
-								aq.id(R.id.email_radio).textColor(
+								aq.id(R.id.email_radio_appoin).textColor(
 										Color.parseColor("#bababa"));
 							}
 						}
@@ -125,9 +139,10 @@ public class AddTaskBeforeFragment extends Fragment {
 					.getGridView()
 					.setAdapter(
 							new ArrayAdapter<String>(getActivity(),
-									R.layout.grid_layout_textview, Constants.beforeArray) {
+									R.layout.grid_layout_textview, beforeArray) {
 
-								@Override
+								@NotNull
+                                @Override
 								public View getView(int position,
 										View convertView, ViewGroup parent) {
 
@@ -147,7 +162,7 @@ public class AddTaskBeforeFragment extends Fragment {
 										((TextView) textView)
 												.setTextColor(getResources()
 														.getColor(
-																R.color._4d4d4d)); 
+																R.color._4d4d4d));
 									return textView;
 								}
 
@@ -164,8 +179,8 @@ public class AddTaskBeforeFragment extends Fragment {
 			final NumberPicker customDays = (NumberPicker) dialoglayout
 					.findViewById(R.id.days_picker_dialog);
 			customDays.setMinValue(0);
-			customDays.setMaxValue(Constants.beforevalues.length - 1);
-			customDays.setDisplayedValues(Constants.beforevalues);
+			customDays.setMaxValue(values.length - 1);
+			customDays.setDisplayedValues(values);
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
 			builder.setView(dialoglayout);
@@ -173,7 +188,7 @@ public class AddTaskBeforeFragment extends Fragment {
 			aq.id(R.id.before_grid_view).itemClicked(new OnItemClickListener() {
 
 				@Override
-				public void onItemClick(AdapterView<?> parent, View view,
+				public void onItemClick(AdapterView<?> parent, @NotNull View view,
 						int position, long id) {
 
 					if (((TextView) previousSelected).getText().toString()
@@ -197,19 +212,18 @@ public class AddTaskBeforeFragment extends Fragment {
 					((TextView) view).setTextColor(Color.WHITE);
 					view.setSelected(true);
 					previousSelected = view;
-					if (Constants.beforeArray[position].equals("Custom")) {
+					if (beforeArray[position].equals("Custom")) {
 						alert.show();
 
 					} else {
 
-						if (Constants.beforeArray[position] == "On Time") {
-							before.setVisibility(View.VISIBLE);
-							before.setText(Constants.beforeArray[position]);
+						if (beforeArray[position] == "On Time") {
+							before.setText(beforeArray[position]);
 						} else {
-							before.setVisibility(View.VISIBLE);
-							before.setText(
-									Constants.beforeArray[position]+" Before");
-						} 
+							before.setText("Reminde before "
+									+ beforeArray[position]);
+						}
+					
 					}
 				}
 
@@ -230,8 +244,11 @@ public class AddTaskBeforeFragment extends Fragment {
 				public void onClick(View v) {
 					numberPicker.clearFocus();
 					customDays.clearFocus();
-					before.setText(numberPicker.getValue()
-							+ " " + Constants.beforevalues[customDays.getValue()]+" Before"); 
+					TextView before = (TextView) getActivity().findViewById(
+							R.id.before_appoinment);
+					before.setText("Reminde before " + numberPicker.getValue()
+							+ " " + values[customDays.getValue()]);
+					
 					numberPicker.getValue();
 					alert.dismiss();
 				}
@@ -240,7 +257,7 @@ public class AddTaskBeforeFragment extends Fragment {
 			set();
 			// ***************************location dialog
 
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) AddTask.dialoglayout5
+			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.adress);
 			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
 					getActivity(),
@@ -248,7 +265,7 @@ public class AddTaskBeforeFragment extends Fragment {
 			AlertDialog.Builder builder5 = new AlertDialog.Builder(
 					getActivity());
 
-			builder5.setView(AddTask.dialoglayout5);
+			builder5.setView(BaseTaskFragment.dialoglayout5);
 			location = builder5.create();
 
 			location.setOnDismissListener(new OnDismissListener() {
@@ -262,9 +279,9 @@ public class AddTaskBeforeFragment extends Fragment {
 					aqd.id(R.id.home).getTextView().setFocusable(true);
 				}
 			});
-			aqd = new AQuery(AddTask.dialoglayout5);
+			aqd = new AQuery(BaseTaskFragment.dialoglayout5);
 
-			TextView save1 = (TextView) AddTask.dialoglayout5
+			TextView save1 = (TextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.save);
 			save1.setOnClickListener(new OnClickListener() {
 
@@ -274,8 +291,8 @@ public class AddTaskBeforeFragment extends Fragment {
 							.id(R.id.home).getText().toString().equals(""))) {
 
 						((TextView) viewP).setTextColor(Color
-								.parseColor("#000000"));  
-						aq.id(R.id.location_before).text(
+								.parseColor("#000000"));
+						aq.id(R.id.location_before_appoin).text(
 								aqd.id(R.id.adress).getText());
 						((TextView) viewP).setText(aqd.id(R.id.home).getText());
 
@@ -300,7 +317,7 @@ public class AddTaskBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) AddTask.dialoglayout5
+			TextView cancel1 = (TextView) BaseTaskFragment.dialoglayout5
 					.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
@@ -323,10 +340,12 @@ public class AddTaskBeforeFragment extends Fragment {
 			aq.id(R.id.pre_defined_4).getTextView()
 					.setOnLongClickListener(new LocationEditClickListener());
 
+			temp = aq.id(R.id.pre_defined_1).getView();
 			aq.id(R.id.pre_defined_1).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_2).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_3).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_4).clicked(new LocationTagClickListener());
+
 			aq_del.id(R.id.edit_cencel).clicked(new OnClickListener() {
 
 				@Override
@@ -369,14 +388,15 @@ public class AddTaskBeforeFragment extends Fragment {
 				public void onClick(View arg0) {
 					// TODO Auto-generated method stub=
 					aqd.id(R.id.add_location_title).text("Edit");
-					aqd.id(R.id.save).text("SAVE");
+					aqd.id(R.id.save).text("Save");
 					location_edit.dismiss();
 					location.show();
 				}
 			});
+
 			aq.id(R.id.arrive_leave_checkbox_layout).visible();
 			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq
-					.id(R.id.location_before).getView();
+					.id(R.id.location_before_appoin).getView();
 			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(
 					getActivity(),
 					android.R.layout.simple_spinner_dropdown_item));
@@ -384,7 +404,7 @@ public class AddTaskBeforeFragment extends Fragment {
 					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 						@Override
-						public void onCheckedChanged(RadioGroup group,
+						public void onCheckedChanged(@NotNull RadioGroup group,
 								int checkedId) {
 							if (previousSelectedLocation != null) {
 								((RadioButton) previousSelectedLocation)
@@ -394,23 +414,21 @@ public class AddTaskBeforeFragment extends Fragment {
 							((RadioButton) group.findViewById(checkedId))
 									.setTextColor(Color.WHITE);
 							TextView before = (TextView) getActivity()
-									.findViewById(R.id.before);
-
-							before.setVisibility(View.VISIBLE);
+									.findViewById(R.id.before_appoinment);
 							before.setText("On "
 									+ aq.id(checkedId).getText().toString());
 							previousSelectedLocation = group
-									.findViewById(checkedId); 
+									.findViewById(checkedId);
+							
 						}
 					});
 		}
-		
 	}
 
 	private class LocationTagClickListener implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 
 			load(v.getId());
 
@@ -420,12 +438,12 @@ public class AddTaskBeforeFragment extends Fragment {
 				location.show();
 			} else {
 				if (button != null) {
-					aq.id(R.id.location_before).text(padress);
+					aq.id(R.id.location_before_appoin).text(padress);
 					button.setBackgroundResource(R.drawable.button_shadow2);
 					v.setBackgroundResource(R.drawable.button_shadow);
 					button = v;
 				} else {
-					aq.id(R.id.location_before).text(padress);
+					aq.id(R.id.location_before_appoin).text(padress);
 					button = v;
 					v.setBackgroundResource(R.drawable.button_shadow);
 				}
@@ -437,7 +455,7 @@ public class AddTaskBeforeFragment extends Fragment {
 	private class LocationEditClickListener implements OnLongClickListener {
 
 		@Override
-		public boolean onLongClick(final View view) {
+		public boolean onLongClick(@NotNull final View view) {
 			// TODO Auto-generated method stu
 			if (((TextView) view).getText().toString().equals("New")) {
 
@@ -459,30 +477,31 @@ public class AddTaskBeforeFragment extends Fragment {
 		}
 
 	}
+
 	public void save(long id, String name, String location) {
 		// 0 - for private mode
-		editor.putString(1 + "key_name" + id, name); // Storing integer
-		editor.putString(1 + "key_location" + id, location); // Storing float
+		editor.putString(4 + "key_name" + id, name); // Storing integer
+		editor.putString(4 + "key_location" + id, location); // Storing float
 		editor.commit();
 	}
 
 	public void load(long id) {
-		pname = AddTask.pref.getString(1 + "key_name" + id, null); // getting
+		pname = BaseTaskFragment.pref.getString(4 + "key_name" + id, null); // getting
 																	// String
-		padress = AddTask.pref.getString(1 + "key_location" + id, null); // getting
+		padress = BaseTaskFragment.pref.getString(4 + "key_location" + id, null); // getting
 																			// String
 	}
 
 	public void remove(long id) {
-		editor.remove(1 + "key_name" + id); // will delete key name
-		editor.remove(1 + "key_location" + id); // will delete key email
+		editor.remove(4 + "key_name" + id); // will delete key name
+		editor.remove(4 + "key_location" + id); // will delete key email
 		editor.commit();
 	}
 
 	public void set() {
 		pname = null;
-		pname = AddTask.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
+		pname = BaseTaskFragment.pref.getString(
+				4 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
 				null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_1).text(pname);
@@ -493,8 +512,8 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
+		pname = BaseTaskFragment.pref.getString(
+				4 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
 				null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_2).text(pname);
@@ -505,8 +524,8 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
+		pname = BaseTaskFragment.pref.getString(
+				4 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
 				null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_3).text(pname);
@@ -517,8 +536,8 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
+		pname = BaseTaskFragment.pref.getString(
+				4 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
 				null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_4).text(pname);

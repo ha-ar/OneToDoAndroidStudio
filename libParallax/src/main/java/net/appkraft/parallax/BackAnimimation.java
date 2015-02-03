@@ -4,14 +4,16 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
-	public class BackAnimimation extends Animation {
+import org.jetbrains.annotations.NotNull;
+
+public class BackAnimimation extends Animation {
 	int targetHeight;
 	int originalHeight;
 	int extraHeight;
 	View view;
 	boolean down;
 
-	protected BackAnimimation(View view, int targetHeight, boolean down) {
+	protected BackAnimimation(@NotNull View view, int targetHeight, boolean down) {
 		this.view = view;
 		this.targetHeight = targetHeight;
 		this.down = down;

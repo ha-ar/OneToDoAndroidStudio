@@ -21,8 +21,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
+
 import com.facebook.Session;
 import com.facebook.SessionState;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -31,8 +35,11 @@ import com.facebook.SessionState;
  */
 public class SessionTracker {
 
+    @Nullable
     private Session session;
+    @NotNull
     private final Session.StatusCallback callback;
+    @NotNull
     private final BroadcastReceiver receiver;
     private final LocalBroadcastManager broadcastManager;
     private boolean isTracking = false;
@@ -85,6 +92,7 @@ public class SessionTracker {
      * 
      * @return the current Session associated with this tracker
      */
+    @Nullable
     public Session getSession() {
         return (session == null) ? Session.getActiveSession() : session;
     }
@@ -95,6 +103,7 @@ public class SessionTracker {
      * 
      * @return the current Session if it's open, otherwise returns null
      */
+    @Nullable
     public Session getOpenSession() {
         Session openSession = getSession();
         if (openSession != null && openSession.isOpened()) {
@@ -108,7 +117,7 @@ public class SessionTracker {
      * 
      * @param newSession the new Session object to track
      */
-    public void setSession(Session newSession) {
+    public void setSession(@Nullable Session newSession) {
         if (newSession == null) {
             if (session != null) {
                 // We're current tracking a Session. Remove the callback
@@ -207,7 +216,7 @@ public class SessionTracker {
      */
     private class ActiveSessionBroadcastReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, @NotNull Intent intent) {
             if (Session.ACTION_ACTIVE_SESSION_SET.equals(intent.getAction())) {
                 Session session = Session.getActiveSession();
                 if (session != null) {
@@ -225,7 +234,7 @@ public class SessionTracker {
         }
 
         @Override
-        public void call(Session session, SessionState state, Exception exception) {
+        public void call(Session session, @NotNull SessionState state, Exception exception) {
             if (wrapped != null && isTracking()) {
                 wrapped.call(session, state, exception);
             }

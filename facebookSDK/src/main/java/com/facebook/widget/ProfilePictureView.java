@@ -27,10 +27,18 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
 import com.facebook.FacebookException;
 import com.facebook.LoggingBehavior;
 import com.facebook.android.R;
-import com.facebook.internal.*;
+import com.facebook.internal.ImageDownloader;
+import com.facebook.internal.ImageRequest;
+import com.facebook.internal.ImageResponse;
+import com.facebook.internal.Logger;
+import com.facebook.internal.Utility;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.URISyntaxException;
 
@@ -105,11 +113,14 @@ public class ProfilePictureView extends FrameLayout {
     private int queryHeight = ImageRequest.UNSPECIFIED_DIMENSION;
     private int queryWidth = ImageRequest.UNSPECIFIED_DIMENSION;
     private boolean isCropped = IS_CROPPED_DEFAULT_VALUE;
+    @Nullable
     private Bitmap imageContents;
     private ImageView image;
     private int presetSizeType = CUSTOM;
+    @Nullable
     private ImageRequest lastRequest;
     private OnErrorListener onErrorListener;
+    @Nullable
     private Bitmap customizedDefaultProfilePicture = null;
 
     /**
@@ -129,7 +140,7 @@ public class ProfilePictureView extends FrameLayout {
      * @param attrs   AttributeSet for this View.
      *                The attribute 'preset_size' is processed here
      */
-    public ProfilePictureView(Context context, AttributeSet attrs) {
+    public ProfilePictureView(@NotNull Context context, @NotNull AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
         parseAttributes(attrs);
@@ -143,7 +154,7 @@ public class ProfilePictureView extends FrameLayout {
      *                 The attribute 'preset_size' is processed here
      * @param defStyle Default style for this View
      */
-    public ProfilePictureView(Context context, AttributeSet attrs, int defStyle) {
+    public ProfilePictureView(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize(context);
         parseAttributes(attrs);
@@ -312,6 +323,7 @@ public class ProfilePictureView extends FrameLayout {
      * of the ProfilePictureView object in scenarios like orientation changes.
      * @return a Parcelable containing the current state
      */
+    @NotNull
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -333,7 +345,7 @@ public class ProfilePictureView extends FrameLayout {
      * @param state a Parcelable containing the current state
      */
     @Override
-    protected void onRestoreInstanceState(Parcelable state) {
+    protected void onRestoreInstanceState(@NotNull Parcelable state) {
         if (state.getClass() != Bundle.class) {
             super.onRestoreInstanceState(state);
         } else {
@@ -381,7 +393,7 @@ public class ProfilePictureView extends FrameLayout {
         addView(image);
     }
 
-    private void parseAttributes(AttributeSet attrs) {
+    private void parseAttributes(@NotNull AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.com_facebook_profile_picture_view);
         setPresetSize(a.getInt(R.styleable.com_facebook_profile_picture_view_preset_size, CUSTOM));
         isCropped = a.getBoolean(R.styleable.com_facebook_profile_picture_view_is_cropped, IS_CROPPED_DEFAULT_VALUE);
@@ -416,7 +428,7 @@ public class ProfilePictureView extends FrameLayout {
 	}
     }
 
-    private void setImageBitmap(Bitmap imageBitmap) {
+    private void setImageBitmap(@Nullable Bitmap imageBitmap) {
         if (image != null && imageBitmap != null) {
             imageContents = imageBitmap; // Hold for save-restore cycles
             image.setImageBitmap(imageBitmap);
@@ -434,7 +446,7 @@ public class ProfilePictureView extends FrameLayout {
                     .setCallback(
                     new ImageRequest.Callback() {
                         @Override
-                        public void onCompleted(ImageResponse response) {
+                        public void onCompleted(@NotNull ImageResponse response) {
                             processResponse(response);
                         }
                     })
@@ -454,7 +466,7 @@ public class ProfilePictureView extends FrameLayout {
         }
     }
 
-    private void processResponse(ImageResponse response) {
+    private void processResponse(@NotNull ImageResponse response) {
         // First check if the response is for the right request. We may have:
         // 1. Sent a new request, thus super-ceding this one.
         // 2. Detached this view, in which case the response should be discarded.

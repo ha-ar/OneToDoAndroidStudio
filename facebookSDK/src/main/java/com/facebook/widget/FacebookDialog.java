@@ -25,18 +25,37 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import com.facebook.*;
-import com.facebook.internal.*;
+
+import com.facebook.AppEventsLogger;
+import com.facebook.FacebookException;
+import com.facebook.FacebookGraphObjectException;
+import com.facebook.NativeAppCallAttachmentStore;
+import com.facebook.NativeAppCallContentProvider;
+import com.facebook.Settings;
+import com.facebook.internal.AnalyticsEvents;
+import com.facebook.internal.NativeProtocol;
+import com.facebook.internal.ServerProtocol;
+import com.facebook.internal.Utility;
+import com.facebook.internal.Validate;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphObjectList;
 import com.facebook.model.OpenGraphAction;
 import com.facebook.model.OpenGraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /*
  * Provides an interface for presenting dialogs provided by the Facebook application for Android. This class
@@ -273,7 +292,7 @@ public class FacebookDialog {
      * @param result the bundle passed back to onActivityResult
      * @return true if the native dialog completed normally
      */
-    public static boolean getNativeDialogDidComplete(Bundle result) {
+    public static boolean getNativeDialogDidComplete(@NotNull Bundle result) {
         return result.getBoolean(EXTRA_DIALOG_COMPLETE_KEY, false);
     }
 
@@ -284,7 +303,7 @@ public class FacebookDialog {
      * @param result the bundle passed back to onActivityResult
      * @return "post" or "cancel" as the completion gesture
      */
-    public static String getNativeDialogCompletionGesture(Bundle result) {
+    public static String getNativeDialogCompletionGesture(@NotNull Bundle result) {
         return result.getString(EXTRA_DIALOG_COMPLETION_GESTURE_KEY);
     }
 
@@ -295,7 +314,7 @@ public class FacebookDialog {
      * @param result the bundle passed back to onActivityResult
      * @return the id of the published post
      */
-    public static String getNativeDialogPostId(Bundle result) {
+    public static String getNativeDialogPostId(@NotNull Bundle result) {
         return result.getString(EXTRA_DIALOG_COMPLETION_ID_KEY);
     }
 
@@ -350,8 +369,8 @@ public class FacebookDialog {
      * @param callback    a callback to call after parsing the results
      * @return true if the activity result was handled, false if not
      */
-    public static boolean handleActivityResult(Context context, PendingCall appCall, int requestCode, Intent data,
-            Callback callback) {
+    public static boolean handleActivityResult(Context context, @NotNull PendingCall appCall, int requestCode, Intent data,
+            @Nullable Callback callback) {
         if (requestCode != appCall.getRequestCode()) {
             return false;
         }
@@ -435,7 +454,7 @@ public class FacebookDialog {
         return handleCanPresent(context, EnumSet.of(OpenGraphMessageDialogFeature.OG_MESSAGE_DIALOG, features));
     }
 
-    private static boolean handleCanPresent(Context context, Iterable<? extends DialogFeature> features) {
+    private static boolean handleCanPresent(Context context, @NotNull Iterable<? extends DialogFeature> features) {
         String actionName = getActionForFeatures(features);
         String applicationId = Settings.getApplicationId();
         if (Utility.isNullOrEmpty(applicationId)) {
@@ -459,10 +478,11 @@ public class FacebookDialog {
         return attachmentStore;
     }
 
+    @Nullable
     private static int[] getVersionSpecForFeatures(
             String applicationId,
             String actionName,
-            Iterable<? extends DialogFeature> features) {
+            @NotNull Iterable<? extends DialogFeature> features) {
         int[] intersectedRange = null; // Null is treated as a fully open Range. So it is safe to compare against.
         for (DialogFeature feature : features) {
             int[] featureVersionSpec = getVersionSpecForFeature(applicationId, actionName, feature);
@@ -472,7 +492,7 @@ public class FacebookDialog {
         return intersectedRange;
     }
 
-    private static int[] getVersionSpecForFeature(String applicationId, String actionName, DialogFeature feature) {
+    private static int[] getVersionSpecForFeature(String applicationId, String actionName, @NotNull DialogFeature feature) {
         // Return the value from DialogFeatureConfig if available. Otherwise, just default to the min-version
         Utility.DialogFeatureConfig config = Utility.getDialogFeatureConfig(applicationId, actionName, feature.name());
         if (config != null) {
@@ -482,7 +502,8 @@ public class FacebookDialog {
         }
     }
 
-    private static String getActionForFeatures(Iterable<? extends DialogFeature> features) {
+    @Nullable
+    private static String getActionForFeatures(@NotNull Iterable<? extends DialogFeature> features) {
         String action = null;
         for (DialogFeature feature : features) {
             // All actions in a set of DialogFeatures should have the same action
@@ -493,20 +514,20 @@ public class FacebookDialog {
         return action;
     }
 
-    private static void logDialogActivity(Activity activity, Fragment fragment, String eventName, String outcome) {
+    private static void logDialogActivity(Activity activity, @Nullable Fragment fragment, String eventName, String outcome) {
         AppEventsLogger logger = AppEventsLogger.newLogger(fragment != null ? fragment.getActivity() : activity);
         Bundle parameters = new Bundle();
         parameters.putString(AnalyticsEvents.PARAMETER_DIALOG_OUTCOME, outcome);
         logger.logSdkEvent(eventName, null, parameters);
     }
 
-    static private String getEventName(Intent intent) {
+    static private String getEventName(@NotNull Intent intent) {
         String action = intent.getStringExtra(NativeProtocol.EXTRA_PROTOCOL_ACTION);
         boolean hasPhotos = intent.hasExtra(NativeProtocol.EXTRA_PHOTOS);
         return getEventName(action, hasPhotos);
     }
 
-    static private String getEventName(String action, boolean hasPhotos) {
+    static private String getEventName(@NotNull String action, boolean hasPhotos) {
         String eventName;
 
         if (action.equals(NativeProtocol.ACTION_FEED_DIALOG)) {
@@ -539,10 +560,13 @@ public class FacebookDialog {
     public abstract static class Builder<CONCRETE extends Builder<?>> {
         final protected Activity activity;
         final protected String applicationId;
+        @NotNull
         final protected PendingCall appCall;
         protected Fragment fragment;
         protected String applicationName;
+        @NotNull
         protected HashMap<String, Bitmap> imageAttachments = new HashMap<String, Bitmap>();
+        @NotNull
         protected HashMap<String, File> imageAttachmentFiles = new HashMap<String, File>();
 
         /**
@@ -565,6 +589,7 @@ public class FacebookDialog {
          * @param requestCode the request code
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setRequestCode(int requestCode) {
             this.appCall.setRequestCode(requestCode);
             @SuppressWarnings("unchecked")
@@ -579,6 +604,7 @@ public class FacebookDialog {
          * @param applicationName the name of the Facebook application
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setApplicationName(String applicationName) {
             this.applicationName = applicationName;
             @SuppressWarnings("unchecked")
@@ -594,6 +620,7 @@ public class FacebookDialog {
          *
          * @param fragment the fragment that contains this control
          */
+        @NotNull
         public CONCRETE setFragment(Fragment fragment) {
             this.fragment = fragment;
             @SuppressWarnings("unchecked")
@@ -607,6 +634,7 @@ public class FacebookDialog {
          *
          * @return a FacebookDialog instance
          */
+        @NotNull
         public FacebookDialog build() {
             validate();
 
@@ -648,6 +676,7 @@ public class FacebookDialog {
          * This is public primarily to allow its use elsewhere in the Android SDK; developers are discouraged from
          * consuming this method as the internal API may change.
          */
+        @Nullable
         protected String getWebFallbackUrlInternal() {
             Iterable<? extends DialogFeature> features = getDialogFeatures();
             String featureName = null;
@@ -706,6 +735,7 @@ public class FacebookDialog {
         void validate() {
         }
 
+        @Nullable
         OnPresentCallback getOnPresentCallback() {
             return new OnPresentCallback() {
                 @Override
@@ -722,7 +752,8 @@ public class FacebookDialog {
             };
         }
 
-        protected List<String> addImageAttachments(Collection<Bitmap> bitmaps) {
+        @NotNull
+        protected List<String> addImageAttachments(@NotNull Collection<Bitmap> bitmaps) {
             ArrayList<String> attachmentUrls = new ArrayList<String>();
             for (Bitmap bitmap : bitmaps) {
                 String attachmentName = UUID.randomUUID().toString();
@@ -737,7 +768,8 @@ public class FacebookDialog {
             return attachmentUrls;
         }
 
-        protected List<String> addImageAttachmentFiles(Collection<File> bitmapFiles) {
+        @NotNull
+        protected List<String> addImageAttachmentFiles(@NotNull Collection<File> bitmapFiles) {
             ArrayList<String> attachmentUrls = new ArrayList<String>();
             for (File bitmapFile : bitmapFiles) {
                 String attachmentName = UUID.randomUUID().toString();
@@ -752,6 +784,7 @@ public class FacebookDialog {
             return attachmentUrls;
         }
 
+        @NotNull
         List<String> getImageAttachmentNames() {
             return new ArrayList<String>(imageAttachments.keySet());
         }
@@ -763,7 +796,7 @@ public class FacebookDialog {
 
         protected abstract Bundle getMethodArguments();
 
-        protected void putExtra(Bundle extras, String key, String value) {
+        protected void putExtra(@NotNull Bundle extras, String key, @Nullable String value) {
             if (value != null) {
                 extras.putString(key, value);
             }
@@ -771,6 +804,7 @@ public class FacebookDialog {
 
         protected abstract EnumSet<? extends DialogFeature> getDialogFeatures();
 
+        @NotNull
         protected CONCRETE addImageAttachment(String imageName, Bitmap bitmap) {
             imageAttachments.put(imageName, bitmap);
             @SuppressWarnings("unchecked")
@@ -778,6 +812,7 @@ public class FacebookDialog {
             return result;
         }
 
+        @NotNull
         protected CONCRETE addImageAttachment(String imageName, File attachment) {
             imageAttachmentFiles.put(imageName, attachment);
             @SuppressWarnings("unchecked")
@@ -812,6 +847,7 @@ public class FacebookDialog {
          * @param name the name
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setName(String name) {
             this.name = name;
             @SuppressWarnings("unchecked")
@@ -825,6 +861,7 @@ public class FacebookDialog {
          * @param caption the caption
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setCaption(String caption) {
             this.caption = caption;
             @SuppressWarnings("unchecked")
@@ -838,6 +875,7 @@ public class FacebookDialog {
          * @param description the description
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setDescription(String description) {
             this.description = description;
             @SuppressWarnings("unchecked")
@@ -851,6 +889,7 @@ public class FacebookDialog {
          * @param link the URL
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setLink(String link) {
             this.link = link;
             @SuppressWarnings("unchecked")
@@ -864,6 +903,7 @@ public class FacebookDialog {
          * @param picture the URL of the image
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setPicture(String picture) {
             this.picture = picture;
             @SuppressWarnings("unchecked")
@@ -877,6 +917,7 @@ public class FacebookDialog {
          * @param place the Facebook ID of the place
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setPlace(String place) {
             this.place = place;
             @SuppressWarnings("unchecked")
@@ -890,6 +931,7 @@ public class FacebookDialog {
          * @param friends a list of Facebook IDs of the friends to be tagged in the shared item
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setFriends(List<String> friends) {
             this.friends = new ArrayList<String>(friends);
             @SuppressWarnings("unchecked")
@@ -903,6 +945,7 @@ public class FacebookDialog {
          * @param ref the 'ref' property
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setRef(String ref) {
             this.ref = ref;
             @SuppressWarnings("unchecked")
@@ -917,6 +960,7 @@ public class FacebookDialog {
          * @param dataErrorsFatal true if data errors should be fatal; false if not
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setDataErrorsFatal(boolean dataErrorsFatal) {
             this.dataErrorsFatal = dataErrorsFatal;
             @SuppressWarnings("unchecked")
@@ -924,8 +968,9 @@ public class FacebookDialog {
             return result;
         }
 
+        @NotNull
         @Override
-        protected Bundle setBundleExtras(Bundle extras) {
+        protected Bundle setBundleExtras(@NotNull Bundle extras) {
             putExtra(extras, NativeProtocol.EXTRA_APPLICATION_ID, applicationId);
             putExtra(extras, NativeProtocol.EXTRA_APPLICATION_NAME, applicationName);
             putExtra(extras, NativeProtocol.EXTRA_TITLE, name);
@@ -944,6 +989,7 @@ public class FacebookDialog {
             return extras;
         }
 
+        @NotNull
         @Override
         protected Bundle getMethodArguments() {
             Bundle methodArguments = new Bundle();
@@ -994,6 +1040,7 @@ public class FacebookDialog {
         static int MAXIMUM_PHOTO_COUNT = 6;
         private String place;
         private ArrayList<String> friends;
+        @NotNull
         private ArrayList<String> imageAttachmentUrls = new ArrayList<String>();
 
         /**
@@ -1011,6 +1058,7 @@ public class FacebookDialog {
          * @param place the Facebook ID of the place
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setPlace(String place) {
             this.place = place;
             @SuppressWarnings("unchecked")
@@ -1024,6 +1072,7 @@ public class FacebookDialog {
          * @param friends a list of Facebook IDs of the friends to be tagged in the shared item
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setFriends(List<String> friends) {
             this.friends = new ArrayList<String>(friends);
             @SuppressWarnings("unchecked")
@@ -1043,7 +1092,8 @@ public class FacebookDialog {
          * @param photos a collection of Files representing photos to be uploaded
          * @return this instance of the builder
          */
-        public CONCRETE addPhotos(Collection<Bitmap> photos) {
+        @NotNull
+        public CONCRETE addPhotos(@NotNull Collection<Bitmap> photos) {
             imageAttachmentUrls.addAll(addImageAttachments(photos));
             @SuppressWarnings("unchecked")
             CONCRETE result = (CONCRETE) this;
@@ -1060,7 +1110,8 @@ public class FacebookDialog {
          * @param photos a collection of Files representing photos to be uploaded
          * @return this instance of the builder
          */
-        public CONCRETE addPhotoFiles(Collection<File> photos) {
+        @NotNull
+        public CONCRETE addPhotoFiles(@NotNull Collection<File> photos) {
             imageAttachmentUrls.addAll(addImageAttachmentFiles(photos));
             @SuppressWarnings("unchecked")
             CONCRETE result = (CONCRETE) this;
@@ -1082,8 +1133,9 @@ public class FacebookDialog {
             }
         }
 
+        @NotNull
         @Override
-        protected Bundle setBundleExtras(Bundle extras) {
+        protected Bundle setBundleExtras(@NotNull Bundle extras) {
             putExtra(extras, NativeProtocol.EXTRA_APPLICATION_ID, applicationId);
             putExtra(extras, NativeProtocol.EXTRA_APPLICATION_NAME, applicationName);
             putExtra(extras, NativeProtocol.EXTRA_PLACE_TAG, place);
@@ -1095,6 +1147,7 @@ public class FacebookDialog {
             return extras;
         }
 
+        @NotNull
         @Override
         protected Bundle getMethodArguments() {
             Bundle methodArgs = new Bundle();
@@ -1169,6 +1222,7 @@ public class FacebookDialog {
          * @param place will be ignored
          * @return this instance of the builder
          */
+        @NotNull
         @Override
         public PhotoMessageDialogBuilder setPlace(String place) {
             return this;
@@ -1180,6 +1234,7 @@ public class FacebookDialog {
          * @param friends will be ignored
          * @return this instance of the builder
          */
+        @NotNull
         @Override
         public PhotoMessageDialogBuilder setFriends(List<String> friends) {
             return this;
@@ -1215,6 +1270,7 @@ public class FacebookDialog {
          * @param place will be ignored
          * @return this instance of the builder
          */
+        @NotNull
         @Override
         public MessageDialogBuilder setPlace(String place) {
             return this;
@@ -1226,6 +1282,7 @@ public class FacebookDialog {
          * @param friends will be ignored
          * @return this instance of the builder
          */
+        @NotNull
         @Override
         public MessageDialogBuilder setFriends(List<String> friends) {
             return this;
@@ -1255,7 +1312,7 @@ public class FacebookDialog {
          *                            Open Graph object which will be displayed as a preview to the user
          */
         @Deprecated
-        public OpenGraphDialogBuilderBase(Activity activity, OpenGraphAction action, String actionType,
+        public OpenGraphDialogBuilderBase(Activity activity, @NotNull OpenGraphAction action, String actionType,
                 String previewPropertyName) {
             super(activity);
 
@@ -1289,7 +1346,7 @@ public class FacebookDialog {
          * @param previewPropertyName the name of a property on the Open Graph action that contains the
          *                            Open Graph object which will be displayed as a preview to the user
          */
-        public OpenGraphDialogBuilderBase(Activity activity, OpenGraphAction action, String previewPropertyName) {
+        public OpenGraphDialogBuilderBase(Activity activity, @NotNull OpenGraphAction action, String previewPropertyName) {
             super(activity);
 
             Validate.notNull(action, "action");
@@ -1313,6 +1370,7 @@ public class FacebookDialog {
          * @param dataErrorsFatal true if data errors should be fatal; false if not
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setDataErrorsFatal(boolean dataErrorsFatal) {
             this.dataErrorsFatal = dataErrorsFatal;
             @SuppressWarnings("unchecked")
@@ -1334,7 +1392,8 @@ public class FacebookDialog {
          * @param bitmaps a list of Bitmaps to be uploaded and attached to the Open Graph action
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentsForAction(List<Bitmap> bitmaps) {
+        @NotNull
+        public CONCRETE setImageAttachmentsForAction(@NotNull List<Bitmap> bitmaps) {
             return setImageAttachmentsForAction(bitmaps, false);
         }
 
@@ -1355,7 +1414,8 @@ public class FacebookDialog {
          * @param isUserGenerated if true, specifies that the user_generated flag should be set for these images
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentsForAction(List<Bitmap> bitmaps,
+        @NotNull
+        public CONCRETE setImageAttachmentsForAction(@NotNull List<Bitmap> bitmaps,
                 boolean isUserGenerated) {
             Validate.containsNoNulls(bitmaps, "bitmaps");
             if (action == null) {
@@ -1384,7 +1444,8 @@ public class FacebookDialog {
          * @param bitmapFiles a list of Files containing bitmaps to be uploaded and attached to the Open Graph action
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentFilesForAction(List<File> bitmapFiles) {
+        @NotNull
+        public CONCRETE setImageAttachmentFilesForAction(@NotNull List<File> bitmapFiles) {
             return setImageAttachmentFilesForAction(bitmapFiles, false);
         }
 
@@ -1405,7 +1466,8 @@ public class FacebookDialog {
          * @param isUserGenerated if true, specifies that the user_generated flag should be set for these images
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentFilesForAction(List<File> bitmapFiles,
+        @NotNull
+        public CONCRETE setImageAttachmentFilesForAction(@NotNull List<File> bitmapFiles,
                 boolean isUserGenerated) {
             Validate.containsNoNulls(bitmapFiles, "bitmapFiles");
             if (action == null) {
@@ -1420,7 +1482,7 @@ public class FacebookDialog {
             return result;
         }
 
-        private void updateActionAttachmentUrls(List<String> attachmentUrls, boolean isUserGenerated) {
+        private void updateActionAttachmentUrls(@NotNull List<String> attachmentUrls, boolean isUserGenerated) {
             List<JSONObject> attachments = action.getImage();
             if (attachments == null) {
                 attachments = new ArrayList<JSONObject>(attachmentUrls.size());
@@ -1462,7 +1524,8 @@ public class FacebookDialog {
          * @param bitmaps        a list of Files containing bitmaps to be uploaded and attached to the Open Graph object
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentsForObject(String objectProperty, List<Bitmap> bitmaps) {
+        @NotNull
+        public CONCRETE setImageAttachmentsForObject(String objectProperty, @NotNull List<Bitmap> bitmaps) {
             return setImageAttachmentsForObject(objectProperty, bitmaps, false);
         }
 
@@ -1491,7 +1554,8 @@ public class FacebookDialog {
          * @param isUserGenerated if true, specifies that the user_generated flag should be set for these images
          * @return this instance of the builder
          */
-        public CONCRETE setImageAttachmentsForObject(String objectProperty, List<Bitmap> bitmaps,
+        @NotNull
+        public CONCRETE setImageAttachmentsForObject(String objectProperty, @NotNull List<Bitmap> bitmaps,
                 boolean isUserGenerated) {
             Validate.notNull(objectProperty, "objectProperty");
             Validate.containsNoNulls(bitmaps, "bitmaps");
@@ -1527,8 +1591,9 @@ public class FacebookDialog {
          * @param bitmapFiles    a list of Bitmaps to be uploaded and attached to the Open Graph object
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setImageAttachmentFilesForObject(String objectProperty,
-                List<File> bitmapFiles) {
+                @NotNull List<File> bitmapFiles) {
             return setImageAttachmentFilesForObject(objectProperty, bitmapFiles, false);
         }
 
@@ -1556,8 +1621,9 @@ public class FacebookDialog {
          * @param isUserGenerated if true, specifies that the user_generated flag should be set for these images
          * @return this instance of the builder
          */
+        @NotNull
         public CONCRETE setImageAttachmentFilesForObject(String objectProperty,
-                List<File> bitmapFiles, boolean isUserGenerated) {
+                @NotNull List<File> bitmapFiles, boolean isUserGenerated) {
             Validate.notNull(objectProperty, "objectProperty");
             Validate.containsNoNulls(bitmapFiles, "bitmapFiles");
             if (action == null) {
@@ -1572,7 +1638,7 @@ public class FacebookDialog {
             return result;
         }
 
-        void updateObjectAttachmentUrls(String objectProperty, List<String> attachmentUrls, boolean isUserGenerated) {
+        void updateObjectAttachmentUrls(String objectProperty, @NotNull List<String> attachmentUrls, boolean isUserGenerated) {
             final OpenGraphObject object;
             try {
                 object = action.getPropertyAs(objectProperty, OpenGraphObject.class);
@@ -1602,8 +1668,9 @@ public class FacebookDialog {
             object.setImage(attachments);
         }
 
+        @NotNull
         @Override
-        protected Bundle setBundleExtras(Bundle extras) {
+        protected Bundle setBundleExtras(@NotNull Bundle extras) {
             putExtra(extras, NativeProtocol.EXTRA_PREVIEW_PROPERTY_NAME, previewPropertyName);
             putExtra(extras, NativeProtocol.EXTRA_ACTION_TYPE, actionType);
             extras.putBoolean(NativeProtocol.EXTRA_DATA_FAILURES_FATAL, dataErrorsFatal);
@@ -1617,6 +1684,7 @@ public class FacebookDialog {
             return extras;
         }
 
+        @NotNull
         @Override
         protected Bundle getMethodArguments() {
             Bundle methodArgs = new Bundle();
@@ -1658,7 +1726,8 @@ public class FacebookDialog {
             }
         }
 
-        private Object flattenObject(Object object) throws JSONException {
+        @Nullable
+        private Object flattenObject(@Nullable Object object) throws JSONException {
             if (object == null) {
                 return null;
             }
@@ -1715,7 +1784,7 @@ public class FacebookDialog {
          *                            Open Graph object which will be displayed as a preview to the user
          */
         @Deprecated
-        public OpenGraphActionDialogBuilder(Activity activity, OpenGraphAction action, String actionType,
+        public OpenGraphActionDialogBuilder(Activity activity, @NotNull OpenGraphAction action, String actionType,
                 String previewPropertyName) {
             super(activity, action, actionType, previewPropertyName);
         }
@@ -1731,7 +1800,7 @@ public class FacebookDialog {
          * @param previewPropertyName the name of a property on the Open Graph action that contains the
          *                            Open Graph object which will be displayed as a preview to the user
          */
-        public OpenGraphActionDialogBuilder(Activity activity, OpenGraphAction action, String previewPropertyName) {
+        public OpenGraphActionDialogBuilder(Activity activity, @NotNull OpenGraphAction action, String previewPropertyName) {
             super(activity, action, previewPropertyName);
         }
 
@@ -1761,7 +1830,7 @@ public class FacebookDialog {
          * @param previewPropertyName the name of a property on the Open Graph action that contains the
          *                            Open Graph object which will be displayed as a preview to the user
          */
-        public OpenGraphMessageDialogBuilder(Activity activity, OpenGraphAction action, String previewPropertyName) {
+        public OpenGraphMessageDialogBuilder(Activity activity, @NotNull OpenGraphAction action, String previewPropertyName) {
             super(activity, action, previewPropertyName);
         }
 
@@ -1790,7 +1859,7 @@ public class FacebookDialog {
             this.requestCode = requestCode;
         }
 
-        private PendingCall(Parcel in) {
+        private PendingCall(@NotNull Parcel in) {
             callId = UUID.fromString(in.readString());
             requestIntent = in.readParcelable(null);
             requestCode = in.readInt();
@@ -1837,7 +1906,7 @@ public class FacebookDialog {
         }
 
         @Override
-        public void writeToParcel(Parcel parcel, int i) {
+        public void writeToParcel(@NotNull Parcel parcel, int i) {
             parcel.writeString(callId.toString());
             parcel.writeParcelable(requestIntent, 0);
             parcel.writeInt(requestCode);
@@ -1845,10 +1914,12 @@ public class FacebookDialog {
 
         public static final Creator<PendingCall> CREATOR
                 = new Creator<PendingCall>() {
-            public PendingCall createFromParcel(Parcel in) {
+            @NotNull
+            public PendingCall createFromParcel(@NotNull Parcel in) {
                 return new PendingCall(in);
             }
 
+            @NotNull
             public PendingCall[] newArray(int size) {
                 return new PendingCall[size];
             }

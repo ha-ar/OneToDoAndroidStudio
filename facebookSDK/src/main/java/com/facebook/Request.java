@@ -20,24 +20,58 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-import com.facebook.internal.*;
-import com.facebook.model.*;
+
+import com.facebook.internal.AttributionIdentifiers;
+import com.facebook.internal.Logger;
+import com.facebook.internal.NativeProtocol;
+import com.facebook.internal.ServerProtocol;
+import com.facebook.internal.Utility;
+import com.facebook.internal.Validate;
+import com.facebook.model.GraphMultiResult;
+import com.facebook.model.GraphObject;
+import com.facebook.model.GraphObjectList;
+import com.facebook.model.GraphPlace;
+import com.facebook.model.GraphUser;
+import com.facebook.model.OpenGraphAction;
+import com.facebook.model.OpenGraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,12 +147,14 @@ public class Request {
     private static Pattern versionPattern = Pattern.compile("^/?v\\d+\\.\\d+/(.*)");
 
     private Session session;
+    @Nullable
     private HttpMethod httpMethod;
     private String graphPath;
     private GraphObject graphObject;
     private String batchEntryName;
     private String batchEntryDependsOn;
     private boolean batchEntryOmitResultOnSuccess = true;
+    @Nullable
     private Bundle parameters;
     private Callback callback;
     private String overriddenURL;
@@ -216,7 +252,7 @@ public class Request {
      * @param version
      *            the version of the Graph API
      */
-    public Request(Session session, String graphPath, Bundle parameters, HttpMethod httpMethod, Callback callback, String version) {
+    public Request(Session session, String graphPath, @Nullable Bundle parameters, HttpMethod httpMethod, Callback callback, String version) {
         this.session = session;
         this.graphPath = graphPath;
         this.callback = callback;
@@ -235,7 +271,7 @@ public class Request {
         }
     }
 
-    Request(Session session, URL overriddenURL) {
+    Request(Session session, @NotNull URL overriddenURL) {
         this.session = session;
         this.overriddenURL = overriddenURL.toString();
 
@@ -258,6 +294,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @Nullable
     public static Request newPostRequest(Session session, String graphPath, GraphObject graphObject, Callback callback) {
         Request request = new Request(session, graphPath, null, HttpMethod.POST , callback);
         request.setGraphObject(graphObject);
@@ -273,10 +310,11 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newMeRequest(Session session, final GraphUserCallback callback) {
+    @Nullable
+    public static Request newMeRequest(Session session, @Nullable final GraphUserCallback callback) {
         Callback wrapper = new Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 if (callback != null) {
                     callback.onCompleted(response.getGraphObjectAs(GraphUser.class), response);
                 }
@@ -294,10 +332,11 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newMyFriendsRequest(Session session, final GraphUserListCallback callback) {
+    @Nullable
+    public static Request newMyFriendsRequest(Session session, @Nullable final GraphUserListCallback callback) {
         Callback wrapper = new Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 if (callback != null) {
                     callback.onCompleted(typedListFromResponse(response, GraphUser.class), response);
                 }
@@ -317,6 +356,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newUploadPhotoRequest(Session session, Bitmap image, Callback callback) {
         Bundle parameters = new Bundle(1);
         parameters.putParcelable(PICTURE_PARAM, image);
@@ -333,7 +373,8 @@ public class Request {
      * @param callback a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newUploadPhotoRequest(Session session, File file,
+    @NotNull
+    public static Request newUploadPhotoRequest(Session session, @NotNull File file,
             Callback callback) throws FileNotFoundException {
         ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
         Bundle parameters = new Bundle(1);
@@ -351,7 +392,8 @@ public class Request {
      * @param callback a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newUploadVideoRequest(Session session, File file,
+    @NotNull
+    public static Request newUploadVideoRequest(Session session, @NotNull File file,
             Callback callback) throws FileNotFoundException {
         ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
         Bundle parameters = new Bundle(1);
@@ -371,6 +413,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @Nullable
     public static Request newGraphPathRequest(Session session, String graphPath, Callback callback) {
         return new Request(session, graphPath, null, null, callback);
     }
@@ -397,8 +440,9 @@ public class Request {
      *
      * @throws FacebookException If neither location nor searchText is specified
      */
-    public static Request newPlacesSearchRequest(Session session, Location location, int radiusInMeters,
-            int resultsLimit, String searchText, final GraphPlaceListCallback callback) {
+    @Nullable
+    public static Request newPlacesSearchRequest(Session session, @Nullable Location location, int radiusInMeters,
+            int resultsLimit, String searchText, @Nullable final GraphPlaceListCallback callback) {
         if (location == null && Utility.isNullOrEmpty(searchText)) {
             throw new FacebookException("Either location or searchText must be specified.");
         }
@@ -417,7 +461,7 @@ public class Request {
 
         Callback wrapper = new Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 if (callback != null) {
                     callback.onCompleted(typedListFromResponse(response, GraphPlace.class), response);
                 }
@@ -438,6 +482,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newStatusUpdateRequest(Session session, String message, Callback callback) {
         return newStatusUpdateRequest(session, message, (String)null, null, callback);
     }
@@ -457,7 +502,8 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    private static Request newStatusUpdateRequest(Session session, String message, String placeId, List<String> tagIds,
+    @NotNull
+    private static Request newStatusUpdateRequest(Session session, String message, @Nullable String placeId, @Nullable List<String> tagIds,
             Callback callback) {
 
         Bundle parameters = new Bundle();
@@ -490,8 +536,9 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newStatusUpdateRequest(Session session, String message, GraphPlace place,
-            List<GraphUser> tags, Callback callback) {
+    @NotNull
+    public static Request newStatusUpdateRequest(Session session, String message, @Nullable GraphPlace place,
+            @Nullable List<GraphUser> tags, Callback callback) {
 
         List<String> tagIds = null;
         if (tags != null) {
@@ -535,7 +582,8 @@ public class Request {
      *            represents the user as described above.
      * @return a Request that is ready to execute
      */
-    public static Request newCustomAudienceThirdPartyIdRequest(Session session, Context context, Callback callback) {
+    @Nullable
+    public static Request newCustomAudienceThirdPartyIdRequest(Session session, @NotNull Context context, Callback callback) {
         return newCustomAudienceThirdPartyIdRequest(session, context, null, callback);
     }
 
@@ -573,8 +621,9 @@ public class Request {
      *            represents the user as described above.
      * @return a Request that is ready to execute
      */
-    public static Request newCustomAudienceThirdPartyIdRequest(Session session,
-            Context context, String applicationId, Callback callback) {
+    @Nullable
+    public static Request newCustomAudienceThirdPartyIdRequest(@Nullable Session session,
+            @NotNull Context context, @Nullable String applicationId, Callback callback) {
 
         // if provided session or activeSession is opened, use it.
         if (session == null) {
@@ -635,6 +684,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newUploadStagingResourceWithImageRequest(Session session,
             Bitmap image, Callback callback) {
         Bundle parameters = new Bundle(1);
@@ -657,8 +707,9 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newUploadStagingResourceWithImageRequest(Session session,
-            File file, Callback callback) throws FileNotFoundException {
+            @NotNull File file, Callback callback) throws FileNotFoundException {
         ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
         ParcelFileDescriptorWithMimeType descriptorWithMimeType = new ParcelFileDescriptorWithMimeType(descriptor, "image/png");
         Bundle parameters = new Bundle(1);
@@ -678,8 +729,9 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newPostOpenGraphObjectRequest(Session session,
-            OpenGraphObject openGraphObject, Callback callback) {
+            @Nullable OpenGraphObject openGraphObject, Callback callback) {
         if (openGraphObject == null) {
             throw new FacebookException("openGraphObject cannot be null");
         }
@@ -718,8 +770,9 @@ public class Request {
      *            may be null
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newPostOpenGraphObjectRequest(Session session, String type, String title, String imageUrl,
-            String url, String description, GraphObject objectProperties, Callback callback) {
+            String url, String description, @Nullable GraphObject objectProperties, Callback callback) {
         OpenGraphObject openGraphObject = OpenGraphObject.Factory.createForPost(OpenGraphObject.class, type, title,
                 imageUrl, url, description);
         if (objectProperties != null) {
@@ -740,7 +793,8 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newPostOpenGraphActionRequest(Session session, OpenGraphAction openGraphAction,
+    @Nullable
+    public static Request newPostOpenGraphActionRequest(Session session, @Nullable OpenGraphAction openGraphAction,
             Callback callback) {
         if (openGraphAction == null) {
             throw new FacebookException("openGraphAction cannot be null");
@@ -764,6 +818,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @Nullable
     public static Request newDeleteObjectRequest(Session session, String id, Callback callback) {
         return new Request(session, id, null, HttpMethod.DELETE, callback);
     }
@@ -779,7 +834,8 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
-    public static Request newUpdateOpenGraphObjectRequest(Session session, OpenGraphObject openGraphObject,
+    @NotNull
+    public static Request newUpdateOpenGraphObjectRequest(Session session, @Nullable OpenGraphObject openGraphObject,
             Callback callback) {
         if (openGraphObject == null) {
             throw new FacebookException("openGraphObject cannot be null");
@@ -816,6 +872,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a Request that is ready to execute
      */
+    @NotNull
     public static Request newUpdateOpenGraphObjectRequest(Session session, String id, String title, String imageUrl,
             String url, String description, GraphObject objectProperties, Callback callback) {
         OpenGraphObject openGraphObject = OpenGraphObject.Factory.createForPost(OpenGraphObject.class, null, title,
@@ -869,6 +926,7 @@ public class Request {
      *
      * @return the HttpMethod
      */
+    @Nullable
     public final HttpMethod getHttpMethod() {
         return this.httpMethod;
     }
@@ -879,7 +937,7 @@ public class Request {
      * @param httpMethod
      *            the HttpMethod, or null for the default (HttpMethod.GET).
      */
-    public final void setHttpMethod(HttpMethod httpMethod) {
+    public final void setHttpMethod(@Nullable HttpMethod httpMethod) {
         if (overriddenURL != null && httpMethod != HttpMethod.GET) {
             throw new FacebookException("Can't change HTTP method on request with overridden URL.");
             }
@@ -918,6 +976,7 @@ public class Request {
      *
      * @return the parameters
      */
+    @Nullable
     public final Bundle getParameters() {
         return this.parameters;
     }
@@ -1101,6 +1160,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executePostRequestAsync(Session session, String graphPath, GraphObject graphObject,
             Callback callback) {
@@ -1120,6 +1180,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executeMeRequestAsync(Session session, GraphUserCallback callback) {
         return newMeRequest(session, callback).executeAsync();
@@ -1138,6 +1199,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executeMyFriendsRequestAsync(Session session, GraphUserListCallback callback) {
         return newMyFriendsRequest(session, callback).executeAsync();
@@ -1158,6 +1220,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executeUploadPhotoRequestAsync(Session session, Bitmap image, Callback callback) {
         return newUploadPhotoRequest(session, image, callback).executeAsync();
@@ -1176,8 +1239,9 @@ public class Request {
      * @param callback a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
-    public static RequestAsyncTask executeUploadPhotoRequestAsync(Session session, File file,
+    public static RequestAsyncTask executeUploadPhotoRequestAsync(Session session, @NotNull File file,
             Callback callback) throws FileNotFoundException {
         return newUploadPhotoRequest(session, file, callback).executeAsync();
     }
@@ -1197,6 +1261,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executeGraphPathRequestAsync(Session session, String graphPath, Callback callback) {
         return newGraphPathRequest(session, graphPath, callback).executeAsync();
@@ -1227,6 +1292,7 @@ public class Request {
      *
      * @throws FacebookException If neither location nor searchText is specified
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executePlacesSearchRequestAsync(Session session, Location location,
             int radiusInMeters, int resultsLimit, String searchText, GraphPlaceListCallback callback) {
@@ -1249,6 +1315,7 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     @Deprecated
     public static RequestAsyncTask executeStatusUpdateRequestAsync(Session session, String message, Callback callback) {
         return newStatusUpdateRequest(session, message, callback).executeAsync();
@@ -1278,6 +1345,7 @@ public class Request {
      *
      * @throws IllegalArgumentException
      */
+    @NotNull
     public final RequestAsyncTask executeAsync() {
         return Request.executeBatchAsync(this);
     }
@@ -1314,7 +1382,7 @@ public class Request {
      * @throws IllegalArgumentException if the passed in collection is empty
      * @throws NullPointerException if the passed in collection or any of its contents are null
      */
-    public static HttpURLConnection toHttpConnection(Collection<Request> requests) {
+    public static HttpURLConnection toHttpConnection(@NotNull Collection<Request> requests) {
         Validate.notEmptyAndContainsNoNulls(requests, "requests");
 
         return toHttpConnection(new RequestBatch(requests));
@@ -1334,7 +1402,7 @@ public class Request {
      *            contacting the service
      * @throws IllegalArgumentException
      */
-    public static HttpURLConnection toHttpConnection(RequestBatch requests) {
+    public static HttpURLConnection toHttpConnection(@NotNull RequestBatch requests) {
 
         URL url = null;
         try {
@@ -1445,7 +1513,7 @@ public class Request {
      * @throws IllegalArgumentException if the passed in RequestBatch is empty
      * @throws NullPointerException if the passed in RequestBatch or any of its contents are null
      */
-    public static List<Response> executeBatchAndWait(RequestBatch requests) {
+    public static List<Response> executeBatchAndWait(@NotNull RequestBatch requests) {
         Validate.notEmptyAndContainsNoNulls(requests, "requests");
 
         HttpURLConnection connection = null;
@@ -1475,6 +1543,7 @@ public class Request {
      * @throws NullPointerException
      *            If a null request is passed in
      */
+    @NotNull
     public static RequestAsyncTask executeBatchAsync(Request... requests) {
         Validate.notNull(requests, "requests");
 
@@ -1495,6 +1564,7 @@ public class Request {
      * @throws IllegalArgumentException if the passed in collection is empty
      * @throws NullPointerException if the passed in collection or any of its contents are null
      */
+    @NotNull
     public static RequestAsyncTask executeBatchAsync(Collection<Request> requests) {
         return executeBatchAsync(new RequestBatch(requests));
     }
@@ -1513,7 +1583,8 @@ public class Request {
      * @throws IllegalArgumentException if the passed in RequestBatch is empty
      * @throws NullPointerException if the passed in RequestBatch or any of its contents are null
      */
-    public static RequestAsyncTask executeBatchAsync(RequestBatch requests) {
+    @NotNull
+    public static RequestAsyncTask executeBatchAsync(@NotNull RequestBatch requests) {
         Validate.notEmptyAndContainsNoNulls(requests, "requests");
 
         RequestAsyncTask asyncTask = new RequestAsyncTask(requests);
@@ -1557,7 +1628,7 @@ public class Request {
      * @throws FacebookException
      *            If there was an error in the protocol used to communicate with the service
      */
-    public static List<Response> executeConnectionAndWait(HttpURLConnection connection, RequestBatch requests) {
+    public static List<Response> executeConnectionAndWait(HttpURLConnection connection, @NotNull RequestBatch requests) {
         List<Response> responses = Response.fromHttpConnection(connection, requests);
 
         Utility.disconnectQuietly(connection);
@@ -1601,7 +1672,8 @@ public class Request {
      *            the requests represented by the HttpURLConnection
      * @return a RequestAsyncTask that is executing the request
      */
-    public static RequestAsyncTask executeConnectionAsync(HttpURLConnection connection, RequestBatch requests) {
+    @NotNull
+    public static RequestAsyncTask executeConnectionAsync(HttpURLConnection connection, @NotNull RequestBatch requests) {
         return executeConnectionAsync(null, connection, requests);
     }
 
@@ -1624,8 +1696,9 @@ public class Request {
      *            the requests represented by the HttpURLConnection
      * @return a RequestAsyncTask that is executing the request
      */
+    @NotNull
     public static RequestAsyncTask executeConnectionAsync(Handler callbackHandler, HttpURLConnection connection,
-            RequestBatch requests) {
+            @NotNull RequestBatch requests) {
         Validate.notNull(connection, "connection");
 
         RequestAsyncTask asyncTask = new RequestAsyncTask(connection, requests);
@@ -1639,6 +1712,7 @@ public class Request {
      *
      * @return the debugging information
      */
+    @NotNull
     @Override
     public String toString() {
         return new StringBuilder().append("{Request: ").append(" session: ").append(session).append(", graphPath: ")
@@ -1647,7 +1721,7 @@ public class Request {
                 .append(parameters).append("}").toString();
     }
 
-    static void runCallbacks(final RequestBatch requests, List<Response> responses) {
+    static void runCallbacks(@NotNull final RequestBatch requests, @NotNull List<Response> responses) {
         int numRequests = requests.size();
 
         // Compile the list of callbacks to call and then run them either on this thread or via the Handler we received
@@ -1684,7 +1758,7 @@ public class Request {
         }
     }
 
-    static HttpURLConnection createConnection(URL url) throws IOException {
+    static HttpURLConnection createConnection(@NotNull URL url) throws IOException {
         HttpURLConnection connection;
         connection = (HttpURLConnection) url.openConnection();
 
@@ -1801,7 +1875,7 @@ public class Request {
         }
     }
 
-    private void serializeToBatch(JSONArray batch, Map<String, Attachment> attachments) throws JSONException, IOException {
+    private void serializeToBatch(@NotNull JSONArray batch, @NotNull Map<String, Attachment> attachments) throws JSONException, IOException {
         JSONObject batchEntry = new JSONObject();
 
         if (this.batchEntryName != null) {
@@ -1854,7 +1928,7 @@ public class Request {
         batch.put(batchEntry);
     }
 
-    private static boolean hasOnProgressCallbacks(RequestBatch requests) {
+    private static boolean hasOnProgressCallbacks(@NotNull RequestBatch requests) {
         for (RequestBatch.Callback callback : requests.getCallbacks()) {
             if (callback instanceof RequestBatch.OnProgressCallback) {
                 return true;
@@ -1870,7 +1944,7 @@ public class Request {
         return false;
     }
 
-    final static void serializeToUrlConnection(RequestBatch requests, HttpURLConnection connection)
+    final static void serializeToUrlConnection(@NotNull RequestBatch requests, @NotNull HttpURLConnection connection)
     throws IOException, JSONException {
         Logger logger = new Logger(LoggingBehavior.REQUESTS, "Request");
 
@@ -1928,7 +2002,7 @@ public class Request {
         logger.log();
     }
 
-    private static void processRequest(RequestBatch requests, Logger logger, int numRequests, URL url, OutputStream outputStream)
+    private static void processRequest(@NotNull RequestBatch requests, @Nullable Logger logger, int numRequests, @NotNull URL url, OutputStream outputStream)
             throws IOException, JSONException
     {
         Serializer serializer = new Serializer(outputStream, logger);
@@ -1978,7 +2052,7 @@ public class Request {
         }
     }
 
-    private static boolean isMeRequest(String path) {
+    private static boolean isMeRequest(@NotNull String path) {
         Matcher matcher = versionPattern.matcher(path);
         if (matcher.matches()) {
             // Group 1 contains the path aside from version
@@ -1990,7 +2064,7 @@ public class Request {
         return false;
     }
 
-    private static void processGraphObject(GraphObject graphObject, String path, KeyValueSerializer serializer)
+    private static void processGraphObject(@NotNull GraphObject graphObject, @NotNull String path, @NotNull KeyValueSerializer serializer)
             throws IOException {
         // In general, graph objects are passed by reference (ID/URL). But if this is an OG Action,
         // we need to pass the entire values of the contents of the 'image' property, as they
@@ -2012,7 +2086,7 @@ public class Request {
         }
     }
 
-    private static void processGraphObjectProperty(String key, Object value, KeyValueSerializer serializer,
+    private static void processGraphObjectProperty(String key, @NotNull Object value, @NotNull KeyValueSerializer serializer,
             boolean passByValue) throws IOException {
         Class<?> valueClass = value.getClass();
         if (GraphObject.class.isAssignableFrom(valueClass)) {
@@ -2068,7 +2142,7 @@ public class Request {
         }
     }
 
-    private static void serializeParameters(Bundle bundle, Serializer serializer, Request request) throws IOException {
+    private static void serializeParameters(@NotNull Bundle bundle, @NotNull Serializer serializer, Request request) throws IOException {
         Set<String> keys = bundle.keySet();
 
         for (String key : keys) {
@@ -2079,7 +2153,7 @@ public class Request {
         }
     }
 
-    private static void serializeAttachments(Map<String, Attachment> attachments, Serializer serializer) throws IOException {
+    private static void serializeAttachments(@NotNull Map<String, Attachment> attachments, @NotNull Serializer serializer) throws IOException {
         Set<String> keys = attachments.keySet();
 
         for (String key : keys) {
@@ -2090,7 +2164,7 @@ public class Request {
         }
     }
 
-    private static void serializeRequestsAsJSON(Serializer serializer, Collection<Request> requests, Map<String, Attachment> attachments)
+    private static void serializeRequestsAsJSON(@NotNull Serializer serializer, @NotNull Collection<Request> requests, @NotNull Map<String, Attachment> attachments)
             throws JSONException, IOException {
         JSONArray batch = new JSONArray();
         for (Request request : requests) {
@@ -2114,7 +2188,7 @@ public class Request {
         return userAgent;
     }
 
-    private static String getBatchAppId(RequestBatch batch) {
+    private static String getBatchAppId(@NotNull RequestBatch batch) {
         if (!Utility.isNullOrEmpty(batch.getBatchApplicationId())) {
             return batch.getBatchApplicationId();
         }
@@ -2128,7 +2202,8 @@ public class Request {
         return Request.defaultBatchApplicationId;
     }
 
-    private static <T extends GraphObject> List<T> typedListFromResponse(Response response, Class<T> clazz) {
+    @Nullable
+    private static <T extends GraphObject> List<T> typedListFromResponse(@NotNull Response response, Class<T> clazz) {
         GraphMultiResult multiResult = response.getGraphObjectAs(GraphMultiResult.class);
         if (multiResult == null) {
             return null;
@@ -2198,7 +2273,7 @@ public class Request {
             }
         }
 
-        public void writeRequestsAsJson(String key, JSONArray requestJsonArray, Collection<Request> requests)
+        public void writeRequestsAsJson(String key, @NotNull JSONArray requestJsonArray, @NotNull Collection<Request> requests)
                 throws IOException, JSONException {
             if (! (outputStream instanceof RequestOutputStream)) {
                 writeString(key, requestJsonArray.toString());
@@ -2234,7 +2309,7 @@ public class Request {
             }
         }
 
-        public void writeBitmap(String key, Bitmap bitmap) throws IOException {
+        public void writeBitmap(String key, @NotNull Bitmap bitmap) throws IOException {
             writeContentDisposition(key, key, "image/png");
             // Note: quality parameter is ignored for PNG
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
@@ -2245,7 +2320,7 @@ public class Request {
             }
         }
 
-        public void writeBytes(String key, byte[] bytes) throws IOException {
+        public void writeBytes(String key, @NotNull byte[] bytes) throws IOException {
             writeContentDisposition(key, key, "content/unknown");
             this.outputStream.write(bytes);
             writeLine("");
@@ -2255,11 +2330,11 @@ public class Request {
             }
         }
 
-        public void writeFile(String key, ParcelFileDescriptorWithMimeType descriptorWithMimeType) throws IOException {
+        public void writeFile(String key, @NotNull ParcelFileDescriptorWithMimeType descriptorWithMimeType) throws IOException {
             writeFile(key, descriptorWithMimeType.getFileDescriptor(), descriptorWithMimeType.getMimeType());
         }
 
-        public void writeFile(String key, ParcelFileDescriptor descriptor, String mimeType) throws IOException {
+        public void writeFile(String key, @NotNull ParcelFileDescriptor descriptor, @Nullable String mimeType) throws IOException {
             if (mimeType == null) {
                 mimeType = "content/unknown";
             }
@@ -2304,7 +2379,7 @@ public class Request {
             writeLine("--%s", MIME_BOUNDARY);
         }
 
-        public void writeContentDisposition(String name, String filename, String contentType) throws IOException {
+        public void writeContentDisposition(String name, @Nullable String filename, @Nullable String contentType) throws IOException {
             write("Content-Disposition: form-data; name=\"%s\"", name);
             if (filename != null) {
                 write("; filename=\"%s\"", filename);
@@ -2316,7 +2391,7 @@ public class Request {
             writeLine(""); // blank line before content
         }
 
-        public void write(String format, Object... args) throws IOException {
+        public void write(@NotNull String format, Object... args) throws IOException {
             if (firstWrite) {
                 // Prepend all of our output with a boundary string.
                 this.outputStream.write("--".getBytes());
@@ -2327,7 +2402,7 @@ public class Request {
             this.outputStream.write(String.format(format, args).getBytes());
         }
 
-        public void writeLine(String format, Object... args) throws IOException {
+        public void writeLine(@NotNull String format, Object... args) throws IOException {
             write(format, args);
             write("\r\n");
         }
@@ -2426,7 +2501,7 @@ public class Request {
             return CONTENTS_FILE_DESCRIPTOR;
         }
 
-        public void writeToParcel(Parcel out, int flags) {
+        public void writeToParcel(@NotNull Parcel out, int flags) {
             out.writeString(mimeType);
             out.writeFileDescriptor(fileDescriptor.getFileDescriptor());
         }
@@ -2434,10 +2509,12 @@ public class Request {
         @SuppressWarnings("unused")
         public static final Parcelable.Creator<ParcelFileDescriptorWithMimeType> CREATOR
                 = new Parcelable.Creator<ParcelFileDescriptorWithMimeType>() {
-            public ParcelFileDescriptorWithMimeType createFromParcel(Parcel in) {
+            @NotNull
+            public ParcelFileDescriptorWithMimeType createFromParcel(@NotNull Parcel in) {
                 return new ParcelFileDescriptorWithMimeType(in);
             }
 
+            @NotNull
             public ParcelFileDescriptorWithMimeType[] newArray(int size) {
                 return new ParcelFileDescriptorWithMimeType[size];
             }
@@ -2448,7 +2525,7 @@ public class Request {
             this.fileDescriptor = fileDescriptor;
         }
 
-        private ParcelFileDescriptorWithMimeType(Parcel in) {
+        private ParcelFileDescriptorWithMimeType(@NotNull Parcel in) {
             mimeType = in.readString();
             fileDescriptor = in.readFileDescriptor();
         }

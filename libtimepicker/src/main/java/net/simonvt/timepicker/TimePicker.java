@@ -16,11 +16,8 @@
 
 package net.simonvt.timepicker;
 
-import net.simonvt.numberpicker.NumberPicker;
-
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,6 +33,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import net.simonvt.numberpicker.NumberPicker;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -77,24 +79,32 @@ public class TimePicker extends FrameLayout {
     private boolean mIsAm;
 
     // ui components
+    @NotNull
     private final NumberPicker mHourSpinner;
 
+    @NotNull
     private final NumberPicker mMinuteSpinner;
 
+    @Nullable
     private final NumberPicker mAmPmSpinner;
 
+    @NotNull
     private final EditText mHourSpinnerInput;
 
+    @NotNull
     private final EditText mMinuteSpinnerInput;
 
+    @Nullable
     private final EditText mAmPmSpinnerInput;
 
+    @NotNull
     private final TextView mDivider;
 
     // Note that the legacy implementation of the TimePicker is
     // using a button for toggling between AM/PM while the new
     // version uses a NumberPicker spinner. Therefore the code
     // accommodates these two cases to be backwards compatible.
+    @Nullable
     private final Button mAmPmButton;
 
     private final String[] mAmPmStrings;
@@ -121,15 +131,15 @@ public class TimePicker extends FrameLayout {
         void onTimeChanged(TimePicker view, int hourOfDay, int minute);
     }
 
-    public TimePicker(Context context) {
+    public TimePicker(@NotNull Context context) {
         this(context, null);
     }
 
-    public TimePicker(Context context, AttributeSet attrs) {
+    public TimePicker(@NotNull Context context, AttributeSet attrs) {
         this(context, attrs, R.attr.timePickerStyle);
     }
 
-    public TimePicker(Context context, AttributeSet attrs, int defStyle) {
+    public TimePicker(@NotNull Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         // initialization based on locale
@@ -213,7 +223,7 @@ public class TimePicker extends FrameLayout {
             mAmPmSpinnerInput = null;
             mAmPmButton = (Button) amPmView;
             mAmPmButton.setOnClickListener(new OnClickListener() {
-                public void onClick(View button) {
+                public void onClick(@NotNull View button) {
                     button.requestFocus();
                     mIsAm = !mIsAm;
                     updateAmPmControl();
@@ -227,7 +237,7 @@ public class TimePicker extends FrameLayout {
             mAmPmSpinner.setMaxValue(1);
             mAmPmSpinner.setDisplayedValues(mAmPmStrings);
             mAmPmSpinner.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                public void onValueChange(@NotNull NumberPicker picker, int oldVal, int newVal) {
                     updateInputState();
                     picker.requestFocus();
                     mIsAm = !mIsAm;
@@ -287,7 +297,7 @@ public class TimePicker extends FrameLayout {
     }
 
     @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
+    protected void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setCurrentLocale(newConfig.locale);
     }
@@ -297,7 +307,7 @@ public class TimePicker extends FrameLayout {
      *
      * @param locale The current locale.
      */
-    private void setCurrentLocale(Locale locale) {
+    private void setCurrentLocale(@NotNull Locale locale) {
         if (locale.equals(mCurrentLocale)) {
             return;
         }
@@ -320,7 +330,7 @@ public class TimePicker extends FrameLayout {
             mMinute = minute;
         }
 
-        private SavedState(Parcel in) {
+        private SavedState(@NotNull Parcel in) {
             super(in);
             mHour = in.readInt();
             mMinute = in.readInt();
@@ -335,7 +345,7 @@ public class TimePicker extends FrameLayout {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NotNull Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeInt(mHour);
             dest.writeInt(mMinute);
@@ -343,16 +353,19 @@ public class TimePicker extends FrameLayout {
 
         @SuppressWarnings({"unused", "hiding"})
         public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            public SavedState createFromParcel(Parcel in) {
+            @NotNull
+            public SavedState createFromParcel(@NotNull Parcel in) {
                 return new SavedState(in);
             }
 
+            @NotNull
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }
         };
     }
 
+    @NotNull
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -393,7 +406,7 @@ public class TimePicker extends FrameLayout {
     /**
      * Set the current hour.
      */
-    public void setCurrentHour(Integer currentHour) {
+    public void setCurrentHour(@Nullable Integer currentHour) {
         // why was Integer used in the first place?
         if (currentHour == null || currentHour == getCurrentHour()) {
             return;
@@ -466,13 +479,13 @@ public class TimePicker extends FrameLayout {
     }
 
     @Override
-    public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
+    public boolean dispatchPopulateAccessibilityEvent(@NotNull AccessibilityEvent event) {
         onPopulateAccessibilityEvent(event);
         return true;
     }
 
     @Override
-    public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
+    public void onPopulateAccessibilityEvent(@NotNull AccessibilityEvent event) {
         super.onPopulateAccessibilityEvent(event);
 
         int flags = DateUtils.FORMAT_SHOW_TIME;
@@ -489,13 +502,13 @@ public class TimePicker extends FrameLayout {
     }
 
     @Override
-    public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
+    public void onInitializeAccessibilityEvent(@NotNull AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
         event.setClassName(TimePicker.class.getName());
     }
 
     @Override
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+    public void onInitializeAccessibilityNodeInfo(@NotNull AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName(TimePicker.class.getName());
     }
@@ -560,7 +573,7 @@ public class TimePicker extends FrameLayout {
         }
     }
 
-    private void trySetContentDescription(View root, int viewId, int contDescResId) {
+    private void trySetContentDescription(@NotNull View root, int viewId, int contDescResId) {
         View target = root.findViewById(viewId);
         if (target != null) {
             target.setContentDescription(getContext().getString(contDescResId));

@@ -18,12 +18,15 @@ package com.facebook;
 
 import android.os.Bundle;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Implements a trivial {@link TokenCachingStrategy} that does not actually cache any tokens.
  * It is intended for use when an access token may be used on a temporary basis but should not be
  * cached for future use (for instance, when handling a deep link).
  */
 public class NonCachingTokenCachingStrategy extends TokenCachingStrategy {
+    @Nullable
     @Override
     public Bundle load() {
         return null;

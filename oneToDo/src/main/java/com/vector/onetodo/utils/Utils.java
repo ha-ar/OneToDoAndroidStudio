@@ -1,12 +1,5 @@
 package com.vector.onetodo.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -37,13 +30,23 @@ import android.widget.TextView;
 
 import com.vector.onetodo.App;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class Utils {
 	public static final Calendar currentDateCal = Calendar
 			.getInstance(Locale.US);
 
 	private static final Calendar tempCal = Calendar.getInstance(Locale.US);
 
-	public static int getPxFromDp(Context context, int val) {
+	public static int getPxFromDp(@NotNull Context context, int val) {
 		Resources r = context.getResources();
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
 				val, r.getDisplayMetrics());
@@ -126,7 +129,7 @@ public class Utils {
 		return formatter.format(tempCal.getTime());
 	}
 
-	public static void clearAllFields(ViewGroup viewGroup) {
+	public static void clearAllFields(@NotNull ViewGroup viewGroup) {
 		for (int i = 0, count = viewGroup.getChildCount(); i < count; ++i) {
 			ViewGroup nestedChild = (ViewGroup) viewGroup.getChildAt(i);
 			for (int j = 0; j <= nestedChild.getChildCount(); j++) {
@@ -138,7 +141,7 @@ public class Utils {
 		}
 	}
 
-	public static void hidKeyboard(Activity act) {
+	public static void hidKeyboard(@NotNull Activity act) {
 		InputMethodManager inputManager = (InputMethodManager) act
 				.getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -150,17 +153,18 @@ public class Utils {
 		inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 	}
 
-	public static void showKeyboard(Activity act) {
+	public static void showKeyboard(@NotNull Activity act) {
 		act.getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 	}
 
-	public static int getDpValue(int val, Context ctx) {
+	public static int getDpValue(int val, @NotNull Context ctx) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
 				val, ctx.getResources().getDisplayMetrics());
 	}
 
-	public static String getDayOfMonthSuffix(final int n) {
+	@NotNull
+    public static String getDayOfMonthSuffix(final int n) {
 		if (n >= 11 && n <= 13) {
 			return "th";
 		}
@@ -176,8 +180,9 @@ public class Utils {
 		}
 	}
 
-	public static Bitmap getBitmap(Uri image, Context ctx,
-			ContentResolver mContentResolver) {
+	@Nullable
+    public static Bitmap getBitmap(Uri image, Context ctx,
+			@NotNull ContentResolver mContentResolver) {
 
 		Uri uri = image;
 		InputStream in = null;
@@ -238,7 +243,7 @@ public class Utils {
 		}
 	}
 
-	public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+	public static Bitmap getRoundedCornerBitmap(@NotNull Bitmap bitmap, int pixels) {
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
 				bitmap.getHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(output);
@@ -261,31 +266,31 @@ public class Utils {
 		return output;
 	}
 
-	public static int convertPixelsToDp(float px, Context context) {
+	public static int convertPixelsToDp(float px, @NotNull Context context) {
 		Resources resources = context.getResources();
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float dp = px / (metrics.densityDpi / 160f);
 		return (int) dp;
 	}
 
-	public static int convertDpToPixel(float dp, Context context) {
+	public static int convertDpToPixel(float dp, @NotNull Context context) {
 		Resources resources = context.getResources();
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float px = dp * (metrics.densityDpi / 160f);
 		return (int) px;
 	}
 
-	public static void RobotoMedium(Context context, TextView view) {
+	public static void RobotoMedium(@NotNull Context context, @NotNull TextView view) {
 		view.setTypeface(Typeface.createFromAsset(context.getAssets(),
 				"Roboto-Medium.ttf"));
 	}
 
-	public static void RobotoRegular(Context context, TextView view) {
+	public static void RobotoRegular(@NotNull Context context, @NotNull TextView view) {
 		view.setTypeface(Typeface.createFromAsset(context.getAssets(),
 				"Roboto-Regular.ttf"));
 	}
 
-	public static String getUserName(Context ctx) {
+	public static String getUserName(@NotNull Context ctx) {
 		Cursor c = ctx.getContentResolver().query(
 				ContactsContract.Profile.CONTENT_URI, null, null, null, null);
 		c.moveToFirst();
@@ -299,7 +304,8 @@ public class Utils {
 		return name;
 	}
 
-	public static ArrayList<String> getContactsList(Context ctx) {
+	@NotNull
+    public static ArrayList<String> getContactsList(@NotNull Context ctx) {
 		ArrayList<String> contactsList = new ArrayList<String>();
 		Cursor phones = ctx.getContentResolver().query(
 				ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
@@ -322,7 +328,7 @@ public class Utils {
 		return contactsList;
 	}
 
-	public static String getDate(long milliSeconds, String dateFormat) {
+	public static String getDate(long milliSeconds, @NotNull String dateFormat) {
 		// Create a DateFormatter object for displaying date in specified
 		// format.
 		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);

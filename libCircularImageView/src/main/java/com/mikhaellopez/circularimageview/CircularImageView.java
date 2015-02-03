@@ -13,22 +13,26 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 public class CircularImageView extends ImageView {
 	private int borderWidth;
 	private int canvasSize;
-	private Bitmap image;
+	@Nullable
+    private Bitmap image;
 	private Paint paint;
 	private Paint paintBorder;
 
-	public CircularImageView(final Context context) {
+	public CircularImageView(@NotNull final Context context) {
 		this(context, null);
 	}
 
-	public CircularImageView(Context context, AttributeSet attrs) {
+	public CircularImageView(@NotNull Context context, @NotNull AttributeSet attrs) {
 		this(context, attrs, R.attr.circularImageViewStyle);
 	}
 
-	public CircularImageView(Context context, AttributeSet attrs, int defStyle) {
+	public CircularImageView(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
 		// init paint
@@ -69,7 +73,7 @@ public class CircularImageView extends ImageView {
 	}
 
 	@Override
-	public void onDraw(Canvas canvas) {
+	public void onDraw(@NotNull Canvas canvas) {
 		// load the bitmap
 		image = drawableToBitmap(getDrawable());
 
@@ -137,7 +141,8 @@ public class CircularImageView extends ImageView {
 		return (result + 2);
 	}
 
-	public Bitmap drawableToBitmap(Drawable drawable) {
+	@Nullable
+    public Bitmap drawableToBitmap(@Nullable Drawable drawable) {
 		if (drawable == null) {
 			return null;
 		} else if (drawable instanceof BitmapDrawable) {

@@ -3,6 +3,9 @@
  */
 package com.android.vending.billing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 public interface IMarketBillingService extends android.os.IInterface {
 	/** Local-side IPC implementation stub class. */
 	public static abstract class Stub extends android.os.Binder implements
@@ -19,8 +22,9 @@ public interface IMarketBillingService extends android.os.IInterface {
 		 * com.android.vending.billing.IMarketBillingService interface,
 		 * generating a proxy if needed.
 		 */
-		public static IMarketBillingService asInterface(
-				android.os.IBinder obj) {
+		@Nullable
+        public static IMarketBillingService asInterface(
+				@Nullable android.os.IBinder obj) {
 			if ((obj == null)) {
 				return null;
 			}
@@ -32,14 +36,15 @@ public interface IMarketBillingService extends android.os.IInterface {
 					obj);
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public android.os.IBinder asBinder() {
 			return this;
 		}
 
 		@Override
-		public boolean onTransact(int code, android.os.Parcel data,
-				android.os.Parcel reply, int flags)
+		public boolean onTransact(int code, @NotNull android.os.Parcel data,
+				@NotNull android.os.Parcel reply, int flags)
 				throws android.os.RemoteException {
 			switch (code) {
 			case INTERFACE_TRANSACTION: {
@@ -82,15 +87,17 @@ public interface IMarketBillingService extends android.os.IInterface {
 				return mRemote;
 			}
 
-			public String getInterfaceDescriptor() {
+			@NotNull
+            public String getInterfaceDescriptor() {
 				return DESCRIPTOR;
 			}
 
 			/**
 			 * Given the arguments in bundle form, returns a bundle for results.
 			 */
-			@Override
-			public android.os.Bundle sendBillingRequest(android.os.Bundle bundle)
+			@Nullable
+            @Override
+			public android.os.Bundle sendBillingRequest(@Nullable android.os.Bundle bundle)
 					throws android.os.RemoteException {
 				android.os.Parcel _data = android.os.Parcel.obtain();
 				android.os.Parcel _reply = android.os.Parcel.obtain();
@@ -124,6 +131,7 @@ public interface IMarketBillingService extends android.os.IInterface {
 	}
 
 	/** Given the arguments in bundle form, returns a bundle for results. */
-	public android.os.Bundle sendBillingRequest(android.os.Bundle bundle)
+	@Nullable
+    public android.os.Bundle sendBillingRequest(android.os.Bundle bundle)
 			throws android.os.RemoteException;
 }

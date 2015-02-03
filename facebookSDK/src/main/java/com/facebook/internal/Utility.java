@@ -29,16 +29,26 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+
 import com.facebook.FacebookException;
 import com.facebook.Request;
 import com.facebook.Settings;
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -46,7 +56,14 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -86,9 +103,11 @@ public final class Utility {
     // This is the default used by the buffer streams, but they trace a warning if you do not specify.
     public static final int DEFAULT_STREAM_BUFFER_SIZE = 8192;
 
+    @NotNull
     private static Map<String, FetchedAppSettings> fetchedAppSettings =
             new ConcurrentHashMap<String, FetchedAppSettings>();
 
+    @Nullable
     private static AsyncTask<Void, Void, GraphObject> initialAppSettingsLoadTask;
 
     public static class FetchedAppSettings {
@@ -132,7 +151,8 @@ public final class Utility {
     }
 
     public static class DialogFeatureConfig {
-        private static DialogFeatureConfig parseDialogConfig(JSONObject dialogConfigJSON) {
+        @Nullable
+        private static DialogFeatureConfig parseDialogConfig(@NotNull JSONObject dialogConfigJSON) {
             String dialogNameWithFeature = dialogConfigJSON.optString(DIALOG_CONFIG_NAME_KEY);
             if (Utility.isNullOrEmpty(dialogNameWithFeature)) {
                 return null;
@@ -163,7 +183,8 @@ public final class Utility {
             return new DialogFeatureConfig(dialogName, featureName, fallbackUri, featureVersionSpec);
         }
 
-        private static int[] parseVersionSpec(JSONArray versionsJSON) {
+        @Nullable
+        private static int[] parseVersionSpec(@Nullable JSONArray versionsJSON) {
             // Null signifies no overrides to the min-version as specified by the SDK.
             // An empty array would basically turn off the dialog (i.e no supported versions), so DON'T default to that.
             int[] versionSpec = null;
@@ -238,7 +259,8 @@ public final class Utility {
      * @param range2
      * @return
      */
-    public static int[] intersectRanges(int[] range1, int[] range2) {
+    @Nullable
+    public static int[] intersectRanges(@Nullable int[] range1, @Nullable int[] range2) {
         if (range1 == null) {
             return range2;
         } else if (range2 == null) {
@@ -309,7 +331,7 @@ public final class Utility {
     // Returns true iff all items in subset are in superset, treating null and
     // empty collections as
     // the same.
-    public static <T> boolean isSubset(Collection<T> subset, Collection<T> superset) {
+    public static <T> boolean isSubset(@Nullable Collection<T> subset, @Nullable Collection<T> superset) {
         if ((superset == null) || (superset.size() == 0)) {
             return ((subset == null) || (subset.size() == 0));
         }
@@ -323,11 +345,11 @@ public final class Utility {
         return true;
     }
 
-    public static <T> boolean isNullOrEmpty(Collection<T> c) {
+    public static <T> boolean isNullOrEmpty(@Nullable Collection<T> c) {
         return (c == null) || (c.size() == 0);
     }
 
-    public static boolean isNullOrEmpty(String s) {
+    public static boolean isNullOrEmpty(@Nullable String s) {
         return (s == null) || (s.length() == 0);
     }
 
@@ -352,7 +374,8 @@ public final class Utility {
         return Collections.unmodifiableCollection(Arrays.asList(ts));
     }
 
-    public static <T> ArrayList<T> arrayList(T... ts) {
+    @NotNull
+    public static <T> ArrayList<T> arrayList(@NotNull T... ts) {
         ArrayList<T> arrayList = new ArrayList<T>(ts.length);
         for (T t : ts) {
             arrayList.add(t);
@@ -360,22 +383,27 @@ public final class Utility {
         return arrayList;
     }
 
-    static String md5hash(String key) {
+    @Nullable
+    static String md5hash(@NotNull String key) {
         return hashWithAlgorithm(HASH_ALGORITHM_MD5, key);
     }
 
-    static String sha1hash(String key) {
+    @Nullable
+    static String sha1hash(@NotNull String key) {
         return hashWithAlgorithm(HASH_ALGORITHM_SHA1, key);
     }
 
+    @Nullable
     static String sha1hash(byte[] bytes) {
         return hashWithAlgorithm(HASH_ALGORITHM_SHA1, bytes);
     }
 
-    private static String hashWithAlgorithm(String algorithm, String key) {
+    @Nullable
+    private static String hashWithAlgorithm(String algorithm, @NotNull String key) {
         return hashWithAlgorithm(algorithm, key.getBytes());
     }
 
+    @Nullable
     private static String hashWithAlgorithm(String algorithm, byte[] bytes) {
         MessageDigest hash;
         try {
@@ -386,7 +414,8 @@ public final class Utility {
         return hashBytes(hash, bytes);
     }
 
-    private static String hashBytes(MessageDigest hash, byte[] bytes) {
+    @NotNull
+    private static String hashBytes(@NotNull MessageDigest hash, byte[] bytes) {
         hash.update(bytes);
         byte[] digest = hash.digest();
         StringBuilder builder = new StringBuilder();
@@ -397,7 +426,7 @@ public final class Utility {
         return builder.toString();
     }
 
-    public static Uri buildUri(String authority, String path, Bundle parameters) {
+    public static Uri buildUri(String authority, String path, @NotNull Bundle parameters) {
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(URL_SCHEME);
         builder.authority(authority);
@@ -411,7 +440,8 @@ public final class Utility {
         return builder.build();
     }
 
-    public static Bundle parseUrlQueryString(String queryString) {
+    @NotNull
+    public static Bundle parseUrlQueryString(@NotNull String queryString) {
         Bundle params = new Bundle();
         if (!isNullOrEmpty(queryString)) {
             String array[] = queryString.split("&");
@@ -437,7 +467,7 @@ public final class Utility {
         return params;
     }
 
-    public static void putObjectInBundle(Bundle bundle, String key, Object value) {
+    public static void putObjectInBundle(@NotNull Bundle bundle, String key, Object value) {
         if (value instanceof String) {
             bundle.putString(key, (String) value);
         } else if (value instanceof Parcelable) {
@@ -449,7 +479,7 @@ public final class Utility {
         }
     }
 
-    public static void closeQuietly(Closeable closeable) {
+    public static void closeQuietly(@Nullable Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
@@ -473,7 +503,8 @@ public final class Utility {
         return Settings.getApplicationId();
     }
 
-    static Map<String, Object> convertJSONObjectToHashMap(JSONObject jsonObject) {
+    @NotNull
+    static Map<String, Object> convertJSONObjectToHashMap(@NotNull JSONObject jsonObject) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         JSONArray keys = jsonObject.names();
         for (int i = 0; i < keys.length(); ++i) {
@@ -492,7 +523,7 @@ public final class Utility {
     }
 
     // Returns either a JSONObject or JSONArray representation of the 'key' property of 'jsonObject'.
-    public static Object getStringPropertyAsJSON(JSONObject jsonObject, String key, String nonJSONPropertyKey)
+    public static Object getStringPropertyAsJSON(@NotNull JSONObject jsonObject, String key, @Nullable String nonJSONPropertyKey)
             throws JSONException {
         Object value = jsonObject.opt(key);
         if (value != null && value instanceof String) {
@@ -519,7 +550,8 @@ public final class Utility {
 
     }
 
-    public static String readStreamToString(InputStream inputStream) throws IOException {
+    @NotNull
+    public static String readStreamToString(@NotNull InputStream inputStream) throws IOException {
         BufferedInputStream bufferedInputStream = null;
         InputStreamReader reader = null;
         try {
@@ -541,7 +573,7 @@ public final class Utility {
         }
     }
 
-    public static boolean stringsEqualOrEmpty(String a, String b) {
+    public static boolean stringsEqualOrEmpty(@NotNull String a, String b) {
         boolean aEmpty = TextUtils.isEmpty(a);
         boolean bEmpty = TextUtils.isEmpty(b);
 
@@ -590,13 +622,13 @@ public final class Utility {
         clearCookiesForDomain(context, "https://.facebook.com");
     }
 
-    public static void logd(String tag, Exception e) {
+    public static void logd(@Nullable String tag, @Nullable Exception e) {
         if (Settings.isDebugEnabled() && tag != null && e != null) {
             Log.d(tag, e.getClass().getSimpleName() + ": " + e.getMessage());
         }
     }
 
-    public static void logd(String tag, String msg) {
+    public static void logd(@Nullable String tag, @Nullable String msg) {
         if (Settings.isDebugEnabled() && tag != null && msg != null) {
             Log.d(tag, msg);
         }
@@ -608,14 +640,14 @@ public final class Utility {
         }
     }
 
-    public static <T> boolean areObjectsEqual(T a, T b) {
+    public static <T> boolean areObjectsEqual(@Nullable T a, @Nullable T b) {
         if (a == null) {
             return b == null;
         }
         return a.equals(b);
     }
 
-    public static void loadAppSettingsAsync(final Context context, final String applicationId) {
+    public static void loadAppSettingsAsync(@NotNull final Context context, final String applicationId) {
         if (Utility.isNullOrEmpty(applicationId) ||
                 fetchedAppSettings.containsKey(applicationId) ||
                 initialAppSettingsLoadTask != null) {
@@ -631,7 +663,7 @@ public final class Utility {
             }
 
             @Override
-            protected void onPostExecute(GraphObject result) {
+            protected void onPostExecute(@Nullable GraphObject result) {
                 if (result != null) {
                     JSONObject resultJSON = result.getInnerJSONObject();
                     parseAppSettingsFromJSON(applicationId, resultJSON);
@@ -668,6 +700,7 @@ public final class Utility {
     }
 
     // Note that this method makes a synchronous Graph API call, so should not be called from the main thread.
+    @Nullable
     public static FetchedAppSettings queryAppSettings(final String applicationId, final boolean forceRequery) {
         // Cache the last app checked results.
         if (!forceRequery && fetchedAppSettings.containsKey(applicationId)) {
@@ -682,7 +715,8 @@ public final class Utility {
         return parseAppSettingsFromJSON(applicationId, response.getInnerJSONObject());
     }
 
-    private static FetchedAppSettings parseAppSettingsFromJSON(String applicationId, JSONObject settingsJSON) {
+    @NotNull
+    private static FetchedAppSettings parseAppSettingsFromJSON(String applicationId, @NotNull JSONObject settingsJSON) {
         FetchedAppSettings result = new FetchedAppSettings(
                 settingsJSON.optBoolean(APP_SETTING_SUPPORTS_ATTRIBUTION, false),
                 settingsJSON.optBoolean(APP_SETTING_SUPPORTS_IMPLICIT_SDK_LOGGING, false),
@@ -709,6 +743,7 @@ public final class Utility {
         return response;
     }
 
+    @Nullable
     public static DialogFeatureConfig getDialogFeatureConfig(String applicationId, String actionName, String featureName) {
         if (Utility.isNullOrEmpty(actionName) || Utility.isNullOrEmpty(featureName)) {
             return null;
@@ -724,7 +759,8 @@ public final class Utility {
         return null;
     }
 
-    private static Map<String, Map<String, DialogFeatureConfig>> parseDialogConfigurations(JSONObject dialogConfigResponse) {
+    @NotNull
+    private static Map<String, Map<String, DialogFeatureConfig>> parseDialogConfigurations(@Nullable JSONObject dialogConfigResponse) {
         HashMap<String, Map<String, DialogFeatureConfig>> dialogConfigMap = new HashMap<String, Map<String, DialogFeatureConfig>>();
 
         if (dialogConfigResponse != null) {
@@ -750,7 +786,7 @@ public final class Utility {
         return dialogConfigMap;
     }
 
-    public static boolean safeGetBooleanFromResponse(GraphObject response, String propertyName) {
+    public static boolean safeGetBooleanFromResponse(@Nullable GraphObject response, String propertyName) {
         Object result = false;
         if (response != null) {
             result = response.getProperty(propertyName);
@@ -761,7 +797,8 @@ public final class Utility {
         return (Boolean) result;
     }
 
-    public static String safeGetStringFromResponse(GraphObject response, String propertyName) {
+    @NotNull
+    public static String safeGetStringFromResponse(@Nullable GraphObject response, String propertyName) {
         Object result = "";
         if (response != null) {
             result = response.getProperty(propertyName);
@@ -772,7 +809,8 @@ public final class Utility {
         return (String) result;
     }
 
-    public static JSONObject tryGetJSONObjectFromResponse(GraphObject response, String propertyKey) {
+    @Nullable
+    public static JSONObject tryGetJSONObjectFromResponse(@Nullable GraphObject response, String propertyKey) {
         if (response == null) {
             return null;
         }
@@ -783,7 +821,8 @@ public final class Utility {
         return (JSONObject) property;
     }
 
-    public static JSONArray tryGetJSONArrayFromResponse(GraphObject response, String propertyKey) {
+    @Nullable
+    public static JSONArray tryGetJSONArrayFromResponse(@Nullable GraphObject response, String propertyKey) {
         if (response == null) {
             return null;
         }
@@ -798,7 +837,7 @@ public final class Utility {
         ImageDownloader.clearCache(context);
     }
 
-    public static void deleteDirectory(File directoryOrFile) {
+    public static void deleteDirectory(@NotNull File directoryOrFile) {
         if (!directoryOrFile.exists()) {
             return;
         }
@@ -811,7 +850,8 @@ public final class Utility {
         directoryOrFile.delete();
     }
 
-    public static <T> List<T> asListNoNulls(T... array) {
+    @NotNull
+    public static <T> List<T> asListNoNulls(@NotNull T... array) {
         ArrayList<T> result = new ArrayList<T>();
         for (T t : array) {
             if (t != null) {
@@ -825,7 +865,8 @@ public final class Utility {
     // in order to do counting of users unknown to Facebook.  Because we put the appid into the key prior to hashing,
     // we cannot do correlation of the same user across multiple apps -- this is intentional.  When we transition to
     // the Google advertising ID, we'll get rid of this and always send that up.
-    public static String getHashedDeviceAndAppID(Context context, String applicationId) {
+    @Nullable
+    public static String getHashedDeviceAndAppID(@NotNull Context context, String applicationId) {
         String androidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 
         if (androidId == null) {
@@ -835,8 +876,8 @@ public final class Utility {
         }
     }
 
-    public static void setAppEventAttributionParameters(GraphObject params,
-                                                        AttributionIdentifiers attributionIdentifiers, String hashedDeviceAndAppId, boolean limitEventUsage) {
+    public static void setAppEventAttributionParameters(@NotNull GraphObject params,
+                                                        @Nullable AttributionIdentifiers attributionIdentifiers, @Nullable String hashedDeviceAndAppId, boolean limitEventUsage) {
         // Send attributionID if it exists, otherwise send a hashed device+appid specific value as the advertiser_id.
         if (attributionIdentifiers != null && attributionIdentifiers.getAttributionId() != null) {
             params.setProperty("attribution", attributionIdentifiers.getAttributionId());
@@ -852,7 +893,7 @@ public final class Utility {
         params.setProperty("application_tracking_enabled", !limitEventUsage);
     }
 
-    public static void setAppEventExtendedDeviceInfoParameters(GraphObject params, Context appContext) {
+    public static void setAppEventExtendedDeviceInfoParameters(@NotNull GraphObject params, @NotNull Context appContext) {
         JSONArray extraInfoArray = new JSONArray();
         extraInfoArray.put(EXTRA_APP_EVENTS_INFO_FORMAT_VERSION);
 
@@ -877,7 +918,8 @@ public final class Utility {
         params.setProperty("extinfo", extraInfoArray.toString());
     }
 
-    public static Method getMethodQuietly(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    @Nullable
+    public static Method getMethodQuietly(@NotNull Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         try {
             return clazz.getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException ex) {
@@ -885,6 +927,7 @@ public final class Utility {
         }
     }
 
+    @Nullable
     public static Method getMethodQuietly(String className, String methodName, Class<?>... parameterTypes) {
         try {
             Class<?> clazz = Class.forName(className);
@@ -894,7 +937,8 @@ public final class Utility {
         }
     }
 
-    public static Object invokeMethodQuietly(Object receiver, Method method, Object... args) {
+    @Nullable
+    public static Object invokeMethodQuietly(Object receiver, @NotNull Method method, Object... args) {
         try {
             return method.invoke(receiver, args);
         } catch (IllegalAccessException ex) {
@@ -907,7 +951,7 @@ public final class Utility {
     /**
      * Returns the name of the current activity if the context is an activity, otherwise return "unknown"
      */
-    public static String getActivityName(Context context) {
+    public static String getActivityName(@Nullable Context context) {
         if (context == null) {
             return "null";
         } else if (context == context.getApplicationContext()) {

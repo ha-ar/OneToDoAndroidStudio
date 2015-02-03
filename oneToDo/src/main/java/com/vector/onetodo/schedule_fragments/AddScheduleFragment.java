@@ -1,32 +1,4 @@
-package com.vector.onetodo;
-
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
+package com.vector.onetodo.schedule_fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -90,11 +62,44 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.PlacesAutoCompleteAdapter;
+import com.vector.onetodo.R;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
+
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddScheduleFragment extends Fragment {
 	
@@ -112,14 +117,17 @@ public class AddScheduleFragment extends Fragment {
 	int Label_postion = -1;
 	View label_view;
 	GradientDrawable label_color;
-	String color,title=null;
-	static String checkedId2 = null;
+	@Nullable
+    String color,title=null;
+	@Nullable
+    static String checkedId2 = null;
 	public static EditText taskTitle;
 
 	private Uri imageUri;
 
 	ImageView last;
-	String plabel = null;
+	@Nullable
+    String plabel = null;
 
 	int pposition = -1;
 	int itempos = -1;
@@ -136,20 +144,25 @@ public class AddScheduleFragment extends Fragment {
 
 private String currentDay, currentMon, endEventDay, endEventMon;
 
-	private int[] collapsingViews = { R.id.sch_time_date_to_include,
+	@NotNull
+    private int[] collapsingViews = { R.id.sch_time_date_to_include,
 			R.id.sch_time_date_from_include, R.id.sch_repeat_grid_layout,
 			R.id.sch_label_grid, R.id.before_grid_view_linear_schedule };
-	public static String repeatdate = "", setmon1;
+	@NotNull
+    public static String repeatdate = "", setmon1;
 
-	private int[] allViews = { R.id.sch_time_to_layout,
+	@NotNull
+    private int[] allViews = { R.id.sch_time_to_layout,
 			R.id.sch_time_from_layout, R.id.sch_title_layout,
 			R.id.sch_location, R.id.repeat_schedule_lay, R.id.sch_label_layout,
 			R.id.before_schedule_lay, R.id.schedule_all_lay };
 
-	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+	@NotNull
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
 
 	Editor editor, editorattach;
-	EditText label_field = null;
+	@Nullable
+    EditText label_field = null;
 	AlertDialog date_time_alert, add_new_label_alert, date_time,label_edit,location_del,attach_alert;
 
 
@@ -159,11 +172,13 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 
 	public static final int PICK_CONTACT = 2;
 
-	public static View allView, viewl;
+	@Nullable
+    public static View allView, viewl;
 
 	public static Activity act;
 
-	public static AddScheduleFragment newInstance(int position, int dayPosition) {
+	@NotNull
+    public static AddScheduleFragment newInstance(int position, int dayPosition) {
 		AddScheduleFragment myFragment = new AddScheduleFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -173,7 +188,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setRetainInstance(true);
 		View view = inflater.inflate(R.layout.scheduale_fragment, container,
@@ -186,8 +201,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		editor = AddTask.label.edit();
-		editorattach = AddTask.attach.edit();
+		editor = BaseTaskFragment.label.edit();
+		editorattach = BaseTaskFragment.attach.edit();
 		final int dayPosition = getArguments().getInt("dayPosition", 0);
 
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -230,11 +245,11 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		taskTitle.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
+			public void onTextChanged(@NotNull CharSequence s, int start, int before,
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+					BaseTaskFragment.btn.setAlpha(1);
 
 				for (String words : Constants.CONTACTS_EVOKING_WORDS) {
 					String[] typedWords = s.toString().split(" ");
@@ -454,7 +469,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 								R.layout.grid_layout_textview, Constants.repeatArray) {
 
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 
@@ -479,7 +495,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		aq.id(R.id.sch_repeat_grid).itemClicked(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
+			public void onItemClick(AdapterView<?> parent, @NotNull View view,
 					int position, long id) {
 
 				if (((TextView) previousSelected).getText().toString()
@@ -747,7 +763,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 								R.layout.grid_layout_label_text_view,
 								Constants.labels_array) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
@@ -784,7 +801,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 				.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
+					public void onItemClick(AdapterView<?> parent, @NotNull View view,
 							int position, long id) {
 						itempos = position;
 						label_view = view;
@@ -1076,7 +1093,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		aq.id(R.id.sch_label_layout).background(R.drawable.input_fields_gray);
 	}
 
-	private void showCurrentView(View v) {
+	private void showCurrentView(@NotNull View v) {
 
 		hideAll();
 
@@ -1180,7 +1197,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 	private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 			v.setFocusableInTouchMode(true);
 			v.requestFocus();
 			showCurrentView(v);
@@ -1196,7 +1213,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 
 	}
 
-	private void setAllOtherFocusableFalse(View v) {
+	private void setAllOtherFocusableFalse(@NotNull View v) {
 		for (int id : allViews)
 			if (v.getId() != id) {
 				try {
@@ -1218,7 +1235,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 			return 2; // just Add Task & Add Event
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -1237,7 +1255,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		}
 	}
 
-	public void slideUpDown(final View view) {
+	public void slideUpDown(@NotNull final View view) {
 		if (!isPanelShown(view)) {
 			// Show the panel
 			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
@@ -1263,12 +1281,12 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		}
 	}
 
-	private boolean isPanelShown(View view) {
+	private boolean isPanelShown(@NotNull View view) {
 		return view.getVisibility() == View.VISIBLE;
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
@@ -1301,7 +1319,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		}
 	}
 
-	private void showImageURI(Uri selectedImage) {
+	private void showImageURI(@NotNull Uri selectedImage) {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
@@ -1334,7 +1352,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 				imagemenu.setOnClickListener(new OnClickListener() {
 
 					@Override
-					public void onClick(View arg0) {
+					public void onClick(@NotNull View arg0) {
 						// TODO Auto-generated method stub
 						Toast.makeText(getActivity(),
 								arg0.getId() + "     " + arg0.getTag(),
@@ -1456,7 +1474,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
-					public void callback(String url, JSONObject json,
+					public void callback(String url, @NotNull JSONObject json,
 							AjaxStatus status) { 
 						String path = null;
 						try {
@@ -1527,11 +1545,11 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(3 + "key_label" + id, null); // getting
+		plabel = BaseTaskFragment.label.getString(3 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(3 + "key_color_position" + id, 0); // getting
+		pposition = BaseTaskFragment.label.getInt(3 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
@@ -1543,7 +1561,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 	private class LabelEditClickListener implements OnItemLongClickListener {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+		public boolean onItemLongClick(AdapterView<?> arg0, @NotNull final View arg1,
 				int position, long arg3) {
 			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
@@ -1576,7 +1594,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 			return 10;
 		}
 
-		public Object getItem(int position) {
+		@Nullable
+        public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 
@@ -1585,7 +1604,8 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 		}
 
 		// create a new ImageView for each item referenced by the Adapter
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			ImageView imageView;
 			if (convertView == null) {
 				imageView = new ImageView(mContext);
@@ -1617,12 +1637,12 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 	}
 
 	public void Loadattachmax() {
-		MaxId = AddTask.attach.getInt("3Max", 0);
+		MaxId = BaseTaskFragment.attach.getInt("3Max", 0);
 	}
 
 	public void Loadattach(int id) {
-		AddTask.attach.getString(3 + "path" + id, null);
-		AddTask.attach.getString(3 + "type" + id, null); // getting String
+		BaseTaskFragment.attach.getString(3 + "path" + id, null);
+		BaseTaskFragment.attach.getString(3 + "type" + id, null); // getting String
 	}
 
 	public void Removeattach(int id) {

@@ -8,12 +8,14 @@ import android.view.ViewGroup;
 
 import com.androidquery.AQuery;
 
+import org.jetbrains.annotations.NotNull;
+
 public class About extends Fragment {
 
 	AQuery aq;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.about_settings, container, false);

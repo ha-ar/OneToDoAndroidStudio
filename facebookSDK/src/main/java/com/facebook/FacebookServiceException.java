@@ -16,6 +16,8 @@
 
 package com.facebook;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents an error returned from the Facebook service in response to a request.
  */
@@ -44,6 +46,7 @@ public class FacebookServiceException extends FacebookException {
         return error;
     }
 
+    @NotNull
     @Override
     public final String toString() {
         return new StringBuilder()

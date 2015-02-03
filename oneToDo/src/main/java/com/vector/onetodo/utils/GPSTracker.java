@@ -1,9 +1,5 @@
 package com.vector.onetodo.utils;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
@@ -20,6 +16,13 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.vector.onetodo.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class GPSTracker extends Service implements LocationListener {
 	private final Context mContext;
@@ -187,7 +190,7 @@ public class GPSTracker extends Service implements LocationListener {
 		alertDialog.setNegativeButton(R.string.cancel,
 				new DialogInterface.OnClickListener() {
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
+					public void onClick(@NotNull DialogInterface dialog, int which) {
 						dialog.cancel();
 					}
 				});
@@ -202,7 +205,8 @@ public class GPSTracker extends Service implements LocationListener {
 	 */
 	static int count = 0;
 
-	public List<Address> getGeocoderAddress(Context context) {
+	@Nullable
+    public List<Address> getGeocoderAddress(Context context) {
 
 		if (location != null) {
 
@@ -230,7 +234,8 @@ public class GPSTracker extends Service implements LocationListener {
 	 * 
 	 * @return null or addressLine
 	 */
-	public String getAddressLine(Context context) {
+	@Nullable
+    public String getAddressLine(Context context) {
 		List<Address> addresses = getGeocoderAddress(context);
 		if (addresses != null && addresses.size() > 0) {
 			Address address = addresses.get(0);
@@ -247,7 +252,8 @@ public class GPSTracker extends Service implements LocationListener {
 	 * 
 	 * @return null or locality
 	 */
-	public String getLocality(Context context) {
+	@Nullable
+    public String getLocality(Context context) {
 		List<Address> addresses = getGeocoderAddress(context);
 		if (addresses != null && addresses.size() > 0) {
 			Address address = addresses.get(0);
@@ -264,7 +270,8 @@ public class GPSTracker extends Service implements LocationListener {
 	 * 
 	 * @return null or postalCode
 	 */
-	public String getPostalCode(Context context) {
+	@Nullable
+    public String getPostalCode(Context context) {
 		List<Address> addresses = getGeocoderAddress(context);
 		if (addresses != null && addresses.size() > 0) {
 			Address address = addresses.get(0);
@@ -281,7 +288,8 @@ public class GPSTracker extends Service implements LocationListener {
 	 * 
 	 * @return null or postalCode
 	 */
-	public String getCountryName(Context context) {
+	@Nullable
+    public String getCountryName(Context context) {
 		List<Address> addresses = getGeocoderAddress(context);
 		if (addresses != null && addresses.size() > 0) {
 			Address address = addresses.get(0);
@@ -301,7 +309,8 @@ public class GPSTracker extends Service implements LocationListener {
 	public void onProviderEnabled(String provider) {
 	}
 
-	@Override
+	@Nullable
+    @Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;

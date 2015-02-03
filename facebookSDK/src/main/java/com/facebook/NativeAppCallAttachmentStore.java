@@ -19,10 +19,19 @@ package com.facebook;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
+
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 
-import java.io.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +65,7 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
      *                         the URI processed by openFile
      * @throws java.io.IOException
      */
-    public void addAttachmentsForCall(Context context, UUID callId, Map<String, Bitmap> imageAttachments) {
+    public void addAttachmentsForCall(@NotNull Context context, @NotNull UUID callId, @NotNull Map<String, Bitmap> imageAttachments) {
         Validate.notNull(context, "context");
         Validate.notNull(callId, "callId");
         Validate.containsNoNulls(imageAttachments.values(), "imageAttachments");
@@ -64,7 +73,7 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
 
         addAttachments(context, callId, imageAttachments, new ProcessAttachment<Bitmap>() {
             @Override
-            public void processAttachment(Bitmap attachment, File outputFile) throws IOException {
+            public void processAttachment(@NotNull Bitmap attachment, @NotNull File outputFile) throws IOException {
                 FileOutputStream outputStream = new FileOutputStream(outputFile);
                 try {
                     attachment.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
@@ -85,7 +94,7 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
      *                         part of the URI processed by openFile
      * @throws java.io.IOException
      */
-    public void addAttachmentFilesForCall(Context context, UUID callId, Map<String, File> imageAttachmentFiles) {
+    public void addAttachmentFilesForCall(@NotNull Context context, @NotNull UUID callId, @NotNull Map<String, File> imageAttachmentFiles) {
         Validate.notNull(context, "context");
         Validate.notNull(callId, "callId");
         Validate.containsNoNulls(imageAttachmentFiles.values(), "imageAttachmentFiles");
@@ -93,7 +102,7 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
 
         addAttachments(context, callId, imageAttachmentFiles, new ProcessAttachment<File>() {
             @Override
-            public void processAttachment(File attachment, File outputFile) throws IOException {
+            public void processAttachment(@NotNull File attachment, @NotNull File outputFile) throws IOException {
                 FileOutputStream outputStream = new FileOutputStream(outputFile);
                 FileInputStream inputStream = null;
                 try {
@@ -112,8 +121,8 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
         });
     }
 
-    private <T> void addAttachments(Context context, UUID callId, Map<String, T> attachments,
-            ProcessAttachment<T> processor) {
+    private <T> void addAttachments(@NotNull Context context, @NotNull UUID callId, @NotNull Map<String, T> attachments,
+            @NotNull ProcessAttachment<T> processor) {
         if (attachments.size() == 0) {
             return;
         }
@@ -161,13 +170,14 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
      * @param context the Context the call is being made from
      * @param callId the unique ID of the call
      */
-    public void cleanupAttachmentsForCall(Context context, UUID callId) {
+    public void cleanupAttachmentsForCall(Context context, @NotNull UUID callId) {
         File dir = getAttachmentsDirectoryForCall(callId, false);
         Utility.deleteDirectory(dir);
     }
 
+    @Nullable
     @Override
-    public File openAttachment(UUID callId, String attachmentName) throws FileNotFoundException {
+    public File openAttachment(@Nullable UUID callId, String attachmentName) throws FileNotFoundException {
         if (Utility.isNullOrEmpty(attachmentName) ||
                 callId == null) {
             throw new FileNotFoundException();
@@ -182,20 +192,21 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
         }
     }
 
-    synchronized static File getAttachmentsDirectory(Context context) {
+    synchronized static File getAttachmentsDirectory(@NotNull Context context) {
         if (attachmentsDirectory == null) {
             attachmentsDirectory = new File(context.getCacheDir(), ATTACHMENTS_DIR_NAME);
         }
         return attachmentsDirectory;
     }
 
-    File ensureAttachmentsDirectoryExists(Context context) {
+    File ensureAttachmentsDirectoryExists(@NotNull Context context) {
         File dir = getAttachmentsDirectory(context);
         dir.mkdirs();
         return dir;
     }
 
-    File getAttachmentsDirectoryForCall(UUID callId, boolean create) {
+    @Nullable
+    File getAttachmentsDirectoryForCall(@NotNull UUID callId, boolean create) {
         if (attachmentsDirectory == null) {
             return null;
         }
@@ -207,7 +218,8 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
         return dir;
     }
 
-    File getAttachmentFile(UUID callId, String attachmentName, boolean createDirs) throws IOException {
+    @Nullable
+    File getAttachmentFile(@NotNull UUID callId, String attachmentName, boolean createDirs) throws IOException {
         File dir = getAttachmentsDirectoryForCall(callId, createDirs);
         if (dir == null) {
             return null;
@@ -220,7 +232,7 @@ public final class NativeAppCallAttachmentStore implements NativeAppCallContentP
         }
     }
 
-    void cleanupAllAttachments(Context context) {
+    void cleanupAllAttachments(@NotNull Context context) {
         // Attachments directory may or may not exist; we won't create it if not, since we are just going to delete it.
         File dir = getAttachmentsDirectory(context);
         Utility.deleteDirectory(dir);

@@ -16,6 +16,13 @@
 
 package com.google.maps.android;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.google.maps.android.MathUtil.EARTH_RADIUS;
 import static com.google.maps.android.MathUtil.clamp;
 import static com.google.maps.android.MathUtil.hav;
@@ -34,11 +41,6 @@ import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.tan;
 import static java.lang.Math.toRadians;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.android.gms.maps.model.LatLng;
 
 public class PolyUtil {
 
@@ -109,7 +111,7 @@ public class PolyUtil {
      * The polygon is formed of great circle segments if geodesic is true, and of rhumb
      * (loxodromic) segments otherwise.
      */
-    public static boolean containsLocation(LatLng point, List<LatLng> polygon, boolean geodesic) {
+    public static boolean containsLocation(@NotNull LatLng point, @NotNull List<LatLng> polygon, boolean geodesic) {
         final int size = polygon.size();
         if (size == 0) {
             return false;
@@ -146,7 +148,7 @@ public class PolyUtil {
      * is true, and of Rhumb segments otherwise. The polygon edge is implicitly closed -- the
      * closing segment between the first point and the last point is included.
      */
-    public static boolean isLocationOnEdge(LatLng point, List<LatLng> polygon, boolean geodesic,
+    public static boolean isLocationOnEdge(@NotNull LatLng point, @NotNull List<LatLng> polygon, boolean geodesic,
                                            double tolerance) {
         return isLocationOnEdgeOrPath(point, polygon, true, geodesic, tolerance);
     }
@@ -155,7 +157,7 @@ public class PolyUtil {
      * Same as {@link #isLocationOnEdge(LatLng, List, boolean, double)}
      * with a default tolerance of 0.1 meters.
      */
-    public static boolean isLocationOnEdge(LatLng point, List<LatLng> polygon, boolean geodesic) {
+    public static boolean isLocationOnEdge(@NotNull LatLng point, @NotNull List<LatLng> polygon, boolean geodesic) {
         return isLocationOnEdge(point, polygon, geodesic, DEFAULT_TOLERANCE);
     }
 
@@ -165,7 +167,7 @@ public class PolyUtil {
      * is true, and of Rhumb segments otherwise. The polyline is not closed -- the closing
      * segment between the first point and the last point is not included.
      */
-    public static boolean isLocationOnPath(LatLng point, List<LatLng> polyline,
+    public static boolean isLocationOnPath(@NotNull LatLng point, @NotNull List<LatLng> polyline,
                                            boolean geodesic, double tolerance) {
         return isLocationOnEdgeOrPath(point, polyline, false, geodesic, tolerance);
     }
@@ -175,12 +177,12 @@ public class PolyUtil {
      *
      * with a default tolerance of 0.1 meters.
      */
-    public static boolean isLocationOnPath(LatLng point, List<LatLng> polyline,
+    public static boolean isLocationOnPath(@NotNull LatLng point, @NotNull List<LatLng> polyline,
                                            boolean geodesic) {
         return isLocationOnPath(point, polyline, geodesic, DEFAULT_TOLERANCE);
     }
 
-    private static boolean isLocationOnEdgeOrPath(LatLng point, List<LatLng> poly, boolean closed,
+    private static boolean isLocationOnEdgeOrPath(@NotNull LatLng point, @NotNull List<LatLng> poly, boolean closed,
                                                   boolean geodesic, double toleranceEarth) {
         int size = poly.size();
         if (size == 0) {
@@ -302,7 +304,8 @@ public class PolyUtil {
     /**
      * Decodes an encoded path string into a sequence of LatLngs.
      */
-    public static List<LatLng> decode(final String encodedPath) {
+    @NotNull
+    public static List<LatLng> decode(@NotNull final String encodedPath) {
         int len = encodedPath.length();
 
         // For speed we preallocate to an upper bound on the final length, then
@@ -341,7 +344,8 @@ public class PolyUtil {
     /**
      * Encodes a sequence of LatLngs into an encoded path string.
      */
-    public static String encode(final List<LatLng> path) {
+    @NotNull
+    public static String encode(@NotNull final List<LatLng> path) {
         long lastLat = 0;
         long lastLng = 0;
 
@@ -363,7 +367,7 @@ public class PolyUtil {
         return result.toString();
     }
 
-    private static void encode(long v, StringBuffer result) {
+    private static void encode(long v, @NotNull StringBuffer result) {
         v = v < 0 ? ~(v << 1) : v << 1;
         while (v >= 0x20) {
             result.append(Character.toChars((int) ((0x20 | (v & 0x1f)) + 63)));

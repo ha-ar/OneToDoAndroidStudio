@@ -1,8 +1,5 @@
 package com.google.maps.android.clustering;
 
-import java.util.Collection;
-import java.util.Set;
-
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -16,6 +13,11 @@ import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.Set;
+
 /**
  * Groups many items on a map based on zoom level.
  * <p/>
@@ -28,6 +30,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener {
     private static final String TAG = ClusterManager.class.getName();
 
+    @NotNull
     private final MarkerManager mMarkerManager;
     private final MarkerManager.Collection mMarkers;
     private final MarkerManager.Collection mClusterMarkers;
@@ -41,11 +44,11 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
     private OnClusterItemClickListener<T> mOnClusterItemClickListener;
     private OnClusterClickListener<T> mOnClusterClickListener;
 
-    public ClusterManager(Context context, GoogleMap map) {
+    public ClusterManager(@NotNull Context context, GoogleMap map) {
         this(context, map, new MarkerManager(map));
     }
 
-    public ClusterManager(Context context, GoogleMap map, MarkerManager markerManager) {
+    public ClusterManager(@NotNull Context context, GoogleMap map, @NotNull MarkerManager markerManager) {
         mMap = map;
         mMarkerManager = markerManager;
         mClusterMarkers = markerManager.newCollection();
@@ -63,11 +66,12 @@ public class ClusterManager<T extends ClusterItem> implements GoogleMap.OnCamera
         return mClusterMarkers;
     }
 
+    @NotNull
     public MarkerManager getMarkerManager() {
         return mMarkerManager;
     }
 
-    public void setRenderer(ClusterRenderer<T> view) {
+    public void setRenderer(@NotNull ClusterRenderer<T> view) {
         view.setOnClusterClickListener(null);
         view.setOnClusterItemClickListener(null);
         mClusterMarkers.clear();

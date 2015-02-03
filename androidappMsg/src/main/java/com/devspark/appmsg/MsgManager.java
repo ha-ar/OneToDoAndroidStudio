@@ -16,15 +16,17 @@
 
 package com.devspark.appmsg;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * @author Evgeny Shishkin
@@ -59,7 +61,7 @@ class MsgManager extends Handler {
      *
      * @param appMsg
      */
-    void add(AppMsg appMsg) {
+    void add(@NotNull AppMsg appMsg) {
         msgQueue.add(appMsg);
         if (inAnimation == null) {
             inAnimation = AnimationUtils.loadAnimation(appMsg.getActivity(),
@@ -75,7 +77,7 @@ class MsgManager extends Handler {
     /**
      * Removes all {@link AppMsg} from the queue.
      */
-    void clearMsg(AppMsg appMsg) {
+    void clearMsg(@NotNull AppMsg appMsg) {
         if(msgQueue.contains(appMsg)){
             // Avoid the message from being removed twice.
             removeMessages(MESSAGE_REMOVE);
@@ -127,7 +129,7 @@ class MsgManager extends Handler {
      *
      * @param appMsg The {@link AppMsg} added to a {@link ViewGroup} and should be removed.s
      */
-    private void removeMsg(final AppMsg appMsg) {
+    private void removeMsg(@NotNull final AppMsg appMsg) {
         ViewGroup parent = ((ViewGroup) appMsg.getView().getParent());
         if (parent != null) {
             outAnimation.setAnimationListener(new OutAnimationListener(appMsg));
@@ -146,7 +148,7 @@ class MsgManager extends Handler {
         }
     }
 
-    private void addMsgToView(AppMsg appMsg) {
+    private void addMsgToView(@NotNull AppMsg appMsg) {
         View view = appMsg.getView();
         if (view.getParent() == null) {
             appMsg.getActivity().addContentView(
@@ -163,7 +165,7 @@ class MsgManager extends Handler {
     }
 
     @Override
-    public void handleMessage(Message msg) {
+    public void handleMessage(@NotNull Message msg) {
         final AppMsg appMsg;
         switch (msg.what) {
             case MESSAGE_DISPLAY:

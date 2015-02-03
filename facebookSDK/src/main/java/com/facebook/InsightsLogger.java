@@ -18,7 +18,11 @@ package com.facebook;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import com.facebook.internal.Logger;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -42,6 +46,7 @@ public class InsightsLogger {
     /**
      * Deprecated. Please use {@link AppEventsLogger} instead.
      */
+    @Nullable
     public static InsightsLogger newLogger(Context context, String clientToken) {
         return new InsightsLogger(context, null, null);
     }
@@ -49,6 +54,7 @@ public class InsightsLogger {
     /**
      * Deprecated. Please use {@link AppEventsLogger} instead.
      */
+    @Nullable
     public static InsightsLogger newLogger(Context context, String clientToken, String applicationId) {
         return new InsightsLogger(context, applicationId, null);
     }
@@ -56,6 +62,7 @@ public class InsightsLogger {
     /**
      * Deprecated. Please use {@link AppEventsLogger} instead.
      */
+    @NotNull
     public static InsightsLogger newLogger(Context context, String clientToken, String applicationId, Session session) {
         return new InsightsLogger(context, applicationId, session);
     }
@@ -77,7 +84,7 @@ public class InsightsLogger {
     /**
      * Deprecated. Please use {@link AppEventsLogger} instead.
      */
-    public void logConversionPixel(String pixelId, double valueOfPixel) {
+    public void logConversionPixel(@Nullable String pixelId, double valueOfPixel) {
 
         if (pixelId == null) {
             Logger.log(LoggingBehavior.DEVELOPER_ERRORS, "Insights", "pixelID cannot be null");

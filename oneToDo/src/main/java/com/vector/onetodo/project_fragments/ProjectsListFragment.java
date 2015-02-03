@@ -1,8 +1,4 @@
-package com.vector.onetodo;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package com.vector.onetodo.project_fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,7 +11,15 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.vector.onetodo.R;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ProjectsListFragment extends ProjectsTabHolder implements
 		OnScrollListener {
@@ -26,7 +30,8 @@ public class ProjectsListFragment extends ProjectsTabHolder implements
 
  
 
-	public static ProjectsListFragment newInstance(int position) {
+	@NotNull
+    public static ProjectsListFragment newInstance(int position) {
 		ProjectsListFragment myFragment = new ProjectsListFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -41,7 +46,7 @@ public class ProjectsListFragment extends ProjectsTabHolder implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater
 				.inflate(R.layout.invitation_list, container, false);
@@ -90,8 +95,9 @@ public class ProjectsListFragment extends ProjectsTabHolder implements
 			return 0;
 		}
 
-		@Override
-		public Object getItem(int position) {
+		@Nullable
+        @Override
+		public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 

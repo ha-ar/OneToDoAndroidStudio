@@ -1,15 +1,20 @@
 package com.vector.model;
 
-import java.util.ArrayList;
-
 import com.google.gson.annotations.SerializedName;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class ContactsData {
 
-	public static ContactsData contacts = null;
+	@Nullable
+    public static ContactsData contacts = null;
 
 
-	public static ContactsData getInstance() {
+	@Nullable
+    public static ContactsData getInstance() {
 		if (contacts == null) {
 			contacts = new ContactsData();
 		}
@@ -21,7 +26,8 @@ public class ContactsData {
 	}
 
 	
-		@SerializedName("contacts")
+		@NotNull
+        @SerializedName("contacts")
 		public ArrayList<Contacts> contactsList = new ArrayList<Contacts>();
 
 		public class Contacts {

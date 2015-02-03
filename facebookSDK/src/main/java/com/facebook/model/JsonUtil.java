@@ -17,13 +17,20 @@
 package com.facebook.model;
 
 import android.annotation.SuppressLint;
+
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 class JsonUtil {
-    static void jsonObjectClear(JSONObject jsonObject) {
+    static void jsonObjectClear(@NotNull JSONObject jsonObject) {
         @SuppressWarnings("unchecked")
         Iterator<String> keys = (Iterator<String>) jsonObject.keys();
         while (keys.hasNext()) {
@@ -32,7 +39,7 @@ class JsonUtil {
         }
     }
 
-    static boolean jsonObjectContainsValue(JSONObject jsonObject, Object value) {
+    static boolean jsonObjectContainsValue(@NotNull JSONObject jsonObject, Object value) {
         @SuppressWarnings("unchecked")
         Iterator<String> keys = (Iterator<String>) jsonObject.keys();
         while (keys.hasNext()) {
@@ -64,6 +71,7 @@ class JsonUtil {
             return this.value;
         }
 
+        @NotNull
         @Override
         public Object setValue(Object object) {
             throw new UnsupportedOperationException("JSONObjectEntry is immutable");
@@ -71,7 +79,8 @@ class JsonUtil {
 
     }
 
-    static Set<Map.Entry<String, Object>> jsonObjectEntrySet(JSONObject jsonObject) {
+    @NotNull
+    static Set<Map.Entry<String, Object>> jsonObjectEntrySet(@NotNull JSONObject jsonObject) {
         HashSet<Map.Entry<String, Object>> result = new HashSet<Map.Entry<String, Object>>();
 
         @SuppressWarnings("unchecked")
@@ -85,7 +94,8 @@ class JsonUtil {
         return result;
     }
 
-    static Set<String> jsonObjectKeySet(JSONObject jsonObject) {
+    @NotNull
+    static Set<String> jsonObjectKeySet(@NotNull JSONObject jsonObject) {
         HashSet<String> result = new HashSet<String>();
 
         @SuppressWarnings("unchecked")
@@ -97,7 +107,7 @@ class JsonUtil {
         return result;
     }
 
-    static void jsonObjectPutAll(JSONObject jsonObject, Map<String, Object> map) {
+    static void jsonObjectPutAll(@NotNull JSONObject jsonObject, @NotNull Map<String, Object> map) {
         Set<Map.Entry<String, Object>> entrySet = map.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
             try {
@@ -108,7 +118,8 @@ class JsonUtil {
         }
     }
 
-    static Collection<Object> jsonObjectValues(JSONObject jsonObject) {
+    @NotNull
+    static Collection<Object> jsonObjectValues(@NotNull JSONObject jsonObject) {
         ArrayList<Object> result = new ArrayList<Object>();
 
         @SuppressWarnings("unchecked")

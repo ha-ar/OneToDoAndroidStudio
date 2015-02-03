@@ -31,7 +31,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_margin="10dp"
-            android:animateLayoutChanges="true"
             android:padding="10dp"
             android:src="@drawable/menu_dots"
             android:visibility="gone" />
@@ -64,7 +63,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_margin="10dp"
-            android:animateLayoutChanges="true"
             android:src="@drawable/ic_show_white" />
     </RelativeLayout>
 
@@ -83,7 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/comment_box"
-                android:animateLayoutChanges="true"
                 android:background="@color/light_grey_color"
                 android:scrollbars="none" >
 
@@ -91,7 +88,6 @@
                     android:id="@+id/inner_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:animateLayoutChanges="true"
                     android:background="@color/light_grey_color"
                     android:columnCount="1"
                     android:orientation="vertical"

@@ -23,10 +23,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.facebook.internal.AttributionIdentifiers;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,7 +81,9 @@ public class AppLinkData {
     private static final String TAG = AppLinkData.class.getCanonicalName();
 
     private String ref;
+    @Nullable
     private Uri targetUri;
+    @Nullable
     private JSONObject arguments;
     private Bundle argumentBundle;
 
@@ -88,7 +94,7 @@ public class AppLinkData {
      * @param completionHandler CompletionHandler to be notified with the AppLinkData object or null if none is
      *                          available.  Must not be null.
      */
-    public static void fetchDeferredAppLinkData(Context context, CompletionHandler completionHandler) {
+    public static void fetchDeferredAppLinkData(@NotNull Context context, @NotNull CompletionHandler completionHandler) {
         fetchDeferredAppLinkData(context, null, completionHandler);
     }
 
@@ -101,9 +107,9 @@ public class AppLinkData {
      *                          available.  Must not be null.
      */
     public static void fetchDeferredAppLinkData(
-            Context context,
-            String applicationId,
-            final CompletionHandler completionHandler) {
+            @NotNull Context context,
+            @Nullable String applicationId,
+            @NotNull final CompletionHandler completionHandler) {
         Validate.notNull(context, "context");
         Validate.notNull(completionHandler, "completionHandler");
 
@@ -124,9 +130,9 @@ public class AppLinkData {
     }
 
     private static void fetchDeferredAppLinkFromServer(
-            Context context,
+            @NotNull Context context,
             String applicationId,
-            final CompletionHandler completionHandler) {
+            @NotNull final CompletionHandler completionHandler) {
 
         GraphObject deferredApplinkParams = GraphObject.Factory.create();
         deferredApplinkParams.setProperty("event", DEFERRED_APP_LINK_EVENT);
@@ -206,7 +212,8 @@ public class AppLinkData {
      * @param activity Activity that was started because of an app link
      * @return AppLinkData if found. null if not.
      */
-    public static AppLinkData createFromActivity(Activity activity) {
+    @Nullable
+    public static AppLinkData createFromActivity(@NotNull Activity activity) {
         Validate.notNull(activity, "activity");
         Intent intent = activity.getIntent();
         if (intent == null) {
@@ -226,7 +233,8 @@ public class AppLinkData {
         return appLinkData;
     }
 
-    private static AppLinkData createFromAlApplinkData(Intent intent) {
+    @Nullable
+    private static AppLinkData createFromAlApplinkData(@NotNull Intent intent) {
         Bundle applinks = intent.getBundleExtra(BUNDLE_AL_APPLINK_DATA_KEY);
         if (applinks == null) {
             return null;
@@ -250,7 +258,8 @@ public class AppLinkData {
         return appLinkData;
     }
 
-    private static AppLinkData createFromJson(String jsonString) {
+    @Nullable
+    private static AppLinkData createFromJson(@Nullable String jsonString) {
         if (jsonString  == null) {
             return null;
         }
@@ -295,7 +304,8 @@ public class AppLinkData {
         return null;
     }
 
-    private static AppLinkData createFromUri(Uri appLinkDataUri) {
+    @Nullable
+    private static AppLinkData createFromUri(@Nullable Uri appLinkDataUri) {
         if (appLinkDataUri == null) {
             return null;
         }
@@ -305,7 +315,8 @@ public class AppLinkData {
         return appLinkData;
     }
 
-    private static Bundle toBundle(JSONObject node) throws JSONException {
+    @NotNull
+    private static Bundle toBundle(@NotNull JSONObject node) throws JSONException {
         Bundle bundle = new Bundle();
         @SuppressWarnings("unchecked")
         Iterator<String> fields = node.keys();
@@ -354,6 +365,7 @@ public class AppLinkData {
      * Returns the target uri for this App Link.
      * @return target uri
      */
+    @Nullable
     public Uri getTargetUri() {
         return targetUri;
     }
@@ -370,6 +382,7 @@ public class AppLinkData {
      * This method has been deprecated. Please use {@link AppLinkData#getArgumentBundle()} instead.
      * @return JSONObject property bag.
      */
+    @Nullable
     @Deprecated
     public JSONObject getArguments() {
         return arguments;
@@ -389,6 +402,7 @@ public class AppLinkData {
      * fb_access_token, fb_expires_in, and fb_ref.
      * @return the referer data.
      */
+    @Nullable
     public Bundle getRefererData() {
         if (argumentBundle != null) {
             return argumentBundle.getBundle(ARGUMENTS_REFERER_DATA_KEY);

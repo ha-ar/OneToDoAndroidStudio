@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
@@ -27,7 +28,15 @@ import com.facebook.model.GraphObject;
 import com.facebook.model.GraphObjectList;
 import com.facebook.model.GraphUser;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implements an subclass of Session that knows about test users for a particular
@@ -105,6 +114,7 @@ public class TestSession extends Session {
      *                    a common set of permissions (email, publish_actions) being requested
      * @return a new TestSession that is in the CREATED state, ready to be opened
      */
+    @NotNull
     public static TestSession createSessionWithPrivateUser(Activity activity, List<String> permissions) {
         return createTestSession(activity, permissions, Mode.PRIVATE, null);
     }
@@ -122,6 +132,7 @@ public class TestSession extends Session {
      *                    a common set of permissions (email, publish_actions) being requested
      * @return a new TestSession that is in the CREATED state, ready to be opened
      */
+    @NotNull
     public static TestSession createSessionWithSharedUser(Activity activity, List<String> permissions) {
         return createSessionWithSharedUser(activity, permissions, null);
     }
@@ -142,6 +153,7 @@ public class TestSession extends Session {
      *                             with each other, and which therefore must have sessions associated with different users.
      * @return a new TestSession that is in the CREATED state, ready to be opened
      */
+    @NotNull
     public static TestSession createSessionWithSharedUser(Activity activity, List<String> permissions,
             String sessionUniqueUserTag) {
         return createTestSession(activity, permissions, Mode.SHARED, sessionUniqueUserTag);
@@ -210,6 +222,7 @@ public class TestSession extends Session {
     }
 
 
+    @NotNull
     private static synchronized TestSession createTestSession(Activity activity, List<String> permissions, Mode mode,
             String sessionUniqueUserTag) {
         if (Utility.isNullOrEmpty(testApplicationId) || Utility.isNullOrEmpty(testApplicationSecret)) {
@@ -266,8 +279,8 @@ public class TestSession extends Session {
         return;
     }
 
-    private static synchronized void populateTestAccounts(Collection<TestAccount> testAccounts,
-                                                          GraphObject userAccountsMap) {
+    private static synchronized void populateTestAccounts(@NotNull Collection<TestAccount> testAccounts,
+                                                          @NotNull GraphObject userAccountsMap) {
         for (TestAccount testAccount : testAccounts) {
             GraphUser testUser = userAccountsMap.getPropertyAs(testAccount.getId(), GraphUser.class);
             testAccount.setName(testUser.getName());
@@ -275,11 +288,12 @@ public class TestSession extends Session {
         }
     }
 
-    private static synchronized void storeTestAccount(TestAccount testAccount) {
+    private static synchronized void storeTestAccount(@NotNull TestAccount testAccount) {
         appTestAccounts.put(testAccount.getId(), testAccount);
     }
 
-    private static synchronized TestAccount findTestAccountMatchingIdentifier(String identifier) {
+    @Nullable
+    private static synchronized TestAccount findTestAccountMatchingIdentifier(@NotNull String identifier) {
         retrieveTestAccountsForAppIfNeeded();
 
         for (TestAccount testAccount : appTestAccounts.values()) {
@@ -290,6 +304,7 @@ public class TestSession extends Session {
         return null;
     }
 
+    @NotNull
     @Override
     public final String toString() {
         String superString = super.toString();
@@ -308,7 +323,7 @@ public class TestSession extends Session {
     }
 
     @Override
-    void postStateChange(final SessionState oldState, final SessionState newState, final Exception error) {
+    void postStateChange(@NotNull final SessionState oldState, @NotNull final SessionState newState, final Exception error) {
         // Make sure this doesn't get overwritten.
         String id = testAccountId;
 
@@ -348,6 +363,7 @@ public class TestSession extends Session {
         setCurrentTokenRefreshRequest(new TokenRefreshRequest());
     }
 
+    @NotNull
     static final String getAppAccessToken() {
         return testApplicationId + "|" + testApplicationSecret;
     }
@@ -361,7 +377,7 @@ public class TestSession extends Session {
         }
     }
 
-    private void finishAuthWithTestAccount(TestAccount testAccount) {
+    private void finishAuthWithTestAccount(@NotNull TestAccount testAccount) {
         testAccountId = testAccount.getId();
         testAccountUserName = testAccount.getName();
 
@@ -370,6 +386,7 @@ public class TestSession extends Session {
         finishAuthOrReauth(accessToken, null);
     }
 
+    @Nullable
     private TestAccount createTestAccountAndFinishAuth() {
         Bundle parameters = new Bundle();
         parameters.putString("installed", "true");
@@ -425,10 +442,12 @@ public class TestSession extends Session {
         }
     }
 
+    @NotNull
     private String getPermissionsString() {
         return TextUtils.join(",", requestedPermissions);
     }
 
+    @NotNull
     private String getSharedTestAccountIdentifier() {
         // We use long even though hashes are ints to avoid sign issues.
         long permissionsHash = getPermissionsString().hashCode() & 0xffffffffL;
@@ -438,6 +457,7 @@ public class TestSession extends Session {
         return validNameStringFromInteger(combinedHash);
     }
 
+    @NotNull
     private String validNameStringFromInteger(long i) {
         String s = Long.toString(i);
         StringBuilder result = new StringBuilder("Perm");
@@ -458,23 +478,29 @@ public class TestSession extends Session {
     }
 
     private interface TestAccount extends GraphObject {
+        @NotNull
         String getId();
 
+        @NotNull
         String getAccessToken();
 
         // Note: We don't actually get Name from our accounts/test-users query. We fill it in by correlating with GraphUser.
+        @NotNull
         String getName();
 
         void setName(String name);
     }
 
     private interface TestAccountsResponse extends GraphObject {
+        @NotNull
         GraphObjectList<TestAccount> getData();
     }
 
     private static final class TestTokenCachingStrategy extends TokenCachingStrategy {
+        @Nullable
         private Bundle bundle;
 
+        @Nullable
         @Override
         public Bundle load() {
             return bundle;

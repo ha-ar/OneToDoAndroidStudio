@@ -5,19 +5,21 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 public class SquareTextView extends TextView {
     private int mOffsetTop = 0;
     private int mOffsetLeft = 0;
 
-    public SquareTextView(Context context) {
+    public SquareTextView(@NotNull Context context) {
         super(context);
     }
 
-    public SquareTextView(Context context, AttributeSet attrs) {
+    public SquareTextView(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SquareTextView(Context context, AttributeSet attrs, int defStyle) {
+    public SquareTextView(@NotNull Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -38,7 +40,7 @@ public class SquareTextView extends TextView {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(@NotNull Canvas canvas) {
         canvas.translate(mOffsetLeft / 2, mOffsetTop / 2);
         super.draw(canvas);
     }

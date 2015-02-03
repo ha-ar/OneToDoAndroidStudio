@@ -1,9 +1,5 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,29 +12,34 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao.Properties;
 import com.vector.onetodo.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import de.greenrobot.dao.query.QueryBuilder;
 
 public class TaskListFragment extends ScrollTabHolderFragment implements
 		OnScrollListener {
 
-	TextView tx;
 	private ListView listView;
-	public static QueryBuilder<ToDo> todayQuery, tomorrowQuery, upcommingQuery;
+	public static QueryBuilder<ToDo> todayQuery, tomorrowQuery, upcomingQuery;
  
 	public static TaskListAdapter todayAdapter, tomorrowAdapter,
 			upComingAdapter;
 	private int position;
 	private View mFakeHeader;
-	private static long[] Currentdate;
+	private static long[] currentDate;
 
-	public static TaskListFragment newInstance(int position) {
+	@NotNull
+    public static TaskListFragment newInstance(int position) {
 		TaskListFragment myFragment = new TaskListFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -53,7 +54,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.tasks_list, container, false);
 		listView = (ListView) view.findViewById(R.id.task_list_view);
@@ -101,7 +102,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 
 		});
 
-		Currentdate = new long[3];
+		currentDate = new long[3];
 		String date_string = null;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i <= 2; i++) {
@@ -110,7 +111,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 					+ Utils.getCurrentDayDigit(i);
 			try {
 				Date mDate = sdf.parse(date_string);
-				Currentdate[i] = mDate.getTime();
+				currentDate[i] = mDate.getTime();
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -123,7 +124,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		position = getArguments().getInt("position");
-		setadapter(getActivity(), position);
+		setAdapter(getActivity(), position);
 		listView.setOnScrollListener(this);
 
 		 
@@ -156,22 +157,22 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 
 	public static void todayQuery() {
 		todayQuery = MainActivity.tododao.queryBuilder().where(
-				Properties.Start_date.between(Currentdate[0], Currentdate[1]));
+				Properties.Start_date.between(currentDate[0], currentDate[1]));
 
 	}
 
 	public static void tomorrowQuery() {
 		tomorrowQuery = MainActivity.tododao.queryBuilder().where(
-				Properties.Start_date.between(Currentdate[1], Currentdate[2]));
+				Properties.Start_date.between(currentDate[1], currentDate[2]));
 
 	}
 
 	public static void upComingQuery() {
-		upcommingQuery = MainActivity.tododao.queryBuilder().where(
-				Properties.Start_date.gt(Currentdate[2]));
+		upcomingQuery = MainActivity.tododao.queryBuilder().where(
+				Properties.Start_date.gt(currentDate[2]));
 	}
 
-	private void setadapter(Context context, int position) {
+	private void setAdapter(Context context, int position) {
 
 		switch (position) {
 		case 0:
@@ -188,7 +189,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 		case 2:
 			upComingQuery();
 			upComingAdapter = new TaskListAdapter(getActivity(),
-					upcommingQuery.list());
+					upcomingQuery.list());
 			listView.setAdapter(upComingAdapter);
 			break;
 		default:

@@ -7,6 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A simple extension of a regular linear layout that supports the divider API
  * of Android 4.0+. The dividers are added adjacent to the children by changing
@@ -24,6 +27,7 @@ class IcsLinearLayout extends LinearLayout {
     private static final int LL_SHOW_DIVIDER = 1;
     private static final int LL_DIVIDER_PADDING = 2;
 
+    @Nullable
     private Drawable mDivider;
     private int mDividerWidth;
     private int mDividerHeight;
@@ -31,7 +35,7 @@ class IcsLinearLayout extends LinearLayout {
     private int mDividerPadding;
 
 
-    public IcsLinearLayout(Context context, int themeAttr) {
+    public IcsLinearLayout(@NotNull Context context, int themeAttr) {
         super(context);
 
         TypedArray a = context.obtainStyledAttributes(null, LL, themeAttr, 0);
@@ -41,7 +45,7 @@ class IcsLinearLayout extends LinearLayout {
         a.recycle();
     }
 
-    public void setDividerDrawable(Drawable divider) {
+    public void setDividerDrawable(@Nullable Drawable divider) {
         if (divider == mDivider) {
             return;
         }
@@ -58,7 +62,7 @@ class IcsLinearLayout extends LinearLayout {
     }
 
     @Override
-    protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, int widthUsed, int parentHeightMeasureSpec, int heightUsed) {
+    protected void measureChildWithMargins(@NotNull View child, int parentWidthMeasureSpec, int widthUsed, int parentHeightMeasureSpec, int heightUsed) {
         final int index = indexOfChild(child);
         final int orientation = getOrientation();
         final LayoutParams params = (LayoutParams) child.getLayoutParams();

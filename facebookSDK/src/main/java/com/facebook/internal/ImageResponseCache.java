@@ -18,7 +18,11 @@ package com.facebook.internal;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.facebook.LoggingBehavior;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -33,7 +37,7 @@ class ImageResponseCache {
 
     private volatile static FileLruCache imageCache;
 
-    synchronized static FileLruCache getCache(Context context) throws IOException{
+    synchronized static FileLruCache getCache(@NotNull Context context) throws IOException{
         if (imageCache == null) {
             imageCache = new FileLruCache(context.getApplicationContext(), TAG, new FileLruCache.Limits());
         }
@@ -42,7 +46,8 @@ class ImageResponseCache {
 
     // Get stream from cache, or return null if the image is not cached.
     // Does not throw if there was an error.
-    static InputStream getCachedImageStream(URI url, Context context) {
+    @Nullable
+    static InputStream getCachedImageStream(@Nullable URI url, @NotNull Context context) {
         InputStream imageStream = null;
         if (url != null) {
             if (isCDNURL(url)) {
@@ -58,7 +63,8 @@ class ImageResponseCache {
         return imageStream;
     }
 
-    static InputStream interceptAndCacheImageStream(Context context, HttpURLConnection connection) throws IOException {
+    @Nullable
+    static InputStream interceptAndCacheImageStream(@NotNull Context context, @NotNull HttpURLConnection connection) throws IOException {
         InputStream stream = null;
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             URL url = connection.getURL();
@@ -81,7 +87,7 @@ class ImageResponseCache {
         return stream;
     }
 
-   private static boolean isCDNURL(URI url) {
+   private static boolean isCDNURL(@Nullable URI url) {
         if (url != null) {
             String uriHost = url.getHost();
 
@@ -97,7 +103,7 @@ class ImageResponseCache {
         return false;
     }
 
-    static void clearCache(Context context) {
+    static void clearCache(@NotNull Context context) {
         try {
             getCache(context).clearCache();
         } catch (IOException e) {
@@ -107,7 +113,7 @@ class ImageResponseCache {
 
     private static class BufferedHttpInputStream extends BufferedInputStream {
         HttpURLConnection connection;
-        BufferedHttpInputStream(InputStream stream, HttpURLConnection connection) {
+        BufferedHttpInputStream(@NotNull InputStream stream, HttpURLConnection connection) {
             super(stream, Utility.DEFAULT_STREAM_BUFFER_SIZE);
             this.connection = connection;
         }

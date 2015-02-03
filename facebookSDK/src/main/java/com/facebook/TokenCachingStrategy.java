@@ -17,7 +17,11 @@
 package com.facebook;
 
 import android.os.Bundle;
+
 import com.facebook.internal.Validate;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,6 +98,7 @@ public abstract class TokenCachingStrategy {
      *
      * @return A Bundle that represents the token state that was loaded.
      */
+    @Nullable
     public abstract Bundle load();
 
     /**
@@ -125,7 +130,7 @@ public abstract class TokenCachingStrategy {
      * @return a boolean indicating whether a Bundle contains properties that
      *         could be a valid saved token.
      */
-    public static boolean hasTokenInformation(Bundle bundle) {
+    public static boolean hasTokenInformation(@Nullable Bundle bundle) {
         if (bundle == null) {
             return false;
         }
@@ -152,7 +157,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static String getToken(Bundle bundle) {
+    public static String getToken(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return bundle.getString(TOKEN_KEY);
     }
@@ -167,7 +172,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle or token value are null
      */
-    public static void putToken(Bundle bundle, String value) {
+    public static void putToken(@NotNull Bundle bundle, String value) {
         Validate.notNull(bundle, "bundle");
         Validate.notNull(value, "value");
         bundle.putString(TOKEN_KEY, value);
@@ -182,6 +187,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
+    @Nullable
     public static Date getExpirationDate(Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return getDate(bundle, EXPIRATION_DATE_KEY);
@@ -197,7 +203,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle or date value are null
      */
-    public static void putExpirationDate(Bundle bundle, Date value) {
+    public static void putExpirationDate(@NotNull Bundle bundle, @NotNull Date value) {
         Validate.notNull(bundle, "bundle");
         Validate.notNull(value, "value");
         putDate(bundle, EXPIRATION_DATE_KEY, value);
@@ -213,7 +219,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static long getExpirationMilliseconds(Bundle bundle) {
+    public static long getExpirationMilliseconds(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return bundle.getLong(EXPIRATION_DATE_KEY);
     }
@@ -229,7 +235,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static void putExpirationMilliseconds(Bundle bundle, long value) {
+    public static void putExpirationMilliseconds(@NotNull Bundle bundle, long value) {
         Validate.notNull(bundle, "bundle");
         bundle.putLong(EXPIRATION_DATE_KEY, value);
     }
@@ -243,7 +249,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static List<String> getPermissions(Bundle bundle) {
+    public static List<String> getPermissions(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return bundle.getStringArrayList(PERMISSIONS_KEY);
     }
@@ -259,7 +265,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle or permissions list are null
      */
-    public static void putPermissions(Bundle bundle, List<String> value) {
+    public static void putPermissions(@NotNull Bundle bundle, List<String> value) {
         Validate.notNull(bundle, "bundle");
         Validate.notNull(value, "value");
 
@@ -283,7 +289,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle or permissions list are null
      */
-    public static void putDeclinedPermissions(Bundle bundle, List<String> value) {
+    public static void putDeclinedPermissions(@NotNull Bundle bundle, List<String> value) {
         Validate.notNull(bundle, "bundle");
         Validate.notNull(value, "value");
 
@@ -306,7 +312,8 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static AccessTokenSource getSource(Bundle bundle) {
+    @NotNull
+    public static AccessTokenSource getSource(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         if (bundle.containsKey(TokenCachingStrategy.TOKEN_SOURCE_KEY)) {
             return (AccessTokenSource) bundle.getSerializable(TokenCachingStrategy.TOKEN_SOURCE_KEY);
@@ -325,7 +332,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static void putSource(Bundle bundle, AccessTokenSource value) {
+    public static void putSource(@NotNull Bundle bundle, AccessTokenSource value) {
         Validate.notNull(bundle, "bundle");
         bundle.putSerializable(TOKEN_SOURCE_KEY, value);
     }
@@ -339,6 +346,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
+    @Nullable
     public static Date getLastRefreshDate(Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return getDate(bundle, LAST_REFRESH_DATE_KEY);
@@ -354,7 +362,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle or date value are null
      */
-    public static void putLastRefreshDate(Bundle bundle, Date value) {
+    public static void putLastRefreshDate(@NotNull Bundle bundle, @NotNull Date value) {
         Validate.notNull(bundle, "bundle");
         Validate.notNull(value, "value");
         putDate(bundle, LAST_REFRESH_DATE_KEY, value);
@@ -369,7 +377,7 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static long getLastRefreshMilliseconds(Bundle bundle) {
+    public static long getLastRefreshMilliseconds(@NotNull Bundle bundle) {
         Validate.notNull(bundle, "bundle");
         return bundle.getLong(LAST_REFRESH_DATE_KEY);
     }
@@ -385,12 +393,13 @@ public abstract class TokenCachingStrategy {
      *
      * @throws NullPointerException if the passed in Bundle is null
      */
-    public static void putLastRefreshMilliseconds(Bundle bundle, long value) {
+    public static void putLastRefreshMilliseconds(@NotNull Bundle bundle, long value) {
         Validate.notNull(bundle, "bundle");
         bundle.putLong(LAST_REFRESH_DATE_KEY, value);
     }
 
-    static Date getDate(Bundle bundle, String key) {
+    @Nullable
+    static Date getDate(@Nullable Bundle bundle, String key) {
         if (bundle == null) {
             return null;
         }
@@ -403,7 +412,7 @@ public abstract class TokenCachingStrategy {
         return new Date(n);
     }
 
-    static void putDate(Bundle bundle, String key, Date date) {
+    static void putDate(@NotNull Bundle bundle, String key, @NotNull Date date) {
         bundle.putLong(key, date.getTime());
     }
 }

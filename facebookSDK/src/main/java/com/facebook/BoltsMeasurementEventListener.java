@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import org.jetbrains.annotations.NotNull;
+
 public class BoltsMeasurementEventListener extends BroadcastReceiver {
     private static BoltsMeasurementEventListener _instance;
 
@@ -17,7 +19,7 @@ public class BoltsMeasurementEventListener extends BroadcastReceiver {
 
     private Context applicationContext;
 
-    private BoltsMeasurementEventListener(Context context) {
+    private BoltsMeasurementEventListener(@NotNull Context context) {
         applicationContext = context.getApplicationContext();
     }
 
@@ -31,7 +33,7 @@ public class BoltsMeasurementEventListener extends BroadcastReceiver {
       broadcastManager.unregisterReceiver(this);
     }
 
-    static BoltsMeasurementEventListener getInstance(Context context) {
+    static BoltsMeasurementEventListener getInstance(@NotNull Context context) {
         if (_instance != null) {
             return _instance;
         }
@@ -49,7 +51,7 @@ public class BoltsMeasurementEventListener extends BroadcastReceiver {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(@NotNull Context context, @NotNull Intent intent) {
         AppEventsLogger appEventsLogger = AppEventsLogger.newLogger(context);
         String eventName = BOLTS_MEASUREMENT_EVENT_PREFIX + intent.getStringExtra(MEASUREMENT_EVENT_NAME_KEY);
         Bundle eventArgs = intent.getBundleExtra(MEASUREMENT_EVENT_ARGS_KEY);

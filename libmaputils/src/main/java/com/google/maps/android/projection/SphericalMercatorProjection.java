@@ -18,6 +18,8 @@ package com.google.maps.android.projection;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.jetbrains.annotations.NotNull;
+
 public class SphericalMercatorProjection {
     final double mWorldWidth;
 
@@ -25,7 +27,8 @@ public class SphericalMercatorProjection {
         mWorldWidth = worldWidth;
     }
 
-    public Point toPoint(final LatLng latLng) {
+    @NotNull
+    public Point toPoint(@NotNull final LatLng latLng) {
         final double x = latLng.longitude / 360 + .5;
         final double siny = Math.sin(Math.toRadians(latLng.latitude));
         final double y = 0.5 * Math.log((1 + siny) / (1 - siny)) / -(2 * Math.PI) + .5;
@@ -33,7 +36,8 @@ public class SphericalMercatorProjection {
         return new Point(x * mWorldWidth, y * mWorldWidth);
     }
 
-    public LatLng toLatLng(com.google.maps.android.geometry.Point point) {
+    @NotNull
+    public LatLng toLatLng(@NotNull com.google.maps.android.geometry.Point point) {
         final double x = point.x / mWorldWidth - 0.5;
         final double lng = x * 360;
 

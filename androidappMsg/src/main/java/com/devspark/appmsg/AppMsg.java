@@ -25,6 +25,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * In-layout notifications. Based on {@link android.widget.Toast} notifications
  * and article by Cyril Mottier (http://android.cyrilmottier.com/?p=773).
@@ -89,7 +91,8 @@ public class AppMsg {
      * @param text    The text to show. Can be formatted text.
      * @param style   The style with a background and a duration.
      */
-    public static AppMsg makeText(Activity context, CharSequence text, Style style) {
+    @NotNull
+    public static AppMsg makeText(@NotNull Activity context, CharSequence text, @NotNull Style style) {
         return makeText(context, text, style, R.layout.app_msg);
     }
 
@@ -101,7 +104,8 @@ public class AppMsg {
      * @param text    The text to show. Can be formatted text.
      * @param style   The style with a background and a duration.
      */
-    public static AppMsg makeText(Activity context, CharSequence text, Style style, int layoutId) {
+    @NotNull
+    public static AppMsg makeText(@NotNull Activity context, CharSequence text, @NotNull Style style, int layoutId) {
         LayoutInflater inflate = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflate.inflate(layoutId, null);
@@ -120,7 +124,8 @@ public class AppMsg {
      * @param text     The text to show. Can be formatted text.
      * @param style    The style with a background and a duration.
      */
-    public static AppMsg makeText(Activity context, CharSequence text, Style style, View customView) {
+    @NotNull
+    public static AppMsg makeText(Activity context, CharSequence text, @NotNull Style style, @NotNull View customView) {
        return makeText(context, text, style, customView, false);
     }
 
@@ -135,7 +140,8 @@ public class AppMsg {
      * @param style    The style with a background and a duration.
      * @param floating true if it'll float.
      */
-    private static AppMsg makeText(Activity context, CharSequence text, Style style, View view, boolean floating) {
+    @NotNull
+    private static AppMsg makeText(Activity context, CharSequence text, @NotNull Style style, @NotNull View view, boolean floating) {
         AppMsg result = new AppMsg(context);
 
         view.setBackgroundResource(style.background);
@@ -160,7 +166,8 @@ public class AppMsg {
      * @param style    The style with a background and a duration.
      * @param floating true if it'll float.
      */
-    public static AppMsg makeText(Activity context, int resId, Style style, View customView, boolean floating) {
+    @NotNull
+    public static AppMsg makeText(@NotNull Activity context, int resId, @NotNull Style style, @NotNull View customView, boolean floating) {
         return makeText(context, context.getResources().getText(resId), style, customView, floating);
     }
 
@@ -175,7 +182,8 @@ public class AppMsg {
      * @param style   The style with a background and a duration.
      * @throws Resources.NotFoundException if the resource can't be found.
      */
-    public static AppMsg makeText(Activity context, int resId, Style style)
+    @NotNull
+    public static AppMsg makeText(@NotNull Activity context, int resId, @NotNull Style style)
             throws Resources.NotFoundException {
         return makeText(context, context.getResources().getText(resId), style);
     }
@@ -191,7 +199,8 @@ public class AppMsg {
      * @param style   The style with a background and a duration.
      * @throws Resources.NotFoundException if the resource can't be found.
      */
-    public static AppMsg makeText(Activity context, int resId, Style style, int layoutId)
+    @NotNull
+    public static AppMsg makeText(@NotNull Activity context, int resId, @NotNull Style style, int layoutId)
             throws Resources.NotFoundException {
         return makeText(context, context.getResources().getText(resId), style, layoutId);
     }
@@ -320,6 +329,7 @@ public class AppMsg {
      * @param layoutParams The layout parameters to use.
      * @return <code>this</code>, for chaining.
      */
+    @NotNull
     public AppMsg setLayoutParams(LayoutParams layoutParams) {
         mLayoutParams = layoutParams;
         return this;
@@ -332,6 +342,7 @@ public class AppMsg {
      * @return <code>this</code>, for chaining.
      * @see android.view.Gravity
      */
+    @NotNull
     public AppMsg setLayoutGravity(int gravity) {
         mLayoutParams = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, gravity);
         return this;

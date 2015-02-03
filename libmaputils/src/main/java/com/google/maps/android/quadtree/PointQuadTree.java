@@ -16,12 +16,15 @@
 
 package com.google.maps.android.quadtree;
 
+import com.google.maps.android.geometry.Bounds;
+import com.google.maps.android.geometry.Point;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import com.google.maps.android.geometry.Bounds;
-import com.google.maps.android.geometry.Point;
 
 /**
  * A quad tree which tracks items with a Point geometry.
@@ -51,6 +54,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
     /**
      * The elements inside this quad, if any.
      */
+    @Nullable
     private List<T> mItems;
 
     /**
@@ -61,6 +65,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
     /**
      * Child quads.
      */
+    @Nullable
     private PointQuadTree<T>[] mChildren = null;
 
     /**
@@ -91,7 +96,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
     /**
      * Insert an item.
      */
-    public void add(T item) {
+    public void add(@NotNull T item) {
         Point point = item.getPoint();
         insert(point.x, point.y, item);
     }
@@ -144,7 +149,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
      *
      * @return whether the item was removed.
      */
-    public boolean remove(T item) {
+    public boolean remove(@NotNull T item) {
         Point point = item.getPoint();
         return remove(point.x, point.y, item);
     }
@@ -175,13 +180,14 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
     /**
      * Search for all items within a given bounds.
      */
-    public Collection<T> search(Bounds searchBounds) {
+    @NotNull
+    public Collection<T> search(@NotNull Bounds searchBounds) {
         final List<T> results = new ArrayList<T>();
         search(searchBounds, results);
         return results;
     }
 
-    private void search(Bounds searchBounds, Collection<T> results) {
+    private void search(@NotNull Bounds searchBounds, @NotNull Collection<T> results) {
         if (!mBounds.intersects(searchBounds)) {
             return;
         }

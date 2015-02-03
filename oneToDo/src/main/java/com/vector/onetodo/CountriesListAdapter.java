@@ -1,9 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +9,13 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class CountriesListAdapter extends BaseAdapter implements Filterable{
 	private final Context context;
@@ -30,8 +33,9 @@ public class CountriesListAdapter extends BaseAdapter implements Filterable{
         ImageView imageView;
     }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	@Nullable
+    @Override
+	public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -56,20 +60,22 @@ public class CountriesListAdapter extends BaseAdapter implements Filterable{
 				"drawable/" + pngName, null, context.getPackageName()));
 		return convertView;
 	}
-	@Override
+	@Nullable
+    @Override
     public Filter getFilter() {
         Filter filter = new Filter() {
 
             @SuppressWarnings("unchecked")
 			@Override
-            protected void publishResults(CharSequence constraint,FilterResults results) {
+            protected void publishResults(CharSequence constraint, @NotNull FilterResults results) {
 
                 arrayList = (List<String>) results.values; // has the filtered values
                 notifyDataSetChanged();  // notifies the data with new filtered values
             }
 
+            @NotNull
             @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
+            protected FilterResults performFiltering(@Nullable CharSequence constraint) {
                 FilterResults results = new FilterResults();        // Holds the results of a filtering operation in values
                 List<String> FilteredArrList = new ArrayList<String>();
 
@@ -107,7 +113,8 @@ public class CountriesListAdapter extends BaseAdapter implements Filterable{
         return filter;
     }
 
-	public String getCountryName(String ssid) {
+	@NotNull
+    public String getCountryName(String ssid) {
 		Locale loc = new Locale("", ssid);
 		return loc.getDisplayCountry().trim();
 	}

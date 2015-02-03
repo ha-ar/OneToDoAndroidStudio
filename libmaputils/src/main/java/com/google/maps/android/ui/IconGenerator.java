@@ -29,6 +29,9 @@ import android.widget.TextView;
 
 import com.google.maps.android.R;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * IconGenerator generates icons that contain text (or custom content) within an info
  * window-like shape.
@@ -43,6 +46,7 @@ public class IconGenerator {
 
     private ViewGroup mContainer;
     private RotationLayout mRotationLayout;
+    @Nullable
     private TextView mTextView;
     private View mContentView;
 
@@ -121,7 +125,7 @@ public class IconGenerator {
      * If the view contains a {@link TextView} with the id "text", operations such as {@link
      * #setTextAppearance} and {@link #makeIcon(String)} will operate upon that {@link TextView}.
      */
-    public void setContentView(View contentView) {
+    public void setContentView(@NotNull View contentView) {
         ensureViewsSetUp();
         mRotationLayout.removeAllViews();
         mRotationLayout.addView(contentView);
@@ -187,7 +191,7 @@ public class IconGenerator {
      *
      * @param resid the identifier of the resource.
      */
-    public void setTextAppearance(Context context, int resid) {
+    public void setTextAppearance(@NotNull Context context, int resid) {
         ensureViewsSetUp();
         if (mTextView != null) {
             mTextView.setTextAppearance(context, resid);
@@ -219,7 +223,7 @@ public class IconGenerator {
      */
     @SuppressWarnings("deprecation")
     // View#setBackgroundDrawable is compatible with pre-API level 16 (Jelly Bean).
-    public void setBackground(Drawable background) {
+    public void setBackground(@Nullable Drawable background) {
         getContainer().setBackgroundDrawable(background);
 
         // Force setting of padding.

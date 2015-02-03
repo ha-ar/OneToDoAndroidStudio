@@ -1,13 +1,15 @@
 package com.mobeta.android.dslv;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.CursorAdapter;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 
 /**
@@ -32,8 +34,10 @@ public abstract class DragSortCursorAdapter extends CursorAdapter implements Dra
     /**
      * Key is ListView position, value is Cursor position
      */
+    @NotNull
     private SparseIntArray mListMapping = new SparseIntArray();
 
+    @NotNull
     private ArrayList<Integer> mRemovedCursorPositions = new ArrayList<Integer>();
     
     public DragSortCursorAdapter(Context context, Cursor c) {
@@ -206,6 +210,7 @@ public abstract class DragSortCursorAdapter extends CursorAdapter implements Dra
      * Get the current order of Cursor positions presented by the
      * list.
      */
+    @NotNull
     public ArrayList<Integer> getCursorPositions() {
         ArrayList<Integer> result = new ArrayList<Integer>();
 

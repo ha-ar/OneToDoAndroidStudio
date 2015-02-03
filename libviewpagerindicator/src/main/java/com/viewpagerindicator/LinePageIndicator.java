@@ -32,6 +32,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Draws a line for each page. The current page line is colored differently
  * than the unselected page lines.
@@ -54,15 +56,15 @@ public class LinePageIndicator extends View implements PageIndicator {
     private boolean mIsDragging;
 
 
-    public LinePageIndicator(Context context) {
+    public LinePageIndicator(@NotNull Context context) {
         this(context, null);
     }
 
-    public LinePageIndicator(Context context, AttributeSet attrs) {
+    public LinePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs) {
         this(context, attrs, R.attr.vpiLinePageIndicatorStyle);
     }
 
-    public LinePageIndicator(Context context, AttributeSet attrs, int defStyle) {
+    public LinePageIndicator(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         if (isInEditMode()) return;
 
@@ -154,7 +156,7 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NotNull Canvas canvas) {
         super.onDraw(canvas);
 
         if (mViewPager == null) {
@@ -190,7 +192,7 @@ public class LinePageIndicator extends View implements PageIndicator {
         }
     }
 
-    public boolean onTouchEvent(android.view.MotionEvent ev) {
+    public boolean onTouchEvent(@NotNull android.view.MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
         }
@@ -274,7 +276,7 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager viewPager) {
+    public void setViewPager(@NotNull ViewPager viewPager) {
         if (mViewPager == viewPager) {
             return;
         }
@@ -291,7 +293,7 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
-    public void setViewPager(ViewPager view, int initialPosition) {
+    public void setViewPager(@NotNull ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
@@ -406,6 +408,7 @@ public class LinePageIndicator extends View implements PageIndicator {
         requestLayout();
     }
 
+    @NotNull
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -421,24 +424,26 @@ public class LinePageIndicator extends View implements PageIndicator {
             super(superState);
         }
 
-        private SavedState(Parcel in) {
+        private SavedState(@NotNull Parcel in) {
             super(in);
             currentPage = in.readInt();
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NotNull Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
 
         @SuppressWarnings("UnusedDeclaration")
         public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @NotNull
             @Override
-            public SavedState createFromParcel(Parcel in) {
+            public SavedState createFromParcel(@NotNull Parcel in) {
                 return new SavedState(in);
             }
 
+            @NotNull
             @Override
             public SavedState[] newArray(int size) {
                 return new SavedState[size];

@@ -18,6 +18,9 @@ package com.facebook;
 
 import android.os.Handler;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,9 +32,10 @@ class ProgressOutputStream extends FilterOutputStream implements RequestOutputSt
     private final long threshold;
 
     private long batchProgress, lastReportedProgress, maxProgress;
+    @Nullable
     private RequestProgress currentRequestProgress;
 
-    ProgressOutputStream(OutputStream out, RequestBatch requests, Map<Request, RequestProgress> progressMap, long maxProgress) {
+    ProgressOutputStream(@NotNull OutputStream out, RequestBatch requests, Map<Request, RequestProgress> progressMap, long maxProgress) {
         super(out);
         this.requests = requests;
         this.progressMap = progressMap;
@@ -78,7 +82,7 @@ class ProgressOutputStream extends FilterOutputStream implements RequestOutputSt
         }
     }
 
-    public void setCurrentRequest(Request request) {
+    public void setCurrentRequest(@Nullable Request request) {
         currentRequestProgress = request != null? progressMap.get(request) : null;
     }
 
@@ -91,13 +95,13 @@ class ProgressOutputStream extends FilterOutputStream implements RequestOutputSt
     }
 
     @Override
-    public void write(byte[] buffer) throws IOException {
+    public void write(@NotNull byte[] buffer) throws IOException {
         out.write(buffer);
         addProgress(buffer.length);
     }
 
     @Override
-    public void write(byte[] buffer, int offset, int length) throws IOException {
+    public void write(@NotNull byte[] buffer, int offset, int length) throws IOException {
         out.write(buffer, offset, length);
         addProgress(length);
     }

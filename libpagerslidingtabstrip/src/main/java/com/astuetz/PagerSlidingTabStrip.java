@@ -14,6 +14,7 @@
 * limitations under the License.
 */
 package com.astuetz;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -31,16 +32,19 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.BaseSavedState;
-import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.FrameLayout.LayoutParams;
-import java.util.Locale;
+
 import com.astuetz.pagerslidingtabstrip.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 public interface IconTabProvider {
 public int getPageIconResId(int position);
@@ -76,6 +80,7 @@ private int dividerWidth = 1;
 private int tabTextSize = 12;
 private int tabTextColor = 0xFF666666;
 private int tabDeactivateTextColor = 0xFFCCCCCC;
+@Nullable
 private Typeface tabTypeface = null;
 private int tabTypefaceStyle = Typeface.BOLD;
 private int lastScrollX = 0;
@@ -83,13 +88,13 @@ private int tabBackgroundResId = R.drawable.background_tab;
 private int transparentColorId = R.color.transparent;
 private Locale locale;
 private boolean tabSwitch;
-public PagerSlidingTabStrip(Context context) {
+public PagerSlidingTabStrip(@NotNull Context context) {
 this(context, null);
 }
-public PagerSlidingTabStrip(Context context, AttributeSet attrs) {
+public PagerSlidingTabStrip(@NotNull Context context, @NotNull AttributeSet attrs) {
 this(context, attrs, 0);
 }
-public PagerSlidingTabStrip(Context context, AttributeSet attrs, int defStyle) {
+public PagerSlidingTabStrip(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
 super(context, attrs, defStyle);
 setFillViewport(true);
 setWillNotDraw(false);
@@ -139,7 +144,7 @@ if (locale == null) {
 locale = getResources().getConfiguration().locale;
 }
 }
-public void setViewPager(ViewPager pager) {
+public void setViewPager(@NotNull ViewPager pager) {
 this.pager = pager;
 if (pager.getAdapter() == null) {
 throw new IllegalStateException("ViewPager does not have adapter instance.");
@@ -188,7 +193,7 @@ ImageButton tab = new ImageButton(getContext());
 tab.setImageResource(resId);
 addTab(position, tab);
 }
-private void addTab(final int position, View tab) {
+private void addTab(final int position, @NotNull View tab) {
 tab.setFocusable(true);
 tab.setOnClickListener(new OnClickListener() {
 @Override
@@ -248,7 +253,7 @@ scrollTo(newScrollX, 0);
 }
 }
 @Override
-protected void onDraw(Canvas canvas) {
+protected void onDraw(@NotNull Canvas canvas) {
 super.onDraw(canvas);
 if (isInEditMode() || tabCount == 0) {
 return;
@@ -438,6 +443,7 @@ super.onRestoreInstanceState(savedState.getSuperState());
 currentPosition = savedState.currentPosition;
 requestLayout();
 }
+@NotNull
 @Override
 public Parcelable onSaveInstanceState() {
 Parcelable superState = super.onSaveInstanceState();
@@ -450,20 +456,22 @@ int currentPosition;
 public SavedState(Parcelable superState) {
 super(superState);
 }
-private SavedState(Parcel in) {
+private SavedState(@NotNull Parcel in) {
 super(in);
 currentPosition = in.readInt();
 }
 @Override
-public void writeToParcel(Parcel dest, int flags) {
+public void writeToParcel(@NotNull Parcel dest, int flags) {
 super.writeToParcel(dest, flags);
 dest.writeInt(currentPosition);
 }
 public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+@NotNull
 @Override
-public SavedState createFromParcel(Parcel in) {
+public SavedState createFromParcel(@NotNull Parcel in) {
 return new SavedState(in);
 }
+@NotNull
 @Override
 public SavedState[] newArray(int size) {
 return new SavedState[size];

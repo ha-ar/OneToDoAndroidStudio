@@ -32,14 +32,27 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
-import com.facebook.*;
+
+import com.facebook.AppEventsLogger;
+import com.facebook.FacebookException;
+import com.facebook.LoggingBehavior;
+import com.facebook.Request;
+import com.facebook.Session;
 import com.facebook.android.R;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.Logger;
 import com.facebook.internal.Utility;
 import com.facebook.model.GraphPlace;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PlacePickerFragment extends PickerFragment<GraphPlace> {
     /**
@@ -90,6 +103,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
     private int radiusInMeters = DEFAULT_RADIUS_IN_METERS;
     private int resultsLimit = DEFAULT_RESULTS_LIMIT;
     private String searchText;
+    @Nullable
     private Timer searchTextTimer;
     private boolean hasSearchTextChangedSinceLastQuery;
     private boolean showSearchBox = true;
@@ -231,6 +245,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
      *
      * @return the currently-selected place, or null if there is none
      */
+    @Nullable
     public GraphPlace getSelection() {
         Collection<GraphPlace> selection = getSelectedGraphObjects();
         return (selection != null && !selection.isEmpty()) ? selection.iterator().next() : null;
@@ -242,7 +257,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
     }
 
     @Override
-    public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+    public void onInflate(@NotNull Activity activity, @NotNull AttributeSet attrs, Bundle savedInstanceState) {
         super.onInflate(activity, attrs, savedInstanceState);
         TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.com_facebook_place_picker_fragment);
 
@@ -257,7 +272,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
     }
 
     @Override
-    void setupViews(ViewGroup view) {
+    void setupViews(@NotNull ViewGroup view) {
         if (showSearchBox) {
             ListView listView = (ListView) view.findViewById(R.id.com_facebook_picker_list_view);
 
@@ -295,7 +310,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         }
     }
 
-    void saveSettingsToBundle(Bundle outState) {
+    void saveSettingsToBundle(@NotNull Bundle outState) {
         super.saveSettingsToBundle(outState);
 
         outState.putInt(RADIUS_IN_METERS_BUNDLE_KEY, radiusInMeters);
@@ -336,12 +351,14 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         logger.logSdkEvent(AnalyticsEvents.EVENT_PLACE_PICKER_USAGE, null, parameters);
     }
 
+    @Nullable
     @Override
     PickerFragmentAdapter<GraphPlace> createAdapter() {
         PickerFragmentAdapter<GraphPlace> adapter = new PickerFragmentAdapter<GraphPlace>(
                 this.getActivity()) {
+            @Nullable
             @Override
-            protected CharSequence getSubTitleOfGraphObject(GraphPlace graphObject) {
+            protected CharSequence getSubTitleOfGraphObject(@NotNull GraphPlace graphObject) {
                 String category = graphObject.getCategory();
                 Integer wereHereCount = (Integer) graphObject.getProperty(WERE_HERE_COUNT);
 
@@ -372,11 +389,13 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         return adapter;
     }
 
+    @NotNull
     @Override
     LoadingStrategy createLoadingStrategy() {
         return new AsNeededLoadingStrategy();
     }
 
+    @NotNull
     @Override
     SelectionStrategy createSelectionStrategy() {
         return new SingleSelectionStrategy();
@@ -410,7 +429,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         return request;
     }
 
-    private void setPlacePickerSettingsFromBundle(Bundle inState) {
+    private void setPlacePickerSettingsFromBundle(@Nullable Bundle inState) {
         // We do this in a separate non-overridable method so it is safe to call from the constructor.
         if (inState != null) {
             setRadiusInMeters(inState.getInt(RADIUS_IN_METERS_BUNDLE_KEY, radiusInMeters));
@@ -426,6 +445,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         }
     }
 
+    @NotNull
     private Timer createSearchTextTimer() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -489,8 +509,8 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         }
 
         @Override
-        protected void onLoadFinished(GraphObjectPagingLoader<GraphPlace> loader,
-                SimpleGraphObjectCursor<GraphPlace> data) {
+        protected void onLoadFinished(@NotNull GraphObjectPagingLoader<GraphPlace> loader,
+                @Nullable SimpleGraphObjectCursor<GraphPlace> data) {
             super.onLoadFinished(loader, data);
 
             // We could be called in this state if we are clearing data or if we are being re-attached
@@ -517,7 +537,7 @@ public class PlacePickerFragment extends PickerFragment<GraphPlace> {
         }
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        public void onTextChanged(@NotNull CharSequence s, int start, int before, int count) {
             onSearchBoxTextChanged(s.toString(), false);
         }
 

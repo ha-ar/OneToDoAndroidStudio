@@ -7,16 +7,22 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 public class ParallaxScrollView extends ScrollView {
 
     public final static double NO_ZOOM = 1;
+    @NotNull
     private ArrayList<OnOverScrollByListener> mOnOverScrollByList = new ArrayList<OnOverScrollByListener>();
+    @NotNull
     private ArrayList<OnTouchEventListener> mOnTouchEventList = new ArrayList<OnTouchEventListener>();
     private ImageView mImageView;
 	private int mDrawableMaxHeight = -1;
 	private int mImageViewHeight = -1;
+    @NotNull
     private OnOverScrollByListener onScroll = new OnOverScrollByListener() {
 
         @Override
@@ -62,10 +68,11 @@ public class ParallaxScrollView extends ScrollView {
 
         }
     };
+    @NotNull
     private OnTouchEventListener onTouched = new OnTouchEventListener() {
 
         @Override
-        public void onTouchEvent(MotionEvent ev) {
+        public void onTouchEvent(@NotNull MotionEvent ev) {
 
             if (ev.getAction() == MotionEvent.ACTION_UP) {
 
@@ -82,22 +89,22 @@ public class ParallaxScrollView extends ScrollView {
     };
     private double mZoomRatio = 1;
 
-    public ParallaxScrollView(Context context) {
+    public ParallaxScrollView(@NotNull Context context) {
         super(context);
         init(context, null);
     }
 
-	public ParallaxScrollView(Context context, AttributeSet attrs) {
+	public ParallaxScrollView(@NotNull Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-	public ParallaxScrollView(Context context, AttributeSet attrs, int defStyle) {
+	public ParallaxScrollView(@NotNull Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs);
     }
 
-	private void init(Context context, AttributeSet attrs) {
+	private void init(@NotNull Context context, @Nullable AttributeSet attrs) {
 
         if (attrs != null) {
 
@@ -144,7 +151,7 @@ public class ParallaxScrollView extends ScrollView {
 	}
 
 	@Override
-    public boolean onTouchEvent(MotionEvent ev) {
+    public boolean onTouchEvent(@NotNull MotionEvent ev) {
 
         for (int i = 0; i < mOnTouchEventList.size(); i++) {
 
@@ -165,7 +172,7 @@ public class ParallaxScrollView extends ScrollView {
      *
      */
 
-    public void setImageViewToParallax(ImageView imageView) {
+    public void setImageViewToParallax(@NotNull ImageView imageView) {
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 

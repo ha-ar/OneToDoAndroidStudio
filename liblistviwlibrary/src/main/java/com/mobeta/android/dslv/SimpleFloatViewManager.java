@@ -1,13 +1,15 @@
 package com.mobeta.android.dslv;
 
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.graphics.Color;
-import android.widget.ListView;
-import android.widget.ImageView;
+import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
+import android.widget.ImageView;
+import android.widget.ListView;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Simple implementation of the FloatViewManager class. Uses list
@@ -15,6 +17,7 @@ import android.util.Log;
  */
 public class SimpleFloatViewManager implements DragSortListView.FloatViewManager {
 
+    @Nullable
     private Bitmap mFloatBitmap;
 
     private ImageView mImageView;
@@ -35,6 +38,7 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
      * This simple implementation creates a Bitmap copy of the
      * list item currently shown at ListView <code>position</code>.
      */
+    @Nullable
     @Override
     public View onCreateFloatView(int position) {
         // Guaranteed that this will not be null? I think so. Nope, got
@@ -78,7 +82,7 @@ public class SimpleFloatViewManager implements DragSortListView.FloatViewManager
      * onCreateFloatView() and tells the system to recycle it.
      */
     @Override
-    public void onDestroyFloatView(View floatView) {
+    public void onDestroyFloatView(@NotNull View floatView) {
         ((ImageView) floatView).setImageDrawable(null);
 
         mFloatBitmap.recycle();

@@ -23,14 +23,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.webkit.WebView;
+
 import com.facebook.FacebookException;
-import com.facebook.android.Util;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.WebDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.EnumSet;
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for Android. Use of
@@ -46,10 +47,10 @@ public class FacebookWebFallbackDialog extends WebDialog {
 
     private boolean waitingForDialogToClose;
 
-    public static boolean presentWebFallback(final Context context,
+    public static boolean presentWebFallback(@NotNull final Context context,
                                              String dialogUrl,
                                              String applicationId,
-                                             final FacebookDialog.PendingCall appCall,
+                                             @NotNull final FacebookDialog.PendingCall appCall,
                                              final FacebookDialog.Callback callback) {
         if (Utility.isNullOrEmpty(dialogUrl)) {
             return false;
@@ -62,7 +63,7 @@ public class FacebookWebFallbackDialog extends WebDialog {
                 context, dialogUrl, redirectUrl);
         fallbackWebDialog.setOnCompleteListener(new WebDialog.OnCompleteListener() {
             @Override
-            public void onComplete(Bundle values, FacebookException error) {
+            public void onComplete(@Nullable Bundle values, FacebookException error) {
                 Intent dummyIntent = new Intent();
                 dummyIntent.putExtras(values == null ? new Bundle() : values);
                 FacebookDialog.handleActivityResult(
@@ -78,12 +79,13 @@ public class FacebookWebFallbackDialog extends WebDialog {
         return true;
     }
 
-    private FacebookWebFallbackDialog(Context context, String url, String expectedRedirectUrl) {
+    private FacebookWebFallbackDialog(@NotNull Context context, String url, String expectedRedirectUrl) {
         super(context, url);
 
         setExpectedRedirectUrl(expectedRedirectUrl);
     }
 
+    @NotNull
     @Override
     protected Bundle parseResponseUri(String url) {
         Uri responseUri = Uri.parse(url);

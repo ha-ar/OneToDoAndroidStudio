@@ -1,18 +1,5 @@
-package com.vector.onetodo;
+package com.vector.onetodo.appointment_fragments;
 
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -63,11 +50,30 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.R;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
+
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddAppoinmentFragment extends Fragment {
 	public static AQuery aq, popupAQ, aqloc, aqd, aq_del, aq_edit;
@@ -75,7 +81,8 @@ public class AddAppoinmentFragment extends Fragment {
 	static List<java.lang.Object> names;
 	int Label_postion = -1;
 	ImageView last;
-	String plabel = null;
+	@Nullable
+    String plabel = null;
 	int pposition = -1;
 	int itempos = -1;
 	int MaxId = -1;
@@ -85,7 +92,8 @@ public class AddAppoinmentFragment extends Fragment {
 	Editor editor;
 	View label_view, viewl;
 	GradientDrawable label_color;
-	static String checkedId2 = null;
+	@Nullable
+    static String checkedId2 = null;
 
 	private Uri imageUri;
 	int dayPosition;
@@ -99,21 +107,25 @@ public class AddAppoinmentFragment extends Fragment {
 	static int currentHours, currentMin, currentDayDigit, currentYear,
 			currentMonDigit;
 
-	private int[] collapsingViews = { R.id.label_grid_view3,
+	@NotNull
+    private int[] collapsingViews = { R.id.label_grid_view3,
 			R.id.before_grid_view_linear_appoinment,
 			R.id.date_time_include_appoinment };
 
 	private String currentDay, currentMon;
-	private int[] allViews = { R.id.spinner_label_layout,
+	@NotNull
+    private int[] allViews = { R.id.spinner_label_layout,
 			R.id.before_appoinment_lay, R.id.time_date_appoinment,
 			R.id.appoinment_title };
 
-	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+	@NotNull
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
 
 	private final String[] labels_array = new String[] { "Personal", "Home",
 			"Work", "New", "New", "New", "New", "New", "New" };
 
-	EditText label_field = null;
+	@Nullable
+    EditText label_field = null;
 	AlertDialog date_time_alert, add_new_label_alert,location_del,label_edit;
 
 	protected static final int RESULT_CODE = 123;
@@ -122,11 +134,13 @@ public class AddAppoinmentFragment extends Fragment {
 
 	public static final int PICK_CONTACT = 2;
 
-	public static View allView;
+	@Nullable
+    public static View allView;
 
 	public static Activity act;
 
-	public static AddAppoinmentFragment newInstance(int position,
+	@NotNull
+    public static AddAppoinmentFragment newInstance(int position,
 			int dayPosition) {
 		AddAppoinmentFragment myFragment = new AddAppoinmentFragment();
 		Bundle args = new Bundle();
@@ -137,7 +151,7 @@ public class AddAppoinmentFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.appoinment_fragment, container,
 				false);
@@ -152,7 +166,7 @@ public class AddAppoinmentFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		editor = AddTask.label.edit();
+		editor = BaseTaskFragment.label.edit();
 		dayPosition = getArguments().getInt("dayPosition", 0);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -184,7 +198,7 @@ public class AddAppoinmentFragment extends Fragment {
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+					BaseTaskFragment.btn.setAlpha(1);
 
 				aq.id(R.id.completed_appoinment).textColorId(R.color.active);
 
@@ -416,7 +430,8 @@ public class AddAppoinmentFragment extends Fragment {
 								R.layout.grid_layout_label_text_view,
 								labels_array) {
 
-							@Override
+							@NotNull
+                            @Override
 							public View getView(int position, View convertView,
 									ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
@@ -452,7 +467,7 @@ public class AddAppoinmentFragment extends Fragment {
 				.setOnItemClickListener(new OnItemClickListener() {
 
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view,
+					public void onItemClick(AdapterView<?> parent, @NotNull View view,
 							int position, long id) {
 						itempos = position;
 						label_view = view;
@@ -627,7 +642,7 @@ public class AddAppoinmentFragment extends Fragment {
 
 	}
 
-	private void showCurrentView(View v) {
+	private void showCurrentView(@NotNull View v) {
 
 		hideAll();
 
@@ -697,7 +712,7 @@ public class AddAppoinmentFragment extends Fragment {
 	private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(@NotNull View v) {
 			v.setFocusableInTouchMode(true);
 			v.requestFocus();
 			showCurrentView(v);
@@ -710,7 +725,7 @@ public class AddAppoinmentFragment extends Fragment {
 
 	}
 
-	private void setAllOtherFocusableFalse(View v) {
+	private void setAllOtherFocusableFalse(@NotNull View v) {
 		for (int id : allViews)
 			if (v.getId() != id) {
 				try {
@@ -721,7 +736,7 @@ public class AddAppoinmentFragment extends Fragment {
 			}
 	}
 
-	public void slideUpDown(final View view) {
+	public void slideUpDown(@NotNull final View view) {
 		if (!isPanelShown(view)) {
 			// Show the panel
 			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
@@ -747,12 +762,12 @@ public class AddAppoinmentFragment extends Fragment {
 		}
 	}
 
-	private boolean isPanelShown(View view) {
+	private boolean isPanelShown(@NotNull View view) {
 		return view.getVisibility() == View.VISIBLE;
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
@@ -785,7 +800,7 @@ public class AddAppoinmentFragment extends Fragment {
 		}
 	}
 
-	private void showImageURI(Uri selectedImage) {
+	private void showImageURI(@NotNull Uri selectedImage) {
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
 		Bitmap bitmap;
@@ -853,7 +868,8 @@ public class AddAppoinmentFragment extends Fragment {
 			return 2; // just Add Task & Add Event
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -875,7 +891,7 @@ public class AddAppoinmentFragment extends Fragment {
 	private class LabelEditClickListener implements OnItemLongClickListener {
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+		public boolean onItemLongClick(AdapterView<?> arg0, @NotNull final View arg1,
 				int position, long arg3) {
 			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
@@ -908,7 +924,8 @@ public class AddAppoinmentFragment extends Fragment {
 			return 10;
 		}
 
-		public Object getItem(int position) {
+		@Nullable
+        public com.vector.onetodo.Object getItem(int position) {
 			return null;
 		}
 
@@ -917,7 +934,8 @@ public class AddAppoinmentFragment extends Fragment {
 		}
 
 		// create a new ImageView for each item referenced by the Adapter
-		public View getView(int position, View convertView, ViewGroup parent) {
+		@Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
 			ImageView imageView;
 			if (convertView == null) {
 				imageView = new ImageView(mContext);
@@ -948,11 +966,11 @@ public class AddAppoinmentFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(4 + "key_label" + id, null); // getting
+		plabel = BaseTaskFragment.label.getString(4 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(4 + "key_color_position" + id, 0); // getting
+		pposition = BaseTaskFragment.label.getInt(4 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 

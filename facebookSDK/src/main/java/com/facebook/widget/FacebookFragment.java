@@ -19,11 +19,14 @@ package com.facebook.widget;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+
 import com.facebook.Session;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.internal.SessionAuthorizationType;
 import com.facebook.internal.SessionTracker;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -96,6 +99,7 @@ class FacebookFragment extends Fragment {
      * 
      * @return the current Session object.
      */
+    @Nullable
     protected final Session getSession() {
         if (sessionTracker != null) {
             return sessionTracker.getSession();
@@ -120,6 +124,7 @@ class FacebookFragment extends Fragment {
      * 
      * @return the current state of the session
      */
+    @Nullable
     protected final SessionState getSessionState() {
         if (sessionTracker != null) {
             Session currentSession = sessionTracker.getSession();
@@ -134,6 +139,7 @@ class FacebookFragment extends Fragment {
      * 
      * @return the access token
      */
+    @Nullable
     protected final String getAccessToken() {
         if (sessionTracker != null) {
             Session currentSession = sessionTracker.getOpenSession();
@@ -148,6 +154,7 @@ class FacebookFragment extends Fragment {
      * 
      * @return the date at which the current session will expire
      */
+    @Nullable
     protected final Date getExpirationDate() {
         if (sessionTracker != null) {
             Session currentSession = sessionTracker.getOpenSession();
@@ -186,6 +193,7 @@ class FacebookFragment extends Fragment {
      * 
      * @return the permissions associated with the current session
      */
+    @Nullable
     protected final List<String> getSessionPermissions() {
         if (sessionTracker != null) {
             Session currentSession = sessionTracker.getSession();

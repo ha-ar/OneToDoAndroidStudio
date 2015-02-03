@@ -1,9 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -25,6 +21,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Country extends Fragment {
 
 	private ListView lv;
@@ -33,7 +35,7 @@ public class Country extends Fragment {
 	private List<String> countriesList;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.country, container, false);
 
@@ -62,7 +64,7 @@ public class Country extends Fragment {
 		lv.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View view,
+			public void onItemClick(AdapterView<?> arg0, @NotNull View view,
 					int position, long id) {
 				SplashScreen.country = ((TextView) view
 						.findViewById(R.id.country_name)).getText().toString();
@@ -77,7 +79,7 @@ public class Country extends Fragment {
 	SearchView search;
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.base, menu);
 
@@ -112,7 +114,7 @@ public class Country extends Fragment {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(@NotNull MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			if (search.isIconified())

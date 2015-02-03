@@ -16,9 +16,6 @@
 
 package net.simonvt.datepicker;
 
-import net.simonvt.calendarview.CalendarView;
-import net.simonvt.numberpicker.NumberPicker;
-
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -42,9 +39,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.simonvt.calendarview.CalendarView;
+import net.simonvt.numberpicker.NumberPicker;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -88,20 +90,28 @@ public class DatePicker extends FrameLayout {
 
     private static final boolean DEFAULT_ENABLED_STATE = true;
 
+    @NotNull
     private final LinearLayout mSpinners;
 
+    @NotNull
     private final NumberPicker mDaySpinner;
 
+    @NotNull
     private final NumberPicker mMonthSpinner;
 
+    @NotNull
     private final NumberPicker mYearSpinner;
 
+    @NotNull
     private final EditText mDaySpinnerInput;
 
+    @NotNull
     private final EditText mMonthSpinnerInput;
 
+    @NotNull
     private final EditText mYearSpinnerInput;
 
+    @NotNull
     private final CalendarView mCalendarView;
 
     private Locale mCurrentLocale;
@@ -141,15 +151,15 @@ public class DatePicker extends FrameLayout {
         void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth);
     }
 
-    public DatePicker(Context context) {
+    public DatePicker(@NotNull Context context) {
         this(context, null);
     }
 
-    public DatePicker(Context context, AttributeSet attrs) {
+    public DatePicker(@NotNull Context context, @NotNull AttributeSet attrs) {
         this(context, attrs, R.attr.datePickerStyle);
     }
 
-    public DatePicker(Context context, AttributeSet attrs, int defStyle) {
+    public DatePicker(@NotNull Context context, @NotNull AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         // initialization based on locale
@@ -383,13 +393,13 @@ public class DatePicker extends FrameLayout {
     }
 
     @Override
-    public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
+    public boolean dispatchPopulateAccessibilityEvent(@NotNull AccessibilityEvent event) {
         onPopulateAccessibilityEvent(event);
         return true;
     }
 
     @Override
-    public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
+    public void onPopulateAccessibilityEvent(@NotNull AccessibilityEvent event) {
         super.onPopulateAccessibilityEvent(event);
 
         final int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
@@ -399,19 +409,19 @@ public class DatePicker extends FrameLayout {
     }
 
     @Override
-    public void onInitializeAccessibilityEvent(AccessibilityEvent event) {
+    public void onInitializeAccessibilityEvent(@NotNull AccessibilityEvent event) {
         super.onInitializeAccessibilityEvent(event);
         event.setClassName(DatePicker.class.getName());
     }
 
     @Override
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+    public void onInitializeAccessibilityNodeInfo(@NotNull AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName(DatePicker.class.getName());
     }
 
     @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
+    protected void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setCurrentLocale(newConfig.locale);
     }
@@ -432,6 +442,7 @@ public class DatePicker extends FrameLayout {
      * @return The calendar view.
      * @see #getCalendarViewShown()
      */
+    @NotNull
     public CalendarView getCalendarView () {
         return mCalendarView;
     }
@@ -468,7 +479,7 @@ public class DatePicker extends FrameLayout {
      *
      * @param locale The current locale.
      */
-    private void setCurrentLocale(Locale locale) {
+    private void setCurrentLocale(@NotNull Locale locale) {
         if (locale.equals(mCurrentLocale)) {
             return;
         }
@@ -494,7 +505,7 @@ public class DatePicker extends FrameLayout {
      * @param oldCalendar The old calendar.
      * @param locale The locale.
      */
-    private Calendar getCalendarForLocale(Calendar oldCalendar, Locale locale) {
+    private Calendar getCalendarForLocale(@Nullable Calendar oldCalendar, Locale locale) {
         if (oldCalendar == null) {
             return Calendar.getInstance(locale);
         } else {
@@ -553,10 +564,11 @@ public class DatePicker extends FrameLayout {
 
     // Override so we are in complete control of save / restore for this widget.
     @Override
-    protected void dispatchRestoreInstanceState(SparseArray<Parcelable> container) {
+    protected void dispatchRestoreInstanceState(@NotNull SparseArray<Parcelable> container) {
         dispatchThawSelfOnly(container);
     }
 
+    @NotNull
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -596,7 +608,7 @@ public class DatePicker extends FrameLayout {
      *
      * @return True if the date was parsed.
      */
-    private boolean parseDate(String date, Calendar outDate) {
+    private boolean parseDate(String date, @NotNull Calendar outDate) {
         try {
             outDate.setTime(mDateFormat.parse(date));
             return true;
@@ -711,7 +723,7 @@ public class DatePicker extends FrameLayout {
      * @param spinnerCount The total spinner count.
      * @param spinnerIndex The index of the given spinner.
      */
-    private void setImeOptions(NumberPicker spinner, int spinnerCount, int spinnerIndex) {
+    private void setImeOptions(@NotNull NumberPicker spinner, int spinnerCount, int spinnerIndex) {
         final int imeOptions;
         if (spinnerIndex < spinnerCount - 1) {
             imeOptions = EditorInfo.IME_ACTION_NEXT;
@@ -741,7 +753,7 @@ public class DatePicker extends FrameLayout {
                 R.string.date_picker_decrement_year_button);
     }
 
-    private void trySetContentDescription(View root, int viewId, int contDescResId) {
+    private void trySetContentDescription(@NotNull View root, int viewId, int contDescResId) {
         View target = root.findViewById(viewId);
         if (target != null) {
             target.setContentDescription(getContext().getString(contDescResId));
@@ -795,7 +807,7 @@ public class DatePicker extends FrameLayout {
         /**
          * Constructor called from {@link #CREATOR}
          */
-        private SavedState(Parcel in) {
+        private SavedState(@NotNull Parcel in) {
             super(in);
             mYear = in.readInt();
             mMonth = in.readInt();
@@ -803,7 +815,7 @@ public class DatePicker extends FrameLayout {
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(@NotNull Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
             dest.writeInt(mYear);
             dest.writeInt(mMonth);
@@ -814,10 +826,12 @@ public class DatePicker extends FrameLayout {
         // suppress unused and hiding
         public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
 
-            public SavedState createFromParcel(Parcel in) {
+            @NotNull
+            public SavedState createFromParcel(@NotNull Parcel in) {
                 return new SavedState(in);
             }
 
+            @NotNull
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }

@@ -1,8 +1,4 @@
-package com.vector.onetodo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+package com.vector.onetodo.task_fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,7 +15,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.vector.onetodo.BaseTaskFragment;
+import com.vector.onetodo.R;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AddTaskComment extends Fragment {
 
@@ -32,10 +37,11 @@ public class AddTaskComment extends Fragment {
 	SharedPreferences sprefrences;
 	Editor editor;
 	int MaxId, MinId;
-	Boolean bool = true;
+	@NotNull
+    Boolean bool = true;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		setRetainInstance(true);
@@ -63,8 +69,8 @@ public class AddTaskComment extends Fragment {
 
 		Loadcommentmax();
 		MinId = MaxId;
-		AddTask.comment = new ArrayList<String>();
-		AddTask.commenttime = new ArrayList<String>();
+		BaseTaskFragment.comment = new ArrayList<String>();
+		BaseTaskFragment.commenttime = new ArrayList<String>();
 
 		aq.id(R.id.textView1).text(AddTaskFragment.title);
 		adapter = new comment_A(getActivity());
@@ -130,10 +136,10 @@ public class AddTaskComment extends Fragment {
 							+ Utils.getCurrentMonthDigit(1) + "-"
 							+ Utils.getCurrentDayDigit(1) + " " + hms);
 
-					AddTask.comment.add(aq.id(R.id.comment).getText()
+					BaseTaskFragment.comment.add(aq.id(R.id.comment).getText()
 							.toString());
 
-					AddTask.commenttime.add(Utils.getCurrentYear(1) + "-"
+					BaseTaskFragment.commenttime.add(Utils.getCurrentYear(1) + "-"
 							+ Utils.getCurrentMonthDigit(1) + "-"
 							+ Utils.getCurrentDayDigit(1) + " " + hms);
 					aq.id(R.id.nocooment_layout).visibility(View.GONE);
@@ -163,7 +169,8 @@ public class AddTaskComment extends Fragment {
 			return commment.size();
 		}
 
-		@Override
+		@Nullable
+        @Override
 		public java.lang.Object getItem(int arg0) {
 			// TODO Auto-generated method stub
 			return null;

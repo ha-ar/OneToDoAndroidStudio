@@ -18,7 +18,11 @@ package com.facebook.internal;
 
 import android.content.Context;
 import android.util.Log;
+
 import com.facebook.LoggingBehavior;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,14 +37,15 @@ class UrlRedirectCache {
 
     private volatile static FileLruCache urlRedirectCache;
 
-    synchronized static FileLruCache getCache(Context context) throws IOException{
+    synchronized static FileLruCache getCache(@NotNull Context context) throws IOException{
         if (urlRedirectCache == null) {
             urlRedirectCache = new FileLruCache(context.getApplicationContext(), TAG, new FileLruCache.Limits());
         }
         return urlRedirectCache;
     }
 
-    static URI getRedirectedUri(Context context, URI uri) {
+    @Nullable
+    static URI getRedirectedUri(@NotNull Context context, @Nullable URI uri) {
         if (uri == null) {
             return null;
         }
@@ -81,7 +86,7 @@ class UrlRedirectCache {
         return null;
     }
 
-    static void cacheUriRedirect(Context context, URI fromUri, URI toUri) {
+    static void cacheUriRedirect(@NotNull Context context, @Nullable URI fromUri, @Nullable URI toUri) {
         if (fromUri == null || toUri == null) {
             return;
         }
@@ -98,7 +103,7 @@ class UrlRedirectCache {
         }
     }
 
-    static void clearCache(Context context) {
+    static void clearCache(@NotNull Context context) {
         try {
             getCache(context).clearCache();
         } catch (IOException e) {

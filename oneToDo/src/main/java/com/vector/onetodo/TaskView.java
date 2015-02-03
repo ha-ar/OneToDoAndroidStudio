@@ -1,12 +1,5 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
-import net.appkraft.parallax.ParallaxScrollView;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +15,16 @@ import com.androidquery.AQuery;
 import com.vector.model.TaskData;
 import com.vector.onetodo.utils.Utils;
 
+import net.appkraft.parallax.ParallaxScrollView;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class TaskView extends Fragment {
 
 	AQuery aq, aqd, aq_menu;
@@ -31,7 +34,7 @@ public class TaskView extends Fragment {
 	private PopupWindow popupWindowTask;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.viewtask, container, false);

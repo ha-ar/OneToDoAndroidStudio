@@ -17,7 +17,12 @@ import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
+import com.vector.onetodo.project_fragments.ProjectsListFragment;
+import com.vector.onetodo.project_fragments.ProjectsScrollHolder;
+import com.vector.onetodo.project_fragments.ProjectsTabHolder;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
 
 public class Projects extends Fragment implements ProjectsScrollHolder {
 
@@ -28,7 +33,7 @@ public class Projects extends Fragment implements ProjectsScrollHolder {
 	
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.projects, container, false);
@@ -115,7 +120,8 @@ public class Projects extends Fragment implements ProjectsScrollHolder {
 			// return 3; // no. of tabs are Today, Tomorrow & Upcoming
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
@@ -135,9 +141,10 @@ public class Projects extends Fragment implements ProjectsScrollHolder {
 			return mScrollTabHolders;
 		}
 
-		@Override
+		@NotNull
+        @Override
 		public Fragment getItem(int position) {
-			ProjectsTabHolder fragment = 
+			ProjectsTabHolder fragment =
 					(ProjectsTabHolder) ProjectsListFragment.newInstance(position);
 
 			mScrollTabHolders.put(position, fragment);

@@ -17,7 +17,10 @@
 package com.facebook.widget;
 
 import android.database.CursorIndexOutOfBoundsException;
+
 import com.facebook.model.GraphObject;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +28,7 @@ import java.util.Collection;
 class SimpleGraphObjectCursor<T extends GraphObject> implements GraphObjectCursor<T> {
     private int pos = -1;
     private boolean closed = false;
+    @NotNull
     private ArrayList<T> graphObjects = new ArrayList<T>();
     private boolean moreObjectsAvailable = false;
     private boolean fromCache = false;
@@ -32,7 +36,7 @@ class SimpleGraphObjectCursor<T extends GraphObject> implements GraphObjectCurso
     SimpleGraphObjectCursor() {
     }
 
-    SimpleGraphObjectCursor(SimpleGraphObjectCursor<T> other) {
+    SimpleGraphObjectCursor(@NotNull SimpleGraphObjectCursor<T> other) {
         pos = other.pos;
         closed = other.closed;
         graphObjects = new ArrayList<T>();

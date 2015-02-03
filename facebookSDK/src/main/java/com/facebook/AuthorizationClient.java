@@ -26,6 +26,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.CookieSyncManager;
+
 import com.facebook.android.R;
 import com.facebook.internal.AnalyticsEvents;
 import com.facebook.internal.NativeProtocol;
@@ -33,6 +34,9 @@ import com.facebook.internal.ServerProtocol;
 import com.facebook.internal.Utility;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.WebDialog;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -76,15 +80,21 @@ class AuthorizationClient implements Serializable {
     static final String EVENT_EXTRAS_NOT_TRIED = "not_tried";
     static final String EVENT_EXTRAS_NEW_PERMISSIONS = "new_permissions";
 
+    @Nullable
     List<AuthHandler> handlersToTry;
+    @Nullable
     AuthHandler currentHandler;
     transient Context context;
+    @Nullable
     transient StartActivityDelegate startActivityDelegate;
     transient OnCompletedListener onCompletedListener;
     transient BackgroundProcessingListener backgroundProcessingListener;
     transient boolean checkedInternetPermission;
+    @Nullable
     AuthorizationRequest pendingRequest;
+    @Nullable
     Map<String, String> loggingExtras;
+    @Nullable
     private transient AppEventsLogger appEventsLogger;
 
     interface OnCompletedListener {
@@ -109,7 +119,7 @@ class AuthorizationClient implements Serializable {
         startActivityDelegate = null;
     }
 
-    void setContext(final Activity activity) {
+    void setContext(@NotNull final Activity activity) {
         this.context = activity;
 
         // If we are used in the context of an activity, we will always use that activity to
@@ -120,6 +130,7 @@ class AuthorizationClient implements Serializable {
                 activity.startActivityForResult(intent, requestCode);
             }
 
+            @NotNull
             @Override
             public Activity getActivityContext() {
                 return activity;
@@ -135,7 +146,7 @@ class AuthorizationClient implements Serializable {
         }
     }
 
-    void authorize(AuthorizationRequest request) {
+    void authorize(@Nullable AuthorizationRequest request) {
         if (request == null) {
             return;
         }
@@ -181,7 +192,8 @@ class AuthorizationClient implements Serializable {
         return false;
     }
 
-    private List<AuthHandler> getHandlerTypes(AuthorizationRequest request) {
+    @NotNull
+    private List<AuthHandler> getHandlerTypes(@NotNull AuthorizationRequest request) {
         ArrayList<AuthHandler> handlers = new ArrayList<AuthHandler>();
 
         final SessionLoginBehavior behavior = request.getLoginBehavior();
@@ -271,7 +283,7 @@ class AuthorizationClient implements Serializable {
         return tried;
     }
 
-    void completeAndValidate(Result outcome) {
+    void completeAndValidate(@NotNull Result outcome) {
         // Do we need to validate a successful result (as in the case of a reauth)?
         if (outcome.token != null && pendingRequest.needsNewTokenValidation()) {
             validateSameFbidAndFinish(outcome);
@@ -281,7 +293,7 @@ class AuthorizationClient implements Serializable {
         }
     }
 
-    void complete(Result outcome) {
+    void complete(@NotNull Result outcome) {
         // This might be null if, for some reason, none of the handlers were successfully tried (in which case
         // we already logged that).
         if (currentHandler != null) {
@@ -318,6 +330,7 @@ class AuthorizationClient implements Serializable {
         this.backgroundProcessingListener = backgroundProcessingListener;
     }
 
+    @Nullable
     StartActivityDelegate getStartActivityDelegate() {
         if (startActivityDelegate != null) {
             return startActivityDelegate;
@@ -338,11 +351,11 @@ class AuthorizationClient implements Serializable {
         return null;
     }
 
-    int checkPermission(String permission) {
+    int checkPermission(@NotNull String permission) {
         return context.checkCallingOrSelfPermission(permission);
     }
 
-    void validateSameFbidAndFinish(Result pendingResult) {
+    void validateSameFbidAndFinish(@NotNull Result pendingResult) {
         if (pendingResult.token == null) {
             throw new FacebookException("Can't validate without a token");
         }
@@ -354,7 +367,8 @@ class AuthorizationClient implements Serializable {
         batch.executeAsync();
     }
 
-    RequestBatch createReauthValidationBatch(final Result pendingResult) {
+    @NotNull
+    RequestBatch createReauthValidationBatch(@NotNull final Result pendingResult) {
         // We need to ensure that the token we got represents the same fbid as the old one. We issue
         // a "me" request using the current token, a "me" request using the new token, and a "me/permissions"
         // request using the current token to get the permissions of the user.
@@ -366,7 +380,7 @@ class AuthorizationClient implements Serializable {
 
         Request.Callback meCallback = new Request.Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 try {
                     GraphUser user = response.getGraphObjectAs(GraphUser.class);
                     if (user != null) {
@@ -387,7 +401,7 @@ class AuthorizationClient implements Serializable {
         Request requestCurrentTokenPermissions = createGetPermissionsRequest(validateSameFbidAsToken);
         requestCurrentTokenPermissions.setCallback(new Request.Callback() {
             @Override
-            public void onCompleted(Response response) {
+            public void onCompleted(@NotNull Response response) {
                 try {
                     Session.PermissionsPair permissionsPair = Session.handlePermissionResponse(response);
                     if (permissionsPair != null) {
@@ -430,12 +444,14 @@ class AuthorizationClient implements Serializable {
         return batch;
     }
 
+    @Nullable
     Request createGetPermissionsRequest(String accessToken) {
         Bundle parameters = new Bundle();
         parameters.putString("access_token", accessToken);
         return new Request(null, "me/permissions", parameters, HttpMethod.GET, null);
     }
 
+    @Nullable
     Request createGetProfileIdRequest(String accessToken) {
         Bundle parameters = new Bundle();
         parameters.putString("fields", "id");
@@ -443,6 +459,7 @@ class AuthorizationClient implements Serializable {
         return new Request(null, "me", parameters, HttpMethod.GET, null);
     }
 
+    @Nullable
     private AppEventsLogger getAppEventsLogger() {
         if (appEventsLogger == null || !appEventsLogger.getApplicationId().equals(pendingRequest.getApplicationId())) {
             appEventsLogger = AppEventsLogger.newLogger(context, pendingRequest.getApplicationId());
@@ -476,13 +493,13 @@ class AuthorizationClient implements Serializable {
         getAppEventsLogger().logSdkEvent(EVENT_NAME_LOGIN_METHOD_START, null, bundle);
     }
 
-    private void logAuthorizationMethodComplete(String method, Result result, Map<String, String> loggingExtras) {
+    private void logAuthorizationMethodComplete(String method, @NotNull Result result, Map<String, String> loggingExtras) {
         logAuthorizationMethodComplete(method, result.code.getLoggingValue(), result.errorMessage, result.errorCode,
                 loggingExtras);
     }
 
-    private void logAuthorizationMethodComplete(String method, String result, String errorMessage, String errorCode,
-            Map<String, String> loggingExtras) {
+    private void logAuthorizationMethodComplete(String method, @Nullable String result, @Nullable String errorMessage, @Nullable String errorCode,
+            @Nullable Map<String, String> loggingExtras) {
         Bundle bundle = null;
         if (pendingRequest == null) {
             // We don't expect this to happen, but if it does, log an event for diagnostic purposes.
@@ -512,6 +529,7 @@ class AuthorizationClient implements Serializable {
         getAppEventsLogger().logSdkEvent(EVENT_NAME_LOGIN_METHOD_COMPLETE, null, bundle);
     }
 
+    @NotNull
     static Bundle newAuthorizationLoggingBundle(String authLoggerId) {
         // We want to log all parameters for all events, to ensure stability of columns across different event types.
         Bundle bundle = new Bundle();
@@ -531,6 +549,7 @@ class AuthorizationClient implements Serializable {
         Map<String, String> methodLoggingExtras;
 
         abstract boolean tryAuthorize(AuthorizationRequest request);
+        @NotNull
         abstract String getNameForLogging();
 
         boolean onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -548,7 +567,7 @@ class AuthorizationClient implements Serializable {
         void cancel() {
         }
 
-        protected void addLoggingExtra(String key, Object value) {
+        protected void addLoggingExtra(String key, @Nullable Object value) {
             if (methodLoggingExtras == null) {
                 methodLoggingExtras = new HashMap<String, String>();
             }
@@ -558,10 +577,13 @@ class AuthorizationClient implements Serializable {
 
     class WebViewAuthHandler extends AuthHandler {
         private static final long serialVersionUID = 1L;
+        @Nullable
         private transient WebDialog loginDialog;
         private String applicationId;
+        @Nullable
         private String e2e;
 
+        @NotNull
         @Override
         String getNameForLogging() {
             return "web_view";
@@ -591,7 +613,7 @@ class AuthorizationClient implements Serializable {
         }
 
         @Override
-        boolean tryAuthorize(final AuthorizationRequest request) {
+        boolean tryAuthorize(@NotNull final AuthorizationRequest request) {
             applicationId = request.getApplicationId();
             Bundle parameters = new Bundle();
             if (!Utility.isNullOrEmpty(request.getPermissions())) {
@@ -635,7 +657,7 @@ class AuthorizationClient implements Serializable {
             return true;
         }
 
-        void onWebDialogComplete(AuthorizationRequest request, Bundle values,
+        void onWebDialogComplete(@NotNull AuthorizationRequest request, @Nullable Bundle values,
                 FacebookException error) {
             Result outcome;
             if (values != null) {
@@ -700,8 +722,10 @@ class AuthorizationClient implements Serializable {
 
     class GetTokenAuthHandler extends AuthHandler {
         private static final long serialVersionUID = 1L;
+        @Nullable
         private transient GetTokenClient getTokenClient;
 
+        @NotNull
         @Override
         String getNameForLogging() {
             return "get_token";
@@ -722,7 +746,7 @@ class AuthorizationClient implements Serializable {
             return getTokenClient == null;
         }
 
-        boolean tryAuthorize(final AuthorizationRequest request) {
+        boolean tryAuthorize(@NotNull final AuthorizationRequest request) {
             getTokenClient = new GetTokenClient(context, request.getApplicationId());
             if (!getTokenClient.start()) {
                 return false;
@@ -741,7 +765,7 @@ class AuthorizationClient implements Serializable {
             return true;
         }
 
-        void getTokenCompleted(AuthorizationRequest request, Bundle result) {
+        void getTokenCompleted(@NotNull AuthorizationRequest request, @Nullable Bundle result) {
             getTokenClient = null;
 
             notifyBackgroundProcessingStop();
@@ -781,7 +805,7 @@ class AuthorizationClient implements Serializable {
     abstract class KatanaAuthHandler extends AuthHandler {
         private static final long serialVersionUID = 1L;
 
-        protected boolean tryIntent(Intent intent, int requestCode) {
+        protected boolean tryIntent(@Nullable Intent intent, int requestCode) {
             if (intent == null) {
                 return false;
             }
@@ -802,13 +826,14 @@ class AuthorizationClient implements Serializable {
         private static final long serialVersionUID = 1L;
         private String applicationId;
 
+        @NotNull
         @Override
         String getNameForLogging() {
             return "katana_proxy_auth";
         }
 
         @Override
-        boolean tryAuthorize(AuthorizationRequest request) {
+        boolean tryAuthorize(@NotNull AuthorizationRequest request) {
             applicationId = request.getApplicationId();
 
             String e2e = getE2E();
@@ -821,7 +846,7 @@ class AuthorizationClient implements Serializable {
         }
 
         @Override
-        boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        boolean onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
             // Handle stuff
             Result outcome;
 
@@ -844,7 +869,8 @@ class AuthorizationClient implements Serializable {
             return true;
         }
 
-        private Result handleResultOk(Intent data) {
+        @Nullable
+        private Result handleResultOk(@NotNull Intent data) {
             Bundle extras = data.getExtras();
             String error = extras.getString("error");
             if (error == null) {
@@ -905,16 +931,19 @@ class AuthorizationClient implements Serializable {
             super(context, applicationId, OAUTH_DIALOG, parameters);
         }
 
+        @NotNull
         public AuthDialogBuilder setE2E(String e2e) {
             this.e2e = e2e;
             return this;
         }
 
+        @NotNull
         public AuthDialogBuilder setIsRerequest(boolean isRerequest) {
             this.isRerequest = isRerequest;
             return this;
         }
 
+        @NotNull
         @Override
         public WebDialog build() {
             Bundle parameters = getParameters();
@@ -1044,6 +1073,7 @@ class AuthorizationClient implements Serializable {
         final String errorMessage;
         final String errorCode;
         final AuthorizationRequest request;
+        @Nullable
         Map<String, String> loggingExtras;
 
         private Result(AuthorizationRequest request, Code code, AccessToken token, String errorMessage,
@@ -1055,18 +1085,22 @@ class AuthorizationClient implements Serializable {
             this.errorCode = errorCode;
         }
 
+        @Nullable
         static Result createTokenResult(AuthorizationRequest request, AccessToken token) {
             return new Result(request, Code.SUCCESS, token, null, null);
         }
 
+        @Nullable
         static Result createCancelResult(AuthorizationRequest request, String message) {
             return new Result(request, Code.CANCEL, null, message, null);
         }
 
+        @Nullable
         static Result createErrorResult(AuthorizationRequest request, String errorType, String errorDescription) {
             return createErrorResult(request, errorType, errorDescription, null);
         }
 
+        @Nullable
         static Result createErrorResult(AuthorizationRequest request, String errorType, String errorDescription,
                 String errorCode) {
             String message = TextUtils.join(": ", Utility.asListNoNulls(errorType, errorDescription));

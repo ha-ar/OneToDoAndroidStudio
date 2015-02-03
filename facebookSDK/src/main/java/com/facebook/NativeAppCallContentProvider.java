@@ -24,6 +24,9 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Pair;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.UUID;
@@ -59,6 +62,7 @@ public class NativeAppCallContentProvider extends ContentProvider {
     }
 
     interface AttachmentDataSource {
+        @Nullable
         File openAttachment(UUID callId, String attachmentName) throws FileNotFoundException;
     }
 
@@ -67,7 +71,7 @@ public class NativeAppCallContentProvider extends ContentProvider {
      * @param applicationId the Facebook application ID of the application
      * @return the String to use as the authority portion of a content URI.
      */
-    public static String getAttachmentUrl(String applicationId, UUID callId, String attachmentName) {
+    public static String getAttachmentUrl(String applicationId, @NotNull UUID callId, String attachmentName) {
         return String.format("%s%s/%s/%s", ATTACHMENT_URL_BASE, applicationId, callId.toString(), attachmentName);
     }
 
@@ -76,16 +80,19 @@ public class NativeAppCallContentProvider extends ContentProvider {
         return true;
     }
 
+    @Nullable
     @Override
     public Cursor query(Uri uri, String[] strings, String s, String[] strings2, String s2) {
         return null;
     }
 
+    @Nullable
     @Override
     public String getType(Uri uri) {
         return null;
     }
 
+    @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
         return null;
@@ -102,7 +109,7 @@ public class NativeAppCallContentProvider extends ContentProvider {
     }
 
     @Override
-    public android.os.ParcelFileDescriptor openFile(android.net.Uri uri, java.lang.String mode)
+    public android.os.ParcelFileDescriptor openFile(@NotNull android.net.Uri uri, java.lang.String mode)
             throws java.io.FileNotFoundException {
 
         Pair<UUID, String> callIdAndAttachmentName = parseCallIdAndAttachmentName(uri);
@@ -120,7 +127,8 @@ public class NativeAppCallContentProvider extends ContentProvider {
         }
     }
 
-    Pair<UUID, String> parseCallIdAndAttachmentName(Uri uri) {
+    @Nullable
+    Pair<UUID, String> parseCallIdAndAttachmentName(@NotNull Uri uri) {
         try {
             // We don't do explicit format checking here. Malformed URIs may generate NullPointerExceptions or
             // array bounds exceptions, which we'll catch and return null. All of these will result in a

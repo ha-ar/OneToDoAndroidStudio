@@ -8,6 +8,6 @@ public class Object {
 	public List<Object> children; // same as above
 
 	public Object() {
-		children = new ArrayList<Object>();
+		children = new ArrayList<>();
 	}
 }

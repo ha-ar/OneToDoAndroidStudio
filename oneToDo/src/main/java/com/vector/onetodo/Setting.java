@@ -16,11 +16,12 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.ToggleButton;
 
 import com.androidquery.AQuery;
 import com.vector.onetodo.utils.Utils;
+
+import org.jetbrains.annotations.NotNull;
 
 public class Setting extends Fragment {
 
@@ -33,7 +34,7 @@ public class Setting extends Fragment {
 	private RadioGroup radioGroup;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.settings, container, false);
 		toggle = (ToggleButton) view.findViewById(R.id.switch_event);
@@ -50,14 +51,14 @@ public class Setting extends Fragment {
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		menu.clear();
 		inflater.inflate(R.menu.plain, menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(@NotNull MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			getActivity().getFragmentManager().popBackStack();

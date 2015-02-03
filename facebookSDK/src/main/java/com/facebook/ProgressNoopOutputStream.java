@@ -18,6 +18,9 @@ package com.facebook;
 
 import android.os.Handler;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +29,9 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
     private final Map<Request, RequestProgress> progressMap = new HashMap<Request, RequestProgress>();
     private final Handler callbackHandler;
 
+    @Nullable
     private Request currentRequest;
+    @Nullable
     private RequestProgress currentRequestProgress;
     private int batchMax;
 
@@ -34,7 +39,7 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
         this.callbackHandler = callbackHandler;
     }
 
-    public void setCurrentRequest(Request currentRequest) {
+    public void setCurrentRequest(@Nullable Request currentRequest) {
         this.currentRequest = currentRequest;
         this.currentRequestProgress = currentRequest != null? progressMap.get(currentRequest) : null;
     }
@@ -43,6 +48,7 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
         return batchMax;
     }
 
+    @NotNull
     Map<Request,RequestProgress> getProgressMap() {
         return progressMap;
     }
@@ -58,7 +64,7 @@ class ProgressNoopOutputStream extends OutputStream implements RequestOutputStre
     }
 
     @Override
-    public void write(byte[] buffer) {
+    public void write(@NotNull byte[] buffer) {
         addProgress(buffer.length);
     }
 

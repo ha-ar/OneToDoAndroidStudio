@@ -1,7 +1,5 @@
 package com.roomorma.caldroid;
 
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.util.TypedValue;
@@ -11,13 +9,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
 /**
  * Customize the weekday gridview
  */
 public class WeekdayArrayAdapter extends ArrayAdapter<String> {
 	public static int textColor = Color.WHITE;
 	private Context ctx;
-	public WeekdayArrayAdapter(Context context, int textViewResourceId,
+	public WeekdayArrayAdapter(@NotNull Context context, int textViewResourceId,
 			List<String> objects) {
 		super(context, textViewResourceId, objects);
 		
@@ -36,7 +38,8 @@ public class WeekdayArrayAdapter extends ArrayAdapter<String> {
 	}
 
 	// Set color to gray and text size to 12sp
-	@Override
+	@NotNull
+    @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		// To customize text size and color
 		TextView textView = (TextView) super.getView(position, convertView,

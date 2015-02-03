@@ -19,14 +19,27 @@ package com.facebook.model;
 import com.facebook.FacebookGraphObjectException;
 import com.facebook.internal.Utility;
 import com.facebook.internal.Validate;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.AbstractList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * GraphObject is the primary interface used by the Facebook SDK for Android to represent objects in the Facebook
@@ -46,6 +59,7 @@ public interface GraphObject {
      * @param graphObjectClass the type of GraphObject to return
      * @return a new instance of the GraphObject-derived-type that references the same underlying data
      */
+    @NotNull
     <T extends GraphObject> T cast(Class<T> graphObjectClass);
 
     /**
@@ -53,12 +67,14 @@ public interface GraphObject {
      * inner JSON representation.
      * @return a Java Collections map representing the GraphObject state
      */
+    @NotNull
     Map<String, Object> asMap();
 
     /**
      * Gets the underlying JSONObject representation of this graph object.
      * @return the underlying JSONObject representation of this graph object
      */
+    @NotNull
     JSONObject getInnerJSONObject();
 
     /**
@@ -66,6 +82,7 @@ public interface GraphObject {
      * @param propertyName the name of the property to get
      * @return the value of the named property
      */
+    @NotNull
     Object getProperty(String propertyName);
 
     /**
@@ -76,6 +93,7 @@ public interface GraphObject {
      * @param graphObjectClass the GraphObject-derived interface to cast the property to
      * @return
      */
+    @NotNull
     <T extends GraphObject> T getPropertyAs(String propertyName, Class<T> graphObjectClass);
 
     /**
@@ -86,6 +104,7 @@ public interface GraphObject {
      * @param graphObjectClass the GraphObject-derived interface to cast the property to a list of
      * @return
      */
+    @NotNull
     <T extends GraphObject> GraphObjectList<T> getPropertyAsList(String propertyName, Class<T> graphObjectClass);
 
     /**
@@ -126,6 +145,7 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
+        @NotNull
         public static GraphObject create(JSONObject json) {
             return create(json, GraphObject.class);
         }
@@ -139,7 +159,8 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
-        public static <T extends GraphObject> T create(JSONObject json, Class<T> graphObjectClass) {
+        @NotNull
+        public static <T extends GraphObject> T create(JSONObject json, @NotNull Class<T> graphObjectClass) {
             return createGraphObjectProxy(graphObjectClass, json);
         }
 
@@ -150,6 +171,7 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
+        @NotNull
         public static GraphObject create() {
             return create(GraphObject.class);
         }
@@ -162,7 +184,8 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
-        public static <T extends GraphObject> T create(Class<T> graphObjectClass) {
+        @NotNull
+        public static <T extends GraphObject> T create(@NotNull Class<T> graphObjectClass) {
             return createGraphObjectProxy(graphObjectClass, new JSONObject());
         }
 
@@ -172,7 +195,7 @@ public interface GraphObject {
          * @param b another graph object
          * @return true if both graph objects have an ID and it is the same ID, false otherwise
          */
-        public static boolean hasSameId(GraphObject a, GraphObject b) {
+        public static boolean hasSameId(@Nullable GraphObject a, @Nullable GraphObject b) {
             if (a == null || b == null || !a.asMap().containsKey("id") || !b.asMap().containsKey("id")) {
                 return false;
             }
@@ -196,6 +219,7 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
+        @NotNull
         public static <T> GraphObjectList<T> createList(JSONArray array, Class<T> graphObjectClass) {
             return new GraphObjectListImpl<T>(array, graphObjectClass);
         }
@@ -208,11 +232,13 @@ public interface GraphObject {
          * @throws com.facebook.FacebookException
          *            If the passed in Class is not a valid GraphObject interface
          */
+        @NotNull
         public static <T> GraphObjectList<T> createList(Class<T> graphObjectClass) {
             return createList(new JSONArray(), graphObjectClass);
         }
 
-        private static <T extends GraphObject> T createGraphObjectProxy(Class<T> graphObjectClass, JSONObject state) {
+        @NotNull
+        private static <T extends GraphObject> T createGraphObjectProxy(@NotNull Class<T> graphObjectClass, JSONObject state) {
             verifyCanProxyClass(graphObjectClass);
 
             Class<?>[] interfaces = new Class<?>[] { graphObjectClass };
@@ -224,6 +250,7 @@ public interface GraphObject {
             return graphObject;
         }
 
+        @NotNull
         private static Map<String, Object> createGraphObjectProxyForMap(JSONObject state) {
             Class<?>[] interfaces = new Class<?>[]{Map.class};
             GraphObjectProxy graphObjectProxy = new GraphObjectProxy(state, Map.class);
@@ -243,7 +270,7 @@ public interface GraphObject {
             verifiedGraphObjectClasses.add(graphObjectClass);
         }
 
-        private static <T extends GraphObject> void verifyCanProxyClass(Class<T> graphObjectClass) {
+        private static <T extends GraphObject> void verifyCanProxyClass(@NotNull Class<T> graphObjectClass) {
             if (hasClassBeenVerified(graphObjectClass)) {
                 return;
             }
@@ -295,8 +322,9 @@ public interface GraphObject {
 
         // If expectedType is a generic type, expectedTypeAsParameterizedType must be provided in order to determine
         // generic parameter types.
-        static <U> U coerceValueToExpectedType(Object value, Class<U> expectedType,
-                ParameterizedType expectedTypeAsParameterizedType) {
+        @Nullable
+        static <U> U coerceValueToExpectedType(@Nullable Object value, @NotNull Class<U> expectedType,
+                @Nullable ParameterizedType expectedTypeAsParameterizedType) {
             if (value == null) {
                 if (boolean.class.equals(expectedType)) {
                     @SuppressWarnings("unchecked")
@@ -401,12 +429,14 @@ public interface GraphObject {
                     + expectedType.getName());
         }
 
+        @NotNull
         static String convertCamelCaseToLowercaseWithUnderscores(String string) {
             string = string.replaceAll("([a-z])([A-Z])", "$1_$2");
             return string.toLowerCase(Locale.US);
         }
 
-        private static Object getUnderlyingJSONObject(Object obj) {
+        @Nullable
+        private static Object getUnderlyingJSONObject(@Nullable Object obj) {
             if (obj == null) {
                 return null;
             }
@@ -445,12 +475,13 @@ public interface GraphObject {
             }
 
             // Declared to return Object just to simplify implementation of proxy helpers.
-            protected final Object throwUnexpectedMethodSignature(Method method) {
+            @NotNull
+            protected final Object throwUnexpectedMethodSignature(@NotNull Method method) {
                 throw new FacebookGraphObjectException(getClass().getName() + " got an unexpected method signature: "
                         + method.toString());
             }
 
-            protected final Object proxyObjectMethods(Object proxy, Method method, Object[] args) throws Throwable {
+            protected final Object proxyObjectMethods(Object proxy, @NotNull Method method, Object[] args) throws Throwable {
                 String methodName = method.getName();
                 if (methodName.equals(EQUALS_METHOD)) {
                     Object other = args[0];
@@ -509,8 +540,9 @@ public interface GraphObject {
                 return String.format("GraphObject{graphObjectClass=%s, state=%s}", graphObjectClass.getSimpleName(), state);
             }
 
+            @Nullable
             @Override
-            public final Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            public final Object invoke(Object proxy, @NotNull Method method, Object[] args) throws Throwable {
                 Class<?> declaringClass = method.getDeclaringClass();
 
                 if (declaringClass == Object.class) {
@@ -526,7 +558,8 @@ public interface GraphObject {
                 return throwUnexpectedMethodSignature(method);
             }
 
-            private final Object proxyMapMethods(Method method, Object[] args) {
+            @Nullable
+            private final Object proxyMapMethods(@NotNull Method method, Object[] args) {
                 String methodName = method.getName();
                 if (methodName.equals(CLEAR_METHOD)) {
                     JsonUtil.jsonObjectClear(this.state);
@@ -570,7 +603,8 @@ public interface GraphObject {
                 return throwUnexpectedMethodSignature(method);
             }
 
-            private final Object proxyGraphObjectMethods(Object proxy, Method method, Object[] args) {
+            @Nullable
+            private final Object proxyGraphObjectMethods(Object proxy, @NotNull Method method, Object[] args) {
                 String methodName = method.getName();
                 if (methodName.equals(CAST_METHOD)) {
                     @SuppressWarnings("unchecked")
@@ -599,16 +633,19 @@ public interface GraphObject {
                     final Class<?> expectedType = (Class<?>) args[1];
 
                     ParameterizedType parameterizedType = new ParameterizedType() {
+                        @NotNull
                         @Override
                         public Type[] getActualTypeArguments() {
                             return new Type[]{ expectedType };
                         }
 
+                        @Nullable
                         @Override
                         public Type getOwnerType() {
                             return null;
                         }
 
+                        @NotNull
                         @Override
                         public Type getRawType() {
                             return GraphObjectList.class;
@@ -625,7 +662,8 @@ public interface GraphObject {
                 return throwUnexpectedMethodSignature(method);
             }
 
-            private Object createGraphObjectsFromParameters(CreateGraphObject createGraphObject, Object value) {
+            @NotNull
+            private Object createGraphObjectsFromParameters(@Nullable CreateGraphObject createGraphObject, @NotNull Object value) {
                 if (createGraphObject != null &&
                         !Utility.isNullOrEmpty(createGraphObject.value())) {
                     String propertyName = createGraphObject.value();
@@ -651,7 +689,8 @@ public interface GraphObject {
                 return value;
             }
 
-            private final Object proxyGraphObjectGettersAndSetters(Method method, Object[] args) throws JSONException {
+            @Nullable
+            private final Object proxyGraphObjectGettersAndSetters(@NotNull Method method, Object[] args) throws JSONException {
                 String methodName = method.getName();
                 int parameterCount = method.getParameterTypes().length;
                 PropertyName propertyNameOverride = method.getAnnotation(PropertyName.class);
@@ -690,6 +729,7 @@ public interface GraphObject {
                 return throwUnexpectedMethodSignature(method);
             }
 
+            @Nullable
             private Object setJSONProperty(Object[] args) {
                 String name = (String) args[0];
                 Object property = args[1];
@@ -732,6 +772,7 @@ public interface GraphObject {
                 put(location, object);
             }
 
+            @Nullable
             @Override
             public T set(int location, T object) {
                 checkIndex(location);
@@ -747,7 +788,7 @@ public interface GraphObject {
             }
 
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Nullable Object obj) {
                 if (obj == null) {
                     return false;
                 } else if (this == obj) {
@@ -760,6 +801,7 @@ public interface GraphObject {
                 return state.equals(other.state);
             }
 
+            @Nullable
             @SuppressWarnings("unchecked")
             @Override
             public T get(int location) {
@@ -779,8 +821,9 @@ public interface GraphObject {
                 return state.length();
             }
 
+            @NotNull
             @Override
-            public final <U extends GraphObject> GraphObjectList<U> castToListOf(Class<U> graphObjectClass) {
+            public final <U extends GraphObject> GraphObjectList<U> castToListOf(@NotNull Class<U> graphObjectClass) {
                 if (GraphObject.class.isAssignableFrom(itemType)) {
                     if (graphObjectClass.isAssignableFrom(itemType)) {
                         @SuppressWarnings("unchecked")
