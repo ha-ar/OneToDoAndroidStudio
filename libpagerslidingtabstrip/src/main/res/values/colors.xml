@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <color name="background_tab_pressed">#6633B5E5</color>
-    <color name="activate_text_color">#FFFFFF</color>
-    <color name="deactivate_text_color">#4DFFFFFF</color>
-    <color name="transparent">#00000000</color>
-
-</resources>
