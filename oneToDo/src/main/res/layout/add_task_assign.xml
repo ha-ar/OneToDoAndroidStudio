@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_container_assign"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="#EEEEEE"
+    android:clickable="true" >
+
+    <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" >
+
+        <RelativeLayout
+            android:id="@+id/header"
+            android:layout_width="fill_parent"
+            android:layout_height="56dp"
+            android:background="@color/active" >
+
+            <TextView
+                android:id="@+id/assign_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="26dp"
+                android:layout_toRightOf="@+id/assign_back"
+                android:paddingBottom="3dp"
+                android:text="Assign to"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/assign_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/back" />
+
+            <ImageView
+                android:id="@+id/assign_add"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/assign_menu"
+                android:alpha="0.3"
+                android:background="@drawable/accept" />
+
+            <ImageView
+                android:id="@+id/assign_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="10dp"
+                android:layout_centerVertical="true"
+                android:animateLayoutChanges="true"
+                android:src="@drawable/ic_show_white" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/header"
+            android:background="@color/active"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="0.5dp" >
+
+            <com.astuetz.PagerSlidingTabStrip
+                android:id="@+id/assing_tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal|bottom"
+                android:background="@color/active"
+                app:pstsActivateTextColor="#FFFFFF"
+                app:pstsDeactivateTextColor="#4DFFFFFF"
+                app:pstsTabSwitch="true" >
+            </com.astuetz.PagerSlidingTabStrip>
+        </LinearLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/assign_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tab_layout" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/contact_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/header"
+        android:layout_gravity="center"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="195dp"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/user3" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView2"
+            android:layout_centerHorizontal="true"
+            android:text="No contact to collaborate"
+            android:textColor="@color/_777777"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/add_contact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="5dp"
+            android:text="Add contacts"
+            android:textColor="#bababa"
+            android:textSize="15.56sp" />
+    </RelativeLayout>
+
+</FrameLayout>

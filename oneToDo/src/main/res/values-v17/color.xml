@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="blue_color">#58aadf</color>
+    <color name="blue_transparent">#883399CC</color>
+    <color name="green_line_color">#4FB86D</color>
+    <color name="graytab">#ff989898</color>
+    <color name="very_light_grey_color">#F5F5F5</color>
+    <color name="grey">#AAAAAA</color>
+    <color name="light_grey_color">#EEEEEE</color>
+    <color name="dark_grey_color">#808080</color>
+    <color name="yellow_bar_color">#FADA5C</color>
+    <color name="light_yellow">#fff89f</color>
+    <color name="dark_blue_color">#0072BC</color>
+    <color name="dark_orange">#F26522</color>
+    <color name="light_orange">#F8941D</color>
+
+</resources>

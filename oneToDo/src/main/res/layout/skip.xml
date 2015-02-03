@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_dialog"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/skip_title"
+        android:layout_width="wrap_content"
+        android:layout_height="53.33dp"
+        android:drawablePadding="10dp"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="15dp"
+        android:text="Skip login?"
+        android:textColor="@color/_4d4d4d"
+        android:textSize="22.22sp" />
+
+    <TextView
+        android:id="@+id/skip_txt1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="3dp"
+        android:text="Collaboration is only possible when you confirm your phone number."
+        android:textColor="@color/_777777"
+        android:textSize="15.56sp" />
+
+    <TextView
+        android:id="@+id/skip_txt2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        android:paddingLeft="8dp"
+        android:text="You can skip and confirm your phone number later as well."
+        android:textColor="@color/_777777"
+        android:textSize="15.56sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp" >
+
+        <TextView
+            android:id="@+id/skip_save"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="SKIP"
+            android:textColor="@color/active"
+            android:textSize="15.56sp" />
+
+        <TextView
+            android:id="@+id/skip_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="40dp"
+            android:layout_toLeftOf="@+id/skip_save"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="CONFIRM NOW"
+            android:textSize="15.56sp" />
+    </RelativeLayout>
+
+</LinearLayout>

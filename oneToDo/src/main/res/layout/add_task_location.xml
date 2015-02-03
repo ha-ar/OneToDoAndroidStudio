@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/location_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="10dp" >
+
+    <AutoCompleteTextView
+        android:id="@+id/location_before"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:hint="Enter location or tap button below to set location"
+        android:singleLine="true"
+        android:textColorHint="#bababa"
+        android:textSize="13.33sp" />
+
+    <LinearLayout
+        android:id="@+id/pre_defined_locations"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="14dp"
+        android:layout_marginRight="14dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:weightSum="4" >
+
+        <TextView
+            android:id="@+id/pre_defined_1"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@color/caldroid_gray"
+            android:gravity="center"
+            android:text="New"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="17.78sp" />
+
+        <TextView
+            android:id="@+id/pre_defined_2"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@color/caldroid_gray"
+            android:gravity="center"
+            android:text="New"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="17.78sp" />
+
+        <TextView
+            android:id="@+id/pre_defined_3"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@color/caldroid_gray"
+            android:gravity="center"
+            android:text="New"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="17.78sp" />
+
+        <TextView
+            android:id="@+id/pre_defined_4"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:background="@color/caldroid_gray"
+            android:gravity="center"
+            android:text="New"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="17.78sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/arrive_leave_checkbox_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <RadioGroup
+            android:id="@+id/leave_arrive_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/checkbox_arrive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="40dp"
+                android:background="@drawable/round_buttons"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Arrive"
+                android:textColor="@color/_4d4d4d" />
+
+            <RadioButton
+                android:id="@+id/checkbox_leave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/round_buttons"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Leave"
+                android:textColor="@color/_4d4d4d" />
+        </RadioGroup>
+    </LinearLayout>
+
+</LinearLayout>

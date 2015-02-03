@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/time_date_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/input_fields_gray"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/underline_textview_lightgray"
+        android:paddingBottom="2dp"
+        android:paddingTop="27dp"
+        android:text="DETAILS"
+        android:textColor="@color/active"
+        android:textSize="13.33sp"
+        android:typeface="monospace" />
+
+    <LinearLayout
+        android:id="@+id/project_time_date"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:animateLayoutChanges="true"
+        android:animationCache="true"
+        android:background="@drawable/input_fields_gray"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/calendare_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/calendar_grey" />
+
+        <!-- android:id="@+id/time_date" -->
+
+        <LinearLayout
+            android:id="@+id/time_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:weightSum="3" >
+
+            <TextView
+                android:id="@+id/da"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:hint="Due"
+                android:textColor="@color/_4d4d4d"
+                android:textColorHint="@color/_999999"
+                android:textSize="17.78sp" />
+
+            <TextView
+                android:id="@+id/day_field"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_weight="0.55"
+                android:gravity="center"
+                android:textColor="@color/_4d4d4d"
+                android:textColorHint="@color/_999999"
+                android:textSize="17.78sp" />
+
+            <TextView
+                android:id="@+id/month_year_field"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_weight="0.8"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="2dp"
+                android:textColor="@color/_4d4d4d"
+                android:textColorHint="@color/_999999"
+                android:textSize="17.78sp" />
+
+            <TextView
+                android:id="@+id/time_field"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_weight=".7"
+                android:gravity="center"
+                android:hint=""
+                android:textColor="@color/_4d4d4d"
+                android:textColorHint="@color/_999999"
+                android:textSize="17.78sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <include
+        android:id="@+id/date_time_include"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        layout="@layout/date_time_layout"
+        android:visibility="gone" />
+
+</LinearLayout>

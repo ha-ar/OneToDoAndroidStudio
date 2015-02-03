@@ -1,0 +1,89 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/active"
+        android:minHeight="?attr/actionBarSize"
+        app:popupTheme="@style/Theme.AppCompat.Light"
+        app:theme="@style/ThemeToolbarLightOverflow" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_top" >
+
+        <FrameLayout
+            android:id="@+id/container_inner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <com.astuetz.PagerSlidingTabStrip
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/active"
+                    app:pstsActivateTextColor="#FFFFFF"
+                    app:pstsDeactivateTextColor="#4DFFFFFF"
+                    app:pstsTabSwitch="true" >
+                </com.astuetz.PagerSlidingTabStrip>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tabs"
+                    android:background="#eeeeee" />
+
+                <TextView
+                    android:id="@+id/pagertext"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/header"
+                    android:gravity="center"
+                    android:text=""
+                    android:textColor="#B6B6B6"
+                    android:textSize="20sp"
+                    android:visibility="gone" />
+            </RelativeLayout>
+        </FrameLayout>
+
+        <include
+            android:id="@+id/content_frame"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            layout="@layout/menu_drawer" />
+
+        <include
+            android:id="@+id/right_menu"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            layout="@layout/menu_drawer_right" />
+    </android.support.v4.widget.DrawerLayout>
+
+    <ImageView
+        android:id="@+id/add_task_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/ic_plus"
+        android:text="TextView" />
+
+</RelativeLayout>

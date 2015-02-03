@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:background="#FFFFFF"
+    android:paddingLeft="10dp" >
+
+    <CheckBox
+        android:id="@+id/completed_task"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="2dp"
+        android:button="@drawable/task_chechk_box" />
+
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/list_time"
+        android:layout_toRightOf="@+id/completed_task"
+        android:orientation="vertical"
+        android:paddingLeft="30dp"
+        android:paddingTop="5dp" >
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_type_landing"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="TASK"
+            android:textColor="#808080"
+            android:textSize="8.89sp" />
+
+        <TextView
+            android:id="@+id/list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:text=""
+            android:singleLine="true"
+            android:textSize="17.78sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/list_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/title_layout"
+        android:layout_below="@+id/title_layout"
+        android:paddingLeft="30dp"
+        android:text=""
+        android:textColor="#808080"
+        android:textSize="13.33sp" />
+
+    <TextView
+        android:id="@+id/list_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:text=""
+        android:textColor="#33b5e5"
+        android:textSize="13.33sp" />
+
+    <TextView
+        android:id="@+id/list_time1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/list_time"
+        android:layout_marginRight="5dp"
+        android:text=""
+        android:textColor="#33b5e5"
+        android:textSize="13.33sp" />
+
+    <TextView
+        android:id="@+id/list_time2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/list_time1"
+        android:layout_marginRight="5dp"
+        android:text=""
+        android:textColor="#33b5e5"
+        android:textSize="13.33sp" />
+
+    <TextView
+        android:id="@+id/list_time3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/list_time2"
+        android:layout_marginRight="5dp"
+        android:text=""
+        android:textColor="#33b5e5"
+        android:textSize="13.33sp" />
+
+    <TextView
+        android:id="@+id/list_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="3dp"
+        android:textColor="#ff0000"
+        android:textSize="16dp"
+        android:visibility="gone" />
+
+</RelativeLayout>

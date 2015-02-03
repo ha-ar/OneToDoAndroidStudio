@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/imageView1"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/round_gray"
+        android:gravity="center"
+        android:text="UA"
+        android:textColor="@android:color/white"
+        android:textSize="15.56sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/comment_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/comment_date"
+                android:paddingLeft="20dp"
+                android:paddingTop="5dp"
+                android:text="Usman Ameer"
+                android:textColor="@color/blue_color"
+                android:textSize="17.78sp" />
+
+            <TextView
+                android:id="@+id/comment_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:textSize="11sp"
+                android:text="Today, 13:25"
+                android:textColor="@color/grey" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/comment_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingLeft="20dp"
+            android:text="Hello kese ho yara ................................................... kia chal raha hai yar me in 
+            home doing worked on project"
+            android:visibility="visible" >
+        </TextView>
+
+        <RelativeLayout
+            android:id="@+id/attach_comment_lay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/attach_file"
+                android:layout_width="50dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.7"
+                android:src="@drawable/actionbar_background" />
+
+            <TextView
+                android:id="@+id/attach_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/attach_file"
+                android:layout_toRightOf="@+id/attach_file"
+                android:paddingLeft="15dp"
+                android:text="TextView" />
+
+            <TextView
+                android:id="@+id/attach_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/attach_name"
+                android:layout_centerVertical="true"
+                android:paddingLeft="15dp"
+                android:text="9 MB"
+                android:textColor="@color/inactive" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

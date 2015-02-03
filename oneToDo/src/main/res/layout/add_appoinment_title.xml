@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/title_appoinment_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/input_fields_gray"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" >
+
+        <CheckBox
+            android:id="@+id/completed_appoinment"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:button="@drawable/task_chechk_box" />
+
+        <EditText
+            android:id="@+id/appoinment_title"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/completed_appoinment"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:hint="Title"
+            android:paddingLeft="15dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textColor="@color/_4d4d4d"
+            android:textColorHint="@color/_999999"
+            android:textSize="17.78sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/title_event_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/title_event_layout"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/input_fields_gray"
+        android:gravity="center_vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/assign_event_button"
+            android:layout_width="20dp"
+            android:layout_height="25dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/invite1" />
+
+        <TextView
+            android:id="@+id/event_assign"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/assign_event_button"
+            android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:hint="Invite"
+            android:paddingLeft="15dp"
+            android:paddingRight="5dp"
+            android:singleLine="true"
+            android:textColor="@color/_4d4d4d"
+            android:textColorHint="@color/_999999"
+            android:textSize="17.78sp" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/event_assign"
+            android:layout_centerVertical="true"
+            android:src="@drawable/next_arrow" />
+    </RelativeLayout>
+
+</LinearLayout>

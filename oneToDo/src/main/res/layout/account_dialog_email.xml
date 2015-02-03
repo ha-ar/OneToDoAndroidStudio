@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dslv="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:padding="10dp"
+        android:text="Email"
+        android:textColor="@color/_4d4d4d"
+        android:textSize="22.22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/email_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0px"
+        android:ems="10"
+        android:gravity="left"
+        android:padding="3dp"
+        android:text="You can get reminder alerts on this email	.You can change this email anytime."
+        android:textSize="16dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp" >
+
+        <TextView
+            android:id="@+id/ok_event"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="35dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="OK"
+            android:textColor="@color/active"
+            android:textSize="15.56sp" />
+
+        <TextView
+            android:id="@+id/cancel_event"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="40dp"
+            android:layout_toLeftOf="@+id/ok_event"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="CHANGE EMAIL"
+            android:textColor="@color/_4d4d4d"
+            android:textSize="15.56sp" />
+    </RelativeLayout>
+
+</LinearLayout>

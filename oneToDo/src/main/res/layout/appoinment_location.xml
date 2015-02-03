@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/location_container_appoinment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <AutoCompleteTextView
+        android:id="@+id/location_before_appoinment"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="40dp"
+        android:background="@drawable/input_fields"
+        android:hint="Enter location or tap on tag to set location"
+        android:singleLine="true"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:id="@+id/pre_defined_locations_appoinment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="4" >
+
+        <TextView
+            android:id="@+id/pre_defined_home_appoinment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/label_background_dotted"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="Home"
+            android:textColor="@color/grey" />
+
+        <TextView
+            android:id="@+id/pre_defined_office_appoinment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/label_background_dotted"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="Office"
+            android:textColor="@color/grey" />
+
+        <TextView
+            android:id="@+id/pre_defined_Market_appoinment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/label_background_dotted"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="Market"
+            android:textColor="@color/grey" />
+
+        <TextView
+            android:id="@+id/pre_defined_new_appoinment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/label_background_dotted"
+            android:gravity="center"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="New"
+            android:textColor="@color/grey" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/arrive_leave_checkbox_layout_appoinment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <RadioGroup
+            android:id="@+id/leave_arrive_radio_appoinment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/checkbox_arrive_appoinment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_buttons"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Arrive"
+                android:layout_marginRight="10dp"
+                android:textColor="@color/deep_sky_blue" />
+
+            <RadioButton
+                android:id="@+id/checkbox_leave_appoinment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_buttons"
+                android:button="@null"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="Leave"
+                android:textColor="@color/deep_sky_blue" />
+        </RadioGroup>
+    </LinearLayout>
+
+</LinearLayout>

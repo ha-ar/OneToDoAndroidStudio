@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notes_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:background="@drawable/underline_textview_lightgray"
+        android:paddingBottom="2dp"
+        android:text="NOTES"
+        android:textColor="@color/active"
+        android:textSize="13.33sp"
+        android:typeface="monospace" />
+
+    <EditText
+        android:id="@+id/notes_task"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/Button03"
+        android:layout_below="@+id/priority_text"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/input_fields_gray"
+        android:ems="10"
+        android:gravity="top|left"
+        android:hint="Add Notes here..."
+        android:inputType="textMultiLine"
+        android:minHeight="100dp"
+        android:padding="3dp"
+        android:textColor="@color/_4d4d4d"
+        android:textColorHint="@color/_999999"
+        android:textSize="13.33sp"
+        android:visibility="visible" />
+
+</LinearLayout>

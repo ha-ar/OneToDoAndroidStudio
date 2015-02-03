@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title_task_layout1"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_below="@+id/title_task_layout"
+    android:animateLayoutChanges="true"
+    android:background="@drawable/input_fields_gray"
+    android:gravity="center_vertical"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp" >
+
+    <ImageButton
+        android:id="@+id/assign_schedule_button"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/assign_blue" />
+
+    <TextView
+        android:id="@+id/schedule_assign"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/assign_schedule_button"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:hint="Assign"
+        android:paddingLeft="15dp"
+        android:paddingRight="20dp"
+        android:singleLine="true"
+        android:textColor="@color/_4d4d4d"
+        android:textColorHint="@color/_999999"
+        android:textSize="17.78sp" />
+
+    <ImageView
+        android:id="@+id/imageView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/schedule_assign"
+        android:layout_centerVertical="true"
+        android:src="@drawable/next_arrow" />
+
+</RelativeLayout>
