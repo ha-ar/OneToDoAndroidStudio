@@ -54,8 +54,7 @@ public class AssignListFragment extends ProjectsTabHolder {
 				.inflate(R.layout.invitation_list, container, false);
 		listView = (ListView) view.findViewById(R.id.invitation_list_view);
 		img = (ImageView) getActivity().findViewById(R.id.assign_add);
-        long[] currentdate = new long[3];
-		String date_string = null;
+		String date_string;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i <= 2; i++) {
 			date_string = Utils.getCurrentYear(i) + "-"
@@ -63,7 +62,6 @@ public class AssignListFragment extends ProjectsTabHolder {
 					+ Utils.getCurrentDayDigit(i);
 			try {
 				Date mDate = sdf.parse(date_string);
-				currentdate[i] = mDate.getTime();
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -85,7 +83,7 @@ public class AssignListFragment extends ProjectsTabHolder {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View container,
-					int arg2, long arg3) {
+					int position, long id) {
 				LinearLayout linearLayoutParent = (LinearLayout) container;
 				RelativeLayout linearLayoutChild = (RelativeLayout) linearLayoutParent
 						.getChildAt(1);
@@ -100,7 +98,6 @@ public class AssignListFragment extends ProjectsTabHolder {
 				img.setAlpha((float) 1);
 				AddTaskFragment.assignedSelectedID = String.valueOf(contactsList.get(position).getFriends_id());
 				AddTaskFragment.assignedSelectedName = contactsList.get(position).getName();
-				
 				AddTaskFragment.updateAssign(contactsList.get(position).getName());
 			}
 		});

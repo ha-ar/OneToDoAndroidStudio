@@ -202,7 +202,7 @@ public class AddTask extends FragmentActivity {
 
         // Initialize the ViewPager and set an adapter
         ViewPager pager = (ViewPager) aq.id(R.id.add_task_pager).getView();
-        pager.setOffscreenPageLimit(5);
+        pager.setOffscreenPageLimit(1);
 
         pager.setAdapter(new AddTaskPagerFragment(getSupportFragmentManager()));
         PageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);

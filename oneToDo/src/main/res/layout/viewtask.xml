@@ -25,6 +25,7 @@
             android:id="@+id/imageView1123"
             android:layout_width="match_parent"
             android:layout_height="204dp"
+            android:scaleType="fitXY"
             android:src="@drawable/viewbg" />
 
         <LinearLayout
@@ -210,11 +211,11 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="19dp"
                     android:singleLine="true"
-                    android:text="ABCDEFVGSFADS"
+                    android:text=""
                     android:textColor="@color/_4d4d4d"
                     android:textSize="13.33sp" />
             </LinearLayout>
- 			<LinearLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -241,33 +242,6 @@
                     android:textColor="#0eafe3"
                     android:textSize="12sp" />
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:paddingRight="15dp"
-                android:visibility="gone" >
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/underline_textview"
-                    android:paddingBottom="1dp"
-                    android:paddingLeft="3dp"
-                    android:text="NOTES"
-                    android:textColor="@color/active"
-                    android:textSize="13.33sp" />
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_marginLeft="15dp"
-                    android:ems="3"
-                    android:minLines="2" />
-            </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -275,78 +249,56 @@
                 android:layout_marginRight="10dp"
                 android:background="#1ab2e4" />
 
-            <LinearLayout
+
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingLeft="20dp"
-                android:paddingBottom="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="20dp" >
+                android:layout_height="fill_parent">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:visibility="visible" >
+                    <ListView
+                        android:id="@+id/invitee_list"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:visibility="visible"
+                        android:divider="@null"
+                        android:dividerHeight="0dp"
+                        android:layout_height="120dp" >
+                    </ListView>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/location_grey_dark" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="1dp"
+                        android:paddingLeft="3dp"
+                        android:text="NOTES"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@color/active"
+                        android:textSize="12sp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="#1ab2e4" />
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:id="@+id/notes"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:minLines="2" />
 
-                <TextView
-                    android:id="@+id/location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="23dp"
-                    android:singleLine="true"
-                    android:text="Hasan"
-                    android:textColor="@color/_4d4d4d"
-                    android:textSize="13.33sp" />
-            </LinearLayout>
-             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingLeft="20dp"
-                android:paddingBottom="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="10dp" >
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="#1ab2e4" />
+                </LinearLayout>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/location_grey_dark" />
-
-                <TextView
-                    android:id="@+id/location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="23dp"
-                    android:singleLine="true"
-                    android:text="Hasan"
-                    android:textColor="@color/_4d4d4d"
-                    android:textSize="13.33sp" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingLeft="20dp"
-                android:paddingBottom="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="10dp" >
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/location_grey_dark" />
-
-                <TextView
-                    android:id="@+id/location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="23dp"
-                    android:singleLine="true"
-                    android:text="Hasan"
-                    android:textColor="@color/_4d4d4d"
-                    android:textSize="13.33sp" />
-            </LinearLayout>
+            </ScrollView>
         </LinearLayout>
 
         <ImageView
@@ -355,13 +307,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:padding="5dp"
+            android:padding="20dp"
             android:src="@drawable/back" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/btn_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -398,7 +348,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/backview"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="15dp"
+            android:padding="15dp"
             android:src="@drawable/ic_show_white" />
 
         <Button
@@ -413,6 +363,7 @@
             android:layout_marginRight="7dp"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/imageView4"
+            android:visibility="gone"
             android:text="RSVP" />
 
     </RelativeLayout>

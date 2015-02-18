@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 
@@ -25,9 +24,8 @@ import com.vector.onetodo.utils.Utils;
 public class AddTaskAssign extends Fragment {
 
 	AlertDialog dialog,Invite_selection, Invite;
-	AQuery aqemail, aq, aq_menu,aq_selection,aq_invite;
+	AQuery  aq, aq_menu,aq_selection,aq_invite;
 	public int check = 0, position = 0;
-    LinearLayout last = null;
     private PopupWindow popupWindowTask;
 	
 	public static AddTaskAssign newInstance(int position) {
@@ -79,7 +77,6 @@ public class AddTaskAssign extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Invite.dismiss();
 			}
 		});
@@ -88,7 +85,6 @@ public class AddTaskAssign extends Fragment {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 
 				Invite.show();
 				Invite_selection.dismiss();
@@ -107,8 +103,6 @@ public class AddTaskAssign extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
 				if (popupWindowTask.isShowing()) {
 					popupWindowTask.dismiss();
 
@@ -134,7 +128,6 @@ public class AddTaskAssign extends Fragment {
 
 			@Override
 			public void onDismiss() {
-				// TODO Auto-generated method stub
 				aq.id(R.id.assign_menu).image(R.drawable.ic_show_white);
 			}
 		});
@@ -143,7 +136,7 @@ public class AddTaskAssign extends Fragment {
 		aq.id(R.id.assign_back).clicked(new OnClickListener() {
 
 			@Override
-			public void onClick(View arg0) { // TODO Auto-generated
+			public void onClick(View arg0) {
 				getActivity().getSupportFragmentManager().popBackStack();
 			}
 		});
@@ -167,7 +160,7 @@ public class AddTaskAssign extends Fragment {
 		tabs.setIndicatorColor(Color.parseColor("#ffffff"));
 		tabs.setTextColor(Color.parseColor("#ffffff"));
 		tabs.setSmoothScrollingEnabled(true);
-		tabs.setShouldExpand(false);
+		tabs.setShouldExpand(true);
 		tabs.setAllCaps(false);
 		tabs.setTypeface(null, Typeface.NORMAL);
 		tabs.setViewPager(pager);
@@ -218,10 +211,10 @@ public class AddTaskAssign extends Fragment {
 		public Fragment getItem(int position) {
 			ProjectsTabHolder fragment;
 			if(AddTaskAssign.this.position == 1 || AddTaskAssign.this.position == 4){
-				fragment = (ProjectsTabHolder) AssignMultipleFragment
+				fragment = AssignMultipleFragment
 						.newInstance(position);
 			}else
-				fragment = (ProjectsTabHolder) AssignListFragment
+				fragment = AssignListFragment
 					.newInstance(position);
 
 			mScrollTabHolders.put(position, fragment);
