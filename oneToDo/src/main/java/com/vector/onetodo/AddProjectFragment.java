@@ -1,14 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -61,45 +52,37 @@ import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+
 public class AddProjectFragment extends Fragment {
 
 	// event_attachment
-	public static AQuery aq, popupAQ, aqloc, AQlabel, AQlabel_edit,
+	private AQuery aq, AQlabel, AQlabel_edit,
 			AQlabel_del;
 
-	View label_view, viewl;
-	GradientDrawable label_color;
-	int Label_postion = -1;
-	private int lastCheckedId = -1;
-	ImageView last;
-	String plabel = null;
-	int pposition = -1;
-	int itempos = -1;
-	int MaxId = -1;
+	private View label_view;
+	private int Label_postion = -1;
+	private ImageView last;
+	private String plabel = null;
+	private int pposition = -1;
+	private int itempos = -1;
 	public static EditText taskTitle;
-
-	static List<java.lang.Object> names;
-
 	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
-
 	private String currentDay, currentMon;
-	static String checkedId2 = null;
 	private Uri imageUri;
 	public static final int RESULT_GALLERY = 0;
-
 	public static final int PICK_CONTACT = 2;
-
 	private static final int TAKE_PICTURE = 1;
-
-	static LinearLayout lll;
-
-	AlertDialog  add_new_label_alert, assig_alert,location_del,label_edit,
-			share_alert, date_time_alert;
-	static int currentHours, currentMin, currentDayDigit, currentYear,
+	private AlertDialog  add_new_label_alert, label_edit;
+	public static int currentHours, currentMin, currentDayDigit, currentYear,
 			currentMonDigit;
-
-	int Month, Year;
-
 	private int[] collapsingViews = { R.id.date_time_include,
 			R.id.label_project_grid_view };
 
@@ -107,15 +90,15 @@ public class AddProjectFragment extends Fragment {
 
 	int dayPosition;
 	Editor editor;
-	EditText label_field = null;
 
 	protected static final int RESULT_CODE = 123;
 
 	public static View allView;
 
 	public static Activity act;
+    private AlertDialog location_del;
 
-	public static AddProjectFragment newInstance(int position, int dayPosition) {
+    public static AddProjectFragment newInstance(int position, int dayPosition) {
 		AddProjectFragment myFragment = new AddProjectFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -683,7 +666,6 @@ public class AddProjectFragment extends Fragment {
 								+ " will be deleted");
 				AQlabel_edit.id(R.id.add_task_edit_title).text(
 						"Label: " + ((TextView) arg1).getText().toString());
-				viewl = arg1;
 				itempos = position;
 				label_edit.show();
 			}
@@ -734,7 +716,7 @@ public class AddProjectFragment extends Fragment {
 
 	}
 
-	public void Save(String id, String name, int label_position) {
+	void Save(String id, String name, int label_position) {
 		// 0 - for private mode
 		editor.putString(5 + "key_label" + id, name); // Storing integer
 		editor.putInt(5 + "key_color_position" + id, label_position); // Storing
@@ -742,7 +724,7 @@ public class AddProjectFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void Load(String id) {
+	void Load(String id) {
 		plabel = null;
 		plabel = AddTask.label.getString(5 + "key_label" + id, null); // getting
 																		// String
@@ -752,9 +734,4 @@ public class AddProjectFragment extends Fragment {
 																			// String
 	}
 
-	public void Remove(String id) {
-		editor.remove(5 + "key_label" + id); // will delete key name
-		editor.remove(5 + "key_color_position" + id); // will delete key email
-		editor.commit();
-	}
 }

@@ -1,6 +1,5 @@
 package com.vector.onetodo;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -27,16 +26,18 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.vector.onetodo.utils.Constants;
 
+import net.simonvt.numberpicker.NumberPicker;
+
 public class AddEventBeforeFragment extends Fragment {
 
-	int position;
+	private int position;
 
-	AQuery aq, aqd, aq_del, aq_edit;
-	TextView before;
-	Editor editor;
-	String padress = null, pname = null;
-	AlertDialog alert, location, location_del, location_edit;
-	View temp, viewl;
+	private AQuery aq, aqd, aq_del, aq_edit;
+	private TextView before;
+	private Editor editor;
+	private String padress = null, pname = null;
+	private AlertDialog alert, location, location_del, location_edit;
+	private View viewl;
 
 	public static View viewP;
 
@@ -364,7 +365,7 @@ public class AddEventBeforeFragment extends Fragment {
 			aq.id(R.id.pre_defined_11).getTextView()
 					.setOnLongClickListener(new LocationEditClickListener());
 
-			temp = aq.id(R.id.pre_defined_11).getView();
+			View temp = aq.id(R.id.pre_defined_11).getView();
 			aq.id(R.id.pre_defined_11).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_21).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_31).clicked(new LocationTagClickListener());
@@ -476,27 +477,27 @@ public class AddEventBeforeFragment extends Fragment {
 
 	}
 
-	public void save(long id, String name, String location) {
+	void save(long id, String name, String location) {
 		// 0 - for private mode
 		editor.putString(2 + "key_name" + id, name); // Storing integer
 		editor.putString(2 + "key_location" + id, location); // Storing float
 		editor.commit();
 	}
 
-	public void load(long id) {
+	void load(long id) {
 		pname = AddTask.pref.getString(2 + "key_name" + id, null); // getting
 																	// String
 		padress = AddTask.pref.getString(2 + "key_location" + id, null); // getting
 																			// String
 	}
 
-	public void remove(long id) {
+	void remove(long id) {
 		editor.remove(2 + "key_name" + id); // will delete key name
 		editor.remove(2 + "key_location" + id); // will delete key email
 		editor.commit();
 	}
 
-	public void set() {
+	void set() {
 		pname = null;
 		pname = AddTask.pref.getString(
 				2 + "key_name" + aq.id(R.id.pre_defined_11).getView().getId(),

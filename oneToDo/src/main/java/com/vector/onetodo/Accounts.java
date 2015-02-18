@@ -1,10 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -35,20 +30,32 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 import com.vector.onetodo.utils.Utils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Accounts extends Fragment {
 
-	AQuery aq, aq_attach, aq_onetodoinfo, aq_buypro, aq_phone, aq_changephone,
-			aq_email, aq_changeemail, aq_name;
+	private AQuery aq;
+    private AQuery aq_changephone;
+    private AQuery aq_changeemail;
+    private AQuery aq_name;
 	private Uri imageUri;
 	File photo;
 	private static final int TAKE_PICTURE = 1;
 	public static final int RESULT_GALLERY = 0;
 	CircularImageView imageEvent;
-	Dialog onetodoinfo, buypro, onetodopro, phoneinfo, changephone, emailinfo,
-			changeemail, nameinfo, select_image;
-	private ActionBar actionBar;
+	private Dialog onetodoinfo;
+    private Dialog buypro;
+    private Dialog phoneinfo;
+    private Dialog changephone;
+    private Dialog emailinfo;
+    private Dialog changeemail;
+    private Dialog nameinfo;
+    private Dialog select_image;
 
-	@Override
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.account, container, false);
@@ -57,7 +64,7 @@ public class Accounts extends Fragment {
 		Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
 		if (toolbar != null)
 			((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
-		actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
 		actionBar.setTitle("Manage Account");
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowHomeEnabled(true);
@@ -93,28 +100,28 @@ public class Accounts extends Fragment {
 
 		View dialoglayout6 = inflater.inflate(
 				R.layout.account_dialog_attachfrom_gallery_camera, null, false);
-		aq_attach = new AQuery(dialoglayout6);
+        AQuery aq_attach = new AQuery(dialoglayout6);
 		AlertDialog.Builder builder6 = new AlertDialog.Builder(getActivity());
 		builder6.setView(dialoglayout6);
 		select_image = builder6.create();
 
 		View dialoglayout7 = inflater.inflate(
 				R.layout.account_dialog_getonetodo, null, false);
-		aq_onetodoinfo = new AQuery(dialoglayout7);
+        AQuery aq_onetodoinfo = new AQuery(dialoglayout7);
 		AlertDialog.Builder builder7 = new AlertDialog.Builder(getActivity());
 		builder7.setView(dialoglayout7);
 		onetodoinfo = builder7.create();
 
 		View dialoglayout8 = inflater.inflate(R.layout.account_dialog_phoneno,
 				null, false);
-		aq_phone = new AQuery(dialoglayout8);
+        AQuery aq_phone = new AQuery(dialoglayout8);
 		AlertDialog.Builder builder8 = new AlertDialog.Builder(getActivity());
 		builder8.setView(dialoglayout8);
 		phoneinfo = builder8.create();
 
 		View dialoglayout9 = inflater.inflate(R.layout.account_dialog_email,
 				null, false);
-		aq_email = new AQuery(dialoglayout9);
+        AQuery aq_email = new AQuery(dialoglayout9);
 		AlertDialog.Builder builder9 = new AlertDialog.Builder(getActivity());
 		builder9.setView(dialoglayout9);
 		emailinfo = builder9.create();
@@ -128,8 +135,7 @@ public class Accounts extends Fragment {
 
 		View dialoglayout2 = inflater.inflate(
 				R.layout.account_dialog_getbuypro, null, false);
-		aq_buypro = new AQuery(dialoglayout2);
-		AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
 		builder2.setView(dialoglayout2);
 		buypro = builder2.create();
 
@@ -432,7 +438,7 @@ public class Accounts extends Fragment {
 		}
 	}
 
-	public void setFont() {
+	void setFont() {
 		Utils.RobotoRegular(getActivity(), aq.id(R.id.accounts).getTextView());
 		Utils.RobotoRegular(getActivity(), aq.id(R.id.email).getTextView());
 		Utils.RobotoRegular(getActivity(), aq.id(R.id.mynumber).getTextView());

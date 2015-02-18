@@ -10,7 +10,7 @@ import com.androidquery.AQuery;
 
 public class About extends Fragment {
 
-	AQuery aq;
+	private AQuery aq;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

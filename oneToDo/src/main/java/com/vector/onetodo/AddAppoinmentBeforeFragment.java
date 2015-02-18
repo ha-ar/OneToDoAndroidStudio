@@ -1,6 +1,5 @@
 package com.vector.onetodo;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -25,19 +24,23 @@ import android.widget.TextView;
 
 import com.androidquery.AQuery;
 
+import net.simonvt.numberpicker.NumberPicker;
+
 public class AddAppoinmentBeforeFragment extends Fragment {
 
-	int position;
-	AQuery aq, aqd, aq_edit, aq_del;
-	TextView before;
-	Editor editor;
-	AlertDialog alert, location, label,location_edit ,location_del;
+	private int position;
+	private AQuery aq, aqd, aq_edit, aq_del;
+	private TextView before;
+	private Editor editor;
+	private AlertDialog alert, location, location_edit ,location_del;
 	static final String[] beforeArray = new String[] { "On Time", "15 Mins",
 			"30 Mins", "2 Hours", "Custom" };
 	static final String[] values = { "Mins", "Hours", "Days", "Weeks",
 			"Months", "Years" };
-	static View viewP, viewl, button = null, temp;
-	String Title, pname = null, padress = null;
+	public static View viewP;
+    private static View viewl;
+    private static View button = null;
+    String  pname = null, padress = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
 
@@ -95,16 +98,8 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
-							if (((CheckBox) arg0).isChecked()) {
-								aq.id(R.id.notification_radio_appoin).textColor(
-										getResources()
-												.getColor(R.color._4d4d4d));
-							} else {
-
-								aq.id(R.id.notification_radio_appoin).textColor(
-										Color.parseColor("#bababa"));
-							}
+                            aq.id(R.id.notification_radio_appoin).textColor(((CheckBox) arg0).isChecked() ? getResources()
+                                    .getColor(R.color._4d4d4d) : Color.parseColor("#bababa"));
 						}
 					});
 
@@ -113,7 +108,6 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio_appoin).textColor(
 										getResources()
@@ -135,23 +129,24 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 								public View getView(int position,
 										View convertView, ViewGroup parent) {
 
-									TextView textView = (TextView) super
-											.getView(position, convertView,
-													parent);
-									if (textView.getText().toString()
+									TextView textView;
+                                    textView = (TextView) super
+                                            .getView(position, convertView,
+                                                    parent);
+                                    if (textView.getText().toString()
 											.equals("15 Mins")) {
 
 										previousSelected = textView;
-										((TextView) textView)
+										textView
 												.setBackgroundResource(R.drawable.round_buttons_blue);
-										((TextView) textView)
+										textView
 												.setTextColor(Color.WHITE);
 
 									} else
-										((TextView) textView)
+										textView
 												.setTextColor(getResources()
-														.getColor(
-																R.color._4d4d4d));
+                                                        .getColor(
+                                                                R.color._4d4d4d));
 									return textView;
 								}
 
@@ -183,7 +178,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 					if (((TextView) previousSelected).getText().toString()
 							.equals("15 Mins")) {
 
-						((TextView) previousSelected)
+						previousSelected
 								.setBackgroundResource(R.drawable.round_buttons_white);
 						((TextView) previousSelected)
 								.setTextColor(getResources().getColor(
@@ -195,7 +190,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 					}
 					if (((TextView) view).getText().toString()
 							.equals("15 Mins")) {
-						((TextView) view)
+						view
 								.setBackgroundResource(R.drawable.round_buttons_blue);
 					}
 					((TextView) view).setTextColor(Color.WHITE);
@@ -329,7 +324,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 			aq.id(R.id.pre_defined_4).getTextView()
 					.setOnLongClickListener(new LocationEditClickListener());
 
-			temp = aq.id(R.id.pre_defined_1).getView();
+            View temp = aq.id(R.id.pre_defined_1).getView();
 			aq.id(R.id.pre_defined_1).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_2).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_3).clicked(new LocationTagClickListener());
@@ -467,27 +462,27 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 	}
 
-	public void save(long id, String name, String location) {
+	void save(long id, String name, String location) {
 		// 0 - for private mode
 		editor.putString(4 + "key_name" + id, name); // Storing integer
 		editor.putString(4 + "key_location" + id, location); // Storing float
 		editor.commit();
 	}
 
-	public void load(long id) {
+	void load(long id) {
 		pname = AddTask.pref.getString(4 + "key_name" + id, null); // getting
 																	// String
 		padress = AddTask.pref.getString(4 + "key_location" + id, null); // getting
 																			// String
 	}
 
-	public void remove(long id) {
+	void remove(long id) {
 		editor.remove(4 + "key_name" + id); // will delete key name
 		editor.remove(4 + "key_location" + id); // will delete key email
 		editor.commit();
 	}
 
-	public void set() {
+	void set() {
 		pname = null;
 		pname = AddTask.pref.getString(
 				4 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),

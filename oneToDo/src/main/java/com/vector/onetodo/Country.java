@@ -1,9 +1,5 @@
 package com.vector.onetodo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -25,14 +21,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Country extends Fragment {
 
 	private ListView lv;
 	private CountriesListAdapter adapter;
-	private ActionBar actionBar;
-	private List<String> countriesList;
 
-	@Override
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.country, container, false);
@@ -42,7 +40,7 @@ public class Country extends Fragment {
 		if (toolbar != null)
 			((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
 
-		actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
 		actionBar.setTitle("Select Country");
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowHomeEnabled(true);
@@ -56,7 +54,7 @@ public class Country extends Fragment {
 
 		String[] recourseList = getResources().getStringArray(
 				R.array.CountryCodes);
-		countriesList = new ArrayList<String>(Arrays.asList(recourseList));
+        List<String> countriesList = new ArrayList<String>(Arrays.asList(recourseList));
 		adapter = new CountriesListAdapter(getActivity(), countriesList);
 		lv.setAdapter(adapter);
 		lv.setOnItemClickListener(new OnItemClickListener() {

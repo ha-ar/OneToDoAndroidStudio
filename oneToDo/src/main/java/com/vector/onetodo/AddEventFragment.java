@@ -98,37 +98,30 @@ import com.vector.onetodo.utils.Utils;
 
 public class AddEventFragment extends Fragment {
 
-	public AQuery aq, AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
-
-	// HttpClient client;
-	HttpPost post;
-	List<NameValuePair> pairs;
-	HttpResponse response = null;
-	static int FragmentCheck = 0;
-	Uri filename;
-	static EditText taskTitle;
+	private AQuery aq, AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
+	private List<NameValuePair> pairs;
+	private static int FragmentCheck = 0;
+	private Uri filename;
+	public static EditText taskTitle;
 	private static int Tag = 0;
 	private PopupWindow popupWindowAttach;
 	static LinearLayout ll_iner;
 	private static View previousSelected;
-	static String checkedId2 = null, setmon1;
-	View label_view, viewl;;
-	GradientDrawable label_color;
-	int Label_postion = -1;
-	int dayPosition;
+	static String setmon1;
+	private View label_view, viewl;
+	private int Label_postion = -1;
+	private int dayPosition;
 	private int lastCheckedId = -1;
-	ImageView last;
-	String plabel = null;
-
-	static String repeatdate = "";
-	int pposition = -1;
-	int itempos = -1;
-	int MaxId = -1;
-	Editor editor, editorattach;
-	
-	AlertDialog add_new_label_alert, date_time_alert, label_edit, location_del,
+	private ImageView last;
+	private String plabel = null;
+	public static String repeatdate = "";
+	private int pposition = -1;
+	private int itempos = -1;
+	private int MaxId = -1;
+	private Editor editor, editorattach;
+	private AlertDialog add_new_label_alert, date_time_alert, label_edit, location_del,
 			attach_alert;
-	static int currentHours, currentMin, currentDayDigit, currentYear,
+	public static int currentHours, currentMin, currentDayDigit, currentYear,
 			currentMonDigit, endEventHours, endEventMin, endEventDayDigit, endEventYear, endEventMonDigit;
 
 	private String currentDay, currentMon, endEventDay, endEventMon, title;
@@ -142,28 +135,17 @@ public class AddEventFragment extends Fragment {
 			R.id.spinner_labels_event, R.id.spinner_label_layout };
 
 	public static HashMap<Integer, Integer> inflatingLayoutsEvents = new HashMap<Integer, Integer>();
-
-	public static View parentView;
-
 	protected static final int RESULT_CODE = 123;
-
 	private static final int TAKE_PICTURE = 1;
-
 	public static final int RESULT_GALLERY = 0;
-
 	public static final int PICK_CONTACT = 2;
-
     public static final int RESULT_DROPBOX = 3;
-
     public static final int RESULT_GOOGLEDRIVE = 4;
-
 	private Uri imageUri;
-
 	public static View allView;
-
 	public static Activity act;
-	
 	public static ArrayList<String> selectedInvitees = new ArrayList<String>();
+
 
 	public static AddEventFragment newInstance(int position, int dayPosition) {
 		AddEventFragment myFragment = new AddEventFragment();
@@ -359,7 +341,7 @@ public class AddEventFragment extends Fragment {
 					boolean isChecked) {
 				// TODO Auto-generated method stub
 
-				if (isChecked == true) {
+				if (isChecked) {
 					aq.id(R.id.time_from).getTextView()
 							.setVisibility(View.GONE);
 					aq.id(R.id.time_to).getTextView().setVisibility(View.GONE);
@@ -1703,17 +1685,17 @@ public class AddEventFragment extends Fragment {
 			bm = MediaStore.Images.Media.getBitmap(getActivity()
 					.getContentResolver(), filename);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		byte[] byteArray = baos.toByteArray();
+        if (bm != null) {
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        }
+        byte[] byteArray = baos.toByteArray();
 		String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-		pairs = new ArrayList<NameValuePair>();
+		pairs = new ArrayList<>();
 		pairs.add(new BasicNameValuePair("image", encoded));
 
 		try {

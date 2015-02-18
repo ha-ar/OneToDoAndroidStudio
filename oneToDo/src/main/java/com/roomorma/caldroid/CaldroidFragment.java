@@ -1,22 +1,9 @@
 package com.roomorma.caldroid;
 
-import hirondelle.date4j.DateTime;
-
-import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -31,22 +18,28 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.antynyt.infiniteviewpager.InfinitePagerAdapter;
 import com.antynyt.infiniteviewpager.InfiniteViewPager;
 import com.vector.onetodo.R;
+
+import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import hirondelle.date4j.DateTime;
 
 /**
  * Caldroid is a fragment that display calendar with dates in a month. Caldroid
@@ -96,21 +89,8 @@ public class CaldroidFragment extends DialogFragment {
 	public static int FRIDAY = 6;
 	public static int SATURDAY = 7;
 
-	/*
-	 * Listview for tasks
-	 */
 
-	ListView taskList;
-
-	View mFakeHeader;
-
-	View calendarHeader;
-
-	GridView weeksGrid;
-
-	private AccelerateDecelerateInterpolator mSmoothInterpolator;
-
-	/**
+    /**
 	 * Flags to display month
 	 */
 	private static final int MONTH_YEAR_FLAG = DateUtils.FORMAT_SHOW_DATE
@@ -207,7 +187,7 @@ public class CaldroidFragment extends DialogFragment {
 	/**
 	 * textColorForDateMap holds color for text for each date
 	 */
-	protected HashMap<DateTime, Integer> textColorForDateTimeMap = new HashMap<DateTime, Integer>();;
+	protected HashMap<DateTime, Integer> textColorForDateTimeMap = new HashMap<DateTime, Integer>();
 
 	/**
 	 * First column of calendar is Sunday
@@ -1116,55 +1096,6 @@ public class CaldroidFragment extends DialogFragment {
 		View view = inflater.inflate(R.layout.calendar_view_caldroid,
 				container, false);
 
-		taskList = (ListView) view.findViewById(R.id.tasks_list);
-		String[] tasks = { "temp", "temp", "temp", "temp", "temp", "temp",
-				"temp", "temp", "temp", "temp", "temp", "temp", "temp", "temp",
-				"temp", "temp", "temp", "temp", "temp", "temp", "temp", "temp",
-				"temp", "temp", "temp" };
-		mSmoothInterpolator = new AccelerateDecelerateInterpolator();
-
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-				android.R.layout.simple_list_item_1, tasks);
-
-		calendarHeader = view.findViewById(R.id.months_infinite_pager);
-		mFakeHeader = getActivity().getLayoutInflater().inflate(
-				R.layout.fake_calendar_view, taskList, false);
-		taskList.addHeaderView(mFakeHeader);
-		taskList.setAdapter(adapter);
-
-		weeksGrid = (GridView) view.findViewById(R.id.week_view_grid);
-		ArrayAdapter<String> weekViewAdapter = new ArrayAdapter<String>(
-				getActivity(), R.layout.date_cell2,
-				CalendarHelper.getCurrentWeek());
-		weeksGrid.setAdapter(weekViewAdapter);
-
-		taskList.setOnScrollListener(new AbsListView.OnScrollListener() {
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if (scrollState == 1) {
-					userScrolled = true;
-				}
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
-				if (userScrolled) {
-					int scrollY = getScrollY();
-					float ratio = clamp(20 / -calendarHeader.getTranslationY(),
-							0.0f, 1.0f);
-					calendarHeader.setTranslationY(-scrollY);
-					setTitleAlpha(ratio);
-				}
-
-			}
-		});
-
-		// For the monthTitleTextView
-		// monthTitleTextView = (TextView) getActivity()
-		// .findViewById(R.id.weather);
-		// monthTitleTextView.setTypeface(TypeFaces.get(getActivity(),
-		// "HeleveticaNeueTStd-Roman"));
 
 		// For the left arrow button
 		leftArrowButton = (Button) view.findViewById(R.id.calendar_left_arrow);
@@ -1209,64 +1140,6 @@ public class CaldroidFragment extends DialogFragment {
 			caldroidListener.onCaldroidViewCreated();
 		}
 
-		// Show spinner for monthly or yearly view
-		// String[] yearArray = { "Month", "Year" };
-		String[] monthArray = { "January", "Feburary", "March", "April", "May",
-				"June", "July", "August", "September", "October", "November",
-				"December" };
-		// Spinner yearSpinner = (Spinner) view
-		// .findViewById(R.id.calendar_view_caldroid);
-		//
-		// ArrayAdapter<String> spinner_adapter = new ArrayAdapter<String>(
-		// getActivity(), android.R.layout.simple_spinner_dropdown_item,
-		// yearArray);
-		// yearSpinner.setAdapter(spinner_adapter);
-		// yearSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-		//
-		// @Override
-		// public void onItemSelected(AdapterView<?> parent, View view,
-		// int position, long id) {
-		// if (position == 1) {
-		// Fragment fr = YearViewParent.newInstance();
-		// FragmentTransaction transaction = getActivity()
-		// .getSupportFragmentManager().beginTransaction();
-		// transaction.setCustomAnimations(R.anim.slide_in,
-		// R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
-		// transaction.replace(R.id.calendar_container, fr);
-		// transaction.addToBackStack("YearView");
-		// transaction.commit();
-		// }
-		// }
-		//
-		// @Override
-		// public void onNothingSelected(AdapterView<?> parent) {
-		// do nothing
-		// }
-		//
-		// });
-		Spinner monthSpinner = (Spinner) view
-				.findViewById(R.id.select_month_caldroid);
-		ArrayAdapter<String> month_spinner_adapter = new ArrayAdapter<String>(
-				getActivity(), android.R.layout.simple_spinner_dropdown_item,
-				monthArray);
-		monthSpinner.setAdapter(month_spinner_adapter);
-		monthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-
-				DateTime dateToShow = new DateTime(year, position + 1, 1, 0, 0,
-						0, 0);
-				moveToDateTime(dateToShow);
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-
-			}
-
-		});
 		final Button rightYear = (Button) view.findViewById(R.id.right_year);
 		final Button leftYear = (Button) view.findViewById(R.id.left_year);
 
@@ -1598,65 +1471,6 @@ public class CaldroidFragment extends DialogFragment {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public int getScrollY() {
-		View c = taskList.getChildAt(0);
-		if (c == null) {
-			return 0;
-		}
-
-		int firstVisiblePosition = taskList.getFirstVisiblePosition();
-		int top = c.getTop();
-
-		int headerHeight = 0;
-		if (firstVisiblePosition >= 1) {
-			headerHeight = mFakeHeader.getHeight();
-		}
-
-		return -top + firstVisiblePosition * c.getHeight() + headerHeight;
-	}
-
-	public static float clamp(float value, float max, float min) {
-		return Math.min(Math.max(value, max), min);
-	}
-
-	private RectF mRect1 = new RectF();
-	private RectF mRect2 = new RectF();
-
-	private void interpolate(View view1, View view2, float interpolation) {
-		getOnScreenRect(mRect1, view1);
-		getOnScreenRect(mRect2, view2);
-
-		float scaleX = 1.0F + interpolation
-				* (mRect2.width() / mRect1.width() - 1.0F);
-		float scaleY = 1.0F + interpolation
-				* (mRect2.height() / mRect1.height() - 1.0F);
-		float translationX = 0.5F * (interpolation * (mRect2.left
-				+ mRect2.right - mRect1.left - mRect1.right));
-		float translationY = 0.5F * (interpolation * (mRect2.top
-				+ mRect2.bottom - mRect1.top - mRect1.bottom));
-
-		view1.setTranslationX(translationX);
-		view1.setTranslationY(translationY - calendarHeader.getTranslationY());
-		view1.setScaleX(scaleX);
-		view1.setScaleY(scaleY);
-	}
-
-	private RectF getOnScreenRect(RectF rect, View view) {
-		rect.set(view.getLeft(), view.getTop(), view.getRight(),
-				view.getBottom());
-		return rect;
-	}
-
-	private void setTitleAlpha(float alpha) {
-		if (alpha <= 0.05f) {
-			weeksGrid.setVisibility(View.VISIBLE);
-			alpha = 0.0f;
-		} else {
-			weeksGrid.setVisibility(View.GONE);
-		}
-		calendarHeader.setAlpha(alpha);
 	}
 
 }

@@ -21,8 +21,9 @@ public class AppPrefs {
 	private String TIME_FORMAT = "time_format";
 	private String STARTING_DAY = "starting_day";
 	private String COUNTRY_CODE = "country_code";
+    private String USER_LOCATION = "user_location";
 
-	public AppPrefs(Context context) {
+    public AppPrefs(Context context) {
 		this.appSharedPrefs = context.getSharedPreferences(SHARED_NAME,
 				Activity.MODE_PRIVATE);
 		this.prefsEditor = appSharedPrefs.edit();
@@ -163,4 +164,10 @@ public class AppPrefs {
 		return appSharedPrefs.getString(COUNTRY_CODE, "+");
 	}
 
+    public String getUserLocation() {
+        return appSharedPrefs.getString(USER_LOCATION, "");
+    }
+    public void setUserLocation(String userLocation){
+        prefsEditor.putString(USER_LOCATION, userLocation).commit();
+    }
 }

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -70,9 +69,7 @@ import com.google.android.gms.plus.Plus.PlusOptions;
 import com.google.gson.Gson;
 import com.vector.model.TaskData;
 import com.vector.model.TaskData.Todos;
-import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
-import com.vector.onetodo.db.gen.LabelNameDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
@@ -101,41 +98,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import de.greenrobot.dao.query.QueryBuilder;
-
 public class MainActivity extends BaseActivity implements
-		ViewPager.OnPageChangeListener, OnItemClickListener, ConnectionCallbacks, OnConnectionFailedListener {
-	public static GoogleApiClient mGoogleApiClient;
+		OnItemClickListener, ConnectionCallbacks, OnConnectionFailedListener {
+	private GoogleApiClient mGoogleApiClient;
 	public static final int RC_SIGN_IN = 0;
-	public boolean mIntentInProgress;
-	public ConnectionResult mConnectionResult;
-	public boolean mSignInClicked;
+	private boolean mIntentInProgress;
+	private ConnectionResult mConnectionResult;
+	private boolean mSignInClicked;
 	ProgressDialog progressDialog;
 	final List<String> Permissions = Arrays.asList("public_profile", "email",
 			"user_likes", "user_status", "offline_access", "read_stream", 
             "publish_stream","create_event","user_events","friends_events",
             "publish_checkins", "friends_checkins","read_friendlists");
 	public static SharedPreferences setting;
-	Editor setting_editor;
 	public static Calendar CurrentDate;
-	static int check = -1, check1 = 0;;
+	static int  check1 = 0;;
 	public static int menuchange = 0;
 	private PopupWindow popupWindowTask;
 	public static RelativeLayout layout_MainMenu;
 	private InputMethodManager inputMethodManager;
 	private AlertDialog date_time_alert;
-	public static List<ToDo> todos;
 	public static int pager_number = 0;
 	private AlarmManagerBroadcastReceiver alarm;
 	static ToDoDao tododao;
-	static LabelNameDao labelnamedao;
 	static LabelDao labeldao;
 	static List<ToDo> todo_obj;
-	public ViewPager pager;
+	public static ViewPager pager;
 	public TabPagerAdapter tabPagerAdapter;
 	private PagerSlidingTabStrip tabs;
-	public static QueryBuilder<Label> label1, label2, label3, label4, label5,
-			label6;
 	public static List<Todos> Today, Tomorrow, Upcoming;
 	private ActionBarDrawerToggle actionBarDrawerToggle;
 	private DrawerLayout drawerLayout;
@@ -266,19 +256,19 @@ public class MainActivity extends BaseActivity implements
 		if (id == R.id.action_settings) {
 			return true;
 		}
-		if (id == R.id.action_gmail) {
-			if (!mGoogleApiClient.isConnected())
-			{
-				g_plus_LogIn();					
-			}
-			return true;
-		}
-		if (id == R.id.action_facebook) {
-			{
-				Fb_Clicked();
-			}
-			return true;
-		}
+//		if (id == R.id.action_gmail) {
+//			if (!mGoogleApiClient.isConnected())
+//			{
+//				g_plus_LogIn();
+//			}
+//			return true;
+//		}
+//		if (id == R.id.action_facebook) {
+//			{
+//				Fb_Clicked();
+//			}
+//			return true;
+//		}
 		return super.onOptionsItemSelected(item);
 	}
 	public void Fb_Clicked() {
@@ -367,7 +357,7 @@ public class MainActivity extends BaseActivity implements
 		try {			
 			if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
 				com.google.android.gms.plus.model.people.Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-				name=  currentPerson.getId().toString();
+				name= currentPerson.getId();
 				Log.e("Name","//"+name);
 			}
 			mGoogleApiClient.disconnect();
@@ -450,10 +440,9 @@ protected void onActivityResult(int requestCode, int responseCode,
 									@Override
 									public void onCompleted(GraphUser user,
 											Response response) {
-										// TODO Auto-generated method stub
 										 if (user != null) {
 											 String fqlQuery = "SELECT eid, name, pic, creator, start_time FROM event WHERE eid IN (SELECT eid FROM event_member WHERE uid='"+user.getId()+"')";       
-											 Log.e("Result:" , fqlQuery.toString());      
+											 Log.e("Result:" , fqlQuery);
 											 Bundle params = new Bundle();
 											    params.putString("q", fqlQuery);
 											    Request request = new Request(session, "/fql", params, HttpMethod.GET, 
@@ -554,9 +543,9 @@ protected void onActivityResult(int requestCode, int responseCode,
 
 		// ***** Initializinf Today, tomorrow, upcoming and seprate save for
 		// each**********//
-		Today = new ArrayList<Todos>();
-		Tomorrow = new ArrayList<Todos>();
-		Upcoming = new ArrayList<Todos>();
+		Today = new ArrayList<>();
+		Tomorrow = new ArrayList<>();
+		Upcoming = new ArrayList<>();
 
 		CurrentDate = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -585,17 +574,19 @@ protected void onActivityResult(int requestCode, int responseCode,
 					e.printStackTrace();
 				}
 
-				if (date.equals(today)) {
-					Log.e("Today", date + "   " + today);
-					Today.add((TaskData.getInstance().todos.get(i)));
-				} else if (date.equals(tomorrow)) {
-					Log.v("Tomorrow", date + "   " + tomorrow);
-					Tomorrow.add((TaskData.getInstance().todos.get(i)));
-				} else if (date.after(tomorrow)) {
-					Log.v("upcoming", date + "   " + tomorrow);
-					Upcoming.add((TaskData.getInstance().todos.get(i)));
-				}
-			}
+                if (date != null) {
+                    if (date.equals(today)) {
+                        Log.e("Today", date + "   " + today);
+                        Today.add((TaskData.getInstance().todos.get(i)));
+                    } else if (date.equals(tomorrow)) {
+                        Log.v("Tomorrow", date + "   " + tomorrow);
+                        Tomorrow.add((TaskData.getInstance().todos.get(i)));
+                    } else if (date.after(tomorrow)) {
+                        Log.v("upcoming", date + "   " + tomorrow);
+                        Upcoming.add((TaskData.getInstance().todos.get(i)));
+                    }
+                }
+            }
 		}
 
 		inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -716,18 +707,6 @@ protected void onActivityResult(int requestCode, int responseCode,
 			}
 		});
 
-		aq.id(R.id.search_button).clicked(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				inputMethodManager.toggleSoftInput(
-						InputMethodManager.SHOW_FORCED, 0);
-
-				aq.id(R.id.search_layout).getView().setVisibility(View.VISIBLE);
-				// aq.id(R.id.header_layout).getView().setVisibility(View.GONE);
-				aq.id(R.id.search_text).getEditText().setFocusable(true);
-			}
-		});
 
 		// Menu Drawer on click change items
 
@@ -827,16 +806,16 @@ protected void onActivityResult(int requestCode, int responseCode,
 				aq.id(R.id.project_image).image(R.drawable.progress_black);
 				aq.id(R.id.project_text).textColor(Color.parseColor("#000000"));
 //
-//				Fragment fr = new Calender();
-//				FragmentTransaction transaction = getSupportFragmentManager()
-//						.beginTransaction(); //
-//				/*
-//				 * transaction.setCustomAnimations(R.anim.slide_in,
-//				 * R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
-//				 */
-//				transaction.replace(R.id.container_inner, fr);
-//				transaction.addToBackStack("CALENDAR");
-//				transaction.commit();
+				Fragment fr = new Calender();
+				FragmentTransaction transaction = getSupportFragmentManager()
+						.beginTransaction(); //
+				/*
+				 * transaction.setCustomAnimations(R.anim.slide_in,
+				 * R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
+				 */
+				transaction.replace(R.id.container_inner, fr);
+				transaction.addToBackStack("CALENDAR");
+				transaction.commit();
 
 			}
 		});
@@ -914,7 +893,6 @@ protected void onActivityResult(int requestCode, int responseCode,
 		// tabs.setTextColorResource(R.color.graytab);
 		tabs.setAllCaps(false);
 		tabs.setTypeface(null, Typeface.NORMAL);
-		tabs.setOnPageChangeListener(this);
 
 		tabs.setViewPager(pager);
 		tabPagerAdapter.notifyDataSetChanged();
@@ -1030,52 +1008,13 @@ protected void onActivityResult(int requestCode, int responseCode,
 		}
 	}
 
-	public void cancelRepeatingTimer(View view) {
-		Context context = this.getApplicationContext();
-		if (alarm != null) {
-			alarm.CancelAlarm(context);
-		} else {
-			Toast.makeText(context, "Alarm is null", Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	public void onetimeTimer(View view) {
-		Context context = this.getApplicationContext();
-		if (alarm != null) {
-
-			alarm.setOnetimeTimer(context);
-		} else {
-			Toast.makeText(context, "Alarm is null", Toast.LENGTH_SHORT).show();
-		}
-	}
 
 	public void db_initialize() {
 		tododao = App.daoSession.getToDoDao();
 		labeldao = App.daoSession.getLabelDao();
 	}
 
-	public static void alrammmm(Context context) {
-		NotificationHandler nHandler;
-		nHandler = NotificationHandler.getInstance(context);
-		nHandler.createSimpleNotification(context);
-	}
 
-	@Override
-	public void onPageScrollStateChanged(int arg0) {
-		// nothing
-
-	}
-
-	@Override
-	public void onPageScrolled(int arg0, float arg1, int arg2) {
-		// nothing
-
-	}
-
-	@Override
-	public void onPageSelected(int position) {
-
-	}
 
 	// ****************** Notification List Adapter*********
 

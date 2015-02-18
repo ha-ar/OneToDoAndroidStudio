@@ -24,8 +24,6 @@ public class Constants {
 	public static String MED_TYPEFACE = "HelveticaNeue-Medium.otf";
 	public static String BOLD_TYPEFACE = "HelveticaNeueLTStd-Bd.otf";
 	public static String ROMAN_TYPEFACE = "HelveticaNeueLTStd-Roman.otf";
-	public static int AlaramIndex = -1;
-	public static int AlaramSize = 0;
 	public static float density = 0, dp = 0;
 	public static List<String> Name,Contact;
 	
@@ -60,4 +58,11 @@ public class Constants {
 			{ { "DD/MM/YY", "MM/DD/YY" }, { "12H", "24H" },
 					{ "Monday", "Sunday" }, {}, {} }, { {}, {}, {}, {}, {} },
 			{ {}, {}, {}, {}, {} } };
+
+    public static int MIN =  60 * 1000;
+    public static int HOUR = 60 * 60 * 1000;
+    public static int DAY = 24 * 60 * 60 * 1000;
+    public static int WEEK = 7 * 24 * 60 * 60 * 1000;
+    public static int MONTH = 31 * 24 * 60 * 60 * 1000;
+    public static int YEAR = 12 * 31 * 24 * 60 * 60 * 1000;
 }

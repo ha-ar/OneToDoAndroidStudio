@@ -1,18 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -42,19 +29,29 @@ import com.vector.onetodo.db.gen.AssignDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.Utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class CountrySelector extends Fragment {
 
 	private AQuery aq;
-	private TextView skip;
-	private Boolean message;
+    private Boolean message;
 	private AlertDialog alert;
-	private TextView confirm, save;
-	private int position = 0;
+    private int position = 0;
 	public static View view;
 	private InputMethodManager imm;
 	private ArrayList<String> contactsList = new ArrayList<String>();
-	private AssignDao assignDao;
-	String phoneNumber = null;
+    String phoneNumber = null;
 
 	@Override
 	public void onResume() {
@@ -102,7 +99,7 @@ public class CountrySelector extends Fragment {
 		String html = "ONE" + "<br />" + "todo";
 		aq.id(R.id.title).text(Html.fromHtml(html));
 
-		skip = (TextView) getActivity().findViewById(R.id.loginSkip);
+        TextView skip = (TextView) getActivity().findViewById(R.id.loginSkip);
 
 		View vie = getActivity().getLayoutInflater().inflate(R.layout.skip,
 				null, false);
@@ -110,8 +107,8 @@ public class CountrySelector extends Fragment {
 				getActivity());
 		builderLabel.setView(vie);
 		alert = builderLabel.create();
-		confirm = (TextView) vie.findViewById(R.id.skip_confirm);
-		save = (TextView) vie.findViewById(R.id.skip_save);
+        TextView confirm = (TextView) vie.findViewById(R.id.skip_confirm);
+        TextView save = (TextView) vie.findViewById(R.id.skip_save);
 
 		aq.id(R.id.spinner1).clicked(new OnClickListener() {
 
@@ -156,26 +153,26 @@ public class CountrySelector extends Fragment {
 		});
 		skip.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				alert.show();
-			}
-		});
+            @Override
+            public void onClick(View arg0) {
+                alert.show();
+            }
+        });
 		confirm.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View arg0) {
-				alert.dismiss();
-			}
-		});
+            @Override
+            public void onClick(View arg0) {
+                alert.dismiss();
+            }
+        });
 		save.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				alert.dismiss();
-				showUserDetailsActivity();
-			}
-		});
+            @Override
+            public void onClick(View v) {
+                alert.dismiss();
+                showUserDetailsActivity();
+            }
+        });
 
 		if (!Utils.getUserName(getActivity()).isEmpty())
 			aq.id(R.id.user_name).text(Utils.getUserName(getActivity()));
@@ -205,8 +202,8 @@ public class CountrySelector extends Fragment {
 		params.put("user[registration_type_id]", "not using yet");
 		params.put(
 				"user[device_type_id]",
-				Secure.getString(getActivity().getContentResolver(),
-						Secure.ANDROID_ID).toString());
+                Secure.getString(getActivity().getContentResolver(),
+                        Secure.ANDROID_ID));
 
 		params.put("user[device_type]", Build.MODEL + "");
 		params.put("user[mobile_no]", aq.id(R.id.country).getText().toString());
@@ -302,7 +299,7 @@ public class CountrySelector extends Fragment {
 						if (json != null) {
 							Gson gson = new Gson();
 							ContactsData obj = new ContactsData();
-							obj = gson.fromJson(json.toString(),
+							obj = gson.fromJson(json,
 									ContactsData.class);
 							ContactsData.getInstance().setList(obj);
 							// Log.v("Contact",
@@ -316,7 +313,7 @@ public class CountrySelector extends Fragment {
 	}
 
 	private void populateAssignAbleFriends() {
-		assignDao = App.daoSession.getAssignDao();
+        AssignDao assignDao = App.daoSession.getAssignDao();
 		assignDao.deleteAll();
 		for (int i = 0; i < ContactsData.getInstance().contactsList.size(); i++) {
 			String initials = ContactsData.getInstance().contactsList.get(i).firstName
