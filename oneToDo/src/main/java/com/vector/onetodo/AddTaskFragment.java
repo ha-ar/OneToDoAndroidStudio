@@ -161,6 +161,10 @@ public class AddTaskFragment extends Fragment {
 
 	public static final int PICK_CONTACT = 2;
 
+    public static final int RESULT_DROPBOX = 3;
+
+    public static final int RESULT_GOOGLEDRIVE = 4;
+
 	private Uri imageUri;
 
 	public static View allView;
@@ -888,6 +892,39 @@ public class AddTaskFragment extends Fragment {
 						startActivityForResult(intent, TAKE_PICTURE);
 					}
 				});
+        // DropBox and Google Drive intent
+        att.id(R.id.add_attachment_dropbox)
+                .typeface(
+                        TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attach.dismiss();
+                        int CODE = 42;
+                        Intent dropboxIntent = new Intent(Intent.ACTION_GET_CONTENT );
+                        dropboxIntent.setType("*/*");
+                        startActivityForResult(dropboxIntent
+                                .createChooser(dropboxIntent
+                                        .setPackage("com.dropbox.android"), "DropBox"), RESULT_DROPBOX);
+
+                    }
+                });
+
+        att.id(R.id.add_attachment_google)
+                .typeface(TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attach.dismiss();
+                        int CODE = 42;
+                        Intent dropboxIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                        dropboxIntent.setType("*/*");
+                        startActivityForResult(dropboxIntent
+                                .createChooser(dropboxIntent
+                                        .setPackage("com.google.android.apps.docs"), "Google Drive"), RESULT_GOOGLEDRIVE);
+
+                    }
+                });
 		AlertDialog.Builder attach_builder = new AlertDialog.Builder(
 				getActivity());
 		attach_builder.setView(attachment);
@@ -1146,6 +1183,16 @@ public class AddTaskFragment extends Fragment {
 				showImageURI(data.getData());
 			}
 			break;
+            case RESULT_DROPBOX:
+                if(null != data){
+                    showImageURI(data.getData());
+                }
+                break;
+            case RESULT_GOOGLEDRIVE:
+                if( null != data){
+                    showImageURI(data.getData());
+                }
+                break;
 		case PICK_CONTACT:
 			if (resultCode == Activity.RESULT_OK) {
 				Uri contactData = data.getData();
@@ -1172,6 +1219,8 @@ public class AddTaskFragment extends Fragment {
 
 		String type = MimeTypeMap.getFileExtensionFromUrl(selectedImage
 				.toString());
+
+        Toast.makeText(getActivity(), type, Toast.LENGTH_SHORT).show();
 
 		Bitmap bitmap;
 		if (FragmentCheck == 0) {
@@ -1241,7 +1290,7 @@ public class AddTaskFragment extends Fragment {
 						.findViewById(R.id.image_added_size);
 				Calendar cal = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
-				by.setText("By Usman Ameer on " + sdf.format(cal.getTime()));
+				by.setText("By Usman Ameer on " + sdf.format(cal.getTime())); // hard codded value
 				filename = selectedImage;
 				File myFile = new File(selectedImage.toString());
 

@@ -353,7 +353,7 @@ public class AddTask extends FragmentActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				if (Position == 0) {
+				if (Position == 0) { // position of page
 					if (AddTaskFragment.taskTitle.length() > 0) {
 						aq_menu.id(R.id.menu_item1)
 								.textColorId(R.color._4d4d4d);
@@ -1418,8 +1418,7 @@ public class AddTask extends FragmentActivity {
 
 			pairs.add(new BasicNameValuePair("todo[title]", title));
 
-			Log.e("start_date", start_date);
-			Log.e("end_date", end_date);
+
 			if (start_date != null)
 				pairs.add(new BasicNameValuePair("todo[start_date]", start_date
 						+ ""));
