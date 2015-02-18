@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AbsListView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
@@ -28,10 +27,8 @@ public class AddTaskAssign extends Fragment {
 	AlertDialog dialog,Invite_selection, Invite;
 	AQuery aqemail, aq, aq_menu,aq_selection,aq_invite;
 	public int check = 0, position = 0;
-	private TabPagerAdapter tabPagerAdapter;
-	LinearLayout last = null;
-	private ViewPager pager;
-	private PopupWindow popupWindowTask;
+    LinearLayout last = null;
+    private PopupWindow popupWindowTask;
 	
 	public static AddTaskAssign newInstance(int position) {
 		AddTaskAssign myFragment = new AddTaskAssign();
@@ -153,26 +150,8 @@ public class AddTaskAssign extends Fragment {
 		
 		
 		//****************** PAGER BINDE WITH TAB
-		pager = (ViewPager) getActivity().findViewById(R.id.assign_pager);
-		tabPagerAdapter = new TabPagerAdapter(getChildFragmentManager());
-		tabPagerAdapter
-				.setTabHolderScrollingContent(new ProjectsScrollHolder() {
-					@Override
-					public void onScroll(AbsListView view,
-							int firstVisibleItem, int visibleItemCount,
-							int totalItemCount, int pagePosition) {
-						// TODO Auto-generated method stub
-
-					}
-
-					@Override
-					public void adjustScroll(int scrollHeight) {
-						// TODO Auto-generated method stub
-
-					}
-				});
-
-
+        ViewPager pager = (ViewPager) getActivity().findViewById(R.id.assign_pager);
+        TabPagerAdapter tabPagerAdapter = new TabPagerAdapter(getChildFragmentManager());
 		pager.setAdapter(tabPagerAdapter);
 
 		// Bind the tabs to the ViewPager

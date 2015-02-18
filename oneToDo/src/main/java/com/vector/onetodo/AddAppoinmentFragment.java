@@ -1,18 +1,5 @@
 package com.vector.onetodo;
 
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -69,26 +56,34 @@ import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Locale;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+
 public class AddAppoinmentFragment extends Fragment {
-	public static AQuery aq, popupAQ, aqloc, aqd, aq_del, aq_edit;
+	private AQuery aq, aqd, aq_del, aq_edit;
 
-	static List<java.lang.Object> names;
-	int Label_postion = -1;
-	ImageView last;
-	String plabel = null;
-	int pposition = -1;
-	int itempos = -1;
-	int MaxId = -1;
-	private int lastCheckedId = -1;
-	public static EditText taskTitle;
+	private int Label_postion = -1;
+	private ImageView last;
+	private String plabel = null;
+	private int pposition = -1;
+	private int itempos = -1;
+	public static  EditText taskTitle;
 
-	Editor editor;
-	View label_view, viewl;
-	GradientDrawable label_color;
-	static String checkedId2 = null;
+	private Editor editor;
+	private View label_view, viewl;
 
 	private Uri imageUri;
-	int dayPosition;
+	private int dayPosition;
 
 	private static final int TAKE_PICTURE = 1;
 
@@ -108,13 +103,12 @@ public class AddAppoinmentFragment extends Fragment {
 			R.id.before_appoinment_lay, R.id.time_date_appoinment,
 			R.id.appoinment_title };
 
-	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+	private static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
 
 	private final String[] labels_array = new String[] { "Personal", "Home",
 			"Work", "New", "New", "New", "New", "New", "New" };
 
-	EditText label_field = null;
-	AlertDialog date_time_alert, add_new_label_alert,location_del,label_edit;
+	private AlertDialog add_new_label_alert,location_del,label_edit;
 
 	protected static final int RESULT_CODE = 123;
 

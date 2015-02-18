@@ -1,12 +1,5 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
-import net.appkraft.parallax.ParallaxScrollView;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,8 +12,17 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 
 import com.androidquery.AQuery;
-import com.vector.model.TaskData;
+import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
+
+import net.appkraft.parallax.ParallaxScrollView;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import de.greenrobot.dao.query.QueryBuilder;
 
 public class TaskView extends Fragment {
 
@@ -33,7 +35,6 @@ public class TaskView extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.viewtask, container, false);
 		parallax = (ParallaxScrollView) view.findViewById(R.id.scrollView123);
 		image = (ImageView) view.findViewById(R.id.imageView1123);
@@ -43,31 +44,32 @@ public class TaskView extends Fragment {
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
 
-		int Position = getArguments().getInt("id");
-		if (TaskData.getInstance().todos.get(Position).title != null)
+		int id = getArguments().getInt("id");
+        QueryBuilder qb = App.daoSession.getToDoDao().queryBuilder();
+        qb.where(ToDoDao.Properties.Id.eq(id));
+        List<ToDo> data = qb.list();
+		if (data.get(0).getTitle() != null)
 			aq.id(R.id.title).text(
-					TaskData.getInstance().todos.get(Position).title);
+                    data.get(0).getTitle());
 
-		if (TaskData.getInstance().todos.get(Position).repeat_interval != null)
+		if (data.get(0).getRepeat() != null)
 			aq.id(R.id.repeat).text(
-					TaskData.getInstance().todos.get(Position).repeat_interval);
-
-		String strDate = TaskData.getInstance().todos.get(Position).start_date;
+                    data.get(0).getRepeat().toString());
+//
+//		String strDate = data.get(0).getStart_date().toString();
 		Calendar calendar = Calendar.getInstance();
-		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss");
-		Date date = null;
-		try {
-			date = dateFormat.parse(strDate);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		calendar.setTime(date);
-		strDate = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT,
+//		SimpleDateFormat dateFormat = new SimpleDateFormat(
+//				"yyyy-MM-dd HH:mm:ss");
+//		Date date = null;
+//		try {
+//			date = dateFormat.parse(strDate);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+		calendar.setTimeInMillis(data.get(0).getStart_date());
+		String strDate = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT,
 				Locale.US)
 				+ " "
 				+ calendar.get(Calendar.DAY_OF_MONTH)
@@ -80,15 +82,13 @@ public class TaskView extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				getActivity().getSupportFragmentManager().popBackStack();
-				;
 			}
 		});
-		if (TaskData.getInstance().todos.get(Position).location != null)
+		if (data.get(0).getLocation() != null)
 			aq.id(R.id.location).text(strDate);
 	 
-		aq.id(R.id.location).text("Reminde before ");
+		aq.id(R.id.location).text("Remind before ");
 
 	 
 		final View view1 = getActivity().getLayoutInflater().inflate(
@@ -116,7 +116,6 @@ public class TaskView extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				alert.dismiss();
 			}
 		});
@@ -124,7 +123,6 @@ public class TaskView extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				alert.dismiss();
 			}
 		});
@@ -133,7 +131,6 @@ public class TaskView extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				popupWindowTask.dismiss();
 				alert.show();
 			}
@@ -143,7 +140,6 @@ public class TaskView extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 
 				if (popupWindowTask.isShowing())
 					popupWindowTask.dismiss();

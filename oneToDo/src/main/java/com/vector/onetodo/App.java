@@ -7,6 +7,7 @@ import com.vector.onetodo.db.gen.DaoMaster;
 import com.vector.onetodo.db.gen.DaoSession;
 import com.vector.onetodo.db.gen.DaoMaster.DevOpenHelper;
 import com.vector.onetodo.utils.AppPrefs;
+import com.vector.onetodo.utils.GPSTracker;
 
 public class App extends Application{
 	
@@ -18,6 +19,7 @@ public class App extends Application{
 	public static SQLiteDatabase ex_db;
 	public static DaoSession daoSession;
 	public static DaoMaster daoMaster;
+    public static GPSTracker gpsTracker;
     
     @Override
     public void onCreate() {
@@ -30,6 +32,8 @@ public class App extends Application{
 		ex_db = ex_database_helper_obj.getWritableDatabase();
 		daoMaster = new DaoMaster(ex_db);
 		daoSession = daoMaster.newSession();
+        gpsTracker = new GPSTracker(this);
+
     }
     
 }

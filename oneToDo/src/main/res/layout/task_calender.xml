@@ -5,20 +5,29 @@
     android:background="#eeeeee"
     android:orientation="vertical" >
 
-    <com.vector.calendar.CollapseCalendarView
-        android:id="@+id/calendar"
+    <LinearLayout
+        android:id="@+id/calendar_caldroid"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/active"
+        android:orientation="vertical" >
+    </LinearLayout>
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@id/calendar_caldroid"
+        android:background="@drawable/drop_shadow" />
 
     <ListView
         android:id="@+id/task_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_below="@id/calendar"
+        android:layout_below="@id/shadow"
         android:background="@color/light_grey_color"
         android:divider="@android:color/transparent"
         android:dividerHeight="7dp"
+        android:paddingTop="15dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:scrollbars="none" >
@@ -28,7 +37,7 @@
         android:id="@+id/no_events"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/calendar"
+        android:layout_below="@id/calendar_caldroid"
         android:text="Hurray! Nothing to do."
         android:gravity="center"
         android:visibility="gone" />

@@ -1,24 +1,15 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,14 +18,17 @@ import com.vector.onetodo.db.gen.Assign;
 import com.vector.onetodo.db.gen.AssignDao;
 import com.vector.onetodo.utils.Utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class AssignMultipleFragment extends ProjectsTabHolder {
 
 	private ListView listView;
-	private int position;
-	private static long[] Currentdate;
-	private RelativeLayout last;
-	private AssignDao dao;
-	private List<Assign> contactsList = new ArrayList<Assign>();
+    private RelativeLayout last;
+    private List<Assign> contactsList = new ArrayList<Assign>();
 	private ImageView img;
 
 	public static AssignMultipleFragment newInstance(int position) {
@@ -58,7 +52,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 				.inflate(R.layout.invitation_list, container, false);
 		listView = (ListView) view.findViewById(R.id.invitation_list_view);
 		img = (ImageView) getActivity().findViewById(R.id.assign_add);
-		Currentdate = new long[3];
+        long[] currentdate = new long[3];
 		String date_string = null;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i <= 2; i++) {
@@ -67,7 +61,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 					+ Utils.getCurrentDayDigit(i);
 			try {
 				Date mDate = sdf.parse(date_string);
-				Currentdate[i] = mDate.getTime();
+				currentdate[i] = mDate.getTime();
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -79,9 +73,9 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		position = getArguments().getInt("position");
+        int position = getArguments().getInt("position");
 		setadapter(getActivity(), position);
-		dao = App.daoSession.getAssignDao();
+        AssignDao dao = App.daoSession.getAssignDao();
 		contactsList = dao.loadAll();
 		listView.setAdapter(new ContactsAdapter(getActivity()));
 
@@ -156,6 +150,7 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 						false);
 				holder = new Holder();
 				holder.title = (TextView) view.findViewById(R.id.assign_name);
+                holder.icon = (TextView) view.findViewById(R.id.assign_image);
 				holder.number = (TextView) view
 						.findViewById(R.id.assign_contact);
 				view.setTag(holder);
@@ -163,6 +158,8 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 				holder = (Holder) view.getTag();
 			}
 			holder.title.setText(contactsList.get(position).getName());
+            holder.icon.setText(contactsList.get(position).getInitials());
+            holder.number.setText(contactsList.get(position).getNumber());
 			// holder.title.setText(contactsList.get(position).get);
 			return view;
 		}

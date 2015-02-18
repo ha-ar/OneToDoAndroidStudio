@@ -1,6 +1,6 @@
 package com.roomorma.caldroid;
 
-import hirondelle.date4j.DateTime;
+import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import hirondelle.date4j.DateTime;
 
 /**
  * Convenient helper to work with date, JODA DateTime and String
@@ -111,12 +113,14 @@ public class CalendarHelper {
 		// Get year, javaMonth, date
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear();
-		calendar.setTime(date);
+        calendar.setTimeInMillis(date.getTime());
 
 		int year = calendar.get(Calendar.YEAR);
 		int javaMonth = calendar.get(Calendar.MONTH);
 		int day = calendar.get(Calendar.DATE);
-
+        Log.e("year", year+"");
+        Log.e("month", javaMonth+"");
+        Log.e("day", day+"");
 		// javaMonth start at 0. Need to plus 1 to get datetimeMonth
 		return new DateTime(year, javaMonth + 1, day, 0, 0, 0, 0);
 	}

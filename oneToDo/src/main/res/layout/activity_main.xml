@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,12 +38,18 @@
                     app:pstsDeactivateTextColor="#4DFFFFFF"
                     app:pstsTabSwitch="true" >
                 </com.astuetz.PagerSlidingTabStrip>
+                <View
+                    android:id="@+id/shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_below="@id/tabs"
+                    android:background="@drawable/drop_shadow" />
 
                 <android.support.v4.view.ViewPager
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tabs"
+                    android:layout_below="@id/shadow"
                     android:background="#eeeeee" />
 
                 <TextView
@@ -77,11 +82,11 @@
 
     <ImageView
         android:id="@+id/add_task_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="50dp"
         android:layout_marginRight="20dp"
         android:src="@drawable/ic_plus"
         android:text="TextView" />

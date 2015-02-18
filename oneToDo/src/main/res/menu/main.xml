@@ -19,30 +19,5 @@
         android:id="@+id/action_label"
         android:title="By Label"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_today"
-        android:icon="@drawable/ic_action_today"
-        android:title="Today"
-        app:showAsAction="always"/>
-    <item
-        android:id="@+id/action_ivitation"
-        android:title="Invitation"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_visible_calendars"
-        android:title="Visible Calendars"
-        app:showAsAction="never"/>
-     <item
-        android:id="@+id/action_facebook"
-        android:title="Sync With Facebook"
-        app:showAsAction="never"/>
-      <item
-        android:id="@+id/action_gmail"
-        android:title="Sync With Gmail"
-        app:showAsAction="never"/>
-    <item
-        android:id="@+id/action_goto"
-        android:title="Go to"
-        app:showAsAction="never"/>
 
 </menu>

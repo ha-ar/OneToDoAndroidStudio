@@ -125,9 +125,7 @@ public class AddScheduleFragment extends Fragment {
 	int itempos = -1;
 	int MaxId = -1;
 
-	private AutoCompleteTextView locationTextView;
-
-	private static final int TAKE_PICTURE = 1;
+    private static final int TAKE_PICTURE = 1;
 
 	private static View previousSelected;
 	static LinearLayout lll;
@@ -283,7 +281,7 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 					boolean isChecked) {
 				// TODO Auto-generated method stub
 
-				if (isChecked == true) {  
+				if (isChecked) {
 					aq.id(R.id.sch_time_from).getTextView()
 							.setVisibility(View.GONE);
 					aq.id(R.id.sch_time_to).getTextView()
@@ -415,31 +413,31 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
 				.clicked(new GeneralOnClickListner());
-		locationTextView = (AutoCompleteTextView) aq.id(R.id.sch_location)
-				.getView();
+        AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.sch_location)
+                .getView();
 		PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(
 				getActivity(), android.R.layout.simple_spinner_dropdown_item); 
 		locationTextView.setAdapter(adapter);
 		locationTextView.addTextChangedListener(new TextWatcher() {
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				// TODO Auto-generated method stub 
-			}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                // TODO Auto-generated method stub
+            }
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
 
-			}
+            }
 
-			@Override
-			public void afterTextChanged(Editable s) {
+            @Override
+            public void afterTextChanged(Editable s) {
 
-			}
-		});
+            }
+        });
 
 		// ******************Location END
 
@@ -1434,8 +1432,10 @@ private String currentDay, currentMon, endEventDay, endEventMon;
 			e.printStackTrace();
 		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		byte[] byteArray = baos.toByteArray();
+        if (bm != null) {
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        }
+        byte[] byteArray = baos.toByteArray();
 		String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
 		pairs = new ArrayList<NameValuePair>();
 		pairs.add(new BasicNameValuePair("image", encoded));
