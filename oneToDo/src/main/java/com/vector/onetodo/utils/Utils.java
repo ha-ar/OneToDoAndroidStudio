@@ -1,12 +1,5 @@
 package com.vector.onetodo.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -37,13 +30,20 @@ import android.widget.TextView;
 
 import com.vector.onetodo.App;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class Utils {
 	public static final Calendar currentDateCal = Calendar
 			.getInstance(Locale.US);
 
 	private static final Calendar tempCal = Calendar.getInstance(Locale.US);
 
-	public static int getPxFromDp(Context context, int val) {
+    public static int getPxFromDp(Context context, int val) {
 		Resources r = context.getResources();
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
 				val, r.getDisplayMetrics());
@@ -334,4 +334,8 @@ public class Utils {
 		return formatter.format(calendar.getTime());
 	}
 
+    public static String getInitials(String name) {
+        String[] firstAndLastName = name.split(" ");
+        return firstAndLastName[0].substring(0,1).toUpperCase()+""+firstAndLastName[1].substring(0,1).toUpperCase();
+    }
 }

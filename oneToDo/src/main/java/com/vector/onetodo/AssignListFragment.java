@@ -2,6 +2,7 @@ package com.vector.onetodo;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,15 +16,28 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
+import com.google.gson.Gson;
+import com.vector.model.ContactsData;
 import com.vector.onetodo.db.gen.Assign;
 import com.vector.onetodo.db.gen.AssignDao;
 import com.vector.onetodo.utils.Utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AssignListFragment extends ProjectsTabHolder {
 
@@ -32,6 +46,7 @@ public class AssignListFragment extends ProjectsTabHolder {
     private RelativeLayout last;
     private List<Assign> contactsList = new ArrayList<Assign>();
 	private ImageView img;
+    private AQuery aq;
 
 	public static AssignListFragment newInstance(int position) {
 		AssignListFragment myFragment = new AssignListFragment();
@@ -66,7 +81,7 @@ public class AssignListFragment extends ProjectsTabHolder {
 				e.printStackTrace();
 			}
 		}
-
+        aq = new AQuery(getActivity(),getView());
 		return view;
 	}
 
@@ -74,6 +89,7 @@ public class AssignListFragment extends ProjectsTabHolder {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		position = getArguments().getInt("position");
+        getContacts();
 		setadapter(getActivity(), position);
         AssignDao dao = App.daoSession.getAssignDao();
 		contactsList = dao.loadAll();
@@ -159,6 +175,7 @@ public class AssignListFragment extends ProjectsTabHolder {
             holder.icon.setText(contactsList.get(position).getInitials());
             holder.number.setText(contactsList.get(position).getNumber());
 			// holder.title.setText(contactsList.get(position).get);
+//            Utils.getInitials();
 			return view;
 		}
 	}
@@ -176,4 +193,49 @@ public class AssignListFragment extends ProjectsTabHolder {
 	public void adjustScroll(int scrollHeight) {
 		
 	}
+
+    private void getContacts() {
+        HttpEntity entity = null;
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        ArrayList<String> contacts = Utils.getContactsList(getActivity());
+        for (int i = 0; i < contactsList.size(); i++) {
+            pairs.add(new BasicNameValuePair("array[]",
+                    contacts.get(i)));
+        }
+        try {
+            entity = new UrlEncodedFormEntity(pairs, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        Map<String, java.lang.Object> params = new HashMap<>();
+        params.put(AQuery.POST_ENTITY, entity);
+        aq.ajax("http://api.heuristix.net/one_todo/v1/user/getContacts",
+                params, String.class, new AjaxCallback<String>() {
+                    @Override
+                    public void callback(String url, String json,
+                                         AjaxStatus status) {
+                        try {
+                            Log.e("status", status.getError());
+                            Log.e("status", status.getMessage());
+                            Log.e("contacts", json.toString());
+                            Gson gson = new Gson();
+                            ContactsData obj = new ContactsData();
+                            obj = gson.fromJson(json,
+                                    ContactsData.class);
+                            ContactsData.getInstance().setList(obj);
+//                            if (!json.getBoolean("error")
+//                                    && json.getBoolean("result")) {
+//                                Toast.makeText(getActivity(),
+//                                        "Contacts Synced!", Toast.LENGTH_SHORT)
+//                                        .show();
+////                                getAssignAbleFriendsList();
+//                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
+                        }
+                    }
+                });
+
+    }
 }

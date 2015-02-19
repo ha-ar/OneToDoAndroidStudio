@@ -244,7 +244,7 @@ public class CountrySelector extends Fragment {
 						if (id != -1) {
 							Constants.user_id = id;
 							App.prefs.setUserId(id);
-							addContacts();
+//							addContacts();
 						}
 						Log.v("Response", json.toString());
 

@@ -58,15 +58,15 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
             public void onItemClick(AdapterView<?> adpater, View view, int pos,
                                     long _id) {
                 int id = 0;
-                switch (position) {
+                switch (MainActivity.pager.getCurrentItem()) {
                     case 0:
-                        id = todayQuery.list().get(position).getId().intValue();
+                        id = todayQuery.list().get(pos).getId().intValue();
                         break;
                     case 1:
-                        id = tomorrowQuery.list().get(position).getId().intValue();
+                        id = tomorrowQuery.list().get(pos).getId().intValue();
                         break;
                     case 2:
-                        id = upcomingQuery.list().get(position).getId().intValue();
+                        id = upcomingQuery.list().get(pos).getId().intValue();
                         break;
 
                 }
