@@ -35,6 +35,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.androidquery.AQuery;
+import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.onetodo.db.gen.CheckList;
@@ -399,7 +400,6 @@ public class AddTask extends FragmentActivity {
 
             @Override
             public void onClick(View arg0) {
-                // TODO Auto-generated method stub
             }
         });
 
@@ -578,7 +578,7 @@ public class AddTask extends FragmentActivity {
 		/*
 		 * AddTask.aq_menu.id(R.id.menu_item2).clicked(new OnClickListener() {
 		 * 
-		 * @Override public void onClick(View arg0) { // TODO Auto-generated
+		 * @Override public void onClick(View arg0) {
 		 * m111111ethod stub
 		 * 
 		 * 
@@ -601,7 +601,6 @@ public class AddTask extends FragmentActivity {
 
             @Override
             public void onClick(View arg0) {
-                // TODO Auto-generated m111111ethod stub
                 String title = null;
                 if (Position == 0) {
                     if (AddTaskFragment.taskTitle.length() > 0) {
@@ -1161,12 +1160,15 @@ public class AddTask extends FragmentActivity {
                     Log.e("reminder time", reminderTime+"");
                 } else {
                     //TODO set notification by GEO fence
+                    Geofences geoFence = new Geofences(this);
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
                     } else if (before.contains("On Leave")) {
                         is_locationtype = 1;
                         locationtype = "On Leave";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
                     }
                 }
             }
@@ -1544,5 +1546,6 @@ public class AddTask extends FragmentActivity {
         super.onDestroy();
         comment_pref.edit().clear().commit();
     }
+
 
 }
