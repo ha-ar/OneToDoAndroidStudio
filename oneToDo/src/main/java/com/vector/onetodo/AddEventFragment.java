@@ -139,6 +139,8 @@ public class AddEventFragment extends Fragment {
 	private static final int TAKE_PICTURE = 1;
 	public static final int RESULT_GALLERY = 0;
 	public static final int PICK_CONTACT = 2;
+    public static final int RESULT_DROPBOX = 3;
+    public static final int RESULT_GOOGLEDRIVE = 4;
 	private Uri imageUri;
 	public static View allView;
 	public static Activity act;
@@ -940,6 +942,34 @@ public class AddEventFragment extends Fragment {
 						startActivityForResult(intent, TAKE_PICTURE);
 					}
 				});
+        aq_attach
+                .id(R.id.add_attachment_dropbox)
+                .typeface(
+                        TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attach_alert.dismiss();
+                        Intent dropboxintent = new Intent(Intent.ACTION_GET_CONTENT);
+                        dropboxintent.setType("*/*");
+                        startActivityForResult(dropboxintent
+                                .createChooser(dropboxintent
+                                        .setPackage("com.dropbox.android"), "DropBox") , RESULT_DROPBOX);
+                    }
+                });
+        aq_attach
+                .id(R.id.add_attachment_google)
+                .typeface(TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attach_alert.dismiss();
+                        Intent googleIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                        googleIntent.setType("*/*");
+                        startActivityForResult(googleIntent
+                                .createChooser(googleIntent.setPackage("com.google.android.apps.docs"), "Google Drive") , RESULT_GOOGLEDRIVE);
+                    }
+                });
 		AlertDialog.Builder attach_builder = new AlertDialog.Builder(
 				getActivity());
 		attach_builder.setView(attachment);
@@ -1158,6 +1188,16 @@ public class AddEventFragment extends Fragment {
 				showImageURI(data.getData());
 			}
 			break;
+            case RESULT_DROPBOX:
+                if(null != data){
+                    showImageURI(data.getData());
+                }
+                break;
+            case RESULT_GOOGLEDRIVE:
+                if(null != data){
+                    showImageURI(data.getData());
+                }
+                break;
 		case PICK_CONTACT:
 			if (resultCode == Activity.RESULT_OK) {
 				Uri contactData = data.getData();

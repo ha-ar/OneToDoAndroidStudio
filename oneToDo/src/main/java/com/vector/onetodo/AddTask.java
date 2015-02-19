@@ -577,23 +577,28 @@ public class AddTask extends FragmentActivity {
 
 		/*
 		 * AddTask.aq_menu.id(R.id.menu_item2).clicked(new OnClickListener() {
+<<<<<<< HEAD
 		 * 
 		 * @Override public void onClick(View arg0) {
+=======
+		 *
+		 * @Override public void onClick(View arg0) { // TODO Auto-generated
+>>>>>>> 0ac90c3e72651659384f365b98826100577183ce
 		 * m111111ethod stub
-		 * 
-		 * 
+		 *
+		 *
 		 * title = aq.id(R.id.event_title).getText() .toString();
 		 * AddTask.popupWindowAdd.dismiss(); Fragment fr = new AddTaskComment();
 		 * FragmentManager manager = getSupportFragmentManager();
 		 * FragmentTransaction transaction = manager .beginTransaction(); if
 		 * (Constants.Project_task_check == 1) {
-		 * 
+		 *
 		 * transaction.replace(R.id.content_task, fr); } else {
-		 * 
+		 *
 		 * transaction.replace(R.id.main_container, fr); }
 		 * transaction.setCustomAnimations(R.anim.slide_in1, R.anim.slide_out1);
 		 * transaction.addToBackStack(null); transaction.commit();
-		 * 
+		 *
 		 * } });
 		 */
 
