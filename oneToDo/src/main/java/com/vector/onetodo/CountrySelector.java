@@ -89,10 +89,10 @@ public class CountrySelector extends Fragment {
 
 		// ******* Phone contact , name list
 
-		Constants.Name = new ArrayList<String>();
-		Constants.Contact = new ArrayList<String>();
+//		Constants.Name = new ArrayList<String>();
+//		Constants.Contact = new ArrayList<String>();
 
-		contactsList = Utils.getContactsList(getActivity());
+//		contactsList = Utils.getContactsList(getActivity());
 		// addContacts();
 		// new Phone_contact().execute();
 
@@ -244,6 +244,7 @@ public class CountrySelector extends Fragment {
 						if (id != -1) {
 							Constants.user_id = id;
 							App.prefs.setUserId(id);
+                            showUserDetailsActivity();
 //							addContacts();
 						}
 						Log.v("Response", json.toString());

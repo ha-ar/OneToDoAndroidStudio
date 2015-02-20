@@ -575,33 +575,6 @@ public class AddTask extends FragmentActivity {
         // DONOT Show location at the moment
         aq.id(R.layout.add_task_location1).gone();
 
-		/*
-		 * AddTask.aq_menu.id(R.id.menu_item2).clicked(new OnClickListener() {
-<<<<<<< HEAD
-		 * 
-		 * @Override public void onClick(View arg0) {
-=======
-		 *
-		 * @Override public void onClick(View arg0) { // TODO Auto-generated
->>>>>>> 0ac90c3e72651659384f365b98826100577183ce
-		 * m111111ethod stub
-		 *
-		 *
-		 * title = aq.id(R.id.event_title).getText() .toString();
-		 * AddTask.popupWindowAdd.dismiss(); Fragment fr = new AddTaskComment();
-		 * FragmentManager manager = getSupportFragmentManager();
-		 * FragmentTransaction transaction = manager .beginTransaction(); if
-		 * (Constants.Project_task_check == 1) {
-		 *
-		 * transaction.replace(R.id.content_task, fr); } else {
-		 *
-		 * transaction.replace(R.id.main_container, fr); }
-		 * transaction.setCustomAnimations(R.anim.slide_in1, R.anim.slide_out1);
-		 * transaction.addToBackStack(null); transaction.commit();
-		 *
-		 * } });
-		 */
-
         aq_menu.id(R.id.menu_item2).clicked(new OnClickListener() {
 
             @Override
@@ -717,34 +690,6 @@ public class AddTask extends FragmentActivity {
             child.setLayoutParams(param);
         }
         gridLayout.invalidate();
-    }
-
-    public class PageChangeListener implements OnPageChangeListener {
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-
-        }
-
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            if (position == 0) {
-                Position = position;
-                aq.id(R.id.menu_dots_task).visible();
-
-            } else if (position == 1) {
-                aq.id(R.id.page_title_header).text("Event");
-                Position = position;
-                aq.id(R.id.menu_dots_task).gone();
-            }
-
-        }
-
     }
 
     public class ListClickListenerTask implements OnItemClickListener {
@@ -1229,7 +1174,7 @@ public class AddTask extends FragmentActivity {
                 reminderr.setLocation_tag(location_tag);
             }
 
-            reminderr.setTime(r_time);
+            reminderr.setTime((long)reminderTime);
             reminderdao.insert(reminderr);
             todoset.setReminder(reminderr);
 

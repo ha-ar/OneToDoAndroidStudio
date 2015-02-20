@@ -334,8 +334,7 @@ public class Utils {
 		return formatter.format(calendar.getTime());
 	}
 
-    public static String getInitials(String name) {
-        String[] firstAndLastName = name.split(" ");
-        return firstAndLastName[0].substring(0,1).toUpperCase()+""+firstAndLastName[1].substring(0,1).toUpperCase();
+    public static String getInitials(String fName, String lName) {
+        return fName.substring(0,1).toUpperCase()+""+lName.substring(0,1).toUpperCase();
     }
 }

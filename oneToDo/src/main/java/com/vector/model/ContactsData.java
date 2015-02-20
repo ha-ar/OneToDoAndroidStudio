@@ -1,8 +1,8 @@
 package com.vector.model;
 
-import java.util.ArrayList;
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
 
 public class ContactsData {
 
@@ -21,11 +21,11 @@ public class ContactsData {
 	}
 
 	
-		@SerializedName("contacts")
+		@SerializedName("result")
 		public ArrayList<Contacts> contactsList = new ArrayList<Contacts>();
 
 		public class Contacts {
-			@SerializedName("contact_id")
+			@SerializedName("id")
 			public String id;
 			@SerializedName("first_name")
 			public String firstName;

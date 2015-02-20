@@ -91,7 +91,6 @@ public class Calender extends Fragment {
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, true);
-//            args.putBoolean(CaldroidFragment.SQUARE_TEXT_VIEW_CELL, true);
             caldroidFragment.setArguments(args);
         }
         List<ToDo> toDoList = MainActivity.tododao.loadAll();
@@ -179,7 +178,6 @@ public class Calender extends Fragment {
                 return true;
             case R.id.action_goto:
                 showNumberDialog();
-//                caldroidFragment.moveToDate(selectedDate);
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -78,7 +78,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
                 bundle.putInt("id", id);
                 fr.setArguments(bundle);
                 transaction.replace(R.id.container, fr);
-                transaction.addToBackStack("TASKVIEW");
+                transaction.addToBackStack("TASK_VIEW");
                 transaction.commit();
             }
 
