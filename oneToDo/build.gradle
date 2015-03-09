@@ -21,6 +21,9 @@ android {
         }
     }
 }
+repositories {
+    jcenter()
+}
 
 dependencies {
     compile project(':androidappMsg')
@@ -52,5 +55,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.google.android.gms:play-services:+'
     compile 'io.reactivex:rxjava:1.0.3'
+    compile 'com.getbase:floatingactionbutton:1.8.0'
+
 
 }
