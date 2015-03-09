@@ -32,6 +32,7 @@ import com.vector.onetodo.App;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -316,7 +317,7 @@ public class Utils {
 						+ phoneNumber.substring(1, phoneNumber.length());
 			}
 			Log.e(name, phoneNumber);
-			contactsList.add(phoneNumber);
+			contactsList.add(phoneNumber.replace(" ",""));
 		}
 		phones.close();
 		return contactsList;
@@ -336,5 +337,44 @@ public class Utils {
 
     public static String getInitials(String fName, String lName) {
         return fName.substring(0,1).toUpperCase()+""+lName.substring(0,1).toUpperCase();
+    }
+
+    public static long milliFromServerDate(String date){
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        try {
+            cal.setTime(sdf.parse(date));
+            return cal.getTimeInMillis();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static int getReminderTime(String time){
+        String[] splitTime = time.split(" ");
+        int days = 0;
+        try{
+            days = Integer.parseInt(splitTime[0]);
+        }catch (NumberFormatException nfe){
+            return days;
+        }
+        int numbers = 1;
+        if(splitTime[1].equalsIgnoreCase("mins"))
+            numbers = Constants.MIN;
+        else if(splitTime[1].equalsIgnoreCase("hours"))
+            numbers = Constants.HOUR;
+        else if(splitTime[1].equalsIgnoreCase("days"))
+            numbers = Constants.DAY;
+        else if(splitTime[1].equalsIgnoreCase("weeks"))
+            numbers = Constants.WEEK;
+        else if(splitTime[1].equalsIgnoreCase("months"))
+            numbers = Constants.MONTH;
+        else if(splitTime[1].equalsIgnoreCase("years"))
+            numbers = Constants.YEAR;
+
+        return days * numbers;
+
+
     }
 }

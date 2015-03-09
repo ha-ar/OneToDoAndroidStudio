@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:background="@color/active"
         android:minHeight="?attr/actionBarSize"
-        app:popupTheme="@style/Theme.AppCompat.Light"
-        app:theme="@style/ThemeToolbarLightOverflow" />
+        fab:popupTheme="@style/Theme.AppCompat.Light"
+        fab:theme="@style/ThemeToolbarLightOverflow" />
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -34,9 +34,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@color/active"
-                    app:pstsActivateTextColor="#FFFFFF"
-                    app:pstsDeactivateTextColor="#4DFFFFFF"
-                    app:pstsTabSwitch="true" >
+                    fab:pstsActivateTextColor="#FFFFFF"
+                    fab:pstsDeactivateTextColor="#4DFFFFFF"
+                    fab:pstsTabSwitch="true" >
                 </com.astuetz.PagerSlidingTabStrip>
                 <View
                     android:id="@+id/shadow"
@@ -49,8 +49,7 @@
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/shadow"
-                    android:background="#eeeeee" />
+                    android:layout_below="@id/shadow"/>
 
                 <TextView
                     android:id="@+id/pagertext"
@@ -80,15 +79,81 @@
             layout="@layout/menu_drawer_right" />
     </android.support.v4.widget.DrawerLayout>
 
-    <ImageView
-        android:id="@+id/add_task_button"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_alignParentBottom="true"
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginRight="20dp"
-        android:src="@drawable/ic_plus"
-        android:text="TextView" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        fab:fab_addButtonStrokeVisible="true"
+        fab:fab_labelStyle="@style/menu_labels_style"
+        fab:fab_addButtonColorNormal="@color/active"
+        fab:fab_addButtonColorPressed="@color/blue_transparent"
+        fab:fab_addButtonPlusIconColor="@android:color/white"
+        fab:fab_labelsPosition="left">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_project_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey_color"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_size="mini"
+            fab:fab_title="Project"
+            fab:fab_colorPressed="@color/grey"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_appointment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey_color"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_size="mini"
+            fab:fab_title="Appointment"
+            fab:fab_colorPressed="@color/grey"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_schedule_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey_color"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_size="mini"
+            fab:fab_title="Schedule"
+            fab:fab_colorPressed="@color/grey"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_event_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey_color"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_size="mini"
+            fab:fab_title="Event"
+            fab:fab_colorPressed="@color/grey"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_task_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/dark_grey_color"
+            fab:fab_colorNormal="@android:color/white"
+            fab:fab_size="mini"
+            fab:fab_title="Task"
+            fab:fab_colorPressed="@color/grey"/>
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    <!--<ImageView-->
+    <!--android:id="@+id/add_task_button"-->
+    <!--android:layout_width="75dp"-->
+    <!--android:layout_height="75dp"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_marginBottom="50dp"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:src="@drawable/ic_plus"-->
+    <!--android:text="TextView" />-->
 
 </RelativeLayout>

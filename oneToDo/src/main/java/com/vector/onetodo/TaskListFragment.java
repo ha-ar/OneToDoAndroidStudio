@@ -1,9 +1,8 @@
 package com.vector.onetodo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,16 +69,9 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
                         break;
 
                 }
-
-                Bundle bundle = new Bundle();
-                Fragment fr = new TaskView();
-                FragmentTransaction transaction = getActivity()
-                        .getSupportFragmentManager().beginTransaction();
-                bundle.putInt("id", id);
-                fr.setArguments(bundle);
-                transaction.replace(R.id.container, fr);
-                transaction.addToBackStack("TASK_VIEW");
-                transaction.commit();
+                Intent intent = new Intent(getActivity(), TaskView.class);
+                intent.putExtra("todo_id", (long) id);
+                startActivity(intent);
             }
 
         });

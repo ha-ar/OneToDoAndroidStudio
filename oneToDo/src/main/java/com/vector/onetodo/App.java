@@ -1,6 +1,7 @@
 package com.vector.onetodo;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.vector.onetodo.db.gen.DaoMaster;
@@ -20,6 +21,8 @@ public class App extends Application{
 	public static DaoSession daoSession;
 	public static DaoMaster daoMaster;
     public static GPSTracker gpsTracker;
+    public static SharedPreferences pref, label, attach;
+
     
     @Override
     public void onCreate() {
@@ -33,6 +36,10 @@ public class App extends Application{
 		daoMaster = new DaoMaster(ex_db);
 		daoSession = daoMaster.newSession();
         gpsTracker = new GPSTracker(getApplicationContext());
+
+        pref = this.getSharedPreferences("Location", 0);
+        label = this.getSharedPreferences("Label", 0);
+        attach = this.getSharedPreferences("Attach", 0);
 
     }
     

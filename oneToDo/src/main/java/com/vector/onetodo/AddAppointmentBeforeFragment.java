@@ -26,7 +26,7 @@ import com.androidquery.AQuery;
 
 import net.simonvt.numberpicker.NumberPicker;
 
-public class AddAppoinmentBeforeFragment extends Fragment {
+public class AddAppointmentBeforeFragment extends Fragment {
 
 	private int position;
 	private AQuery aq, aqd, aq_edit, aq_del;
@@ -43,9 +43,11 @@ public class AddAppoinmentBeforeFragment extends Fragment {
     String  pname = null, padress = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
+    private View dialoglayout5;
 
-	public static AddAppoinmentBeforeFragment newInstance(int position) {
-		AddAppoinmentBeforeFragment myFragment = new AddAppoinmentBeforeFragment();
+
+	public static AddAppointmentBeforeFragment newInstance(int position) {
+		AddAppointmentBeforeFragment myFragment = new AddAppointmentBeforeFragment();
 
 		Bundle args = new Bundle();
 		args.putInt("position", position);
@@ -57,7 +59,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		editor = AddTask.pref.edit();
+		editor = App.pref.edit();
 		position = getArguments().getInt("position", 0);
 		before = (TextView) getActivity().findViewById(R.id.before_appoinment);
 		View view;
@@ -76,6 +78,8 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		setRetainInstance(true);
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
+        dialoglayout5 = inflater5.inflate(R.layout.add_location,
+                null, false);
 
 		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
 				false);
@@ -241,7 +245,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 			set();
 			// ***************************location dialog
 
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) AddTask.dialoglayout5
+			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
 					.findViewById(R.id.adress);
 			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
 					getActivity(),
@@ -249,7 +253,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 			AlertDialog.Builder builder5 = new AlertDialog.Builder(
 					getActivity());
 
-			builder5.setView(AddTask.dialoglayout5);
+			builder5.setView(dialoglayout5);
 			location = builder5.create();
 
 			location.setOnDismissListener(new OnDismissListener() {
@@ -263,9 +267,9 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 					aqd.id(R.id.home).getTextView().setFocusable(true);
 				}
 			});
-			aqd = new AQuery(AddTask.dialoglayout5);
+			aqd = new AQuery(dialoglayout5);
 
-			TextView save1 = (TextView) AddTask.dialoglayout5
+			TextView save1 = (TextView) dialoglayout5
 					.findViewById(R.id.save);
 			save1.setOnClickListener(new OnClickListener() {
 
@@ -301,7 +305,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) AddTask.dialoglayout5
+			TextView cancel1 = (TextView) dialoglayout5
 					.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
@@ -470,9 +474,9 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 	}
 
 	void load(long id) {
-		pname = AddTask.pref.getString(4 + "key_name" + id, null); // getting
+		pname = App.pref.getString(4 + "key_name" + id, null); // getting
 																	// String
-		padress = AddTask.pref.getString(4 + "key_location" + id, null); // getting
+		padress = App.pref.getString(4 + "key_location" + id, null); // getting
 																			// String
 	}
 
@@ -484,7 +488,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 	void set() {
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				4 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
 				null);
 		if (pname != null) {
@@ -496,7 +500,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				4 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
 				null);
 		if (pname != null) {
@@ -508,7 +512,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				4 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
 				null);
 		if (pname != null) {
@@ -520,7 +524,7 @@ public class AddAppoinmentBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				4 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
 				null);
 		if (pname != null) {

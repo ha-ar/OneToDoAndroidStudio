@@ -22,11 +22,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -50,6 +55,21 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
+import com.vector.onetodo.db.gen.CheckList;
+import com.vector.onetodo.db.gen.CheckListDao;
+import com.vector.onetodo.db.gen.Comment;
+import com.vector.onetodo.db.gen.CommentDao;
+import com.vector.onetodo.db.gen.Friends;
+import com.vector.onetodo.db.gen.FriendsDao;
+import com.vector.onetodo.db.gen.Label;
+import com.vector.onetodo.db.gen.LabelDao;
+import com.vector.onetodo.db.gen.Reminder;
+import com.vector.onetodo.db.gen.ReminderDao;
+import com.vector.onetodo.db.gen.Repeat;
+import com.vector.onetodo.db.gen.RepeatDao;
+import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
@@ -61,7 +81,11 @@ import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
 import net.simonvt.timepicker.TimePicker;
 import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -84,6 +108,7 @@ public class AddAppoinmentFragment extends Fragment {
 
 	private Uri imageUri;
 	private int dayPosition;
+    private ArrayList<String> assignedId = new ArrayList<>();
 
 	private static final int TAKE_PICTURE = 1;
 
@@ -119,8 +144,16 @@ public class AddAppoinmentFragment extends Fragment {
 	public static View allView;
 
 	public static Activity act;
+    private ToDoDao tododao;
+    private CheckListDao checklistdao;
+    private FriendsDao friendsdao;
+    private LabelDao labeldao;
+    private ReminderDao reminderdao;
+    private RepeatDao repeatdao;
+    private CommentDao commentdao;
 
-	public static AddAppoinmentFragment newInstance(int position,
+
+    public static AddAppoinmentFragment newInstance(int position,
 			int dayPosition) {
 		AddAppoinmentFragment myFragment = new AddAppoinmentFragment();
 		Bundle args = new Bundle();
@@ -138,15 +171,50 @@ public class AddAppoinmentFragment extends Fragment {
 
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
+        if (toolbar != null)
+            ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
+        initActionBar();
 		return view;
 	}
+    private void initActionBar(){
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("Appointment");
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.todo_menu, menu);
+    }
 
-	@SuppressWarnings("deprecation")
-	@Override
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().getSupportFragmentManager().popBackStack();
+                return true;
+            case R.id.action_save_new:
+
+                return true;
+            case R.id.action_comment:
+                return true;
+
+            case R.id.action_accept:
+                saveAppointment();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		editor = AddTask.label.edit();
+		editor = App.label.edit();
 		dayPosition = getArguments().getInt("dayPosition", 0);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -177,8 +245,8 @@ public class AddAppoinmentFragment extends Fragment {
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 
-				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+//				if (taskTitle.getText().length() > 0)
+//					AddTask.btn.setAlpha(1);
 
 				aq.id(R.id.completed_appoinment).textColorId(R.color.active);
 
@@ -331,7 +399,6 @@ public class AddAppoinmentFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO Auto-generated method stub
 
 				ImageView img = (ImageView) view;
 				if (last != null) {
@@ -356,7 +423,6 @@ public class AddAppoinmentFragment extends Fragment {
 
 			@Override
 			public void onDismiss(DialogInterface arg0) {
-				// TODO Auto-generated method stub
 
 				label_text.setText("");
 			}
@@ -862,7 +928,7 @@ public class AddAppoinmentFragment extends Fragment {
 
 		@Override
 		public Fragment getItem(int position) {
-			return AddAppoinmentBeforeFragment.newInstance(position);
+			return AddAppointmentBeforeFragment.newInstance(position);
 		}
 	}
 
@@ -942,11 +1008,11 @@ public class AddAppoinmentFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(4 + "key_label" + id, null); // getting
+		plabel = App.label.getString(4 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(4 + "key_color_position" + id, 0); // getting
+		pposition = App.label.getInt(4 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
@@ -955,5 +1021,206 @@ public class AddAppoinmentFragment extends Fragment {
 		editor.remove(4 + "key_color_position" + id); // will delete key email
 		editor.commit();
 	}
+    private void saveAppointment() {
+
+        assignedId.clear();
+        if (!(aq.id(R.id.appoinment_title).getText().toString().equals(""))) {
+
+//            MaxId = App.attach.getInt("4Max", 0);
+            String title = aq.id(R.id.appoinment_title).getText().toString();
+
+            boolean is_allday = false;
+
+            String start_date = AddAppoinmentFragment.currentYear  + "-"
+                    + (AddAppoinmentFragment.currentMonDigit + 1) + "-"
+                    + AddAppoinmentFragment.currentDayDigit+ " "
+                    + AddAppoinmentFragment.currentHours + ":"
+                    + AddAppoinmentFragment.currentMin + ":00";
+            String end_date = null;
+
+            String location = null;
+
+            String before = aq.id(R.id.before_appoinment).getText().toString();
+
+            boolean is_time = false, is_location = false;
+            String r_location = "", location_tag = "";
+            if (before.contains("On Arrive") || before.contains("On Leave")) {
+                is_time = false;
+                is_location = true;
+                r_location = aq.id(R.id.location_before_appoin).getText()
+                        .toString();
+
+                location_tag = ((TextView) AddAppointmentBeforeFragment.viewP)
+                        .getText().toString() + "";
+            }
+
+            boolean is_alertEmail = false, is_alertNotification = false;
+            if (!(aq.id(R.id.before_appoinment).getText().toString()
+                    .equals("") || aq.id(R.id.before_appoinment).getText()
+                    .toString() == null)) {
+                is_alertEmail = aq.id(R.id.email_radio_appoin)
+                        .getCheckBox().isChecked();
+                is_alertNotification = aq
+                        .id(R.id.notification_radio_appoin).getCheckBox()
+                        .isChecked();
+            }
+            String repeat = null;
+
+            String repeatdate = null;
+
+            String label_name = aq.id(R.id.spinner_labels_appoin).getText()
+                    .toString();
+
+            toggleCheckList(aq.id(R.id.add_sub_appoinment).getView());
+            String checklist_data = aq.id(R.id.add_sub_appoinment).getEditText()
+                    .getText().toString();
+
+            String notes = aq.id(R.id.notes_appoinment).getText().toString();
+
+            Date startDate, endDate;
+            long startDateInMilli = 0, endDateInMilli = 0;
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                startDate = sdf1.parse(start_date);
+                startDateInMilli = startDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                endDate = sdf1.parse(end_date);
+                endDateInMilli = endDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (NullPointerException npe) {
+                end_date = null;
+            }
+            int reminderTime = 0, is_locationtype = 0;
+            String locationtype = null;
+            Log.e("before", before);
+            if (before != null || before.isEmpty()) {
+                if (is_time) {
+                    reminderTime = Utils.getReminderTime(before);
+                    Log.e("reminder time", reminderTime+"");
+                } else {
+                    //TODO set notification by GEO fence
+                    Geofences geoFence = new Geofences(getActivity());
+                    if (before.contains("On Arrive")) {
+                        is_locationtype = 0;
+                        locationtype = "On Arrive";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
+                    } else if (before.contains("On Leave")) {
+                        is_locationtype = 1;
+                        locationtype = "On Leave";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
+                    }
+                }
+            }
+            long r_repeat = 0;
+            if (repeat != null) {
+                if (repeat.contains("once") || repeat.contains("Once")) {
+                    r_repeat = 0;
+                    repeat = "once";
+                } else if (repeat.contains("daily") || repeat.contains("daily")) {
+                    r_repeat = Constants.DAY;
+                    repeat = "daily";
+                } else if (repeat.contains("weekly")
+                        || repeat.contains("Weekly")) {
+                    r_repeat = Constants.WEEK;
+                    repeat = "weekly";
+                } else if (repeat.contains("monthly")
+                        || repeat.contains("Monthly")) {
+                    r_repeat = Constants.MONTH;
+                    repeat = "monthly";
+                } else if (repeat.contains("yearly")
+                        || repeat.contains("Yearly")) {
+                    r_repeat = Constants.YEAR;
+                    repeat = "yearly";
+                }
+            }
+            db_initialize();
+            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+
+            ToDo todo = new ToDo();
+            todo.setUser_id(Constants.user_id);
+            todo.setTodo_type_id(4);
+            todo.setTitle(title);
+            todo.setStart_date(startDateInMilli);
+            todo.setEnd_date(endDateInMilli);
+            todo.setIs_allday(is_allday);
+            todo.setLocation(location);
+            todo.setNotes(notes);
+            todo.setIs_done(false);
+            todo.setIs_delete(false);
+
+            Label label = new Label();
+            label.setLabel_name(label_name);
+            labeldao.insert(label);
+            todo.setLabel(label);
+
+            Reminder reminder = new Reminder();
+            reminder.setIs_alertEmail(is_alertEmail);
+            reminder.setIs_alertNotification(is_alertNotification);
+            reminder.setIs_time_location(is_location);
+            reminder.setLocation(r_location);
+            reminder.setLocation_type(is_locationtype);
+            if ((!location_tag.equals("New"))) {
+                reminder.setLocation_tag(location_tag);
+            }
+
+            reminder.setTime((long) reminderTime);
+            reminderdao.insert(reminder);
+            todo.setReminder(reminder);
+
+            Repeat repeaT = new Repeat();
+            repeaT.setRepeat_interval(repeat);
+            repeaT.setRepeat_until(r_repeat);
+            repeatdao.insert(repeaT);
+            todo.setRepeat(repeaT);
+
+            CheckList checklist = new CheckList();
+            checklist.setTitle(checklist_data);
+            checklistdao.insert(checklist);
+            todo.setCheckList(checklist);
+
+            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+
+                    Comment commenT = new Comment();
+                    commenT.setComment(AddTaskComment.comment.get(i));
+                    commenT.setToDo(todo);
+                    commentdao.insert(commenT);
+                }
+            }
+
+            Friends friend = new Friends();
+            friend.setEmail("email");
+            friendsdao.insert(friend);
+            todo.setReminder(reminder);
+            tododao.insert(todo);
+
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+
+                alarm.SetNormalAlarm(getActivity());
+
+            // ********************* Data add hit Asyntask
+
+            AddToServer asyn = new AddToServer(title, 4, start_date, end_date, is_location, r_location, location_tag,
+                    locationtype, notes, repeatdate,false, 0,
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+            asyn.execute();
+
+        }else
+            Toast.makeText(getActivity(), "Please enter title",
+                    Toast.LENGTH_SHORT).show();
+    }
+    private void db_initialize() {
+        checklistdao = App.daoSession.getCheckListDao();
+        friendsdao = App.daoSession.getFriendsDao();
+        labeldao = App.daoSession.getLabelDao();
+        tododao = App.daoSession.getToDoDao();
+        commentdao = App.daoSession.getCommentDao();
+        repeatdao = App.daoSession.getRepeatDao();
+        reminderdao = App.daoSession.getReminderDao();
+    }
 
 }

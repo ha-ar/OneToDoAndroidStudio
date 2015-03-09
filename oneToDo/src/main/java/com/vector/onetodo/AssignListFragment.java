@@ -2,6 +2,7 @@ package com.vector.onetodo;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -172,7 +173,7 @@ public class AssignListFragment extends ProjectsTabHolder {
         List<NameValuePair> pairs = new ArrayList<>();
         ArrayList<String> contacts = Utils.getContactsList(getActivity());
         for (int i = 0; i < contacts.size(); i++) {
-            pairs.add(new BasicNameValuePair("array[]",
+            pairs.add(new BasicNameValuePair("contacts[]",
                     contacts.get(i)));
         }
         try {
@@ -184,16 +185,17 @@ public class AssignListFragment extends ProjectsTabHolder {
         params.put(AQuery.POST_ENTITY, entity);
         aq.progress(aq.id(R.id.contacts_dialog).getProgressBar()).ajax("http://api.heuristix.net/one_todo/v1/user/getContacts",
                 params, String.class, new AjaxCallback<String>() {
+
                     @Override
                     public void callback(String url, String json,
                                          AjaxStatus status) {
                         try {
+                            Log.e("contacts", json);
                             Gson gson = new Gson();
                             ContactsData.getInstance().setList(gson.fromJson(json, ContactsData.class));
                             adapter.notifyDataSetChanged();
                         } catch (Exception e) {
                             e.printStackTrace();
-
                         }
                     }
                 });

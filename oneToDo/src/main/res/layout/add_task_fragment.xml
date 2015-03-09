@@ -1,82 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content_task"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_grey_color"
-    android:layerType="hardware" >
+    android:layerType="hardware">
 
-    <RelativeLayout
-        android:id="@+id/addtask_header"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/active"
-        android:visibility="gone" >
+        android:minHeight="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        fab:popupTheme="@style/Theme.AppCompat.Light"
+        fab:theme="@style/ThemeToolbarLightOverflow" />
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@id/toolbar_top"
+        android:background="@drawable/drop_shadow" />
 
-        <TextView
-            android:id="@+id/page_title_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/back"
-            android:paddingBottom="3dp"
-            android:text="Task"
-            android:textColor="@android:color/white"
-            android:textSize="20sp" />
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/addtask_header"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="48dp"-->
+    <!--android:background="@color/active"-->
+    <!--android:visibility="gone" >-->
 
-        <ImageView
-            android:id="@+id/menu_dots_task"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="10dp"
-            android:animateLayoutChanges="true"
-            android:padding="10dp"
-            android:src="@drawable/menu_dots"
-            android:visibility="gone" />
+    <!--<TextView-->
+    <!--android:id="@+id/page_title_header"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginLeft="15dp"-->
+    <!--android:layout_toRightOf="@+id/back"-->
+    <!--android:paddingBottom="3dp"-->
+    <!--android:text="Task"-->
+    <!--android:textColor="@android:color/white"-->
+    <!--android:textSize="20sp" />-->
 
-        <ImageView
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:src="@drawable/back" />
+    <!--<ImageView-->
+    <!--android:id="@+id/menu_dots_task"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:animateLayoutChanges="true"-->
+    <!--android:padding="10dp"-->
+    <!--android:src="@drawable/menu_dots"-->
+    <!--android:visibility="gone" />-->
 
-        <Button
-            android:id="@+id/add_task_main"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@+id/addtask_menu"
-            android:alpha="0.3"
-            android:background="@drawable/accept" />
+    <!--<ImageView-->
+    <!--android:id="@+id/back"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:paddingBottom="10dp"-->
+    <!--android:paddingLeft="10dp"-->
+    <!--android:paddingTop="10dp"-->
+    <!--android:src="@drawable/back" />-->
 
-        <ImageView
-            android:id="@+id/addtask_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="10dp"
-            android:animateLayoutChanges="true"
-            android:src="@drawable/ic_show_white" />
-    </RelativeLayout>
+    <!--<Button-->
+    <!--android:id="@+id/add_task_main"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="30dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:layout_toLeftOf="@+id/addtask_menu"-->
+    <!--android:alpha="0.3"-->
+    <!--android:background="@drawable/accept" />-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/addtask_menu"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:animateLayoutChanges="true"-->
+    <!--android:src="@drawable/ic_show_white" />-->
+    <!--</RelativeLayout>-->
 
     <FrameLayout
         android:id="@+id/add_task_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/addtask_header" >
+        android:layout_below="@+id/shadow" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <com.vector.onetodo.utils.CustomScrollView
                 android:id="@+id/main_scroll"

@@ -35,7 +35,7 @@ public class NotificationHandler {
 	public void createSimpleNotification(Context context, Intent intent) {
 		// Creates an explicit intent for an Activity
 	
-		Intent resultIntent = new Intent(context, MainActivity.class);
+		Intent resultIntent = new Intent(context, TaskView.class);
 
 		// Creating a artifical activity stack for the notification activity
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -61,7 +61,8 @@ public class NotificationHandler {
     public void createNotification(Context context, Intent intent) {
         // Creates an explicit intent for an Activity
 
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, TaskView.class);
+        resultIntent.putExtra("todo_id", intent.getExtras().getLong("id"));
 
         // Creating a artificial activity stack for the notification activity
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -87,16 +88,17 @@ public class NotificationHandler {
         mNotificationManager.notify(0, mBuilder.build());
 
     }
-	public void createSimpleNotification2(Context context,String title,String message) {
+	public void createSimpleNotification2(Context context,String title,String message, String todo_id) {
 		// Creates an explicit intent for an Activity
 	
-		Intent resultIntent = new Intent(context, MainActivity.class);
+		Intent resultIntent = new Intent(context, TaskView.class);
 
 		// Creating a artifical activity stack for the notification activity
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 		stackBuilder.addParentStack(MainActivity.class);
 		stackBuilder.addNextIntent(resultIntent);
-
+        resultIntent.putExtra("todo_id", todo_id);
+        resultIntent.putExtra("is_assigned_task", true);
 		// Pending intent to the notification manager
 		PendingIntent resultPending = stackBuilder
 				.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -104,13 +106,12 @@ public class NotificationHandler {
 
 		// Building the notification
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
 				.setSmallIcon(R.drawable.ic_launcher) // notification icon
 				.setContentTitle(title)
 				.setContentText(message) // notification text
 				.setContentIntent(resultPending); // notification intent
 
-		
-		mBuilder.setContentTitle(title).setContentText(message);
 		// mId allows you to update the notification later on.
 		mNotificationManager.notify(1, mBuilder.build());
 

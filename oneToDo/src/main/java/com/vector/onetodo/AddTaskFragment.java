@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -24,12 +25,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -42,6 +49,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
@@ -60,6 +68,23 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
+import com.mobeta.android.dslv.DragSortController;
+import com.mobeta.android.dslv.DragSortListView;
+import com.vector.onetodo.db.gen.CheckList;
+import com.vector.onetodo.db.gen.CheckListDao;
+import com.vector.onetodo.db.gen.Comment;
+import com.vector.onetodo.db.gen.CommentDao;
+import com.vector.onetodo.db.gen.Friends;
+import com.vector.onetodo.db.gen.FriendsDao;
+import com.vector.onetodo.db.gen.Label;
+import com.vector.onetodo.db.gen.LabelDao;
+import com.vector.onetodo.db.gen.Reminder;
+import com.vector.onetodo.db.gen.ReminderDao;
+import com.vector.onetodo.db.gen.Repeat;
+import com.vector.onetodo.db.gen.RepeatDao;
+import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
@@ -81,9 +106,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -98,40 +126,38 @@ public class AddTaskFragment extends Fragment {
     private List<NameValuePair> pairs;
     private Uri filename;
     private Editor editor, editorattach;
-    private String plabel = null;
-    private int pposition = -1;
-    private int itempos = -1;
+    private String pLabel = null;
+    private int mPosition = -1;
+    private int itemPosition = -1;
     private int MaxId = -1;
     private static int Tag = 0;
     private PopupWindow popupWindowAttach;
-    private static AQuery aq, aq_edit, aqd, aq_del, att, aq_menu;
-    int Label_postion = -1;
+    private static AQuery aq;
+    private static AQuery aq_edit;
+    private static AQuery aqd;
+    private static AQuery aq_del;
+    private static AQuery aq_menu;
+    int labelPosition = -1;
     ImageView last;
-    static LinearLayout ll_iner;
-
+    static LinearLayout ll_linear;
     static int FragmentCheck = 0;
-    static String repeatdate = "";
+    static String repeatDate = "";
     static String title = null;
     View label_view = null, viewl;
     static Dialog add_new_label_alert,
             date_time_alert, attach, location_del, label_edit;
-
     static int currentHours, currentMin, currentDayDigit, currentYear,
             currentMonDigit;
-
     int dayPosition;
-    private String currentDay, currentMon, setmon1;
-
+    private String currentDay, currentMon, setMon;
     private int[] collapsingViews = { R.id.title_task_layout1,
             R.id.date_time_include, R.id.before_grid_view_linear,
             R.id.repeat_linear_layout, R.id.label_grid_view3 };
-
     private int[] allViews = { R.id.task_title1, R.id.time_date,
             R.id.location_task, R.id.before1, R.id.repeat_task_lay,
             R.id.spinner_labels_task };
-
     public static EditText taskTitle;
-    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
     protected static final int RESULT_CODE = 123;
     private static final int TAKE_PICTURE = 1;
     public static final int RESULT_GALLERY = 0;
@@ -144,6 +170,18 @@ public class AddTaskFragment extends Fragment {
     private static View previousSelected;
     public static String assignedSelectedID = "";
     private int lastCheckedId = -1;
+    private ArrayAdapter<String> adapterTask;
+    private PopupWindow popupWindowTask;
+    private String labelColor;
+    private ArrayList<String> assignedId = new ArrayList<>();
+
+    private ToDoDao tododao;
+    private CheckListDao checklistdao;
+    private FriendsDao friendsdao;
+    private LabelDao labeldao;
+    private ReminderDao reminderdao;
+    private RepeatDao repeatdao;
+    private CommentDao commentdao;
 
     public static AddTaskFragment newInstance(int position, int dayPosition) {
         AddTaskFragment myFragment = new AddTaskFragment();
@@ -160,29 +198,72 @@ public class AddTaskFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.add_task_fragment, container,
                 false);
-        editor = AddTask.label.edit();
-        editorattach = AddTask.attach.edit();
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
+        if (toolbar != null)
+            ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
+
+
+        editor = App.label.edit();
+        editorattach = App.attach.edit();
+        initActionBar();
         aq = new AQuery(getActivity(), view);
         act = getActivity();
+        dragAndDrop();
         return view;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.todo_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().getSupportFragmentManager().popBackStack();
+                return true;
+            case R.id.action_save_new:
+
+                return true;
+            case R.id.action_comment:
+                return true;
+            case R.id.action_show_hide:
+                popupWindowTask.showAtLocation(
+                        aq.id(R.id.content_task).getView(),
+                        Gravity.CENTER_HORIZONTAL, 0, 0);
+                return true;
+            case R.id.action_accept:
+                saveTask();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
     }
 
+    private void initActionBar(){
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("Task");
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (Constants.Project_task_check == 1) {
-            aq.id(R.id.addtask_header).getView().setVisibility(View.VISIBLE);
-        }
+//        if (Constants.Project_task_check == 1) {
+//            aq.id(R.id.addtask_header).getView().setVisibility(View.VISIBLE);
+//        }
         dayPosition = getArguments().getInt("dayPosition", 0);
-
         allView = getView();
-
 
         currentYear = Utils.getCurrentYear(dayPosition);
         currentMonDigit = Utils.getCurrentMonthDigit(dayPosition);
@@ -213,15 +294,9 @@ public class AddTaskFragment extends Fragment {
 //				Fragment fr = new AddTaskAssign();
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction transaction = manager.beginTransaction();
-                transaction.setCustomAnimations(R.anim.slide_in1,
-                        R.anim.slide_out1);
-                if (Constants.Project_task_check == 1) {
-
-                    transaction.replace(R.id.content_task, AddTaskAssign.newInstance(0));
-                } else {
-
-                    transaction.replace(R.id.main_container, AddTaskAssign.newInstance(0));
-                }
+                transaction.setCustomAnimations(R.anim.slide_right,
+                        R.anim.slide_left, R.anim.slide_right, R.anim.slide_left);
+                transaction.replace(R.id.content_task, AddTaskAssign.newInstance(0));
                 transaction.addToBackStack(null);
                 transaction.commit();
             }
@@ -312,8 +387,8 @@ public class AddTaskFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before,
                                       int count) {
 
-                if (taskTitle.getText().length() > 0)
-                    AddTask.btn.setAlpha(10);
+//                if (taskTitle.getText().length() > 0)
+//                    AddTask.btn.setAlpha(10);
 
                 aq.id(R.id.completed_task).textColorId(R.color.active);
 
@@ -408,7 +483,7 @@ public class AddTaskFragment extends Fragment {
 
                 img.setImageResource(R.drawable.select_white);
 
-                Label_postion = position;
+                labelPosition = position;
 
             }
         });
@@ -424,7 +499,6 @@ public class AddTaskFragment extends Fragment {
 
                     @Override
                     public void onDismiss(DialogInterface arg0) {
-                        // TODO Auto-generated method stub
 
                         label_text.setText("");
                     }
@@ -436,14 +510,14 @@ public class AddTaskFragment extends Fragment {
             public void onClick(View arg0) {
                 add_new_label_alert.dismiss();
                 if (!(label_text.getText().toString().equals(""))) {
-                    if (Label_postion != -1) {
+                    if (labelPosition != -1) {
                         GradientDrawable mDrawable = (GradientDrawable) getResources()
                                 .getDrawable(R.drawable.label_background);
                         mDrawable.setColor(Color
-                                .parseColor(Constants.label_colors_dialog[Label_postion]));
-                        Save(label_view.getId() + "" + itempos, label_text
-                                .getText().toString(), Label_postion);
-                        Label_postion = -1;
+                                .parseColor(Constants.label_colors_dialog[labelPosition]));
+                        Save(label_view.getId() + "" + itemPosition, label_text
+                                .getText().toString(), labelPosition);
+                        labelPosition = -1;
                         ((TextView) label_view).setBackground(mDrawable);
                         ((TextView) label_view).setText(label_text.getText()
                                 .toString());
@@ -495,14 +569,14 @@ public class AddTaskFragment extends Fragment {
                                             .parseColor(Constants.label_colors[position]));
                                     textView.setBackground(mDrawable);
                                 }
-                                if (plabel != null) {
+                                if (pLabel != null) {
                                     textView.setTextColor(Color.WHITE);
-                                    textView.setText(plabel);
+                                    textView.setText(pLabel);
                                     GradientDrawable mDrawable = (GradientDrawable) getResources()
                                             .getDrawable(
                                                     R.drawable.label_background);
                                     mDrawable.setColor(Color
-                                            .parseColor(Constants.label_colors_dialog[pposition]));
+                                            .parseColor(Constants.label_colors_dialog[mPosition]));
                                     textView.setBackground(mDrawable);
                                 }
                                 return textView;
@@ -516,7 +590,7 @@ public class AddTaskFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view,
                                             int position, long id) {
-                        itempos = position;
+                        itemPosition = position;
                         label_view = view;
                         if (!((TextView) view).getText().toString()
                                 .equalsIgnoreCase("new")) {
@@ -526,6 +600,8 @@ public class AddTaskFragment extends Fragment {
                                     .setBackground(view.getBackground());
                             aq.id(R.id.spinner_labels_task).getTextView()
                                     .setTextColor(Color.WHITE);
+//                            PaintDrawable drawable = (PaintDrawable) view.getBackground();
+//                            labelColor = "#"+drawable.getPaint().getColor();
 
                         } else {
                             add_new_label_alert
@@ -556,7 +632,7 @@ public class AddTaskFragment extends Fragment {
 
             @Override
             public void onClick(View arg0) {
-                Remove(viewl.getId() + "" + itempos);
+                Remove(viewl.getId() + "" + itemPosition);
                 ((TextView) viewl).setText("New");
                 GradientDrawable mDrawable = (GradientDrawable) getResources()
                         .getDrawable(R.drawable.label_simple);
@@ -632,12 +708,12 @@ public class AddTaskFragment extends Fragment {
                                 convertView, parent);
                         if (position == 2) {
                             previousSelected = textView;
-                            ((TextView) textView)
+                            textView
                                     .setBackgroundResource(R.drawable.round_buttons_blue);
-                            ((TextView) textView).setTextColor(Color.WHITE);
+                            textView.setTextColor(Color.WHITE);
 
                         } else
-                            ((TextView) textView).setTextColor(getResources()
+                            textView.setTextColor(getResources()
                                     .getColor(R.color._4d4d4d));
                         return textView;
                     }
@@ -653,7 +729,7 @@ public class AddTaskFragment extends Fragment {
                 if (((TextView) previousSelected).getText().toString()
                         .equals("Weekly")) {
 
-                    ((TextView) previousSelected)
+                    previousSelected
                             .setBackgroundResource(R.drawable.round_buttons_white);
                     ((TextView) previousSelected).setTextColor(getResources()
                             .getColor(R.color._4d4d4d));
@@ -662,8 +738,7 @@ public class AddTaskFragment extends Fragment {
                             .getColor(R.color._4d4d4d));
                 }
                 if (((TextView) view).getText().toString().equals("Weekly")) {
-                    ((TextView) view)
-                            .setBackgroundResource(R.drawable.round_buttons_blue);
+                    view.setBackgroundResource(R.drawable.round_buttons_blue);
                 }
 
                 if (((TextView) view).getText().toString().equals("Never")) {
@@ -731,9 +806,9 @@ public class AddTaskFragment extends Fragment {
 
                 aq.id(R.id.repeat).text(
                         ((TextView) previousSelected).getText().toString()
-                                + " until " + setmon1);
+                                + " until " + setMon);
                 RadioButton rb = (RadioButton) aq.id(R.id.time_radio).getView();
-                rb.setText(setmon1);
+                rb.setText(setMon);
             }
         });
         TextView cancel = (TextView) dateTimePickerDialog
@@ -789,7 +864,7 @@ public class AddTaskFragment extends Fragment {
 
         View attachment = inflater
                 .inflate(R.layout.add_attachment, null, false);
-        att = new AQuery(attachment);
+        AQuery att = new AQuery(attachment);
 
         LinearLayout ll = (LinearLayout) aq.id(R.id.added_image_outer)
                 .getView();
@@ -935,6 +1010,7 @@ public class AddTaskFragment extends Fragment {
                         Toast.LENGTH_LONG).show();
             }
         });
+        Log.e("end Time" , System.currentTimeMillis()+"");
     }
 
     public static void updateAssign(String name){
@@ -943,29 +1019,13 @@ public class AddTaskFragment extends Fragment {
 
     private void toggleCheckList(View switchView) {
         View newView;
-
-		/*
-		 * Here is where the job is done. By simply calling an instance of the
-		 * ChecklistManager we can call its methods.
-		 */
         try {
             // Getting instance
             ChecklistManager mChecklistManager = ChecklistManager
                     .getInstance(getActivity());
 
-			/*
-			 * These method are useful when converting from EditText to
-			 * ChecklistView (but can be set anytime, they'll be used at
-			 * appropriate moment)
-			 */
-
-            // Setting new entries hint text (if not set no hint
-            // will be used)
             mChecklistManager.setNewEntryHint("Add a subtask");
-            // Let checked items are moved on bottom
-
             mChecklistManager.setMoveCheckedOnBottom(1);
-
             mChecklistManager
                     .setCheckListChangedListener(new CheckListChangedListener() {
 
@@ -975,23 +1035,10 @@ public class AddTaskFragment extends Fragment {
                         }
                     });
 
-            // Decide if keep or remove checked items when converting
-            // back to simple text from checklist
             mChecklistManager.setKeepChecked(true);
-
-            // I want to make checks symbols visible when converting
-            // back to simple text from checklist
             mChecklistManager.setShowChecks(true);
-
-            // Converting actual EditText into a View that can
-            // replace the source or viceversa
             newView = mChecklistManager.convert(switchView);
-
-            // Replacing view in the layout
             mChecklistManager.replaceViews(switchView, newView);
-
-            // Updating the instance of the pointed view for
-            // eventual reverse conversion
             switchView = newView;
 
         } catch (ViewNotSupportedException e) {
@@ -1025,8 +1072,8 @@ public class AddTaskFragment extends Fragment {
 
     private void showRightDateAndTimeForDialog() {
         String fff = String.valueOf(currentDayDigit).replace("th", "");
-        setmon1 = fff + " " + currentMon + " " + currentYear;
-        repeatdate = currentYear + "-" + (currentMonDigit + 1) + "-"
+        setMon = fff + " " + currentMon + " " + currentYear;
+        repeatDate = currentYear + "-" + (currentMonDigit + 1) + "-"
                 + currentDayDigit + " 00:00:00";
     }
 
@@ -1047,23 +1094,6 @@ public class AddTaskFragment extends Fragment {
         }
     }
 
-    public static void swapInflatedLayouts(int from, int to) {
-        if (from < to) {
-            for (int i = from; i < to; i++) {
-                Integer temp = inflatingLayouts.get(i);
-                inflatingLayouts.put(i, inflatingLayouts.get(i + 1));
-                inflatingLayouts.put(i + 1, temp);
-            }
-        } else {
-            for (int i = from; i > to; i--) {
-                Integer temp = inflatingLayouts.get(i);
-                inflatingLayouts.put(i, inflatingLayouts.get(i - 1));
-                inflatingLayouts.put(i - 1, temp);
-            }
-
-        }
-
-    }
 
     private class GeneralOnClickListner implements OnClickListener {
 
@@ -1173,7 +1203,7 @@ public class AddTaskFragment extends Fragment {
                         Toast.makeText(getActivity(),
                                 arg0.getId() + "     " + arg0.getTag(),
                                 Toast.LENGTH_LONG).show();
-                        ll_iner = (LinearLayout) item.findViewById(Integer
+                        ll_linear = (LinearLayout) item.findViewById(Integer
                                 .parseInt(arg0.getTag().toString()));
 
                         if (popupWindowAttach.isShowing()) {
@@ -1198,8 +1228,8 @@ public class AddTaskFragment extends Fragment {
 
                             @Override
                             public void onClick(View v) {
-                                if (ll_iner != null)
-                                    item.removeView(ll_iner);
+                                if (ll_linear != null)
+                                    item.removeView(ll_linear);
                                 popupWindowAttach.dismiss();
                             }
                         });
@@ -1390,7 +1420,7 @@ public class AddTaskFragment extends Fragment {
                 aq_edit.id(R.id.add_task_edit_title).text(
                         "Label: " + ((TextView) arg1).getText().toString());
                 viewl = arg1;
-                itempos = position;
+                itemPosition = position;
                 label_edit.show();
             }
             return false;
@@ -1461,12 +1491,12 @@ public class AddTaskFragment extends Fragment {
     }
 
     public void Load(String id) {
-        plabel = null;
-        plabel = AddTask.label.getString(1 + "key_label" + id, null); // getting
+        pLabel = null;
+        pLabel = App.label.getString(1 + "key_label" + id, null); // getting
         // String
-        Log.v("View id= ", id + "| " + plabel + " | " + pposition);
+        Log.v("View id= ", id + "| " + pLabel + " | " + mPosition);
 
-        pposition = AddTask.label.getInt(1 + "key_color_position" + id, 0); // getting
+        mPosition = App.label.getInt(1 + "key_color_position" + id, 0); // getting
         // String
     }
 
@@ -1485,7 +1515,7 @@ public class AddTaskFragment extends Fragment {
     }
 
     public void LoadAttachmax() {
-        MaxId = AddTask.attach.getInt("Max", 0);
+        MaxId = App.attach.getInt("Max", 0);
     }
 
 
@@ -1532,11 +1562,313 @@ public class AddTaskFragment extends Fragment {
 
     }
 
+    private void dragAndDrop(){
+
+        final LayoutInflater inflater = (LayoutInflater) getActivity()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflater.inflate(R.layout.popup_menu, null, false);
+        TextView cancel = (TextView) view.findViewById(R.id.cancel);
+        TextView ok = (TextView) view.findViewById(R.id.ok);
+
+        TextView tx = (TextView) view.findViewById(R.id.show_hid_text);
+        tx.setTypeface(TypeFaces.get(getActivity(), Constants.MED_TYPEFACE));
+
+        popupWindowTask = new PopupWindow(view, Utils.getDpValue(270, getActivity()),
+                WindowManager.LayoutParams.WRAP_CONTENT, true);
+        popupWindowTask.setBackgroundDrawable(new BitmapDrawable());
+        popupWindowTask.setOutsideTouchable(true);
+        popupWindowTask.setOnDismissListener(new OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+//                layout_MainMenu.getForeground().setAlpha(0);
+            }
+        });
+
+
+        cancel.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                popupWindowTask.dismiss();
+            }
+        });
+        ok.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                popupWindowTask.dismiss();
+            }
+        });
+        ArrayList<String> arrayList = new ArrayList<>(
+                Arrays.asList(Constants.layoutsName));
+        DragSortListView listViewTask = (DragSortListView) view.findViewById(R.id.list);
+        adapterTask = new ArrayAdapter<>(getActivity(),
+                R.layout.popup_menu_items, R.id.text, arrayList);
+
+        listViewTask.setAdapter(adapterTask);
+        listViewTask.setDropListener(onDropTask);
+        for (int i = 0; i < Constants.layoutsName.length; i++)
+            listViewTask.setItemChecked(i, true);
+
+        DragSortController controllerTask = new DragSortController(listViewTask);
+        controllerTask.setDragHandleId(R.id.drag_handle);
+
+        listViewTask.setOnTouchListener(controllerTask);
+        listViewTask.setOnItemClickListener(new ListClickListenerTask());
+    }
+
+    private DragSortListView.DropListener onDropTask = new DragSortListView.DropListener() {
+        @Override
+        public void drop(int from, int to) {
+            if (from != to) {
+                String item = adapterTask.getItem(from);
+                adapterTask.remove(item);
+                adapterTask.insert(item, to);
+                inflateLayouts();
+            }
+        }
+    };
+
+    public class ListClickListenerTask implements OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                                long id) {
+            position = position + 1;
+            if (position == 2) {
+                position = position + 1;
+            } else if (position > 1) {
+                position = position + 1;
+            }
+
+            int layoutId = inflatingLayouts.get(position);
+
+            CheckedTextView checkedTextView = (CheckedTextView) view
+                    .findViewById(R.id.checkbox);
+            if (checkedTextView.isChecked()) {
+                aq.id(layoutId).visible();
+            } else {
+                aq.id(layoutId).gone();
+            }
+
+        }
+
+    }
+
+    private void saveTask(){
+        assignedId.clear();
+        assignedId.add(AddTaskFragment.assignedSelectedID);
+        if (!(aq.id(R.id.task_title1).getText().toString().equals(""))) {
+
+            MaxId = App.attach.getInt("Max", 0);
+            title = aq.id(R.id.task_title1).getText().toString();
+
+            boolean is_allday = false;
+            String start_date = AddTaskFragment.currentYear + "-"
+                    + (AddTaskFragment.currentMonDigit + 1) + "-"
+                    + AddTaskFragment.currentDayDigit + " "
+                    + AddTaskFragment.currentHours + ":"
+                    + AddTaskFragment.currentMin +":00";
+            String end_date = null;
+
+            String location = aq.id(R.id.location_task).getText().toString();
+            boolean is_time = false, is_location = false;
+            String r_location = null, location_tag = "";
+            String before = aq.id(R.id.before).getText().toString();
+            if (before.contains("On Arrive") || before.contains("On Leave")) {
+                is_time = false;
+                is_location = true;
+                r_location = aq.id(R.id.location_before).getText()
+                        .toString();
+                location_tag = ((TextView) AddTaskBeforeFragment.viewP)
+                        .getText().toString();
+            }
+
+            boolean is_alertEmail = false, is_alertNotification = false;
+            if (!(aq.id(R.id.before).getText().toString().equals("") || aq
+                    .id(R.id.before).getText().toString() == null)) {
+                is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
+                        .isChecked();
+                is_alertNotification = aq.id(R.id.notification_radio)
+                        .getCheckBox().isChecked();
+            }
+
+            boolean repeat_forever = aq.id(R.id.forever_radio).isChecked();
+            String repeat = aq.id(R.id.repeat).getText().toString();
+            String repeatdate = repeatDate;  // will be used for repeat until
+
+            String label_name = aq.id(R.id.spinner_labels_task).getText()
+                    .toString();
+
+            toggleCheckList(aq.id(R.id.add_sub_task).getView());
+            String checklist_data = aq.id(R.id.add_sub_task).getEditText()
+                    .getText().toString();
+
+            String notes = aq.id(R.id.notes_task).getText().toString();
+//            assignedId.add(AddTaskFragment.assignedSelectedID);
+
+            Date startDate = null, endDate = null;
+            long startDateInMilli = 0, endDateInMilli = 0;
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                startDate = sdf1.parse(start_date);
+                startDateInMilli = startDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                endDate = sdf1.parse(end_date);
+                endDateInMilli = endDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (NullPointerException npe) {
+                end_date = null;
+            }
+            int reminderTime = 0, is_locationtype = 0;
+            String locationType = null;
+            Log.e("before", before);
+            if (before != null || before.isEmpty()) {
+                if (is_time) {
+                    reminderTime = Utils.getReminderTime(before);
+                    Log.e("reminder time", reminderTime+"");
+                } else {
+                    //TODO set notification by GEO fence
+                    Geofences geoFence = new Geofences(getActivity());
+                    if (before.contains("On Arrive")) {
+                        is_locationtype = 0;
+                        locationType = "On Arrive";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
+                    } else if (before.contains("On Leave")) {
+                        is_locationtype = 1;
+                        locationType = "On Leave";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
+                    }
+                }
+            }
+            long r_repeat = 0;
+            if (repeat != null) {
+                if (repeat.contains("once") || repeat.contains("Once")) {
+                    r_repeat = 0;
+                    repeat = "once";
+                } else if (repeat.contains("daily") || repeat.contains("daily")) {
+                    r_repeat = Constants.DAY;
+                    repeat = "daily";
+                } else if (repeat.contains("weekly")
+                        || repeat.contains("Weekly")) {
+                    r_repeat = Constants.WEEK;
+                    repeat = "weekly";
+                } else if (repeat.contains("monthly")
+                        || repeat.contains("Monthly")) {
+                    r_repeat = Constants.MONTH;
+                    repeat = "monthly";
+                } else if (repeat.contains("yearly")
+                        || repeat.contains("Yearly")) {
+                    r_repeat = Constants.YEAR;
+                    repeat = "yearly";
+                }
+            }
+            db_initialize();
+            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+
+            ToDo todo = new ToDo();
+            todo.setUser_id(Constants.user_id);
+            todo.setTodo_type_id(1);
+            todo.setTitle(title);
+            todo.setStart_date(startDateInMilli);
+            todo.setEnd_date(endDateInMilli);
+            todo.setIs_allday(is_allday);
+            todo.setLocation(location);
+            todo.setNotes(notes);
+            todo.setIs_done(false);
+            todo.setIs_delete(false);
+
+            Label label = new Label();
+            label.setLabel_name(label_name);
+            labeldao.insert(label);
+            todo.setLabel(label);
+
+            Reminder reminder = new Reminder();
+            reminder.setIs_alertEmail(is_alertEmail);
+            reminder.setIs_alertNotification(is_alertNotification);
+            reminder.setIs_time_location(is_location);
+            reminder.setLocation(r_location);
+            reminder.setLocation_type(is_locationtype);
+            if ((!location_tag.equals("New")) && location_tag != null) {
+                reminder.setLocation_tag(location_tag);
+            }
+
+            reminder.setTime((long) reminderTime);
+            reminderdao.insert(reminder);
+            todo.setReminder(reminder);
+
+            Repeat repeaT = new Repeat();
+            repeaT.setRepeat_interval(repeat);
+            repeaT.setRepeat_until(r_repeat);
+            repeaT.setIs_forever(repeat_forever);
+            repeatdao.insert(repeaT);
+            todo.setRepeat(repeaT);
+
+            CheckList checklist = new CheckList();
+            checklist.setTitle(checklist_data);
+            checklistdao.insert(checklist);
+            todo.setCheckList(checklist);
+
+            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+
+                    Comment commenT = new Comment();
+                    commenT.setComment(AddTaskComment.comment.get(i));
+                    commenT.setToDo(todo);
+                    commentdao.insert(commenT);
+                }
+            }
+
+            Friends friend = new Friends();
+            friend.setEmail("email");
+            friendsdao.insert(friend);
+            todo.setReminder(reminder);
+            tododao.insert(todo);
+
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+
+            if(reminderTime != 0){
+                alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
+                alarm.SetNormalAlarm(getActivity());
+            }
+            if(r_repeat != 0){
+                alarm.setRepeatAlarm(getActivity(), r_repeat);
+            }
+            else{
+                alarm.SetNormalAlarm(getActivity());
+            }
+
+            // ********************* Data add hit Asyntask
+            AddToServer asyn = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
+                    locationType, notes, repeatdate,repeat_forever, MaxId,
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+            asyn.execute();
+
+        }else
+            Toast.makeText(getActivity(), "Please enter title",
+                    Toast.LENGTH_SHORT).show();
+
+    }
+    private void db_initialize() {
+        checklistdao = App.daoSession.getCheckListDao();
+        friendsdao = App.daoSession.getFriendsDao();
+        labeldao = App.daoSession.getLabelDao();
+        tododao = App.daoSession.getToDoDao();
+        commentdao = App.daoSession.getCommentDao();
+        repeatdao = App.daoSession.getRepeatDao();
+        reminderdao = App.daoSession.getReminderDao();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         Constants.Project_task_check = 0;
-        aq.id(R.id.addtask_header).getView().setVisibility(View.GONE);
     }
+
 
 }

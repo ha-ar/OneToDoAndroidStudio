@@ -1,6 +1,5 @@
 package com.vector.onetodo;
 
-import net.simonvt.numberpicker.NumberPicker;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -18,6 +17,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -25,6 +25,8 @@ import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.vector.onetodo.utils.Constants;
+
+import net.simonvt.numberpicker.NumberPicker;
 
 public class AddTaskBeforeFragment extends Fragment {
 
@@ -38,6 +40,7 @@ public class AddTaskBeforeFragment extends Fragment {
 	String Title, pname = null, padress = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
+    private View dialoglayout5;
 
 	public static AddTaskBeforeFragment newInstance(int position) {
 		
@@ -51,7 +54,7 @@ public class AddTaskBeforeFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		editor = AddTask.pref.edit();
+		editor = App.pref.edit();
 		position = getArguments().getInt("position", 0);
 		before = (TextView) getActivity().findViewById(R.id.before);
 		View view;
@@ -61,6 +64,8 @@ public class AddTaskBeforeFragment extends Fragment {
 		else
 			view = inflater.inflate(R.layout.add_task_location, container,
 					false);
+        dialoglayout5 = (LinearLayout) inflater.inflate(R.layout.add_location,
+                null, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -68,16 +73,16 @@ public class AddTaskBeforeFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		LayoutInflater inflater5 = getActivity().getLayoutInflater();
+		LayoutInflater inflater = getActivity().getLayoutInflater();
 
-		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
+		View dialoglayout6 = inflater.inflate(R.layout.add_task_edit, null,
 				false);
 		aq_edit = new AQuery(dialoglayout6);
 		AlertDialog.Builder builder6 = new AlertDialog.Builder(getActivity());
 		builder6.setView(dialoglayout6);
 		location_edit = builder6.create();
 
-		View dialoglayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
+		View dialoglayout7 = inflater.inflate(R.layout.add_task_edit_delete,
 				null, false);
 		aq_del = new AQuery(dialoglayout7);
 		AlertDialog.Builder builder7 = new AlertDialog.Builder(getActivity());
@@ -240,7 +245,7 @@ public class AddTaskBeforeFragment extends Fragment {
 			set();
 			// ***************************location dialog
 
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) AddTask.dialoglayout5
+			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
 					.findViewById(R.id.adress);
 			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
 					getActivity(),
@@ -248,7 +253,7 @@ public class AddTaskBeforeFragment extends Fragment {
 			AlertDialog.Builder builder5 = new AlertDialog.Builder(
 					getActivity());
 
-			builder5.setView(AddTask.dialoglayout5);
+			builder5.setView(dialoglayout5);
 			location = builder5.create();
 
 			location.setOnDismissListener(new OnDismissListener() {
@@ -262,9 +267,9 @@ public class AddTaskBeforeFragment extends Fragment {
 					aqd.id(R.id.home).getTextView().setFocusable(true);
 				}
 			});
-			aqd = new AQuery(AddTask.dialoglayout5);
+			aqd = new AQuery(dialoglayout5);
 
-			TextView save1 = (TextView) AddTask.dialoglayout5
+			TextView save1 = (TextView) dialoglayout5
 					.findViewById(R.id.save);
 			save1.setOnClickListener(new OnClickListener() {
 
@@ -300,7 +305,7 @@ public class AddTaskBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) AddTask.dialoglayout5
+			TextView cancel1 = (TextView) dialoglayout5
 					.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
@@ -467,9 +472,9 @@ public class AddTaskBeforeFragment extends Fragment {
 	}
 
 	public void load(long id) {
-		pname = AddTask.pref.getString(1 + "key_name" + id, null); // getting
+		pname = App.pref.getString(1 + "key_name" + id, null); // getting
 																	// String
-		padress = AddTask.pref.getString(1 + "key_location" + id, null); // getting
+		padress = App.pref.getString(1 + "key_location" + id, null); // getting
 																			// String
 	}
 
@@ -481,7 +486,7 @@ public class AddTaskBeforeFragment extends Fragment {
 
 	public void set() {
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				1 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
 				null);
 		if (pname != null) {
@@ -493,7 +498,7 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				1 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
 				null);
 		if (pname != null) {
@@ -505,7 +510,7 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				1 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
 				null);
 		if (pname != null) {
@@ -517,7 +522,7 @@ public class AddTaskBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				1 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
 				null);
 		if (pname != null) {

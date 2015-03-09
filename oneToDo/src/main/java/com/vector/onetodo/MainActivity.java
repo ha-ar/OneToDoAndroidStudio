@@ -73,7 +73,6 @@ import com.vector.onetodo.db.gen.LabelDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
-import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 
 import net.simonvt.datepicker.DatePicker;
@@ -137,7 +136,7 @@ public class MainActivity extends BaseActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 				////////////////////////////////////////////////////////////////////
 		PlusOptions plus = new PlusOptions.Builder().build();
 		mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -897,19 +896,41 @@ protected void onActivityResult(int requestCode, int responseCode,
 		tabs.setViewPager(pager);
 		tabPagerAdapter.notifyDataSetChanged();
 
-		aq.id(R.id.add_task_button).typeface(
-				TypeFaces.get(this, Constants.ICON_FONT));
 		aq.id(R.id.add_task_button).clicked(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-
-				Intent intent = new Intent(MainActivity.this, AddTask.class);
-				intent.putExtra("position", pager.getCurrentItem());
-				startActivity(intent);
-				overridePendingTransition(R.anim.slide_in1, R.anim.slide_out1);
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(0, 0)).commit();
 			}
 		});
+        aq.id(R.id.add_event_button).clicked(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(0, 0)).commit();
+            }
+        });
+        aq.id(R.id.add_schedule_button).clicked(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddScheduleFragment.newInstance(0, 0)).commit();
+            }
+        });
+        aq.id(R.id.add_appointment_button).clicked(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddAppoinmentFragment.newInstance(0, 0)).commit();
+            }
+        });
+        aq.id(R.id.add_project_button).clicked(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddProjectFragment.newInstance(0, 0)).commit();
+            }
+        });
 
 	}
 
@@ -1133,4 +1154,9 @@ protected void onActivityResult(int requestCode, int responseCode,
 		}
 
 	}
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

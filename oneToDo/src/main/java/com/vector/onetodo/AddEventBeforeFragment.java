@@ -57,7 +57,7 @@ public class AddEventBeforeFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		editor = AddTask.pref.edit();
+		editor = App.pref.edit();
 		before = (TextView) getActivity().findViewById(R.id.before_event);
 		position = getArguments().getInt("position", 0);
 		View view;
@@ -485,9 +485,9 @@ public class AddEventBeforeFragment extends Fragment {
 	}
 
 	void load(long id) {
-		pname = AddTask.pref.getString(2 + "key_name" + id, null); // getting
+		pname = App.pref.getString(2 + "key_name" + id, null); // getting
 																	// String
-		padress = AddTask.pref.getString(2 + "key_location" + id, null); // getting
+		padress = App.pref.getString(2 + "key_location" + id, null); // getting
 																			// String
 	}
 
@@ -499,7 +499,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 	void set() {
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				2 + "key_name" + aq.id(R.id.pre_defined_11).getView().getId(),
 				null);
 		if (pname != null) {
@@ -511,7 +511,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				2 + "key_name" + aq.id(R.id.pre_defined_21).getView().getId(),
 				null);
 		if (pname != null) {
@@ -523,7 +523,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				2 + "key_name" + aq.id(R.id.pre_defined_31).getView().getId(),
 				null);
 		if (pname != null) {
@@ -535,7 +535,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 		}
 		pname = null;
-		pname = AddTask.pref.getString(
+		pname = App.pref.getString(
 				2 + "key_name" + aq.id(R.id.pre_defined_41).getView().getId(),
 				null);
 		if (pname != null) {

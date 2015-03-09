@@ -65,4 +65,7 @@ public class Constants {
     public static int WEEK = 7 * 24 * 60 * 60 * 1000;
     public static int MONTH = 31 * 24 * 60 * 60 * 1000;
     public static int YEAR = 12 * 31 * 24 * 60 * 60 * 1000;
+
+    public static String[] layoutsName = { "Assign", "Due date", "Location", "Reminder", "Repeat",
+            "Label", "Subtasks", "Notes", "Attachment" };
 }

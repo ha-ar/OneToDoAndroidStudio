@@ -1,7 +1,5 @@
 package com.vector.onetodo;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -17,6 +15,8 @@ import android.view.inputmethod.InputMethodManager;
 import com.androidquery.AQuery;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.vector.onetodo.utils.Constants;
+
+import java.io.IOException;
 
 public class SplashScreen extends BaseActivity {
 
@@ -72,7 +72,7 @@ public class SplashScreen extends BaseActivity {
 
 		aq.id(R.id.intro_5).text(Html.fromHtml("To-do's"));
 		aq.id(R.id.intro_6).text(Html.fromHtml("Events"));
-		aq.id(R.id.intro_7).text(Html.fromHtml("Appoinments"));
+		aq.id(R.id.intro_7).text(Html.fromHtml("Appointments"));
 		aq.id(R.id.intro_8).text(Html.fromHtml("Schedules"));
 		aq.id(R.id.intro_9).text(Html.fromHtml("Projects"));
 
@@ -80,7 +80,6 @@ public class SplashScreen extends BaseActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				showUserDetailsActivity();
 			}
 		});

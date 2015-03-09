@@ -1,35 +1,5 @@
 package com.vector.onetodo;
 
-import it.feio.android.checklistview.ChecklistManager;
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import net.simonvt.datepicker.DatePicker;
-import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
-import net.simonvt.timepicker.TimePicker;
-import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -41,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,12 +23,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -70,6 +47,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -77,7 +55,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -90,15 +67,65 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
+import com.mobeta.android.dslv.DragSortController;
+import com.mobeta.android.dslv.DragSortListView;
+import com.vector.onetodo.db.gen.CheckList;
+import com.vector.onetodo.db.gen.CheckListDao;
+import com.vector.onetodo.db.gen.Comment;
+import com.vector.onetodo.db.gen.CommentDao;
+import com.vector.onetodo.db.gen.Friends;
+import com.vector.onetodo.db.gen.FriendsDao;
+import com.vector.onetodo.db.gen.Label;
+import com.vector.onetodo.db.gen.LabelDao;
+import com.vector.onetodo.db.gen.Reminder;
+import com.vector.onetodo.db.gen.ReminderDao;
+import com.vector.onetodo.db.gen.Repeat;
+import com.vector.onetodo.db.gen.RepeatDao;
+import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
 
+import net.simonvt.datepicker.DatePicker;
+import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
+import net.simonvt.timepicker.TimePicker;
+import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import it.feio.android.checklistview.ChecklistManager;
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+import android.widget.PopupWindow.OnDismissListener;
+
 public class AddEventFragment extends Fragment {
 
-	private AQuery aq, AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
+    public static AQuery aq;
+	private AQuery AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
 	private List<NameValuePair> pairs;
 	private static int FragmentCheck = 0;
 	private Uri filename;
@@ -134,7 +161,7 @@ public class AddEventFragment extends Fragment {
 			R.id.time_date_from, R.id.before_event_lay, R.id.repeat_event_lay,
 			R.id.spinner_labels_event, R.id.spinner_label_layout };
 
-	public static HashMap<Integer, Integer> inflatingLayoutsEvents = new HashMap<Integer, Integer>();
+	public static HashMap<Integer, Integer> inflatingLayoutsEvents = new HashMap<>();
 	protected static final int RESULT_CODE = 123;
 	private static final int TAKE_PICTURE = 1;
 	public static final int RESULT_GALLERY = 0;
@@ -144,8 +171,16 @@ public class AddEventFragment extends Fragment {
 	private Uri imageUri;
 	public static View allView;
 	public static Activity act;
-	public static ArrayList<String> selectedInvitees = new ArrayList<String>();
+    private PopupWindow popupWindowEvent;
+    private ArrayList<String> assignedId = new ArrayList<>();
 
+    private ToDoDao tododao;
+    private CheckListDao checklistdao;
+    private FriendsDao friendsdao;
+    private LabelDao labeldao;
+    private ReminderDao reminderdao;
+    private RepeatDao repeatdao;
+    private CommentDao commentdao;
 
 	public static AddEventFragment newInstance(int position, int dayPosition) {
 		AddEventFragment myFragment = new AddEventFragment();
@@ -163,10 +198,52 @@ public class AddEventFragment extends Fragment {
 				false);
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
-		editor = AddTask.label.edit();
-		editorattach = AddTask.attach.edit();
+		editor = App.label.edit();
+		editorattach = App.attach.edit();
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
+        if (toolbar != null)
+            ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
+        initActionBar();
+        dragAndDrop();
 		return view;
 	}
+
+    private void initActionBar(){
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("Event");
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+        ((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.todo_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().getSupportFragmentManager().popBackStack();
+                return true;
+            case R.id.action_save_new:
+
+                return true;
+            case R.id.action_comment:
+                return true;
+            case R.id.action_show_hide:
+                popupWindowEvent.showAtLocation(
+                        aq.id(R.id.content).getView(),
+                        Gravity.CENTER_HORIZONTAL, 0, 0);
+                return true;
+            case R.id.action_accept:
+                saveEvent();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -185,14 +262,12 @@ public class AddEventFragment extends Fragment {
 		inflatingLayoutsEvents.put(0, R.layout.add_event_title);
 		inflatingLayoutsEvents.put(1, R.layout.add_event_assign);
 		inflatingLayoutsEvents.put(2, R.layout.add_event_details);
-
 		inflatingLayoutsEvents.put(3, R.layout.add_event_time_date);
 		inflatingLayoutsEvents.put(4, R.layout.add_event_location1);
 		inflatingLayoutsEvents.put(5, R.layout.add_event_before);
 		inflatingLayoutsEvents.put(6, R.layout.add_event_repeat);
 		inflatingLayoutsEvents.put(7, R.layout.add_event_label);
 		inflatingLayoutsEvents.put(8, R.layout.add_event_subtask);
-
 		inflatingLayoutsEvents.put(9, R.layout.add_event_notes);
 		inflatingLayoutsEvents.put(10, R.layout.add_event_image);
 		
@@ -207,13 +282,7 @@ public class AddEventFragment extends Fragment {
 				FragmentTransaction transaction = manager.beginTransaction();
 				transaction.setCustomAnimations(R.anim.slide_in1,
 						R.anim.slide_out1);
-				if (Constants.Project_task_check == 1) {
-
-					transaction.replace(R.id.content, AddTaskAssign.newInstance(1));
-				} else {
-
-					transaction.replace(R.id.main_container, AddTaskAssign.newInstance(1));
-				}
+                transaction.replace(R.id.content, AddTaskAssign.newInstance(1));
 				transaction.addToBackStack(null);
 				transaction.commit();
 			}
@@ -274,7 +343,6 @@ public class AddEventFragment extends Fragment {
 			@Override
 			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
 					int arg3) {
-				// TODO Auto-generated method stub
 				aq.id(R.id.event_assign).textColorId(R.color.active);
 				aq.id(R.id.assign_event_button).background(
 						R.drawable.assign_blue);
@@ -285,13 +353,11 @@ public class AddEventFragment extends Fragment {
 			@Override
 			public void beforeTextChanged(CharSequence arg0, int arg1,
 					int arg2, int arg3) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -303,7 +369,7 @@ public class AddEventFragment extends Fragment {
 					int count) {
 
 				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+//					AddTask.btn.setAlpha(1);
 
 				for (String words : Constants.CONTACTS_EVOKING_WORDS) {
 					String[] typedWords = s.toString().split(" ");
@@ -339,7 +405,6 @@ public class AddEventFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				// TODO Auto-generated method stub
 
 				if (isChecked) {
 					aq.id(R.id.time_from).getTextView()
@@ -366,8 +431,6 @@ public class AddEventFragment extends Fragment {
 				}
 			}
 		});
-
-		// *******************dATE tIME
 
 		// Date picker implementation
 		final DatePicker dPicker = (DatePicker) aq.id(R.id.date_picker)
@@ -602,7 +665,6 @@ public class AddEventFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				if (aq.id(R.id.repeat_event).getText().toString() == "Never") {
 				} else {
 					aq.id(R.id.repeat_event).text(
@@ -644,10 +706,6 @@ public class AddEventFragment extends Fragment {
 		// ****************************** Label Dialog
 		GridView gridView;
 
-		// final String[] labels_array1 = new String[] { "A", "A", "A", "A",
-		// "A",
-		// "A", "A", "A", "A", "A", };
-
 		View vie = getActivity().getLayoutInflater().inflate(
 				R.layout.add_label_event, null, false);
 
@@ -663,7 +721,6 @@ public class AddEventFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO Auto-generated method stub
 
 				ImageView img = (ImageView) view;
 				if (last != null) {
@@ -690,8 +747,6 @@ public class AddEventFragment extends Fragment {
 
 					@Override
 					public void onDismiss(DialogInterface arg0) {
-						// TODO Auto-generated method stub
-
 						label_text.setText("");
 					}
 				});
@@ -824,7 +879,6 @@ public class AddEventFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				location_del.dismiss();
 			}
 		});
@@ -833,7 +887,6 @@ public class AddEventFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Remove(viewl.getId() + "" + itempos);
 				((TextView) viewl).setText("New");
 				GradientDrawable mDrawable = (GradientDrawable) getResources()
@@ -849,7 +902,6 @@ public class AddEventFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				label_edit.dismiss();
 				location_del.show();
 			}
@@ -859,7 +911,6 @@ public class AddEventFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub=
 				// aqd.id(R.id.add_label_text).text(((TextView)
 				// viewl).getText().)
 				AQlabel.id(R.id.label_title_event).text("Edit");
@@ -881,17 +932,8 @@ public class AddEventFragment extends Fragment {
 				getActivity()), WindowManager.LayoutParams.WRAP_CONTENT, true);
 
 		popupWindowAttach.setBackgroundDrawable(getResources().getDrawable(
-				android.R.drawable.dialog_holo_light_frame));
+                android.R.drawable.dialog_holo_light_frame));
 		popupWindowAttach.setOutsideTouchable(true);
-		popupWindowAttach.setOnDismissListener(new OnDismissListener() {
-
-			@Override
-			public void onDismiss() {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 
 		View attachment = inflater
@@ -1217,14 +1259,19 @@ public class AddEventFragment extends Fragment {
 		}
 	}
 
+
+    public static void updateAssign(HashMap<String, String> names){
+        StringBuilder builder = new StringBuilder();
+        for(String key : names.keySet()){
+            builder.append(names.get(key)+", ");
+        }
+        aq.id(R.id.event_assign).text(builder);
+    }
+
 	private void showImageURI(Uri selectedImage) {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
-		Cursor returnCursor = cr.query(selectedImage, null, null, null, null);
-
-		MimeTypeMap mime = MimeTypeMap.getSingleton();
-
 		String type = MimeTypeMap.getFileExtensionFromUrl(selectedImage
 				.toString());
 
@@ -1250,7 +1297,6 @@ public class AddEventFragment extends Fragment {
 
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
 						Toast.makeText(getActivity(),
 								arg0.getId() + "     " + arg0.getTag(),
 								Toast.LENGTH_LONG).show();
@@ -1271,7 +1317,6 @@ public class AddEventFragment extends Fragment {
 
 							@Override
 							public void onClick(View arg0) {
-								// TODO Auto-generated method stub
 								popupWindowAttach.dismiss();
 							}
 						});
@@ -1280,7 +1325,6 @@ public class AddEventFragment extends Fragment {
 
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								if (ll_iner != null)
 									item.removeView(ll_iner);
 								popupWindowAttach.dismiss();
@@ -1296,7 +1340,7 @@ public class AddEventFragment extends Fragment {
 						.findViewById(R.id.image_added_size);
 				Calendar cal = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
-				by.setText("By Usman Ameer on " + sdf.format(cal.getTime()));
+				by.setText("By "+App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
 				filename = selectedImage;
 				File myFile = new File(selectedImage.toString());
 
@@ -1612,11 +1656,11 @@ public class AddEventFragment extends Fragment {
 
 	public void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(2 + "key_label" + id, null); // getting
+		plabel = App.label.getString(2 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(2 + "key_color_position" + id, 0); // getting
+		pposition = App.label.getInt(2 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
@@ -1747,12 +1791,12 @@ public class AddEventFragment extends Fragment {
 	}
 
 	public void Loadattachmax() {
-		MaxId = AddTask.attach.getInt("2Max", 0);
+		MaxId = App.attach.getInt("2Max", 0);
 	}
 
 	public void Loadattach(int id) {
-		AddTask.attach.getString(2 + "path" + id, null);
-		AddTask.attach.getString(2 + "type" + id, null); // getting String
+		App.attach.getString(2 + "path" + id, null);
+		App.attach.getString(2 + "type" + id, null); // getting String
 	}
 
 	public void Removeattach(int id) {
@@ -1760,5 +1804,298 @@ public class AddEventFragment extends Fragment {
 		editorattach.remove(2 + "type" + id); // will delete key email
 		editorattach.commit();
 	}
+
+    private void dragAndDrop(){
+        ArrayList<String> arrayListEvent = new ArrayList<>(Arrays.asList(Constants.layoutsName));
+
+        final LayoutInflater inflater2 = (LayoutInflater) getActivity()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view2 = inflater2.inflate(R.layout.popup_menu_event, null,
+                false);
+        TextView cancel_event = (TextView) view2
+                .findViewById(R.id.cancel_event);
+        TextView ok_event = (TextView) view2.findViewById(R.id.ok_event);
+
+        popupWindowEvent = new PopupWindow(view2, Utils.getDpValue(270, getActivity()),
+                WindowManager.LayoutParams.WRAP_CONTENT, true);
+        DragSortListView listViewEvent = (DragSortListView) view2.findViewById(R.id.list_event);
+        ArrayAdapter<String> adapterEvent = new ArrayAdapter<>(getActivity(),
+                R.layout.popup_menu_items_schedule, R.id.text, arrayListEvent);
+
+        listViewEvent.setAdapter(adapterEvent);
+        for (int i = 0; i < arrayListEvent.size(); i++)
+            listViewEvent.setItemChecked(i, true);
+
+        cancel_event.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                popupWindowEvent.dismiss();
+            }
+        });
+        ok_event.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                popupWindowEvent.dismiss();
+            }
+        });
+
+        DragSortController controllerEvent = new DragSortController(
+                listViewEvent);
+        controllerEvent.setDragHandleId(R.id.drag_handle);
+
+        listViewEvent.setOnTouchListener(controllerEvent);
+        listViewEvent.setOnItemClickListener(new ListClickListenerEvent());
+
+        popupWindowEvent = new PopupWindow(view2, Utils.getDpValue(270, getActivity()),
+                WindowManager.LayoutParams.WRAP_CONTENT, true);
+        popupWindowEvent.setBackgroundDrawable(new BitmapDrawable());
+        popupWindowEvent.setOutsideTouchable(true);
+        popupWindowEvent.setOnDismissListener(new OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+//                layout_MainMenu.getForeground().setAlpha(0);
+            }
+        });
+    }
+    public class ListClickListenerEvent implements OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                                long id) {
+            position = position + 1;
+            if (position == 2) {
+                position = position + 1;
+            } else if (position > 1) {
+                position = position + 1;
+            }
+            int layoutId = inflatingLayoutsEvents
+                    .get(position);
+            CheckedTextView checkedTextView = (CheckedTextView) view
+                    .findViewById(R.id.checkbox);
+            if (checkedTextView.isChecked()) {
+                aq.id(layoutId).visible();
+            } else {
+                aq.id(layoutId).gone();
+            }
+        }
+
+    }
+
+    private void saveEvent(){
+        assignedId.clear();
+
+        if (!(aq.id(R.id.event_title).getText().toString().equals(""))) {
+
+            MaxId = App.attach.getInt("2Max", 0);
+
+            title = aq.id(R.id.event_title).getText().toString();
+
+            ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_event).getView();
+            boolean is_allday = switCh.isChecked();
+
+            String start_date = AddEventFragment.currentYear+ "-"
+                    + (AddEventFragment.currentMonDigit + 1) + "-"
+                    +  AddEventFragment.currentDayDigit + " "
+                    + AddEventFragment.currentHours + ":"
+                    + AddEventFragment.currentMin +":00";
+            String end_date = AddEventFragment.endEventYear + "-"
+                    + (AddEventFragment.endEventMonDigit + 1) + "-"
+                    + AddEventFragment.endEventDayDigit + " "
+                    + AddEventFragment.endEventHours + ":"
+                    + AddEventFragment.endEventMin +":00";
+
+            String location = aq.id(R.id.location_event).getText().toString();
+            String r_location= "", location_tag="";
+            boolean is_time = false, is_location = false;
+            String before = aq.id(R.id.before_event).getText().toString();
+            if (before.contains("On Arrive") || before.contains("On Leave")) {
+                is_time = false;
+                is_location = true;
+                r_location = aq.id(R.id.location_before_event).getText()
+                        .toString();
+                location_tag = ((TextView) AddEventBeforeFragment.viewP)
+                        .getText().toString() + "";
+            }
+
+            boolean is_alertEmail = false, is_alertNotification = false;
+            if (!(aq.id(R.id.before_event).getText().toString().equals("") || aq
+                    .id(R.id.before_event).getText().toString() == null)) {
+                is_alertEmail = aq.id(R.id.email_radio_event).getCheckBox()
+                        .isChecked();
+                is_alertNotification = aq.id(R.id.notification_radio_event)
+                        .getCheckBox().isChecked();
+            }
+
+            boolean repeat_forever = aq.id(R.id.repeat_forever_radio).isChecked();
+            String repeat = aq.id(R.id.repeat_event).getText().toString();
+            repeatdate = AddEventFragment.repeatdate;
+
+            String label_name = aq.id(R.id.spinner_labels_event).getText()
+                    .toString();
+
+            toggleCheckList(aq.id(R.id.add_sub_event).getView());
+            String checklist_data = aq.id(R.id.add_sub_event).getEditText()
+                    .getText().toString();
+
+            String notes = aq.id(R.id.notes_event).getText().toString();
+            for (String key : AssignMultipleFragment.selectedInvitees.keySet())
+                assignedId.add(key);
+
+            Date startDate, endDate;
+            long startDateInMilli = 0, endDateInMilli = 0;
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                startDate = sdf1.parse(start_date);
+                startDateInMilli = startDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                endDate = sdf1.parse(end_date);
+                endDateInMilli = endDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (NullPointerException npe) {
+                end_date = null;
+            }
+            int reminderTime = 0, is_locationtype = 0;
+            String locationType = null;
+            Log.e("before", before);
+            if (before != null || before.isEmpty()) {
+                if (is_time) {
+                    reminderTime = Utils.getReminderTime(before);
+                    Log.e("reminder time", reminderTime+"");
+                } else {
+                    //TODO set notification by GEO fence
+                    Geofences geoFence = new Geofences(getActivity());
+                    if (before.contains("On Arrive")) {
+                        is_locationtype = 0;
+                        locationType = "On Arrive";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
+                    } else if (before.contains("On Leave")) {
+                        is_locationtype = 1;
+                        locationType = "On Leave";
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
+                    }
+                }
+            }
+            long r_repeat = 0;
+            if (repeat != null) {
+                if (repeat.contains("once") || repeat.contains("Once")) {
+                    r_repeat = 0;
+                    repeat = "once";
+                } else if (repeat.contains("daily") || repeat.contains("daily")) {
+                    r_repeat = Constants.DAY;
+                    repeat = "daily";
+                } else if (repeat.contains("weekly")
+                        || repeat.contains("Weekly")) {
+                    r_repeat = Constants.WEEK;
+                    repeat = "weekly";
+                } else if (repeat.contains("monthly")
+                        || repeat.contains("Monthly")) {
+                    r_repeat = Constants.MONTH;
+                    repeat = "monthly";
+                } else if (repeat.contains("yearly")
+                        || repeat.contains("Yearly")) {
+                    r_repeat = Constants.YEAR;
+                    repeat = "yearly";
+                }
+            }
+            db_initialize();
+            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+
+            ToDo todo = new ToDo();
+            todo.setUser_id(Constants.user_id);
+            todo.setTodo_type_id(2);
+            todo.setTitle(title);
+            todo.setStart_date(startDateInMilli);
+            todo.setEnd_date(endDateInMilli);
+            todo.setIs_allday(is_allday);
+            todo.setLocation(location);
+            todo.setNotes(notes);
+            todo.setIs_done(false);
+            todo.setIs_delete(false);
+
+            Label label = new Label();
+            label.setLabel_name(label_name);
+            labeldao.insert(label);
+            todo.setLabel(label);
+
+            Reminder reminder = new Reminder();
+            reminder.setIs_alertEmail(is_alertEmail);
+            reminder.setIs_alertNotification(is_alertNotification);
+            reminder.setIs_time_location(is_location);
+            reminder.setLocation(r_location);
+            reminder.setLocation_type(is_locationtype);
+            if ((!location_tag.equals("New")) && location_tag != null) {
+                reminder.setLocation_tag(location_tag);
+            }
+
+            reminder.setTime((long) reminderTime);
+            reminderdao.insert(reminder);
+            todo.setReminder(reminder);
+
+            Repeat repeaT = new Repeat();
+            repeaT.setRepeat_interval(repeat);
+            repeaT.setRepeat_until(r_repeat);
+            repeaT.setIs_forever(repeat_forever);
+            repeatdao.insert(repeaT);
+            todo.setRepeat(repeaT);
+
+            CheckList checklist = new CheckList();
+            checklist.setTitle(checklist_data);
+            checklistdao.insert(checklist);
+            todo.setCheckList(checklist);
+
+            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+
+                    Comment commenT = new Comment();
+                    commenT.setComment(AddTaskComment.comment.get(i));
+                    commenT.setToDo(todo);
+                    commentdao.insert(commenT);
+                }
+            }
+
+            Friends friend = new Friends();
+            friend.setEmail("email");
+            friendsdao.insert(friend);
+            todo.setReminder(reminder);
+            tododao.insert(todo);
+
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+
+            if(reminderTime != 0){
+                alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
+                alarm.SetNormalAlarm(getActivity());
+            }
+            if(r_repeat != 0){
+                alarm.setRepeatAlarm(getActivity(), r_repeat);
+            }
+            else{
+                alarm.SetNormalAlarm(getActivity());
+            }
+
+            AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
+                    locationType, notes, repeatdate,repeat_forever, MaxId,
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+            asyn.execute();
+
+        }else
+            Toast.makeText(getActivity(), "Please enter title",
+                    Toast.LENGTH_SHORT).show();
+    }
+    private void db_initialize() {
+        checklistdao = App.daoSession.getCheckListDao();
+        friendsdao = App.daoSession.getFriendsDao();
+        labeldao = App.daoSession.getLabelDao();
+        tododao = App.daoSession.getToDoDao();
+        commentdao = App.daoSession.getCommentDao();
+        repeatdao = App.daoSession.getRepeatDao();
+        reminderdao = App.daoSession.getReminderDao();
+    }
 
 }

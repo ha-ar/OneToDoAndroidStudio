@@ -7,7 +7,7 @@
     android:background="@android:color/white"
     android:overScrollMode="never"
     android:scrollbars="none"
-    app:zoomRatio="1.4" >
+    app:zoomRatio="1" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,11 +15,6 @@
         android:background="@android:color/white"
         android:orientation="vertical" >
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="3" >
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/imageView1123"
@@ -116,6 +111,7 @@
             android:visibility="visible" >
 
             <LinearLayout
+                android:id="@+id/date_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -141,6 +137,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/location_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -166,6 +163,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/reminder_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -183,7 +181,7 @@
                     android:id="@+id/reminder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="18dp"
+                    android:paddingLeft="23dp"
                     android:singleLine="true"
                     android:text=""
                     android:textColor="@color/_4d4d4d"
@@ -191,6 +189,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/repeat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -209,97 +208,112 @@
                     android:id="@+id/repeat_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="19dp"
+                    android:paddingLeft="23dp"
                     android:singleLine="true"
                     android:text=""
                     android:textColor="@color/_4d4d4d"
                     android:textSize="13.33sp" />
             </LinearLayout>
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:paddingLeft="20dp"-->
+            <!--android:paddingBottom="2dp"-->
+            <!--android:paddingRight="10dp"-->
+            <!--android:paddingTop="5dp" >-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/imageView10"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:text="INVITEE"-->
+            <!--android:textSize="12sp"-->
+            <!--android:textColor="#0eafe3"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/repeat_view"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:paddingLeft="60dp"-->
+            <!--android:singleLine="true"-->
+            <!--android:text="04"-->
+            <!--android:textColor="#0eafe3"-->
+            <!--android:textSize="12sp" />-->
+            <!--</LinearLayout>-->
+            <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_marginLeft="20dp"-->
+            <!--android:layout_marginRight="10dp"-->
+            <!--android:background="#1ab2e4" />-->
+            <LinearLayout android:layout_width="match_parent"
+                android:id="@+id/check_list_layout"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="1dp"
+                    android:text="SUBTASKS"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/active"
+                    android:textSize="13sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#1ab2e4" />
+                <EditText
+                    android:id="@+id/check_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:ems="10"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:hint="Add a subtask"
+                    android:textColor="#414242"
+                    android:textSize="17.78sp" />
+
+            </LinearLayout>
+
             <LinearLayout
+                android:id="@+id/notes_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingLeft="20dp"
-                android:paddingBottom="2dp"
-                android:paddingRight="10dp"
-                android:paddingTop="5dp" >
-
-                <TextView
-                    android:id="@+id/imageView10"
-                    android:layout_width="wrap_content"
-                    android:text="INVITEE"
-                    android:textSize="12sp"
-                    android:textColor="#0eafe3"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/repeat_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="60dp"
-                    android:singleLine="true"
-                    android:text="04"
-                    android:textColor="#0eafe3"
-                    android:textSize="12sp" />
-            </LinearLayout>
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginRight="10dp"
-                android:background="#1ab2e4" />
-
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent">
-                <LinearLayout
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="1dp"
+                    android:text="NOTES"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/active"
+                    android:textSize="13sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#1ab2e4" />
+                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="10dp"
-                    android:visibility="visible" >
-                    <ListView
-                        android:id="@+id/invitee_list"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="center_horizontal"
-                        android:visibility="visible"
-                        android:divider="@null"
-                        android:dividerHeight="0dp"
-                        android:layout_height="120dp" >
-                    </ListView>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="1dp"
-                        android:paddingLeft="3dp"
-                        android:text="NOTES"
-                        android:layout_gravity="center_horizontal"
-                        android:textColor="@color/active"
-                        android:textSize="12sp" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="#1ab2e4" />
-                    <EditText
-                        android:layout_width="match_parent"
-                        android:layout_height="fill_parent"
-                        android:id="@+id/notes"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:minLines="2" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="#1ab2e4" />
-                </LinearLayout>
-
-            </ScrollView>
+                    android:id="@+id/notes"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:background="@android:color/transparent"
+                    android:minLines="2" />
+            </LinearLayout>
         </LinearLayout>
+
 
         <ImageView
             android:id="@+id/backview"
@@ -319,28 +333,39 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="35dp"
             android:src="@drawable/viewedit" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageView1123"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="15dp"
-            android:text="Host:   Me"
-            android:textColor="@android:color/white"
-            android:textSize="13.33sp" />
-
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/textView2"
-            android:layout_alignLeft="@+id/textView2"
+            android:layout_above="@+id/sender_name"
             android:text="IT-Workshop"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@id/completed_task"
+            android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:textSize="26.67sp" />
+            android:textSize="30sp" />
+        <CheckBox
+            android:id="@+id/completed_task"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="5dp"
+            android:layout_above="@+id/sender_name"
+            android:padding="16dp"
+            android:button="@drawable/task_detail_chechk_box" />
+
+        <TextView
+            android:id="@+id/sender_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView1123"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:text="Host:   Me"
+            android:layout_toRightOf="@id/completed_task"
+            android:textColor="@android:color/white"
+            android:textSize="13.33sp" />
 
         <ImageView
             android:id="@+id/imageView4"

@@ -133,9 +133,9 @@ public class CountrySelector extends Fragment {
 						|| aq.id(R.id.country).getText().equals("") || position == 0)) {
 					if (App.prefs.getGcmid() != null) {
 						registerUser();
-						contactsList = Utils.getContactsList(getActivity());
-						Toast.makeText(getActivity(), "Syncing contacts",
-								Toast.LENGTH_SHORT).show();
+//						contactsList = Utils.getContactsList(getActivity());
+//						Toast.makeText(getActivity(), "Syncing contacts",
+//								Toast.LENGTH_SHORT).show();
 
 					} else {
 						Toast.makeText(getActivity(), "Please wait...",
@@ -277,9 +277,9 @@ public class CountrySelector extends Fragment {
 						try {
 							if (!json.getBoolean("error")
 									&& json.getBoolean("result")) {
-								Toast.makeText(getActivity(),
-										"Contacts Synced!", Toast.LENGTH_SHORT)
-										.show();
+//								Toast.makeText(getActivity(),
+//										"Contacts Synced!", Toast.LENGTH_SHORT)
+//										.show();
 								getAssignAbleFriendsList();
 							}
 						} catch (JSONException e) {

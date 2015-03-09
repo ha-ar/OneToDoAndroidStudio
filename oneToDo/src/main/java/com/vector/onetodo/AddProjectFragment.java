@@ -125,7 +125,7 @@ public class AddProjectFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		allView = getView();
-		editor = AddTask.label.edit();
+		editor = App.label.edit();
 		dayPosition = getArguments().getInt("dayPosition", 0);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -152,8 +152,8 @@ public class AddProjectFragment extends Fragment {
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
 
-				if (taskTitle.getText().length() > 0)
-					AddTask.btn.setAlpha(1);
+//				if (taskTitle.getText().length() > 0)
+//					AddTask.btn.setAlpha(1);
 
 				aq.id(R.id.completed_project).textColorId(R.color.active);
 
@@ -428,7 +428,7 @@ public class AddProjectFragment extends Fragment {
 				Bundle b=new Bundle();
 				b.putInt("dayPosition",dayPosition );
 				fr.setArguments(b);
-				trans.replace(R.id.main_container, fr);
+				trans.replace(R.id.content, fr);
 				
 				trans.addToBackStack("ADDPROJECT");
 				
@@ -726,11 +726,11 @@ public class AddProjectFragment extends Fragment {
 
 	void Load(String id) {
 		plabel = null;
-		plabel = AddTask.label.getString(5 + "key_label" + id, null); // getting
+		plabel = App.label.getString(5 + "key_label" + id, null); // getting
 																		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
-		pposition = AddTask.label.getInt(5 + "key_color_position" + id, 0); // getting
+		pposition = App.label.getInt(5 + "key_color_position" + id, 0); // getting
 																			// String
 	}
 
