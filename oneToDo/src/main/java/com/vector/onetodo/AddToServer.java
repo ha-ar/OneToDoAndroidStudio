@@ -185,7 +185,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                     "todo_checklist[checklist_data]", checklist_data));
 
         if (assignedId.size() != 0) {
-            if (titleCheck == 2 || titleCheck == 5) {
+            if (titleCheck == 2) {
                 for (int i = 0; i < assignedId.size(); i++) {
                     pairs.add(new BasicNameValuePair("todo_collaborate["
                             + i + "][assignee_id]", String

@@ -1935,8 +1935,8 @@ public class AddEventFragment extends Fragment {
 
             String label_name = aq.id(R.id.spinner_labels_event).getText()
                     .toString();
-
-            toggleCheckList(aq.id(R.id.add_sub_event).getView());
+            if(!(aq.id(R.id.add_sub_event).getView() instanceof EditText))
+                toggleCheckList(aq.id(R.id.add_sub_event).getView());
             String checklist_data = aq.id(R.id.add_sub_event).getEditText()
                     .getText().toString();
 

@@ -1868,8 +1868,8 @@ public class AddScheduleFragment extends Fragment {
             repeatdate = AddScheduleFragment.repeatdate;
 
             String label_name = aq.id(R.id.sch_label_txt).getText().toString();
-
-            toggleCheckList(aq.id(R.id.add_sub_sch).getView());
+            if(!(aq.id(R.id.add_sub_sch).getView() instanceof EditText))
+                toggleCheckList(aq.id(R.id.add_sub_sch).getView());
             String checklist_data = aq.id(R.id.add_sub_sch).getEditText()
                     .getText().toString();
 
@@ -1906,11 +1906,11 @@ public class AddScheduleFragment extends Fragment {
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, endDateInMilli);
                     } else if (before.contains("On Leave")) {
                         is_locationtype = 1;
                         locationtype = "On Leave";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
+                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, endDateInMilli);
                     }
                 }
             }
@@ -2016,13 +2016,12 @@ public class AddScheduleFragment extends Fragment {
                     locationtype, notes, repeatdate,repeat_forever, MaxId,
                     AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
             asyn.execute();
-            // ********************* Data add hit Asyntask
-//            asyn = new AddToServer();
-//            asyn.execute();
 
         }else
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();
+
+        getActivity().getSupportFragmentManager().popBackStack();
     }
     private void db_initialize() {
         checklistdao = App.daoSession.getCheckListDao();

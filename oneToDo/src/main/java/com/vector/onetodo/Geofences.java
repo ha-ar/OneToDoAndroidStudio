@@ -45,7 +45,7 @@ public class Geofences{
         return PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, GeofenceBroadcastReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public void addGeofence(double lat, double lang, int radius, int enterOrExit, int expiry) {
+    public void addGeofence(double lat, double lang, int radius, int enterOrExit, long expiry) {
         final GeofencingRequest geofencingRequest = createGeofencingRequest(lat, lang, radius, enterOrExit, expiry);
         if (geofencingRequest == null) return;
 
@@ -70,7 +70,7 @@ public class Geofences{
                 });
     }
 
-    public GeofencingRequest createGeofencingRequest(double lat, double lon, int radius, int enterOrExit, int expiry ) {
+    public GeofencingRequest createGeofencingRequest(double lat, double lon, int radius, int enterOrExit, long expiry ) {
         try {
             Geofence geofence = new Geofence.Builder()
                     .setRequestId("GEOFENCE")

@@ -210,7 +210,7 @@ public class AddTaskAssign extends Fragment {
 		@Override
 		public Fragment getItem(int position) {
 			ProjectsTabHolder fragment;
-			if(AddTaskAssign.this.position == 1 || AddTaskAssign.this.position == 4){
+			if(AddTaskAssign.this.position == 1 || AddTaskAssign.this.position == 4 || AddTaskAssign.this.position == 5){
 				fragment = AssignMultipleFragment
 						.newInstance(position);
 			}else

@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/underline_textview_lightgray"
-        android:paddingBottom="2dp"
-        android:paddingTop="27dp"
-        android:text="SUBTASK"
-        android:textColor="@color/active"
-        android:textSize="13.33sp"
-        android:typeface="monospace" />
+    <LinearLayout
+        android:tag="Bottom2"
+        android:background="#333"
+        android:layout_width="40dp"
+        android:gravity="center"
+        android:layout_height="48dp">
+        <ImageView
+            android:id="@+id/trash"
+            android:src="@drawable/ic_circle_close_delete"
+            android:layout_width="22dp"
+            android:layout_height="22dp" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/projec_subtask_lay"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:animateLayoutChanges="true"
         android:background="@drawable/input_fields_gray"
         android:padding="10dp" >
 
@@ -41,7 +43,7 @@
             android:background="@android:color/transparent"
             android:clickable="false"
             android:gravity="center_vertical"
-            android:hint="Task one"
+            android:hint="Add Task"
             android:paddingLeft="18dp"
             android:paddingRight="5dp"
             android:singleLine="true"
@@ -58,4 +60,4 @@
             android:src="@drawable/next_arrow" />
     </RelativeLayout>
 
-</LinearLayout>
+</com.daimajia.swipe.SwipeLayout>

@@ -137,29 +137,20 @@ public class Projects extends Fragment implements ProjectsScrollHolder {
 
 		@Override
 		public Fragment getItem(int position) {
-			ProjectsTabHolder fragment = 
-					(ProjectsTabHolder) ProjectsListFragment.newInstance(position);
-
-			mScrollTabHolders.put(position, fragment);
-			if (mListener != null) {
-				fragment.setScrollTabHolder(mListener);
-			}
-			return fragment;
+			return ProjectsListFragment.newInstance(position);
 		}
 
 	}
 
 	@Override
 	public void adjustScroll(int scrollHeight) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount, int pagePosition) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 }

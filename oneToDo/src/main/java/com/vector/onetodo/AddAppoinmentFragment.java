@@ -1071,7 +1071,8 @@ public class AddAppoinmentFragment extends Fragment {
             String label_name = aq.id(R.id.spinner_labels_appoin).getText()
                     .toString();
 
-            toggleCheckList(aq.id(R.id.add_sub_appoinment).getView());
+            if(!(aq.id(R.id.add_sub_appoinment).getView() instanceof EditText))
+                toggleCheckList(aq.id(R.id.add_sub_appoinment).getView());
             String checklist_data = aq.id(R.id.add_sub_appoinment).getEditText()
                     .getText().toString();
 
@@ -1212,6 +1213,8 @@ public class AddAppoinmentFragment extends Fragment {
         }else
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();
+
+        getActivity().getSupportFragmentManager().popBackStack();
     }
     private void db_initialize() {
         checklistdao = App.daoSession.getCheckListDao();

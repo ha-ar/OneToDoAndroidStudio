@@ -1,44 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_grey_color"
-    android:layerType="hardware" >
+    android:layerType="hardware">
 
-    <FrameLayout
-        android:id="@+id/add_event_frame"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/active"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        fab:popupTheme="@style/Theme.AppCompat.Light"
+        fab:theme="@style/ThemeToolbarLightOverflow" />
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@id/toolbar_top"
+        android:background="@drawable/drop_shadow" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true" >
+        android:layout_below="@id/shadow">
 
-        <RelativeLayout
+        <GridLayout
+            android:id="@+id/inner_event_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:background="@color/light_grey_color"
+            android:columnCount="1"
+            android:orientation="vertical"
+            android:paddingLeft="15dp"
+            android:paddingRight="5dp"
+            android:stretchMode="columnWidth" />
 
-            <com.vector.onetodo.utils.CustomScrollView
-                android:id="@+id/main_scroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/comment_box"
-                android:layout_alignParentTop="true"
-                android:animateLayoutChanges="true"
-                android:background="@color/light_grey_color"
-                android:scrollbars="none" >
-
-                <GridLayout
-                    android:id="@+id/inner_event_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:animateLayoutChanges="true"
-                    android:background="@color/light_grey_color"
-                    android:columnCount="1"
-                    android:orientation="vertical"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="5dp"
-                    android:stretchMode="columnWidth" />
-            </com.vector.onetodo.utils.CustomScrollView>
-        </RelativeLayout>
-    </FrameLayout>
+        <TextView
+            android:id="@+id/sub_task_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/underline_textview_lightgray"
+            android:paddingBottom="2dp"
+            android:paddingTop="27dp"
+            android:text="SUBTASK"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="5dp"
+            android:textColor="@color/active"
+            android:textSize="13.33sp"
+            android:layout_below="@id/inner_event_container"
+            android:typeface="monospace" />
+        <ListView
+            android:id="@+id/subtask_listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="5dp"
+            android:layout_below="@id/sub_task_heading" />
+    </RelativeLayout>
 
 </RelativeLayout>

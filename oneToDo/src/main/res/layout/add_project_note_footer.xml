@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/project_subtask_layout"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="@drawable/input_fields_gray"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
+
+    <CheckBox
+        android:id="@+id/completed_project"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="2dp"
+        android:button="@drawable/task_chechk_box" />
+
+    <TextView
+        android:id="@+id/project_subtask"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/completed_project"
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:gravity="center_vertical"
+        android:hint="Add Task"
+        android:paddingLeft="18dp"
+        android:paddingRight="5dp"
+        android:singleLine="true"
+        android:textColorHint="#bababa"
+        android:textSize="17.78sp" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/project_subtask"
+        android:layout_centerVertical="true"
+        android:clickable="false"
+        android:src="@drawable/next_arrow" />
+</RelativeLayout>

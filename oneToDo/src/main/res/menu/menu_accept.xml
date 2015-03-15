@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     
      <item
-        android:id="@+id/action_accept"
+        android:id="@+id/action_accept_task"
         android:orderInCategory="100"
         android:icon="@drawable/ic_accept"
         app:showAsAction="always"

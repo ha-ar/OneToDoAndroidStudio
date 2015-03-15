@@ -38,6 +38,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/invite_project"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_below="@+id/title_event_layout"

@@ -91,7 +91,16 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
 			@Override
 			public void onClick(View v) {
 				if (img.getAlpha() == 1) {
-                    AddEventFragment.updateAssign(selectedInvitees);
+                    try{
+                        AddEventFragment.updateAssign(selectedInvitees);
+                    }catch (Exception e){
+                        //not from event
+                    }
+                    try{
+                        AddProjectFragment.updateAssign(selectedInvitees);
+                    }catch (Exception e){
+                        // not from project
+                    }
 					getActivity().getSupportFragmentManager().popBackStack();
 				}
 			}

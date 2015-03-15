@@ -173,6 +173,7 @@ public class AddTaskFragment extends Fragment {
     private ArrayAdapter<String> adapterTask;
     private PopupWindow popupWindowTask;
     private String labelColor;
+    private boolean isProjectSubTask = false;
     private ArrayList<String> assignedId = new ArrayList<>();
 
     private ToDoDao tododao;
@@ -263,6 +264,7 @@ public class AddTaskFragment extends Fragment {
 //            aq.id(R.id.addtask_header).getView().setVisibility(View.VISIBLE);
 //        }
         dayPosition = getArguments().getInt("dayPosition", 0);
+        isProjectSubTask = getArguments().getBoolean("is_sub_task", false);
         allView = getView();
 
         currentYear = Utils.getCurrentYear(dayPosition);
@@ -330,8 +332,8 @@ public class AddTaskFragment extends Fragment {
         aq.id(R.id.location_task)
                 .typeface(
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new GeneralOnClickListner())
-                .text(App.gpsTracker.getLocality(getActivity()));
+                .clicked(new GeneralOnClickListner());
+//                .text(App.gpsTracker.getLocality(getActivity()));
         AutoCompleteTextView locationTextView = (AutoCompleteTextView)aq.id(R.id.location_task).getView();
         locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 
@@ -1131,11 +1133,10 @@ public class AddTaskFragment extends Fragment {
         switch (requestCode) {
 
             case TAKE_PICTURE:
-
                 if (resultCode == Activity.RESULT_OK)
                     showImageURI(imageUri);
             case RESULT_GALLERY:
-                if (null != data) {
+                if (data != null) {
                     showImageURI(data.getData());
                 }
                 break;
@@ -1169,6 +1170,11 @@ public class AddTaskFragment extends Fragment {
     }
 
     private void showImageURI(Uri selectedImage) {
+
+        if(selectedImage == null){
+            Toast.makeText(getActivity(), "Error loading image", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         getActivity().getContentResolver().notifyChange(selectedImage, null);
         ContentResolver cr = getActivity().getContentResolver();
@@ -1659,201 +1665,225 @@ public class AddTaskFragment extends Fragment {
     private void saveTask(){
         assignedId.clear();
         assignedId.add(AddTaskFragment.assignedSelectedID);
-        if (!(aq.id(R.id.task_title1).getText().toString().equals(""))) {
-
-            MaxId = App.attach.getInt("Max", 0);
-            title = aq.id(R.id.task_title1).getText().toString();
-
-            boolean is_allday = false;
-            String start_date = AddTaskFragment.currentYear + "-"
-                    + (AddTaskFragment.currentMonDigit + 1) + "-"
-                    + AddTaskFragment.currentDayDigit + " "
-                    + AddTaskFragment.currentHours + ":"
-                    + AddTaskFragment.currentMin +":00";
-            String end_date = null;
-
-            String location = aq.id(R.id.location_task).getText().toString();
-            boolean is_time = false, is_location = false;
-            String r_location = null, location_tag = "";
-            String before = aq.id(R.id.before).getText().toString();
-            if (before.contains("On Arrive") || before.contains("On Leave")) {
-                is_time = false;
-                is_location = true;
-                r_location = aq.id(R.id.location_before).getText()
-                        .toString();
-                location_tag = ((TextView) AddTaskBeforeFragment.viewP)
-                        .getText().toString();
-            }
-
-            boolean is_alertEmail = false, is_alertNotification = false;
-            if (!(aq.id(R.id.before).getText().toString().equals("") || aq
-                    .id(R.id.before).getText().toString() == null)) {
-                is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
-                        .isChecked();
-                is_alertNotification = aq.id(R.id.notification_radio)
-                        .getCheckBox().isChecked();
-            }
-
-            boolean repeat_forever = aq.id(R.id.forever_radio).isChecked();
-            String repeat = aq.id(R.id.repeat).getText().toString();
-            String repeatdate = repeatDate;  // will be used for repeat until
-
-            String label_name = aq.id(R.id.spinner_labels_task).getText()
-                    .toString();
-
-            toggleCheckList(aq.id(R.id.add_sub_task).getView());
-            String checklist_data = aq.id(R.id.add_sub_task).getEditText()
-                    .getText().toString();
-
-            String notes = aq.id(R.id.notes_task).getText().toString();
-//            assignedId.add(AddTaskFragment.assignedSelectedID);
-
-            Date startDate = null, endDate = null;
-            long startDateInMilli = 0, endDateInMilli = 0;
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                startDate = sdf1.parse(start_date);
-                startDateInMilli = startDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            try {
-                endDate = sdf1.parse(end_date);
-                endDateInMilli = endDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (NullPointerException npe) {
-                end_date = null;
-            }
-            int reminderTime = 0, is_locationtype = 0;
-            String locationType = null;
-            Log.e("before", before);
-            if (before != null || before.isEmpty()) {
-                if (is_time) {
-                    reminderTime = Utils.getReminderTime(before);
-                    Log.e("reminder time", reminderTime+"");
-                } else {
-                    //TODO set notification by GEO fence
-                    Geofences geoFence = new Geofences(getActivity());
-                    if (before.contains("On Arrive")) {
-                        is_locationtype = 0;
-                        locationType = "On Arrive";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
-                    } else if (before.contains("On Leave")) {
-                        is_locationtype = 1;
-                        locationType = "On Leave";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
-                    }
-                }
-            }
-            long r_repeat = 0;
-            if (repeat != null) {
-                if (repeat.contains("once") || repeat.contains("Once")) {
-                    r_repeat = 0;
-                    repeat = "once";
-                } else if (repeat.contains("daily") || repeat.contains("daily")) {
-                    r_repeat = Constants.DAY;
-                    repeat = "daily";
-                } else if (repeat.contains("weekly")
-                        || repeat.contains("Weekly")) {
-                    r_repeat = Constants.WEEK;
-                    repeat = "weekly";
-                } else if (repeat.contains("monthly")
-                        || repeat.contains("Monthly")) {
-                    r_repeat = Constants.MONTH;
-                    repeat = "monthly";
-                } else if (repeat.contains("yearly")
-                        || repeat.contains("Yearly")) {
-                    r_repeat = Constants.YEAR;
-                    repeat = "yearly";
-                }
-            }
-            db_initialize();
-            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-
-            ToDo todo = new ToDo();
-            todo.setUser_id(Constants.user_id);
-            todo.setTodo_type_id(1);
-            todo.setTitle(title);
-            todo.setStart_date(startDateInMilli);
-            todo.setEnd_date(endDateInMilli);
-            todo.setIs_allday(is_allday);
-            todo.setLocation(location);
-            todo.setNotes(notes);
-            todo.setIs_done(false);
-            todo.setIs_delete(false);
-
-            Label label = new Label();
-            label.setLabel_name(label_name);
-            labeldao.insert(label);
-            todo.setLabel(label);
-
-            Reminder reminder = new Reminder();
-            reminder.setIs_alertEmail(is_alertEmail);
-            reminder.setIs_alertNotification(is_alertNotification);
-            reminder.setIs_time_location(is_location);
-            reminder.setLocation(r_location);
-            reminder.setLocation_type(is_locationtype);
-            if ((!location_tag.equals("New")) && location_tag != null) {
-                reminder.setLocation_tag(location_tag);
-            }
-
-            reminder.setTime((long) reminderTime);
-            reminderdao.insert(reminder);
-            todo.setReminder(reminder);
-
-            Repeat repeaT = new Repeat();
-            repeaT.setRepeat_interval(repeat);
-            repeaT.setRepeat_until(r_repeat);
-            repeaT.setIs_forever(repeat_forever);
-            repeatdao.insert(repeaT);
-            todo.setRepeat(repeaT);
-
-            CheckList checklist = new CheckList();
-            checklist.setTitle(checklist_data);
-            checklistdao.insert(checklist);
-            todo.setCheckList(checklist);
-
-            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-
-                    Comment commenT = new Comment();
-                    commenT.setComment(AddTaskComment.comment.get(i));
-                    commenT.setToDo(todo);
-                    commentdao.insert(commenT);
-                }
-            }
-
-            Friends friend = new Friends();
-            friend.setEmail("email");
-            friendsdao.insert(friend);
-            todo.setReminder(reminder);
-            tododao.insert(todo);
-
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
-
-            if(reminderTime != 0){
-                alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
-                alarm.SetNormalAlarm(getActivity());
-            }
-            if(r_repeat != 0){
-                alarm.setRepeatAlarm(getActivity(), r_repeat);
-            }
-            else{
-                alarm.SetNormalAlarm(getActivity());
-            }
-
-            // ********************* Data add hit Asyntask
-            AddToServer asyn = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
-                    locationType, notes, repeatdate,repeat_forever, MaxId,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
-            asyn.execute();
-
-        }else
+        if (aq.id(R.id.task_title1).getText().toString().equals("")) {
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        MaxId = App.attach.getInt("Max", 0);
+        title = aq.id(R.id.task_title1).getText().toString();
+
+        boolean is_allday = false;
+        String start_date = AddTaskFragment.currentYear + "-"
+                + (AddTaskFragment.currentMonDigit + 1) + "-"
+                + AddTaskFragment.currentDayDigit + " "
+                + AddTaskFragment.currentHours + ":"
+                + AddTaskFragment.currentMin +":00";
+        String end_date = null;
+
+        String location = aq.id(R.id.location_task).getText().toString();
+        boolean is_time = false, is_location = false;
+        String r_location = null, location_tag = "";
+        String before = aq.id(R.id.before).getText().toString();
+        if (before.contains("On Arrive") || before.contains("On Leave")) {
+            is_time = false;
+            is_location = true;
+            r_location = aq.id(R.id.location_before).getText()
+                    .toString();
+            location_tag = ((TextView) AddTaskBeforeFragment.viewP)
+                    .getText().toString();
+        }
+
+        boolean is_alertEmail = false, is_alertNotification = false;
+        if (!(aq.id(R.id.before).getText().toString().equals("") || aq
+                .id(R.id.before).getText().toString() == null)) {
+            is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
+                    .isChecked();
+            is_alertNotification = aq.id(R.id.notification_radio)
+                    .getCheckBox().isChecked();
+        }
+
+        boolean repeat_forever = aq.id(R.id.forever_radio).isChecked();
+        String repeat = aq.id(R.id.repeat).getText().toString();
+        String repeatdate = repeatDate;  // will be used for repeat until
+
+        String label_name = aq.id(R.id.spinner_labels_task).getText()
+                .toString();
+
+        if(!(aq.id(R.id.add_sub_task).getView() instanceof EditText))
+            toggleCheckList(aq.id(R.id.add_sub_task).getView());
+        String checklist_data = aq.id(R.id.add_sub_task).getEditText()
+                .getText().toString();
+
+        String notes = aq.id(R.id.notes_task).getText().toString();
+//            assignedId.add(AddTaskFragment.assignedSelectedID);
+
+        Date startDate = null, endDate = null;
+        long startDateInMilli = 0, endDateInMilli = 0;
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            startDate = sdf1.parse(start_date);
+            startDateInMilli = startDate.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            endDate = sdf1.parse(end_date);
+            endDateInMilli = endDate.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (NullPointerException npe) {
+            end_date = null;
+        }
+        int reminderTime = 0, is_locationtype = 0;
+        String locationType = null;
+        Log.e("before", before);
+        if (before != null || before.isEmpty()) {
+            if (is_time) {
+                reminderTime = Utils.getReminderTime(before);
+                Log.e("reminder time", reminderTime+"");
+            } else {
+                //TODO set notification by GEO fence
+                Geofences geoFence = new Geofences(getActivity());
+                if (before.contains("On Arrive")) {
+                    is_locationtype = 0;
+                    locationType = "On Arrive";
+                    geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, startDateInMilli);
+                } else if (before.contains("On Leave")) {
+                    is_locationtype = 1;
+                    locationType = "On Leave";
+                    geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, startDateInMilli);
+                }
+            }
+        }
+        long r_repeat = 0;
+        if (repeat != null) {
+            if (repeat.contains("once") || repeat.contains("Once")) {
+                r_repeat = 0;
+                repeat = "once";
+            } else if (repeat.contains("daily") || repeat.contains("daily")) {
+                r_repeat = Constants.DAY;
+                repeat = "daily";
+            } else if (repeat.contains("weekly")
+                    || repeat.contains("Weekly")) {
+                r_repeat = Constants.WEEK;
+                repeat = "weekly";
+            } else if (repeat.contains("monthly")
+                    || repeat.contains("Monthly")) {
+                r_repeat = Constants.MONTH;
+                repeat = "monthly";
+            } else if (repeat.contains("yearly")
+                    || repeat.contains("Yearly")) {
+                r_repeat = Constants.YEAR;
+                repeat = "yearly";
+            }
+        }
+        if(isProjectSubTask){
+            SubTask subTask = new SubTask();
+            subTask.title = title;
+            subTask.startDate = start_date;
+            subTask.endDate = end_date;
+            subTask.location = location;
+            subTask.isLocationBased = is_location;
+            subTask.reminderLocation = r_location;
+            subTask.reminderLocation = r_location;
+            subTask.reminderTime = reminderTime;
+            subTask.repeatInterval = repeat;
+            subTask.repeatTime = r_repeat;
+            subTask.labelName = label_name;
+            subTask.labelColor = labelColor;
+            subTask.subTask = checklist_data;
+            subTask.comments = AddTaskComment.comment;
+//            subTask.titleView =
+            AddProjectFragment.projectsSubTaskArray.add(subTask);
+            getActivity().getSupportFragmentManager().popBackStack();
+            return;
+        }
+        db_initialize();
+        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+
+        ToDo todo = new ToDo();
+        todo.setUser_id(Constants.user_id);
+        todo.setTodo_type_id(1);
+        todo.setTitle(title);
+        todo.setStart_date(startDateInMilli);
+        todo.setEnd_date(endDateInMilli);
+        todo.setIs_allday(is_allday);
+        todo.setLocation(location);
+        todo.setNotes(notes);
+        todo.setIs_done(false);
+        todo.setIs_delete(false);
+
+        Label label = new Label();
+        label.setLabel_name(label_name);
+        labeldao.insert(label);
+        todo.setLabel(label);
+
+        Reminder reminder = new Reminder();
+        reminder.setIs_alertEmail(is_alertEmail);
+        reminder.setIs_alertNotification(is_alertNotification);
+        reminder.setIs_time_location(is_location);
+        reminder.setLocation(r_location);
+        reminder.setLocation_type(is_locationtype);
+        if ((!location_tag.equals("New")) && location_tag != null) {
+            reminder.setLocation_tag(location_tag);
+        }
+
+        reminder.setTime((long) reminderTime);
+        reminderdao.insert(reminder);
+        todo.setReminder(reminder);
+
+        Repeat repeaT = new Repeat();
+        repeaT.setRepeat_interval(repeat);
+        repeaT.setRepeat_until(r_repeat);
+        repeaT.setIs_forever(repeat_forever);
+        repeatdao.insert(repeaT);
+        todo.setRepeat(repeaT);
+
+        CheckList checklist = new CheckList();
+        checklist.setTitle(checklist_data);
+        checklistdao.insert(checklist);
+        todo.setCheckList(checklist);
+
+        if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+            for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+
+                Comment commenT = new Comment();
+                commenT.setComment(AddTaskComment.comment.get(i));
+                commenT.setToDo(todo);
+                commentdao.insert(commenT);
+            }
+        }
+
+        Friends friend = new Friends();
+        friend.setEmail("email");
+        friendsdao.insert(friend);
+        todo.setReminder(reminder);
+        tododao.insert(todo);
+
+        TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+
+        if(reminderTime != 0){
+            alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
+            alarm.SetNormalAlarm(getActivity());
+        }
+        if(r_repeat != 0){
+            alarm.setRepeatAlarm(getActivity(), r_repeat);
+        }
+        else{
+            alarm.SetNormalAlarm(getActivity());
+        }
+
+        // ********************* Data add hit Asyntask
+        AddToServer asyn = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
+                locationType, notes, repeatdate,repeat_forever, MaxId,
+                AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+        asyn.execute();
+        getActivity().getSupportFragmentManager().popBackStack();
     }
+
+
     private void db_initialize() {
         checklistdao = App.daoSession.getCheckListDao();
         friendsdao = App.daoSession.getFriendsDao();

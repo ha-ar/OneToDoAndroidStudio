@@ -38,7 +38,6 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/comment_box"
                 android:layout_alignParentTop="true"
-                android:animateLayoutChanges="true"
                 android:background="@color/light_grey_color"
                 android:scrollbars="none" >
 
@@ -46,7 +45,6 @@
                     android:id="@+id/inner_container_appoinment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:animateLayoutChanges="true"
                     android:background="@color/light_grey_color"
                     android:columnCount="1"
                     android:orientation="vertical"
