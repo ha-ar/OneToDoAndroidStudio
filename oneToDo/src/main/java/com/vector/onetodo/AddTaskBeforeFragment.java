@@ -17,7 +17,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -36,17 +35,21 @@ public class AddTaskBeforeFragment extends Fragment {
 	Editor editor;
 	AlertDialog alert,location,location_del,location_edit;
 	
-	static View viewP, viewl, button = null;
-	String Title, pname = null, padress = null;
+	public static View viewP, viewl, button = null;
+	private String pname = null, padress = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
     private View dialoglayout5;
+    private boolean isEditMode = false;
+    private String selectedItem;
 
-	public static AddTaskBeforeFragment newInstance(int position) {
+	public static AddTaskBeforeFragment newInstance(int position, boolean isEditMode, String selectedItem) {
 		
 		AddTaskBeforeFragment myFragment = new AddTaskBeforeFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
+        args.putBoolean("isEditMode", isEditMode);
+        args.putString("selectedItem", selectedItem);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
@@ -56,6 +59,8 @@ public class AddTaskBeforeFragment extends Fragment {
 			Bundle savedInstanceState) {
 		editor = App.pref.edit();
 		position = getArguments().getInt("position", 0);
+        isEditMode = getArguments().getBoolean("isEditMode", false);
+        selectedItem = getArguments().getString("selectedItem", "");
 		before = (TextView) getActivity().findViewById(R.id.before);
 		View view;
 		if (position == 0)
@@ -64,7 +69,7 @@ public class AddTaskBeforeFragment extends Fragment {
 		else
 			view = inflater.inflate(R.layout.add_task_location, container,
 					false);
-        dialoglayout5 = (LinearLayout) inflater.inflate(R.layout.add_location,
+        dialoglayout5 = inflater.inflate(R.layout.add_location,
                 null, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
@@ -96,7 +101,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.notification_radio).textColor(
 										getResources()
@@ -114,7 +118,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio).textColor(
 										getResources()
@@ -139,20 +142,25 @@ public class AddTaskBeforeFragment extends Fragment {
 									TextView textView = (TextView) super
 											.getView(position, convertView,
 													parent);
-									if (textView.getText().toString()
-											.equals("15 Mins")) {
+                                    if(!isEditMode){
+                                        if (textView.getText().toString()
+                                                .equals("15 Mins")) {
+                                            previousSelected = textView;
+                                            textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                            textView.setTextColor(Color.WHITE);
+                                        } else
+                                            textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+                                    }else{
+                                        String[] tokenArray =  selectedItem.split(" ");
+                                        String comparable = tokenArray[0]+" "+ tokenArray[1];
+                                        if(textView.getText().toString()
+                                                .equals(comparable)){
+                                            previousSelected = textView;
+                                            textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                            textView.setTextColor(Color.WHITE);
+                                        }
+                                    }
 
-										previousSelected = textView;
-										((TextView) textView)
-												.setBackgroundResource(R.drawable.round_buttons_blue);
-										((TextView) textView)
-												.setTextColor(Color.WHITE);
-
-									} else
-										((TextView) textView)
-												.setTextColor(getResources()
-														.getColor(
-																R.color._4d4d4d)); 
 									return textView;
 								}
 
@@ -184,8 +192,7 @@ public class AddTaskBeforeFragment extends Fragment {
 					if (((TextView) previousSelected).getText().toString()
 							.equals("15 Mins")) {
 
-						((TextView) previousSelected)
-								.setBackgroundResource(R.drawable.round_buttons_white);
+						previousSelected.setBackgroundResource(R.drawable.round_buttons_white);
 						((TextView) previousSelected)
 								.setTextColor(getResources().getColor(
 										R.color._4d4d4d));
@@ -196,8 +203,7 @@ public class AddTaskBeforeFragment extends Fragment {
 					}
 					if (((TextView) view).getText().toString()
 							.equals("15 Mins")) {
-						((TextView) view)
-								.setBackgroundResource(R.drawable.round_buttons_blue);
+						view.setBackgroundResource(R.drawable.round_buttons_blue);
 					}
 					((TextView) view).setTextColor(Color.WHITE);
 					view.setSelected(true);
@@ -207,7 +213,7 @@ public class AddTaskBeforeFragment extends Fragment {
 
 					} else {
 
-						if (Constants.beforeArray[position] == "On Time") {
+						if (Constants.beforeArray[position].equals("On Time")) {
 							before.setVisibility(View.VISIBLE);
 							before.setText(Constants.beforeArray[position]);
 						} else {
@@ -241,6 +247,7 @@ public class AddTaskBeforeFragment extends Fragment {
 					alert.dismiss();
 				}
 			});
+
 		} else {
 			set();
 			// ***************************location dialog
@@ -260,8 +267,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onDismiss(DialogInterface arg0) {
-					// TODO Auto-generated method stub
-
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					aqd.id(R.id.home).getTextView().setFocusable(true);
@@ -311,8 +316,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
-
 					aqd.id(R.id.add_location_title).text("Set location");
 					aqd.id(R.id.save).text("Set");
 					location.dismiss();
@@ -336,7 +339,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					location_del.dismiss();
 				}
 			});
@@ -345,11 +347,9 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					((TextView) viewl).setText("New");
 					((TextView) viewl).setTextColor(R.color.grey);
-					((TextView) viewl)
-							.setBackgroundResource(R.color.light_grey_color);
+					viewl.setBackgroundResource(R.color.light_grey_color);
 					remove(viewl.getId());
 					aq.id(R.id.location_before).text("");
 					location_del.dismiss();
@@ -360,7 +360,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					location_edit.dismiss();
@@ -372,7 +371,6 @@ public class AddTaskBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub=
 					aqd.id(R.id.add_location_title).text("Edit");
 					aqd.id(R.id.save).text("SAVE");
 					location_edit.dismiss();
@@ -409,7 +407,6 @@ public class AddTaskBeforeFragment extends Fragment {
 						}
 					});
 		}
-		
 	}
 
 	private class LocationTagClickListener implements OnClickListener {

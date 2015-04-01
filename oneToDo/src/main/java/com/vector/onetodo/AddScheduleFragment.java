@@ -73,6 +73,7 @@ import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
+import com.vector.model.TaskAdded;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
 import com.vector.onetodo.db.gen.Comment;
@@ -87,6 +88,7 @@ import com.vector.onetodo.db.gen.Repeat;
 import com.vector.onetodo.db.gen.RepeatDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
+import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
@@ -124,9 +126,7 @@ import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
 import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
-public class AddScheduleFragment extends Fragment {
-	
- 
+public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 	public static AQuery aq, aqloc, aq_label, aq_label_edit, aq_label_del,
 			aq_menu, aq_attach;
@@ -182,6 +182,8 @@ public class AddScheduleFragment extends Fragment {
     private ReminderDao reminderdao;
     private RepeatDao repeatdao;
     private CommentDao commentdao;
+
+    private ToDo todo;
 
 
     public static AddScheduleFragment newInstance(int position, int dayPosition) {
@@ -1261,7 +1263,7 @@ public class AddScheduleFragment extends Fragment {
 
 	}
 
-	private class GeneralOnClickListner implements OnClickListener {
+    private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
 		public void onClick(View v) {
@@ -1939,7 +1941,7 @@ public class AddScheduleFragment extends Fragment {
             db_initialize();
             AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
 
-            ToDo todo = new ToDo();
+            todo = new ToDo();
             todo.setUser_id(Constants.user_id);
             todo.setTodo_type_id(3);
             todo.setTitle(title);
@@ -2014,7 +2016,7 @@ public class AddScheduleFragment extends Fragment {
 
             AddToServer asyn = new AddToServer(title, 3, start_date, end_date, is_location, r_location, location_tag,
                     locationtype, notes, repeatdate,repeat_forever, MaxId,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddScheduleFragment.this);
             asyn.execute();
 
         }else
@@ -2031,6 +2033,12 @@ public class AddScheduleFragment extends Fragment {
         commentdao = App.daoSession.getCommentDao();
         repeatdao = App.daoSession.getRepeatDao();
         reminderdao = App.daoSession.getReminderDao();
+    }
+
+    @Override
+    public void taskAdded() {
+        todo.setTodo_server_id(TaskAdded.getInstance().id);
+        tododao.insert(todo);
     }
 
 }

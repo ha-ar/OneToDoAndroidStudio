@@ -105,15 +105,6 @@
                 <category android:name="com.vector.onetodo" />
             </intent-filter>
         </receiver>
- 		<!--<service android:name="co.vector.javantube.BillingService"-->
-            <!--android:exported="true"/>-->
-        <!--<receiver android:name="co.vector.javantube.BillingReceiver">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.android.vending.billing.IN_APP_NOTIFY"/>-->
-                <!--<action android:name="com.android.vending.billing.RESPONSE_CODE"/>-->
-                <!--<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
         <service android:name=".GcmIntentService" />
 
     </application>

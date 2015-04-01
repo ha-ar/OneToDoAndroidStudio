@@ -3,6 +3,9 @@ package com.vector.onetodo;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.vector.model.TaskAdded;
+import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
 
 import org.apache.http.HttpResponse;
@@ -47,12 +50,13 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     private String repeat;
     private String label_name;
     private String labelColor;
+    private onTaskAdded mCallBack;
 
     AddToServer(String title, int titleCheck, String start_date, String end_date,
                 boolean is_location, String r_location, String location_tag, String locationType,
                 String notes, String repeatDate, boolean repeat_forever, int MaxId, List<String> comment,
                 List<String> commentTime, String checklist_data, ArrayList<String> assignedID, String repeat,
-                String label_name, String labelColor, String before, String r_time){
+                String label_name, String labelColor, String before, String r_time, onTaskAdded mCallBack){
 
         this.title = title;
         this.titleCheck = titleCheck;
@@ -75,6 +79,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         this.repeat = repeat;
         this.label_name = label_name;
         this.labelColor = labelColor;
+        this.mCallBack = mCallBack;
 
     }
 
@@ -97,6 +102,10 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         try {
             temp = EntityUtils.toString(response.getEntity());
             Log.e("Task Added?", temp);
+            Gson gson = new Gson();
+            TaskAdded obj = gson.fromJson(temp,
+                    TaskAdded.class);
+            TaskAdded.getInstance().setObj(obj);
         } catch (org.apache.http.ParseException | IOException | NullPointerException e) {
             e.printStackTrace();
             this.cancel(true);
@@ -109,8 +118,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
 
-//        dialog.dismiss();
-//        finish();
+        mCallBack.taskAdded();
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,11 +43,15 @@ public class AddEventBeforeFragment extends Fragment {
 	View button = null;
 	private static View previousSelected;
 	private static View previousSelectedLocation;
+    private boolean isEditMode = false;
+    private String selectedItem;
 
-	public static AddEventBeforeFragment newInstance(int position) {
+	public static AddEventBeforeFragment newInstance(int position, boolean isEditMode, String selectedItem) {
 		AddEventBeforeFragment myFragment = new AddEventBeforeFragment();
 		Bundle args = new Bundle();
-		args.putInt("position", position);
+        args.putInt("position", position);
+        args.putBoolean("isEditMode", isEditMode);
+        args.putString("selectedItem", selectedItem);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
@@ -60,6 +63,9 @@ public class AddEventBeforeFragment extends Fragment {
 		editor = App.pref.edit();
 		before = (TextView) getActivity().findViewById(R.id.before_event);
 		position = getArguments().getInt("position", 0);
+        isEditMode = getArguments().getBoolean("isEditMode", false);
+        selectedItem = getArguments().getString("selectedItem", "");
+
 		View view;
 		if (position == 0)
 			view = inflater.inflate(R.layout.add_event_before_grid, container,
@@ -76,28 +82,26 @@ public class AddEventBeforeFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
-		View dialoglayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
+		View dialogLayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
 				null, false);
-		aq_del = new AQuery(dialoglayout7);
+		aq_del = new AQuery(dialogLayout7);
 		AlertDialog.Builder builder7 = new AlertDialog.Builder(getActivity());
-		builder7.setView(dialoglayout7);
+		builder7.setView(dialogLayout7);
 		location_del = builder7.create();
 
-		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
+		View dialogLayout6 = inflater5.inflate(R.layout.add_task_edit, null,
 				false);
-		aq_edit = new AQuery(dialoglayout6);
+		aq_edit = new AQuery(dialogLayout6);
 		AlertDialog.Builder builder6 = new AlertDialog.Builder(getActivity());
-		builder6.setView(dialoglayout6);
+		builder6.setView(dialogLayout6);
 		location_edit = builder6.create();
 
 		if (position == 0) {
-
 			aq.id(R.id.notification_radio_event).getCheckBox()
 					.setOnClickListener(new OnClickListener() {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.notification_radio_event).textColor(
 
@@ -115,7 +119,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 						@Override
 						public void onClick(View arg0) {
-							// TODO Auto-generated method stub
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio_event).textColor(
 
@@ -128,8 +131,7 @@ public class AddEventBeforeFragment extends Fragment {
 						}
 					});
 
-			aq.id(R.id.before_grid_view_event)
-					.getGridView()
+			aq.id(R.id.before_grid_view_event).getGridView()
 					.setAdapter(
 							new ArrayAdapter<String>(getActivity(),
 									R.layout.grid_layout_textview,
@@ -142,41 +144,45 @@ public class AddEventBeforeFragment extends Fragment {
 									TextView textView = (TextView) super
 											.getView(position, convertView,
 													parent);
-									if (textView.getText().toString()
-											.equals("15 Mins")) {
-
-										previousSelected = textView;
-										((TextView) textView)
-												.setBackgroundResource(R.drawable.round_buttons_blue);
-										((TextView) textView)
-												.setTextColor(Color.WHITE);
-
-									} else
-										((TextView) textView)
-												.setTextColor(getResources()
-														.getColor(
-																R.color._4d4d4d));
+                                    if(!isEditMode){
+                                        if (textView.getText().toString()
+                                                .equals("15 Mins")) {
+                                            previousSelected = textView;
+                                            textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                            textView.setTextColor(Color.WHITE);
+                                        } else
+                                            textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+                                    }else{
+                                        String[] tokenArray =  selectedItem.split(" ");
+                                        String comparable = tokenArray[0]+" "+ tokenArray[1];
+                                        if(textView.getText().toString()
+                                                .equals(comparable)){
+                                            previousSelected = textView;
+                                            textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                            textView.setTextColor(Color.WHITE);
+                                        }
+                                    }
 									return textView;
 								}
 
 							});
 
-			View dialoglayout = getActivity().getLayoutInflater().inflate(
+			View dialogLayout = getActivity().getLayoutInflater().inflate(
 					R.layout.custom_number_picker_dialog, null, false);
 
-			final NumberPicker numberPicker = (NumberPicker) dialoglayout
+			final NumberPicker numberPicker = (NumberPicker) dialogLayout
 					.findViewById(R.id.number_picker_dialog);
 			numberPicker.setMinValue(0);
 			numberPicker.setMaxValue(59);
 
-			final NumberPicker customDays = (NumberPicker) dialoglayout
+			final NumberPicker customDays = (NumberPicker) dialogLayout
 					.findViewById(R.id.days_picker_dialog);
 			customDays.setMinValue(0);
 			customDays.setMaxValue(Constants.beforevalues.length - 1);
 			customDays.setDisplayedValues(Constants.beforevalues);
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-			builder.setView(dialoglayout);
+			builder.setView(dialogLayout);
 			alert = builder.create();
 			aq.id(R.id.before_grid_view_event).itemClicked(
 					new OnItemClickListener() {
@@ -188,20 +194,14 @@ public class AddEventBeforeFragment extends Fragment {
 							if (((TextView) previousSelected).getText()
 									.toString().equals("15 Mins")) {
 
-								((TextView) previousSelected)
-										.setBackgroundResource(R.drawable.round_buttons_white);
-								((TextView) previousSelected)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+								previousSelected.setBackgroundResource(R.drawable.round_buttons_white);
+								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							} else if (previousSelected != null) {
-								((TextView) previousSelected)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							}
 							if (((TextView) view).getText().toString()
 									.equals("15 Mins")) {
-								((TextView) view)
-										.setBackgroundResource(R.drawable.round_buttons_blue);
+								view.setBackgroundResource(R.drawable.round_buttons_blue);
 							}
 							((TextView) view).setTextColor(Color.WHITE);
 							view.setSelected(true);
@@ -223,7 +223,7 @@ public class AddEventBeforeFragment extends Fragment {
 						}
 
 					});
-			TextView cancelButton = (TextView) dialoglayout
+			TextView cancelButton = (TextView) dialogLayout
 					.findViewById(R.id.cencel);
 			cancelButton.setOnClickListener(new OnClickListener() {
 
@@ -232,7 +232,7 @@ public class AddEventBeforeFragment extends Fragment {
 					alert.cancel();
 				}
 			});
-			TextView set = (TextView) dialoglayout.findViewById(R.id.set);
+			TextView set = (TextView) dialogLayout.findViewById(R.id.set);
 			set.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -249,6 +249,7 @@ public class AddEventBeforeFragment extends Fragment {
 					alert.dismiss();
 				}
 			});
+
 		} else {
 			// ***************************location dialog
 
@@ -273,8 +274,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onDismiss(DialogInterface arg0) {
-					// TODO Auto-generated method stub
-
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					aqd.id(R.id.home).getTextView().setFocusable(true);
@@ -318,8 +317,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
-
 					aqd.id(R.id.add_location_title).text("Set location");
 					aqd.id(R.id.save).text("Set");
 					location.dismiss();
@@ -374,7 +371,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					location_del.dismiss();
 				}
 			});
@@ -383,11 +379,9 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					((TextView) viewl).setText("New");
 					((TextView) viewl).setTextColor(R.color.grey);
-					((TextView) viewl)
-							.setBackgroundResource(R.color.light_grey_color);
+					viewl.setBackgroundResource(R.color.light_grey_color);
 					remove(viewl.getId());
 					aq.id(R.id.location_before_event).text("");
 					location_del.dismiss();
@@ -398,7 +392,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					location_edit.dismiss();
@@ -410,7 +403,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub=
 					aqd.id(R.id.add_location_title).text("Edit");
 					aqd.id(R.id.save).text("Save");
 					location_edit.dismiss();
@@ -426,8 +418,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-
-			Log.v("Event   Click tag", v.getId() + "");
 			load(v.getId());
 			viewP = v;
 			if (((TextView) v).getText().toString().equals("New")) {
@@ -455,7 +445,6 @@ public class AddEventBeforeFragment extends Fragment {
 
 		@Override
 		public boolean onLongClick(final View view) {
-			// TODO Auto-generated method stu
 			if (((TextView) view).getText().toString().equals("New")) {
 
 			} else {

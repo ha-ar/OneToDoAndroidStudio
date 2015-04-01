@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -17,7 +16,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,14 +31,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,9 +43,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
-import com.facebook.Session;
-import com.facebook.Session.OpenRequest;
-import com.facebook.SessionLoginBehavior;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -89,7 +80,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends BaseActivity implements
-        OnItemClickListener, ConnectionCallbacks, OnConnectionFailedListener {
+       ConnectionCallbacks, OnConnectionFailedListener {
     private GoogleApiClient mGoogleApiClient;
     public static final int RC_SIGN_IN = 0;
     private boolean mIntentInProgress;
@@ -102,11 +93,10 @@ public class MainActivity extends BaseActivity implements
             "publish_checkins", "friends_checkins","read_friendlists");
     public static SharedPreferences setting;
     public static Calendar CurrentDate;
-    static int  check1 = 0;;
+    static int  check1 = 0;
     public static int menuchange = 0;
     private PopupWindow popupWindowTask;
     public static RelativeLayout layout_MainMenu;
-    private InputMethodManager inputMethodManager;
     private AlertDialog date_time_alert;
     public static int pager_number = 0;
     private AlarmManagerBroadcastReceiver alarm;
@@ -120,14 +110,13 @@ public class MainActivity extends BaseActivity implements
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawerLayout;
 
-    // ************** Phone COntacts
+    // ************** Phone Contacts
 
-    String phoneNumber = null;
-    Cursor cursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ////////////////////////////////////////////////////////////////////
         PlusOptions plus = new PlusOptions.Builder().build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -135,6 +124,7 @@ public class MainActivity extends BaseActivity implements
                 .addOnConnectionFailedListener(this).addApi(Plus.API, plus)
                 .addScope(Plus.SCOPE_PLUS_PROFILE).build();
         //////////////////////////////////////////////////////////////////
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_top);
         if (toolbar != null)
             setSupportActionBar(toolbar);
@@ -146,9 +136,8 @@ public class MainActivity extends BaseActivity implements
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
         // ******* Phone contact , name list
-        Constants.Name = new ArrayList<String>();
-        Constants.Contact = new ArrayList<String>();
-        // new Phone_contact().execute();
+        Constants.Name = new ArrayList<>();
+        Constants.Contact = new ArrayList<>();
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -159,7 +148,7 @@ public class MainActivity extends BaseActivity implements
         alarm = new AlarmManagerBroadcastReceiver();
         startRepeatingTimer();
 
-        // ***** Initializinf Registration shared prefrences**********//
+        // ***** Initializing Registration shared prefrences**********//
         Constants.user_id = App.prefs.getUserId();
 
         // **************************Api Call for Landing data
@@ -172,8 +161,7 @@ public class MainActivity extends BaseActivity implements
                                              AjaxStatus status) {
                             if (json != null) {
                                 Gson gson = new Gson();
-                                TaskData obj = new TaskData();
-                                obj = gson.fromJson(json.toString(),
+                                TaskData obj = gson.fromJson(json.toString(),
                                         TaskData.class);
                                 TaskData.getInstance().setList(obj);
                                 Log.v("JSON",
@@ -261,30 +249,30 @@ public class MainActivity extends BaseActivity implements
 //		}
         return super.onOptionsItemSelected(item);
     }
-    public void Fb_Clicked() {
-        Session currentSession = Session.getActiveSession();
-        if (currentSession == null || currentSession.getState().isClosed()) {
-            Session session = new Session.Builder(this).build();
-            Session.setActiveSession(session);
-            currentSession = session;
-        }
-
-        if (currentSession.isOpened()) {
-            // Do whatever u want. User has logged in
-
-        } else if (!currentSession.isOpened()) {
-            // Ask for username and password
-            OpenRequest op = new Session.OpenRequest(this);
-
-            op.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
-            op.setCallback(null);
-            op.setPermissions(Permissions);
-
-            Session session = new Session(MainActivity.this);
-            Session.setActiveSession(session);
-            session.openForPublish(op);
-        }
-    }
+//    public void Fb_Clicked() {
+//        Session currentSession = Session.getActiveSession();
+//        if (currentSession == null || currentSession.getState().isClosed()) {
+//            Session session = new Session.Builder(this).build();
+//            Session.setActiveSession(session);
+//            currentSession = session;
+//        }
+//
+//        if (currentSession.isOpened()) {
+//            // Do whatever u want. User has logged in
+//
+//        } else if (!currentSession.isOpened()) {
+//            // Ask for username and password
+//            OpenRequest op = new Session.OpenRequest(this);
+//
+//            op.setLoginBehavior(SessionLoginBehavior.SUPPRESS_SSO);
+//            op.setCallback(null);
+//            op.setPermissions(Permissions);
+//
+//            Session session = new Session(MainActivity.this);
+//            Session.setActiveSession(session);
+//            session.openForPublish(op);
+//        }
+//    }
     public void g_plus_LogIn() {
         if (!mGoogleApiClient.isConnecting()) {
             progressDialog = new ProgressDialog(
@@ -516,7 +504,6 @@ public class MainActivity extends BaseActivity implements
             }
         }
 
-        inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
         // ***** left drawer open close**********//
         layout_MainMenu = (RelativeLayout) findViewById(R.id.container);
@@ -530,14 +517,7 @@ public class MainActivity extends BaseActivity implements
         popupWindowTask.setBackgroundDrawable(getResources().getDrawable(
                 android.R.drawable.dialog_holo_light_frame));
         popupWindowTask.setOutsideTouchable(true);
-        // popupWindowTask.setAnimationStyle(R.style.Animation);
 
-        popupWindowTask.setOnDismissListener(new OnDismissListener() {
-
-            @Override
-            public void onDismiss() {
-            }
-        });
 
         // DATE Dialog
         View dateTimePickerDialog = getLayoutInflater().inflate(
@@ -553,14 +533,6 @@ public class MainActivity extends BaseActivity implements
             @Override
             public void onClick(View arg0) {
                 date_time_alert.dismiss();
-            }
-        });
-
-        aqd.id(R.id.ok).clicked(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-
             }
         });
 
@@ -659,9 +631,6 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View arg0) {
-                // if (Constants.user_id == -1) {
-                //
-                // } else {
                 getSupportFragmentManager().popBackStack("SETTING",
                         FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 Fragment fr = new Accounts();
@@ -680,8 +649,6 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View arg0) {
-                // // TextView title = (TextView) findViewById(R.id.weather);
-                // title.setText("To-do's");
                 getSupportFragmentManager().popBackStack();
 
                 refreshMenu();
@@ -828,14 +795,14 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(0, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(0, false, 0)).commit();
             }
         });
         aq.id(R.id.add_event_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(0, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(0,false, 0)).commit();
             }
         });
         aq.id(R.id.add_schedule_button).clicked(new OnClickListener() {
@@ -896,17 +863,10 @@ public class MainActivity extends BaseActivity implements
 
     public class TabPagerAdapter extends FragmentPagerAdapter {
 
-        private SparseArrayCompat<ScrollTabHolder> mScrollTabHolders;
-        private ScrollTabHolder mListener;
-
         public TabPagerAdapter(FragmentManager fm) {
             super(fm);
-            mScrollTabHolders = new SparseArrayCompat<ScrollTabHolder>();
         }
 
-        public void setTabHolderScrollingContent(ScrollTabHolder listener) {
-            mListener = listener;
-        }
 
         @Override
         public int getCount() {
@@ -931,18 +891,10 @@ public class MainActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            ScrollTabHolderFragment fragment = (ScrollTabHolderFragment) TaskListFragment
+            ScrollTabHolderFragment fragment = TaskListFragment
                     .newInstance(position);
 
-            mScrollTabHolders.put(position, fragment);
-            if (mListener != null) {
-                fragment.setScrollTabHolder(mListener);
-            }
             return fragment;
-        }
-
-        public SparseArrayCompat<ScrollTabHolder> getScrollTabHolders() {
-            return mScrollTabHolders;
         }
 
     }
@@ -1018,14 +970,6 @@ public class MainActivity extends BaseActivity implements
         }
 
     }
-
-    @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-
-        Toast.makeText(MainActivity.this, "asdasdasd", Toast.LENGTH_SHORT)
-                .show();
-    }
-
 
 
     @Override

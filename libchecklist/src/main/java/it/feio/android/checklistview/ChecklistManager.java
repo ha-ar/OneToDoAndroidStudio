@@ -1,13 +1,5 @@
 package it.feio.android.checklistview;
 
-import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-import it.feio.android.checklistview.interfaces.Constants;
-import it.feio.android.checklistview.models.CheckListView;
-import it.feio.android.checklistview.models.CheckListViewItem;
-
-import java.util.regex.Pattern;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Build;
@@ -16,6 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import java.util.regex.Pattern;
+
+import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
+import it.feio.android.checklistview.interfaces.CheckListChangedListener;
+import it.feio.android.checklistview.interfaces.Constants;
+import it.feio.android.checklistview.models.CheckListView;
+import it.feio.android.checklistview.models.CheckListViewItem;
 
 public class ChecklistManager {
 
@@ -169,20 +169,18 @@ public class ChecklistManager {
 			// All text lines will be cycled to build checklist items
 			String lineText;
 			boolean isChecked = false;
-			for (int i = 0; i < lines.length; i++) {
-				
-				String line = lines[i];
-				
-				if (line.length() == 0)
-					continue;
+            for (String line : lines) {
 
-				// Line text content will be now stripped from checks symbols if they're present
-				// (ex. [x] Task done -> lineText="Task done", lineChecked=true)
-				isChecked = line.indexOf(Constants.CHECKED_SYM) == 0;
-				lineText = line.replace(Constants.CHECKED_SYM, "").replace(Constants.UNCHECKED_SYM, "");
+                if (line.length() == 0)
+                    continue;
 
-				mCheckListView.addItem(lineText, isChecked);
-			}
+                // Line text content will be now stripped from checks symbols if they're present
+                // (ex. [x] Task done -> lineText="Task done", lineChecked=true)
+                isChecked = line.indexOf(Constants.CHECKED_SYM) == 0;
+                lineText = line.replace(Constants.CHECKED_SYM, "").replace(Constants.UNCHECKED_SYM, "");
+
+                mCheckListView.addItem(lineText, isChecked);
+            }
 		}
 
 		// Add new fillable line if newEntryText has some 

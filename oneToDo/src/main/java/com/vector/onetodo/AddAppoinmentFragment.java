@@ -56,6 +56,7 @@ import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
+import com.vector.model.TaskAdded;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
 import com.vector.onetodo.db.gen.Comment;
@@ -70,6 +71,7 @@ import com.vector.onetodo.db.gen.Repeat;
 import com.vector.onetodo.db.gen.RepeatDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
+import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
@@ -93,7 +95,7 @@ import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
 import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
-public class AddAppoinmentFragment extends Fragment {
+public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 	private AQuery aq, aqd, aq_del, aq_edit;
 
 	private int Label_postion = -1;
@@ -151,6 +153,8 @@ public class AddAppoinmentFragment extends Fragment {
     private ReminderDao reminderdao;
     private RepeatDao repeatdao;
     private CommentDao commentdao;
+
+    private ToDo todo;
 
 
     public static AddAppoinmentFragment newInstance(int position,
@@ -754,7 +758,7 @@ public class AddAppoinmentFragment extends Fragment {
 		}
 		}
 
-	private class GeneralOnClickListner implements OnClickListener {
+    private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
 		public void onClick(View v) {
@@ -1141,7 +1145,7 @@ public class AddAppoinmentFragment extends Fragment {
             db_initialize();
             AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
 
-            ToDo todo = new ToDo();
+            todo = new ToDo();
             todo.setUser_id(Constants.user_id);
             todo.setTodo_type_id(4);
             todo.setTitle(title);
@@ -1207,7 +1211,7 @@ public class AddAppoinmentFragment extends Fragment {
 
             AddToServer asyn = new AddToServer(title, 4, start_date, end_date, is_location, r_location, location_tag,
                     locationtype, notes, repeatdate,false, 0,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddAppoinmentFragment.this);
             asyn.execute();
 
         }else
@@ -1225,5 +1229,9 @@ public class AddAppoinmentFragment extends Fragment {
         repeatdao = App.daoSession.getRepeatDao();
         reminderdao = App.daoSession.getReminderDao();
     }
-
+    @Override
+    public void taskAdded() {
+        todo.setTodo_server_id(TaskAdded.getInstance().id);
+        tododao.insert(todo);
+    }
 }

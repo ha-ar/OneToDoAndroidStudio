@@ -1,8 +1,8 @@
 package com.vector.model;
 
-import java.util.ArrayList;
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
 
 public class TaskData {
 
@@ -22,46 +22,64 @@ public class TaskData {
 
 	
 		@SerializedName("todos")
-		public ArrayList<Todos> todos=new ArrayList<TaskData.Todos>();
+		public ArrayList<Todos> todos=new ArrayList<>();
 
 		public class Todos {
 			@SerializedName("id")
 			public String id;
-			@SerializedName("user_id")
+
+            @SerializedName("user_id")
 			public String user_id;
-			@SerializedName("todo_type_id")
+
+            @SerializedName("todo_type_id")
 			public String todo_type_id;
-			@SerializedName("parent")
+
+            @SerializedName("parent")
 			public String parent;
-			@SerializedName("title")
+
+            @SerializedName("title")
 			public String title;
-			@SerializedName("start_date")
+
+            @SerializedName("start_date")
 			public String start_date;
-			@SerializedName("end_date")
+
+            @SerializedName("end_date")
 			public String end_date;
-			@SerializedName("priority")
+
+            @SerializedName("priority")
 			public String priority;
-			@SerializedName("notes")
+
+            @SerializedName("notes")
 			public String notes;
-			@SerializedName("type")
+
+            @SerializedName("type")
 			public String type;
-			@SerializedName("time")
+
+            @SerializedName("time")
 			public String time;
-			@SerializedName("location")
+
+            @SerializedName("location")
 			public String location;
-			@SerializedName("location_tag")
+
+            @SerializedName("location_tag")
 			public String location_tag;
-			@SerializedName("location_type")
+
+            @SerializedName("location_type")
 			public String location_type;
-			@SerializedName("repeat_interval")
+
+            @SerializedName("repeat_interval")
 			public String repeat_interval;
-			@SerializedName("repeat_until")
+
+            @SerializedName("repeat_until")
 			public String repeat_until;
-			@SerializedName("checklist_data")
+
+            @SerializedName("checklist_data")
 			public String checklist_data;
-			@SerializedName("todo_comment")
+
+            @SerializedName("todo_comment")
 			public String[] todo_comment;
-			@SerializedName("todo_attachment")
+
+            @SerializedName("todo_attachment")
 			public String[] todo_attachment;
 		
 	}

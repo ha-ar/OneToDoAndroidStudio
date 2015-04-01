@@ -7,10 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -38,8 +35,6 @@ import com.mobeta.android.dslv.DragSortListView;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.TypeFaces;
 import com.vector.onetodo.utils.Utils;
-import com.viewpagerindicator.CirclePageIndicator;
-import com.viewpagerindicator.PageIndicator;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -156,7 +151,7 @@ public class AddTask extends FragmentActivity {
                 }
             }
         });
-        initPager();
+//        initPager();
         setupMenuTask();
 //        setupMenuEvent();
 //        setupMenuSchedule();
@@ -385,63 +380,63 @@ public class AddTask extends FragmentActivity {
 
     }
 
-    private void initPager(){
-        // Initialize the ViewPager and set an adapter
-        final ViewPager pager = (ViewPager) aq.id(R.id.add_task_pager).getView();
-        pager.setOffscreenPageLimit(0);
-        pager.setAdapter(new AddTaskPagerFragment(getSupportFragmentManager()));
-        PageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
-        mIndicator.setViewPager(pager);
-        mIndicator.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                Position = position;
-                if (position == 0) {
-                    aq.id(R.id.page_title_header).text("Task");
-                    btn.setAlpha((float) 0.3);
-                    comment_pref.edit().clear().commit();
-                }
-
-                else if (position == 1) {
-                    aq.id(R.id.page_title_header).text("Event");
-                    btn.setAlpha((float) 0.3);
-                    comment_pref.edit().clear().commit();
-                }
-
-                else if (position == 2) {
-                    aq.id(R.id.page_title_header).text("Schedule");
-                    btn.setAlpha((float) 0.3);
-                    comment_pref.edit().clear().commit();
-
-                } else if (position == 3) {
-                    aq.id(R.id.page_title_header).text("Appointment");
-                    btn.setAlpha((float) 0.3);
-                    comment_pref.edit().clear().commit();
-                }
-
-                else if (position == 4) {
-                    aq.id(R.id.page_title_header).text("Project");
-                    btn.setAlpha((float) 0.3);
-
-                    comment_pref.edit().clear().commit();
-                }
-
-            }
-
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int position) {
-                // Position=position;
-
-            }
-        });
-
-    }
+//    private void initPager(){
+//        // Initialize the ViewPager and set an adapter
+//        final ViewPager pager = (ViewPager) aq.id(R.id.add_task_pager).getView();
+//        pager.setOffscreenPageLimit(0);
+//        pager.setAdapter(new AddTaskPagerFragment(getSupportFragmentManager()));
+//        PageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
+//        mIndicator.setViewPager(pager);
+//        mIndicator.setOnPageChangeListener(new OnPageChangeListener() {
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                Position = position;
+//                if (position == 0) {
+//                    aq.id(R.id.page_title_header).text("Task");
+//                    btn.setAlpha((float) 0.3);
+//                    comment_pref.edit().clear().commit();
+//                }
+//
+//                else if (position == 1) {
+//                    aq.id(R.id.page_title_header).text("Event");
+//                    btn.setAlpha((float) 0.3);
+//                    comment_pref.edit().clear().commit();
+//                }
+//
+//                else if (position == 2) {
+//                    aq.id(R.id.page_title_header).text("Schedule");
+//                    btn.setAlpha((float) 0.3);
+//                    comment_pref.edit().clear().commit();
+//
+//                } else if (position == 3) {
+//                    aq.id(R.id.page_title_header).text("Appointment");
+//                    btn.setAlpha((float) 0.3);
+//                    comment_pref.edit().clear().commit();
+//                }
+//
+//                else if (position == 4) {
+//                    aq.id(R.id.page_title_header).text("Project");
+//                    btn.setAlpha((float) 0.3);
+//
+//                    comment_pref.edit().clear().commit();
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onPageScrolled(int arg0, float arg1, int arg2) {
+//
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int position) {
+//                // Position=position;
+//
+//            }
+//        });
+//
+//    }
 
     private void setupMenuTask(){
         final LayoutInflater inflater = (LayoutInflater) getApplicationContext()
@@ -730,49 +725,49 @@ public class AddTask extends FragmentActivity {
 
     }
 
-    public class AddTaskPagerFragment extends FragmentPagerAdapter {
-
-        public AddTaskPagerFragment(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return 5; // just Add Task & Add Event
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "Add Task";
-                case 1:
-                    return "Add Event";
-                case 2:
-                    return "Schedule";
-                case 3:
-                    return "Appointments";
-                case 4:
-                    return "Project";
-            }
-            return "";
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 0)
-                return AddTaskFragment.newInstance(position, dayPosition);
-            else if (position == 1)
-                return AddEventFragment.newInstance(position, dayPosition);
-            else if (position == 2)
-                return AddScheduleFragment.newInstance(position, dayPosition);
-            else if (position == 3)
-                return AddAppoinmentFragment.newInstance(position, dayPosition);
-            else if (position == 4)
-                return AddProjectFragment.newInstance(position, dayPosition);
-            return null;
-        }
-    }
+//    public class AddTaskPagerFragment extends FragmentPagerAdapter {
+//
+//        public AddTaskPagerFragment(FragmentManager fm) {
+//            super(fm);
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 5; // just Add Task & Add Event
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position) {
+//                case 0:
+//                    return "Add Task";
+//                case 1:
+//                    return "Add Event";
+//                case 2:
+//                    return "Schedule";
+//                case 3:
+//                    return "Appointments";
+//                case 4:
+//                    return "Project";
+//            }
+//            return "";
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            if (position == 0)
+//                return AddTaskFragment.newInstance(position, dayPosition);
+//            else if (position == 1)
+//                return AddEventFragment.newInstance(position, dayPosition);
+//            else if (position == 2)
+//                return AddScheduleFragment.newInstance(position, dayPosition);
+//            else if (position == 3)
+//                return AddAppoinmentFragment.newInstance(position, dayPosition);
+//            else if (position == 4)
+//                return AddProjectFragment.newInstance(position, dayPosition);
+//            return null;
+//        }
+//    }
 
     private void AddData() {
         assignedId.clear();

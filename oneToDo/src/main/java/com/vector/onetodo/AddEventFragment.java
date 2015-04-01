@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -70,6 +72,7 @@ import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
+import com.vector.model.TaskAdded;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
 import com.vector.onetodo.db.gen.Comment;
@@ -84,6 +87,7 @@ import com.vector.onetodo.db.gen.Repeat;
 import com.vector.onetodo.db.gen.RepeatDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
+import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.ScaleAnimToHide;
 import com.vector.onetodo.utils.ScaleAnimToShow;
@@ -120,9 +124,8 @@ import java.util.Map;
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
 import it.feio.android.checklistview.interfaces.CheckListChangedListener;
-import android.widget.PopupWindow.OnDismissListener;
 
-public class AddEventFragment extends Fragment {
+public class AddEventFragment extends Fragment implements onTaskAdded {
 
     public static AQuery aq;
 	private AQuery AQlabel, AQlabel_edit, AQlabel_del, aq_attach, aq_menu;
@@ -182,11 +185,17 @@ public class AddEventFragment extends Fragment {
     private RepeatDao repeatdao;
     private CommentDao commentdao;
 
-	public static AddEventFragment newInstance(int position, int dayPosition) {
+    private ToDo todo;
+    private boolean isEditMode = false;
+    private long todoId;
+    private String labelColor;
+
+	public static AddEventFragment newInstance(int position, boolean isEditMode, long todoId) {
 		AddEventFragment myFragment = new AddEventFragment();
 		Bundle args = new Bundle();
-		args.putInt("position", position);
-		args.putInt("dayPosition", dayPosition);
+        args.putInt("position", position);
+        args.putLong("todoId", todoId);
+        args.putBoolean("isEditMode", isEditMode);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
@@ -204,7 +213,10 @@ public class AddEventFragment extends Fragment {
         if (toolbar != null)
             ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
         initActionBar();
+        db_initialize();
         dragAndDrop();
+        isEditMode = getArguments().getBoolean("isEditMode");
+        todoId = getArguments().getLong("todoId");
 		return view;
 	}
 
@@ -528,7 +540,7 @@ public class AddEventFragment extends Fragment {
 
 		// ************************** Date TIme END
 
-		// ****************************Repeat Start
+		// **************************** Repeat
 		aq.id(R.id.repeat_grid_view)
 				.getGridView()
 				.setAdapter(
@@ -542,17 +554,28 @@ public class AddEventFragment extends Fragment {
 
 								TextView textView = (TextView) super.getView(
 										position, convertView, parent);
-								if (position == 2) {
-									previousSelected = textView;
-									((TextView) textView)
-											.setBackgroundResource(R.drawable.round_buttons_blue);
-									((TextView) textView)
-											.setTextColor(Color.WHITE);
-
-								} else
-									((TextView) textView)
-											.setTextColor(getResources()
-													.getColor(R.color._4d4d4d));
+                                if(!isEditMode){
+                                    if (position == 2) {
+                                        previousSelected = textView;
+                                        textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                        textView.setTextColor(Color.WHITE);
+                                    }
+                                    else
+                                        textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+                                }else{
+                                    int selectedPosition = 0;
+                                    for(int i = 0; i < Constants.repeatArray.length; i++){
+                                        if(Constants.repeatArray[i].equalsIgnoreCase(todo.getRepeat().getShowable_format())){
+                                            selectedPosition = i;
+                                            break;
+                                        }
+                                    }
+                                    if (position == selectedPosition) {
+                                        previousSelected = textView;
+                                        textView.setBackgroundResource(R.drawable.round_buttons_blue);
+                                        textView.setTextColor(Color.WHITE);
+                                    }
+                                }
 								return textView;
 							}
 
@@ -567,7 +590,7 @@ public class AddEventFragment extends Fragment {
 				if (((TextView) previousSelected).getText().toString()
 						.equals("Weekly")) {
 
-					((TextView) previousSelected)
+					previousSelected
 							.setBackgroundResource(R.drawable.round_buttons_white);
 					((TextView) previousSelected).setTextColor(getResources()
 							.getColor(R.color._4d4d4d));
@@ -576,7 +599,7 @@ public class AddEventFragment extends Fragment {
 							.getColor(R.color._4d4d4d));
 				}
 				if (((TextView) view).getText().toString().equals("Weekly")) {
-					((TextView) view)
+					view
 							.setBackgroundResource(R.drawable.round_buttons_blue);
 				}
 
@@ -778,6 +801,8 @@ public class AddEventFragment extends Fragment {
 						aq.id(R.id.spinner_labels_event).getTextView()
 								.setTextColor(Color.WHITE);
 
+                        labelColor = Constants.label_colors_dialog[Label_postion];
+
 					}
 				}
 			}
@@ -850,7 +875,13 @@ public class AddEventFragment extends Fragment {
 									.setBackground(view.getBackground());
 							aq.id(R.id.spinner_labels_event).getTextView()
 									.setTextColor(Color.WHITE);
+                            labelColor = Constants.label_colors_dialog[position];
 						} else {
+                            add_new_label_alert
+                                    .getWindow()
+                                    .setBackgroundDrawable(
+                                            new ColorDrawable(
+                                                    android.graphics.Color.TRANSPARENT));
 							add_new_label_alert.show();
 						}
 
@@ -862,11 +893,11 @@ public class AddEventFragment extends Fragment {
 				.setOnItemLongClickListener(new LabelEditClickListener());
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
-		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
+		View dialogLayout6 = inflater5.inflate(R.layout.add_task_edit, null,
 				false);
-		AQlabel_edit = new AQuery(dialoglayout6);
+		AQlabel_edit = new AQuery(dialogLayout6);
 		AlertDialog.Builder builder6 = new AlertDialog.Builder(getActivity());
-		builder6.setView(dialoglayout6);
+		builder6.setView(dialogLayout6);
 		label_edit = builder6.create();
 
 		View dialoglayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
@@ -994,7 +1025,7 @@ public class AddEventFragment extends Fragment {
                         attach_alert.dismiss();
                         Intent dropboxintent = new Intent(Intent.ACTION_GET_CONTENT);
                         dropboxintent.setType("*/*");
-                        startActivityForResult(dropboxintent
+                        startActivityForResult(Intent
                                 .createChooser(dropboxintent
                                         .setPackage("com.dropbox.android"), "DropBox") , RESULT_DROPBOX);
                     }
@@ -1008,7 +1039,7 @@ public class AddEventFragment extends Fragment {
                         attach_alert.dismiss();
                         Intent googleIntent = new Intent(Intent.ACTION_GET_CONTENT);
                         googleIntent.setType("*/*");
-                        startActivityForResult(googleIntent
+                        startActivityForResult(Intent
                                 .createChooser(googleIntent.setPackage("com.google.android.apps.docs"), "Google Drive") , RESULT_GOOGLEDRIVE);
                     }
                 });
@@ -1046,9 +1077,7 @@ public class AddEventFragment extends Fragment {
 		tabs.setTextSize(Utils.getPxFromDp(getActivity(), 16));
 		tabs.setIndicatorHeight(Utils.getPxFromDp(getActivity(), 1));
 		tabs.setAllCaps(false);
-		tabs.setTypeface(
-				TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE),
-				Typeface.NORMAL);
+		tabs.setTypeface(TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE),Typeface.NORMAL);
 		tabs.setShouldExpand(true);
 		tabs.setViewPager(pager);
 
@@ -1104,6 +1133,10 @@ public class AddEventFragment extends Fragment {
 
 		View switchView = aq.id(R.id.add_sub_event).getView();
 		toggleCheckList(switchView);
+
+        if(isEditMode){
+            populateValues();
+        }
 
 	}
 
@@ -1163,33 +1196,9 @@ public class AddEventFragment extends Fragment {
 		}
 	}
 
-	public static void swapInflatedLayouts(int from, int to) {
-		if (from < to) {
-			for (int i = from; i < to; i++) {
-				Integer temp = inflatingLayoutsEvents.get(i);
-				inflatingLayoutsEvents
-						.put(i, inflatingLayoutsEvents.get(i + 1));
-				inflatingLayoutsEvents.put(i + 1, temp);
-			}
-		} else {
-			for (int i = from; i > to; i--) {
-				Integer temp = inflatingLayoutsEvents.get(i);
-				inflatingLayoutsEvents
-						.put(i, inflatingLayoutsEvents.get(i - 1));
-				inflatingLayoutsEvents.put(i - 1, temp);
-			}
-
-		}
-
-	}
-
-	/**
+    /**
 	 * Checlists added counter
 	 */
-	static int checklistCount = 0;
-
-	static List<View> checklistViews = new ArrayList<View>();
-	EditText editTextCurrent;
 
 	private class GeneralOnClickListner implements OnClickListener {
 
@@ -1437,12 +1446,7 @@ public class AddEventFragment extends Fragment {
 				aq.id(R.id.before_grid_view_linear_event)
 						.getView()
 						.startAnimation(
-								new ScaleAnimToShow(
-										1.0f,
-										1.0f,
-										1.0f,
-										0.0f,
-										200,
+								new ScaleAnimToShow(1.0f,1.0f,1.0f,0.0f,200,
 										aq.id(R.id.before_grid_view_linear_event)
 												.getView(), true));
 
@@ -1487,50 +1491,6 @@ public class AddEventFragment extends Fragment {
 
 	}
 
-	public class ImageAdapter extends BaseAdapter {
-		private Context context;
-		private final String[] mobileValues;
-
-		public ImageAdapter(Context context, String[] mobileValues) {
-			this.context = context;
-			this.mobileValues = mobileValues;
-		}
-
-		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = (LayoutInflater) context
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View gridView;
-
-			if (convertView == null) {
-				gridView = new View(context);
-				gridView = inflater
-						.inflate(R.layout.add_label_text_event, null);
-
-				TextView textView = (TextView) gridView
-						.findViewById(R.id.grid_item_label_event);
-				textView.setText(mobileValues[position]);
-			} else {
-				gridView = (View) convertView;
-			}
-			return gridView;
-		}
-
-		@Override
-		public int getCount() {
-			return mobileValues.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return null;
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return 0;
-		}
-	}
-
 	public class AddEventBeforePagerFragment extends FragmentStatePagerAdapter {
 
 		public AddEventBeforePagerFragment(FragmentManager fm) {
@@ -1557,7 +1517,7 @@ public class AddEventFragment extends Fragment {
 
 		@Override
 		public Fragment getItem(int position) {
-			return AddEventBeforeFragment.newInstance(position);
+            return AddEventBeforeFragment.newInstance(position, isEditMode, todo != null ? todo.getReminder().getShowable_format() : "");
 		}
 	}
 
@@ -1626,7 +1586,6 @@ public class AddEventFragment extends Fragment {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
 				int position, long arg3) {
-			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
 					|| position < 3) {
 
@@ -1746,9 +1705,6 @@ public class AddEventFragment extends Fragment {
 			entity = new UrlEncodedFormEntity(pairs, "UTF-8");
 
 		} catch (UnsupportedEncodingException e) {
-			// TODO
-			// Auto-generated
-			// catch block
 			e.printStackTrace();
 		}
 
@@ -2004,10 +1960,9 @@ public class AddEventFragment extends Fragment {
                     repeat = "yearly";
                 }
             }
-            db_initialize();
             AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
 
-            ToDo todo = new ToDo();
+            todo = new ToDo();
             todo.setUser_id(Constants.user_id);
             todo.setTodo_type_id(2);
             todo.setTitle(title);
@@ -2021,8 +1976,10 @@ public class AddEventFragment extends Fragment {
 
             Label label = new Label();
             label.setLabel_name(label_name);
+            label.setLabel_color(labelColor);
             labeldao.insert(label);
             todo.setLabel(label);
+
 
             Reminder reminder = new Reminder();
             reminder.setIs_alertEmail(is_alertEmail);
@@ -2064,7 +2021,6 @@ public class AddEventFragment extends Fragment {
             friend.setEmail("email");
             friendsdao.insert(friend);
             todo.setReminder(reminder);
-            tododao.insert(todo);
 
             TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
 
@@ -2079,10 +2035,12 @@ public class AddEventFragment extends Fragment {
                 alarm.SetNormalAlarm(getActivity());
             }
 
+
             AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
                     locationType, notes, repeatdate,repeat_forever, MaxId,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "");
+                    AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddEventFragment.this);
             asyn.execute();
+            getActivity().getSupportFragmentManager().popBackStack();
 
         }else
             Toast.makeText(getActivity(), "Please enter title",
@@ -2098,4 +2056,56 @@ public class AddEventFragment extends Fragment {
         reminderdao = App.daoSession.getReminderDao();
     }
 
+    private void populateValues() {
+
+
+        todo = tododao.load(todoId);
+        aq.id(R.id.event_title).text(todo.getTitle());
+        long reminder = todo.getReminder().getTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(reminder);
+        currentYear = cal.get(Calendar.YEAR);
+        currentMonDigit = cal.get(Calendar.MONTH) + 1;
+        currentDayDigit = cal.get(Calendar.DAY_OF_MONTH);
+        currentHours = cal.get(Calendar.HOUR_OF_DAY);
+        currentMin = cal.get(Calendar.MINUTE);
+        showRightDateAndTime();
+        aq.id(R.id.location_event).text(todo.getLocation());
+        if(todo.getReminder().getShowable_format() != null){
+            aq.id(R.id.before_event).text(todo.getReminder().getShowable_format()).visible();
+        }
+
+        if(todo.getRepeat().getShowable_format() != null) {
+            int selectedPosition = 0;
+            for(int i = 0; i < Constants.repeatArray.length; i++){
+                if(Constants.repeatArray[i].equalsIgnoreCase(todo.getRepeat().getShowable_format())){
+                    selectedPosition = i;
+                    break;
+                }
+            }
+            aq.id(R.id.repeat_grid_view).getGridView().setItemChecked(selectedPosition, true);
+            aq.id(R.id.repeat_event).text(todo.getRepeat().getShowable_format()).visible();
+        }
+
+        if(todo.getLabel().getLabel_color() != null) {
+            aq.id(R.id.spinner_labels_event).text(todo.getLabel().getLabel_name());
+            GradientDrawable mDrawable = (GradientDrawable) getResources()
+                    .getDrawable(R.drawable.label_background);
+            mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+            aq.id(R.id.spinner_labels_event).getView().setBackground(mDrawable);
+            aq.id(R.id.spinner_labels_event).getTextView().setTextColor(Color.WHITE);
+        }
+
+        toggleCheckList(aq.id(R.id.add_sub_event).getView());
+        aq.id(R.id.add_sub_event).text(todo.getCheckList().getTitle());
+        toggleCheckList(aq.id(R.id.add_sub_event).getView());
+
+        aq.id(R.id.notes_event).text(todo.getNotes());
+    }
+
+    @Override
+    public void taskAdded() {
+        todo.setTodo_server_id(TaskAdded.getInstance().id);
+        tododao.insert(todo);
+    }
 }
