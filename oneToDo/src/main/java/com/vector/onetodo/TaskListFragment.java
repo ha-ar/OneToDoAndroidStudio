@@ -101,19 +101,20 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
 
     }
     public static void todayQuery() {
-        todayQuery = MainActivity.tododao.queryBuilder().where(
+        todayQuery = App.daoSession.getToDoDao().queryBuilder().where(
                 Properties.Start_date.between(currentDate[0], currentDate[1]));
     }
 
     public static void tomorrowQuery() {
-        tomorrowQuery = MainActivity.tododao.queryBuilder().where(
+        tomorrowQuery = App.daoSession.getToDoDao().queryBuilder().where(
                 Properties.Start_date.between(currentDate[1], currentDate[2]));
     }
 
     public static void upComingQuery() {
-        upcomingQuery = MainActivity.tododao.queryBuilder().where(
+        upcomingQuery = App.daoSession.getToDoDao().queryBuilder().where(
                 Properties.Start_date.gt(currentDate[2]));
     }
+
 
     public static void setAdapter(Context context, int position) {
 
@@ -155,4 +156,6 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
     public void adjustScroll(int scrollHeight) {
 
     }
+
+
 }

@@ -1,14 +1,24 @@
 package com.vector.onetodo;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
+import com.google.gson.Gson;
+import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.DaoMaster;
-import com.vector.onetodo.db.gen.DaoSession;
 import com.vector.onetodo.db.gen.DaoMaster.DevOpenHelper;
+import com.vector.onetodo.db.gen.DaoSession;
 import com.vector.onetodo.utils.AppPrefs;
+import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.GPSTracker;
+
+import org.json.JSONObject;
 
 public class App extends Application{
 	
@@ -42,5 +52,25 @@ public class App extends Application{
         attach = this.getSharedPreferences("Attach", 0);
 
     }
-    
+
+    public static void updateTaskList(Context ctx){
+        AQuery aq = new AQuery(ctx);
+        aq.ajax("http://api.heuristix.net/one_todo/v1/tasks/"
+                        + Constants.user_id, JSONObject.class,
+                new AjaxCallback<JSONObject>() {
+                    @Override
+                    public void callback(String url, JSONObject json,
+                                         AjaxStatus status) {
+                        if (json != null) {
+                            Gson gson = new Gson();
+                            TaskData obj = gson.fromJson(json.toString(),
+                                    TaskData.class);
+                            TaskData.getInstance().setList(obj);
+                            Log.v("JSON",
+                                    TaskData.getInstance().todos.get(0).notes
+                                            + "");
+                        }
+                    }
+                });
+    }
 }

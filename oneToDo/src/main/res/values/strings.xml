@@ -222,4 +222,8 @@
 		<item>260,ZM</item>
 		<item>263,ZW</item>
 	</string-array>
+    <string name="title_activity_searchable">SearchableActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

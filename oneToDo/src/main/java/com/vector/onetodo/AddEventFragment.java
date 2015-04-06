@@ -67,12 +67,14 @@ import android.widget.ToggleButton;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
+import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
 import com.vector.onetodo.db.gen.Comment;
@@ -2101,11 +2103,106 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
         toggleCheckList(aq.id(R.id.add_sub_event).getView());
 
         aq.id(R.id.notes_event).text(todo.getNotes());
+        int position = 0;
+        aq.id(R.id.notes_task).text(todo.getNotes());
+        try {
+            for (int i = 0; i < TaskData.getInstance().todos.size(); i++) {
+                if (Integer.valueOf(TaskData.getInstance().todos.get(i).id).equals(todo.getTodo_server_id())) {
+                    position = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < TaskData.getInstance().todos.get(position).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().todos.get(position).todo_attachment.get(i));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+        App.updateTaskList(getActivity());
+    }
+    private void showAttachments(String imageUrl){
+        aq.id(R.id.attachment_layout).visible();
+        try {
+            final LinearLayout item = (LinearLayout) aq
+                    .id(R.id.added_image_outer_event).visible().getView();
+
+            final View child = getActivity().getLayoutInflater().inflate(
+                    R.layout.image_added_layout, null);
+
+            ImageView image = (ImageView) child
+                    .findViewById(R.id.image_added);
+
+            ImageView imageMenu = (ImageView) child
+                    .findViewById(R.id.image_menu);
+            Tag = Tag + 1;
+            imageMenu.setTag(Tag);
+            child.setId(Tag);
+            imageMenu.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    ll_iner = (LinearLayout) item.findViewById(Integer
+                            .parseInt(arg0.getTag().toString()));
+
+                    if (popupWindowAttach.isShowing()) {
+                        popupWindowAttach.dismiss();
+
+                    } else {
+                        popupWindowAttach.showAsDropDown(arg0, 5, 0);
+                    }
+                }
+            });
+
+            aq_menu.id(R.id.menu_item1).text("Save file")
+                    .clicked(new OnClickListener() {
+
+                        @Override
+                        public void onClick(View arg0) {
+                            popupWindowAttach.dismiss();
+                        }
+                    });
+            aq_menu.id(R.id.menu_item2).text("Delete")
+                    .clicked(new OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            if (ll_iner != null){
+                                item.removeView(ll_iner);
+                            }
+                            popupWindowAttach.dismiss();
+                        }
+                    });
+
+            ImageOptions options = new ImageOptions();
+            options.round = 20;
+
+            AQuery aq = new AQuery(child);
+            aq.id(image).image(imageUrl, options);
+            child.findViewById(R.id.image_menu);
+            TextView text = (TextView) child
+                    .findViewById(R.id.image_added_text);
+            TextView by = (TextView) child
+                    .findViewById(R.id.image_added_by);
+            TextView size = (TextView) child
+                    .findViewById(R.id.image_added_size);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+            by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+
+//            if (selectedImage.getLastPathSegment().contains(".")) {
+//                text.setText(selectedImage.getLastPathSegment());
+//            } else {
+//                text.setText(selectedImage.getLastPathSegment() + "." + type);
+//            }
+            size.setText("(7024 KB)");
+            item.addView(child);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

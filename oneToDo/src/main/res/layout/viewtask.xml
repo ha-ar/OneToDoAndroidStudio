@@ -231,8 +231,8 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="10dp"
-                    android:visibility="gone"
                     android:animateLayoutChanges="true"
+                    android:visibility="gone"
                     android:orientation="vertical">
                     <TextView
                         android:id="@+id/sub_task_header"
@@ -303,6 +303,40 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:background="@android:color/transparent"
                         android:minLines="2" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/attachment_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="27dp"
+                        android:paddingBottom="2dp"
+                        android:text="ATTACHMENTS"
+                        android:textColor="@color/active"
+                        android:textSize="13.33sp"
+                        android:typeface="monospace" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:layout_gravity="center_horizontal"
+                        android:background="#1ab2e4" />
+                    <LinearLayout
+                        android:id="@+id/added_image_outer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:orientation="vertical"
+                        android:visibility="visible" >
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 

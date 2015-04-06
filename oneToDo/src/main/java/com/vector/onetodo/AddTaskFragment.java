@@ -42,7 +42,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -66,12 +65,14 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
+import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.Attach;
 import com.vector.onetodo.db.gen.AttachDao;
 import com.vector.onetodo.db.gen.CheckList;
@@ -126,7 +127,6 @@ import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     private List<NameValuePair> pairs;
-    private Uri filename;
     private Editor editor, editorattach;
     private String pLabel = null;
     private int mPosition = -1;
@@ -1172,11 +1172,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         getActivity().getContentResolver().notifyChange(selectedImage, null);
         ContentResolver cr = getActivity().getContentResolver();
 
-        String type = MimeTypeMap.getFileExtensionFromUrl(selectedImage
-                .toString());
-
-        Toast.makeText(getActivity(), type, Toast.LENGTH_SHORT).show();
-
         Bitmap bitmap;
         if (FragmentCheck == 0) {
             try {
@@ -1245,17 +1240,18 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                         .findViewById(R.id.image_added_by);
                 TextView size = (TextView) child
                         .findViewById(R.id.image_added_size);
+
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
                 by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-                filename = selectedImage;
-                if (selectedImage.getLastPathSegment().contains(".")) {
-                    text.setText(selectedImage.getLastPathSegment());
-                } else {
-                    text.setText(selectedImage.getLastPathSegment() + "." + type);
-                }
-                size.setText("(" + (new File(selectedImage.getPath()).length()) / 1024 + " KB)");
+                text.setText(getImageName(selectedImage));
+                Bitmap bm = getBitmap(selectedImage);
+                byte[] bitmapArray = getImageByteArray(bm);
+                uploadAttachments(bitmapArray);
+
+                size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
                 item.addView(child);
+
                 Attach attachObj = new Attach();
                 attachObj.setAttach_path(selectedImage.getPath());
                 attachObj.setAttach_type("image");
@@ -1285,6 +1281,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         aq.id(R.id.spinner_label_layout).background(
                 R.drawable.input_fields_gray);
     }
+
 
     private void showCurrentView(View v) {
 
@@ -1419,22 +1416,48 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
     }
 
-    public void uploadAttachments() {
-
-        HttpEntity entity = null;
-
+    private String getImageName(Uri uri){
+        String fileName = "";
+        String scheme = uri.getScheme();
+        if (scheme.equals("file")) {
+            fileName = uri.getLastPathSegment();
+        }
+        else if (scheme.equals("content")) {
+            String[] proj = { MediaStore.Images.Media.TITLE };
+            Cursor cursor = getActivity().getContentResolver().query(uri, proj, null, null, null);
+            if (cursor != null && cursor.getCount() != 0) {
+                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE);
+                cursor.moveToFirst();
+                fileName = cursor.getString(columnIndex);
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return fileName;
+    }
+    private Bitmap getBitmap(Uri fileName){
         Bitmap bm = null;
         try {
             bm = MediaStore.Images.Media.getBitmap(getActivity()
-                    .getContentResolver(), filename);
+                    .getContentResolver(), fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return bm;
+    }
+
+    private byte[] getImageByteArray(Bitmap bm){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         if (bm != null) {
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            bm.compress(Bitmap.CompressFormat.JPEG, 50, baos);
         }
-        byte[] byteArray = baos.toByteArray();
+        return baos.toByteArray();
+    }
+
+    public void uploadAttachments(byte[] byteArray) {
+
+        HttpEntity entity = null;
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
         pairs = new ArrayList<>();
         pairs.add(new BasicNameValuePair("image", encoded));
@@ -1683,15 +1706,19 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         boolean is_alertEmail = false, is_alertNotification = false;
         if (!(aq.id(R.id.before).getText().toString().equals("") || aq
                 .id(R.id.before).getText().toString() == null)) {
-            is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
-                    .isChecked();
-            is_alertNotification = aq.id(R.id.notification_radio)
-                    .getCheckBox().isChecked();
+            try{
+                is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
+                        .isChecked();
+                is_alertNotification = aq.id(R.id.notification_radio)
+                        .getCheckBox().isChecked();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
 
         boolean repeat_forever = aq.id(R.id.forever_radio).isChecked();
         String repeat = aq.id(R.id.repeat).getText().toString();
-        String repeatdate = repeatDate;  // will be used for repeat until
 
         String label_name = aq.id(R.id.spinner_labels_task).getText()
                 .toString();
@@ -1866,7 +1893,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         // ********************* Data add hit Async task ******************//
         AddToServer aSync = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
-                locationType, notes, repeatdate,repeat_forever, MaxId,
+                locationType, notes, repeatDate,repeat_forever, MaxId,
                 AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddTaskFragment.this);
         aSync.execute();
         getActivity().getSupportFragmentManager().popBackStack();
@@ -1932,9 +1959,20 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         aq.id(R.id.add_sub_task).text(todo.getCheckList().getTitle());
         toggleCheckList(aq.id(R.id.add_sub_task).getView());
 
+        int position = 0;
         aq.id(R.id.notes_task).text(todo.getNotes());
-
-
+        try {
+            for (int i = 0; i < TaskData.getInstance().todos.size(); i++) {
+                if (Integer.valueOf(TaskData.getInstance().todos.get(i).id).equals(todo.getTodo_server_id())) {
+                    position = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < TaskData.getInstance().todos.get(position).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().todos.get(position).todo_attachment.get(i));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void showRightDateAndTime() {
@@ -1970,5 +2008,91 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+        App.updateTaskList(getActivity());
+    }
+    private void showAttachments(String imageUrl){
+        aq.id(R.id.attachment_layout).visible();
+        try {
+            final LinearLayout item = (LinearLayout) aq
+                    .id(R.id.added_image_outer).visible().getView();
+
+            final View child = getActivity().getLayoutInflater().inflate(
+                    R.layout.image_added_layout, null);
+
+            ImageView image = (ImageView) child
+                    .findViewById(R.id.image_added);
+
+            ImageView imageMenu = (ImageView) child
+                    .findViewById(R.id.image_menu);
+            Tag = Tag + 1;
+            imageMenu.setTag(Tag);
+            child.setId(Tag);
+
+            imageMenu.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    Toast.makeText(getActivity(),
+                            arg0.getId() + "     " + arg0.getTag(),
+                            Toast.LENGTH_LONG).show();
+                    ll_linear = (LinearLayout) item.findViewById(Integer
+                            .parseInt(arg0.getTag().toString()));
+
+                    if (popupWindowAttach.isShowing()) {
+                        popupWindowAttach.dismiss();
+
+                    } else {
+                        popupWindowAttach.showAsDropDown(arg0, 5, 0);
+                    }
+                }
+            });
+
+            aq_menu.id(R.id.menu_item1).text("Save file")
+                    .clicked(new OnClickListener() {
+
+                        @Override
+                        public void onClick(View arg0) {
+                            popupWindowAttach.dismiss();
+                        }
+                    });
+            aq_menu.id(R.id.menu_item2).text("Delete")
+                    .clicked(new OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            if (ll_linear != null){
+                                item.removeView(ll_linear);
+                                attachArrayList.remove(attach);
+                            }
+                            popupWindowAttach.dismiss();
+                        }
+                    });
+
+            ImageOptions options = new ImageOptions();
+            options.round = 20;
+
+            AQuery aq = new AQuery(child);
+            aq.id(image).image(imageUrl, options);
+            child.findViewById(R.id.image_menu);
+            TextView text = (TextView) child
+                    .findViewById(R.id.image_added_text);
+            TextView by = (TextView) child
+                    .findViewById(R.id.image_added_by);
+            TextView size = (TextView) child
+                    .findViewById(R.id.image_added_size);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+            by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+
+//            if (selectedImage.getLastPathSegment().contains(".")) {
+//                text.setText(selectedImage.getLastPathSegment());
+//            } else {
+//                text.setText(selectedImage.getLastPathSegment() + "." + type);
+//            }
+            size.setText("(7024 KB)");
+            item.addView(child);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -2,21 +2,27 @@ package com.vector.onetodo;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.ImageOptions;
 import com.vector.model.AssignedTaskData;
 import com.vector.model.ItemDetails;
+import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
 
 import net.appkraft.parallax.ParallaxScrollView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -98,7 +104,7 @@ public class TaskView extends BaseActivity {
 
             @Override
             public void onClick(View arg0) {
-                getSupportFragmentManager().popBackStack();
+                TaskView.this.finish();
             }
         });
         aq.id(R.id.imageView4).clicked(new OnClickListener() {
@@ -164,6 +170,25 @@ public class TaskView extends BaseActivity {
 //        aq.id(R.id.invitee_list).adapter(new InviteeAdapter(this, items));
         ToDoDao toDoDao = App.daoSession.getToDoDao();
         ToDo obj = toDoDao.load(id);
+        int serverTaskPosition = -1;
+        Log.e("size", TaskData.getInstance().todos.size()+"");
+        for(int i = 0; i < TaskData.getInstance().todos.size(); i++){
+            try {
+                if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().todos.get(i).id)) {
+                    serverTaskPosition = i;
+                    break;
+                }
+
+            }catch (NullPointerException e){e.printStackTrace();}
+        }
+
+        try{
+            for(int i = 0; i < TaskData.getInstance().todos.get(serverTaskPosition).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().todos.get(serverTaskPosition).todo_attachment.get(i));
+        }catch (Exception npe){
+            npe.printStackTrace();
+        }
+
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
         }
@@ -300,6 +325,46 @@ public class TaskView extends BaseActivity {
             mChecklistManager.replaceViews(switchView, newView);
 
         } catch (ViewNotSupportedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void showAttachments(String imageUrl){
+        aq.id(R.id.attachment_layout).visible();
+        try {
+            final LinearLayout item = (LinearLayout) aq
+                    .id(R.id.added_image_outer).visible().getView();
+
+            final View child = getLayoutInflater().inflate(
+                    R.layout.image_added_layout, null);
+
+            ImageView image = (ImageView) child
+                    .findViewById(R.id.image_added);
+
+            ImageOptions options = new ImageOptions();
+            options.round = 20;
+
+            AQuery aq = new AQuery(child);
+            aq.id(image).image(imageUrl, options);
+            child.findViewById(R.id.image_menu).setVisibility(View.GONE);
+            TextView text = (TextView) child
+                    .findViewById(R.id.image_added_text);
+            TextView by = (TextView) child
+                    .findViewById(R.id.image_added_by);
+            TextView size = (TextView) child
+                    .findViewById(R.id.image_added_size);
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+            by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+//            if (selectedImage.getLastPathSegment().contains(".")) {
+//                text.setText(selectedImage.getLastPathSegment());
+//            } else {
+//                text.setText(selectedImage.getLastPathSegment() + "." + type);
+//            }
+            size.setText("(7024 KB)");
+            item.addView(child);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

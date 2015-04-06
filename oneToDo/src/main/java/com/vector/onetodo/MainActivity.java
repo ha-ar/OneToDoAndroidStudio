@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -34,6 +35,7 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -51,6 +53,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.Plus.PlusOptions;
 import com.google.gson.Gson;
+import com.vector.model.NotificationData;
 import com.vector.model.TaskData;
 import com.vector.model.TaskData.Todos;
 import com.vector.onetodo.db.gen.LabelDao;
@@ -79,8 +82,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+;
+
 public class MainActivity extends BaseActivity implements
-       ConnectionCallbacks, OnConnectionFailedListener {
+        ConnectionCallbacks, OnConnectionFailedListener {
     private GoogleApiClient mGoogleApiClient;
     public static final int RC_SIGN_IN = 0;
     private boolean mIntentInProgress;
@@ -168,16 +173,32 @@ public class MainActivity extends BaseActivity implements
                                         TaskData.getInstance().todos.get(0).notes
                                                 + "");
                             }
-                            init();
                         }
                     });
-        } else {
-            init();
+            aq.ajax("http://api.heuristix.net/one_todo/v1/notifications/"
+                            + Constants.user_id, JSONObject.class,
+                    new AjaxCallback<JSONObject>() {
+                        @Override
+                        public void callback(String url, JSONObject json,
+                                             AjaxStatus status) {
+                            if (json != null) {
+                                Gson gson = new Gson();
+                                NotificationData obj = gson.fromJson(json.toString(),
+                                        NotificationData.class);
+                                NotificationData.getInstance().setList(obj);
+                                Log.v("JSON",
+                                        NotificationData.getInstance().result.get(0).message
+                                                + "");
+                            }
+                        }
+                    });
         }
+        init();
 
     }
 
     Menu menu;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -200,22 +221,45 @@ public class MainActivity extends BaseActivity implements
 
             }
         });
+
         search.setOnQueryTextListener(new OnQueryTextListener() {
             @Override
-            public boolean onQueryTextChange(String query) {
-                // loadHistory(query);
+            public boolean onQueryTextChange(String text) {
+                SearchFragment.qb = App.daoSession.getToDoDao().queryBuilder();
+                SearchFragment.qb.where(ToDoDao.Properties.Title.like("%" + text + "%"));
+                if(SearchFragment.listView != null) {
+                    SearchFragment.filteredAdapter = new TaskListAdapter(MainActivity.this, SearchFragment.qb.list());
+                    SearchFragment.listView.setAdapter(SearchFragment.filteredAdapter);
+                    SearchFragment.filteredAdapter.notifyDataSetChanged();
+                }
                 return true;
             }
 
             @Override
             public boolean onQueryTextSubmit(String arg0) {
-                return false;
+                return true;
             }
 
         });
+        MenuItem menuItem = menu.findItem(R.id.action_search);
 
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.drawer_layout, SearchFragment.newInstance()).addToBackStack(null).commit();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                getSupportFragmentManager().popBackStack();
+                return true;
+            }
+        });
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -247,9 +291,11 @@ public class MainActivity extends BaseActivity implements
 //			}
 //			return true;
 //		}
+
         return super.onOptionsItemSelected(item);
     }
-//    public void Fb_Clicked() {
+
+    //    public void Fb_Clicked() {
 //        Session currentSession = Session.getActiveSession();
 //        if (currentSession == null || currentSession.getState().isClosed()) {
 //            Session session = new Session.Builder(this).build();
@@ -273,6 +319,9 @@ public class MainActivity extends BaseActivity implements
 //            session.openForPublish(op);
 //        }
 //    }
+
+
+
     public void g_plus_LogIn() {
         if (!mGoogleApiClient.isConnecting()) {
             progressDialog = new ProgressDialog(
@@ -419,9 +468,9 @@ public class MainActivity extends BaseActivity implements
     }
     private void init() {
 
-        // ListView notif_list = (ListView) findViewById(R.id.notif_list);
-        // Notify_adapter adapter = new Notify_adapter(this);
-        // notif_list.setAdapter(adapter);
+        ListView notif_list = (ListView) findViewById(R.id.notif_list);
+        Notify_adapter adapter = new Notify_adapter(this);
+        notif_list.setAdapter(adapter);
 
         // ***** LeftMenudrawer Mange Account feld**********//
         if (App.prefs.getUserId() == -1) {
@@ -929,8 +978,9 @@ public class MainActivity extends BaseActivity implements
 
         @Override
         public int getCount() {
-            aq.id(R.id.no_notification).visibility(View.GONE);
-            return 10;
+            if(NotificationData.getInstance().result.size() > 0)
+                aq.id(R.id.no_notification).visibility(View.GONE);
+            return NotificationData.getInstance().result.size();
         }
 
         @Override

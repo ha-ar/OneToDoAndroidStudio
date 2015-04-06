@@ -16,15 +16,21 @@ public class TaskData {
 		return taskdata;
 	}
 
+
+    public void clearList() {
+        taskdata = null;
+    }
 	public void setList(TaskData obj) {
 		taskdata = obj;
 	}
+
 
 	
 		@SerializedName("todos")
 		public ArrayList<Todos> todos=new ArrayList<>();
 
 		public class Todos {
+
 			@SerializedName("id")
 			public String id;
 
@@ -77,10 +83,26 @@ public class TaskData {
 			public String checklist_data;
 
             @SerializedName("todo_comment")
-			public String[] todo_comment;
+			public ArrayList<Comments> todo_comment;
 
             @SerializedName("todo_attachment")
-			public String[] todo_attachment;
+			public ArrayList<String> todo_attachment;
 		
 	}
+
+    public class Comments{
+        public String comment;
+        public String name;
+        public String time;
+    }
+
+    public class Pending{
+        public String user_id;
+        public String name;
+    }
+
+    public class Accepted{
+        public String user_id;
+        public String name;
+    }
 }
