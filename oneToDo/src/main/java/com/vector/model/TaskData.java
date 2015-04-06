@@ -87,6 +87,9 @@ public class TaskData {
 
             @SerializedName("todo_attachment")
 			public ArrayList<String> todo_attachment;
+
+            @SerializedName("invitee_list")
+            public ArrayList<Invitee> invitee_list;
 		
 	}
 
@@ -96,6 +99,10 @@ public class TaskData {
         public String time;
     }
 
+    public class Invitee{
+        public ArrayList<Pending> pending = new ArrayList<>();
+        public ArrayList<Accepted> accepted = new ArrayList<>();
+    }
     public class Pending{
         public String user_id;
         public String name;

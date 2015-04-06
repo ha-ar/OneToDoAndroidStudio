@@ -33,6 +33,7 @@ public class NotificationData {
         public String date_created;
         public String first_name;
         public String last_name;
+        public String todo_title;
         public String profile_image;
 
     }

@@ -121,6 +121,7 @@ public class MainActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        aq = new AQuery(this);
 
         ////////////////////////////////////////////////////////////////////
         PlusOptions plus = new PlusOptions.Builder().build();
@@ -169,9 +170,7 @@ public class MainActivity extends BaseActivity implements
                                 TaskData obj = gson.fromJson(json.toString(),
                                         TaskData.class);
                                 TaskData.getInstance().setList(obj);
-                                Log.v("JSON",
-                                        TaskData.getInstance().todos.get(0).notes
-                                                + "");
+                                Log.v("JSON", json.toString());
                             }
                         }
                     });
@@ -189,6 +188,9 @@ public class MainActivity extends BaseActivity implements
                                 Log.v("JSON",
                                         NotificationData.getInstance().result.get(0).message
                                                 + "");
+                                ListView notif_list = (ListView) findViewById(R.id.notif_list);
+                                Notify_adapter adapter = new Notify_adapter(MainActivity.this);
+                                notif_list.setAdapter(adapter);
                             }
                         }
                     });
@@ -468,9 +470,6 @@ public class MainActivity extends BaseActivity implements
     }
     private void init() {
 
-        ListView notif_list = (ListView) findViewById(R.id.notif_list);
-        Notify_adapter adapter = new Notify_adapter(this);
-        notif_list.setAdapter(adapter);
 
         // ***** LeftMenudrawer Mange Account feld**********//
         if (App.prefs.getUserId() == -1) {
@@ -738,8 +737,8 @@ public class MainActivity extends BaseActivity implements
                 aq.id(R.id.todo_image).image(R.drawable.list_black);
                 aq.id(R.id.todo_text).textColor(Color.parseColor("#000000"));
 
-                aq.id(R.id.todo_layout).getView()
-                        .setBackgroundColor(Color.parseColor("#ffffff"));
+//                aq.id(R.id.todo_layout).getView()
+//                        .setBackgroundColor(Color.parseColor("#ffffff"));
                 aq.id(R.id.calendar_image).image(R.drawable.calendar_blue);
                 aq.id(R.id.calendar_text)
                         .textColor(Color.parseColor("#33B5E5"));
@@ -1011,6 +1010,13 @@ public class MainActivity extends BaseActivity implements
             } else {
                 holder = (Holder) view.getTag();
             }
+
+            holder.message.setText(NotificationData.getInstance().result.get(position).first_name+" "
+                    +NotificationData.getInstance().result.get(position).last_name+" "
+                    +NotificationData.getInstance().result.get(position).message
+                    +NotificationData.getInstance().result.get(position).todo_title);
+
+            holder.time.setText(NotificationData.getInstance().result.get(position).date_created);
 
             return view;
         }
