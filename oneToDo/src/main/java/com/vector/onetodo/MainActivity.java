@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -79,8 +80,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 ;
 
@@ -174,6 +177,22 @@ public class MainActivity extends BaseActivity implements
                             }
                         }
                     });
+            final ListView notif_list = (ListView) findViewById(R.id.notif_list);
+            notif_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    long todoId = -1;
+                    for(int i = 0; i < todo_obj.size(); i++){
+                        if(Integer.valueOf(NotificationData.getInstance().result.get(position).todo_id).equals(todo_obj.get(i).getTodo_server_id())){
+                            todoId = todo_obj.get(i).getTodo_id();
+                        }
+                    }
+                    Intent intent = new Intent(MainActivity.this, TaskView.class);
+                    intent.putExtra("todo_id", todoId);
+                    startActivity(intent);
+                    callNotificationClicked(NotificationData.getInstance().result.get(position).id);
+                }
+            });
             aq.ajax("http://api.heuristix.net/one_todo/v1/notifications/"
                             + Constants.user_id, JSONObject.class,
                     new AjaxCallback<JSONObject>() {
@@ -188,7 +207,6 @@ public class MainActivity extends BaseActivity implements
                                 Log.v("JSON",
                                         NotificationData.getInstance().result.get(0).message
                                                 + "");
-                                ListView notif_list = (ListView) findViewById(R.id.notif_list);
                                 Notify_adapter adapter = new Notify_adapter(MainActivity.this);
                                 notif_list.setAdapter(adapter);
                             }
@@ -197,6 +215,23 @@ public class MainActivity extends BaseActivity implements
         }
         init();
 
+    }
+
+    private void callNotificationClicked(String notificationId){
+        Map<String, String> params = new HashMap<>();
+        params.put("id", notificationId);
+        aq.ajax("http://api.heuristix.net/one_todo/v1/notification/notification"
+                        + Constants.user_id, params ,JSONObject.class,
+                new AjaxCallback<JSONObject>() {
+                    @Override
+                    public void callback(String url, JSONObject json,
+                                         AjaxStatus status) {
+                        if (json != null) {
+                            Log.e("notification", json.toString());
+                            //notification most probably updated
+                        }
+                    }
+                }.method(AQuery.METHOD_POST));
     }
 
     Menu menu;
@@ -228,7 +263,10 @@ public class MainActivity extends BaseActivity implements
             @Override
             public boolean onQueryTextChange(String text) {
                 SearchFragment.qb = App.daoSession.getToDoDao().queryBuilder();
-                SearchFragment.qb.where(ToDoDao.Properties.Title.like("%" + text + "%"));
+                SearchFragment.qb
+                        .where(ToDoDao.Properties.Title.like("%" + text + "%"))
+                        .orderAsc(ToDoDao.Properties.Start_date).build();
+
                 if(SearchFragment.listView != null) {
                     SearchFragment.filteredAdapter = new TaskListAdapter(MainActivity.this, SearchFragment.qb.list());
                     SearchFragment.listView.setAdapter(SearchFragment.filteredAdapter);

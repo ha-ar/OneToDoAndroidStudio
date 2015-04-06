@@ -102,17 +102,20 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
     }
     public static void todayQuery() {
         todayQuery = App.daoSession.getToDoDao().queryBuilder().where(
-                Properties.Start_date.between(currentDate[0], currentDate[1]));
+                Properties.Start_date.between(currentDate[0], currentDate[1]))
+        .orderAsc(Properties.Start_date);
     }
 
     public static void tomorrowQuery() {
         tomorrowQuery = App.daoSession.getToDoDao().queryBuilder().where(
-                Properties.Start_date.between(currentDate[1], currentDate[2]));
+                Properties.Start_date.between(currentDate[1], currentDate[2]))
+                        .orderAsc(Properties.Start_date);
     }
 
     public static void upComingQuery() {
         upcomingQuery = App.daoSession.getToDoDao().queryBuilder().where(
-                Properties.Start_date.gt(currentDate[2]));
+                Properties.Start_date.gt(currentDate[2]))
+                        .orderAsc(Properties.Start_date);
     }
 
 

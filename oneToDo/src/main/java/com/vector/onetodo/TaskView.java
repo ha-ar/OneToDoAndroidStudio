@@ -181,6 +181,8 @@ public class TaskView extends BaseActivity {
 
             }catch (NullPointerException e){e.printStackTrace();}
         }
+        if(serverTaskPosition == -1)
+            return;
 
         try{
             for(int i = 0; i < TaskData.getInstance().todos.get(serverTaskPosition).todo_attachment.size(); i++)
