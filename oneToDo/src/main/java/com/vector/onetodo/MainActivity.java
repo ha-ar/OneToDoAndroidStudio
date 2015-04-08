@@ -157,8 +157,9 @@ public class MainActivity extends BaseActivity implements
         alarm = new AlarmManagerBroadcastReceiver();
         startRepeatingTimer();
 
-        // ***** Initializing Registration shared prefrences**********//
+        // ***** Initializing Registration shared preferences **********//
         Constants.user_id = App.prefs.getUserId();
+        Log.e("user_id", App.prefs.getUserId()+"");
 
         // **************************Api Call for Landing data
         if (Constants.user_id != -1) {
@@ -204,9 +205,6 @@ public class MainActivity extends BaseActivity implements
                                 NotificationData obj = gson.fromJson(json.toString(),
                                         NotificationData.class);
                                 NotificationData.getInstance().setList(obj);
-                                Log.v("JSON",
-                                        NotificationData.getInstance().result.get(0).message
-                                                + "");
                                 Notify_adapter adapter = new Notify_adapter(MainActivity.this);
                                 notif_list.setAdapter(adapter);
                             }
@@ -566,11 +564,11 @@ public class MainActivity extends BaseActivity implements
         }
 
         Date date = null;
-        for (int i = 0; i < TaskData.getInstance().todos.size(); i++) {
-            if (TaskData.getInstance().todos.get(i).start_date != null) {
+        for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+            if (TaskData.getInstance().result.todos.get(i).start_date != null) {
                 try {
                     date = sdf
-                            .parse(TaskData.getInstance().todos.get(i).start_date);
+                            .parse(TaskData.getInstance().result.todos.get(i).start_date);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -578,13 +576,13 @@ public class MainActivity extends BaseActivity implements
                 if (date != null) {
                     if (date.equals(today)) {
                         Log.e("Today", date + "   " + today);
-                        Today.add((TaskData.getInstance().todos.get(i)));
+                        Today.add((TaskData.getInstance().result.todos.get(i)));
                     } else if (date.equals(tomorrow)) {
                         Log.v("Tomorrow", date + "   " + tomorrow);
-                        Tomorrow.add((TaskData.getInstance().todos.get(i)));
+                        Tomorrow.add((TaskData.getInstance().result.todos.get(i)));
                     } else if (date.after(tomorrow)) {
                         Log.v("upcoming", date + "   " + tomorrow);
-                        Upcoming.add((TaskData.getInstance().todos.get(i)));
+                        Upcoming.add((TaskData.getInstance().result.todos.get(i)));
                     }
                 }
             }
@@ -731,6 +729,7 @@ public class MainActivity extends BaseActivity implements
             }
         });
 
+
         aq.id(R.id.todo_layout).clicked(new OnClickListener() {
 
             @Override
@@ -775,8 +774,8 @@ public class MainActivity extends BaseActivity implements
                 aq.id(R.id.todo_image).image(R.drawable.list_black);
                 aq.id(R.id.todo_text).textColor(Color.parseColor("#000000"));
 
-//                aq.id(R.id.todo_layout).getView()
-//                        .setBackgroundColor(Color.parseColor("#ffffff"));
+                aq.id(R.id.todo_layout).getView()
+                        .setBackgroundColor(Color.parseColor("#ffffff"));
                 aq.id(R.id.calendar_image).image(R.drawable.calendar_blue);
                 aq.id(R.id.calendar_text)
                         .textColor(Color.parseColor("#33B5E5"));
@@ -789,10 +788,8 @@ public class MainActivity extends BaseActivity implements
                 Fragment fr = new Calender();
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction(); //
-				/*
-				 * transaction.setCustomAnimations(R.anim.slide_in,
-				 * R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
-				 */
+				transaction.setCustomAnimations(R.anim.slide_in,
+				R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
                 transaction.replace(R.id.container_inner, fr);
                 transaction.addToBackStack("CALENDAR");
                 transaction.commit();

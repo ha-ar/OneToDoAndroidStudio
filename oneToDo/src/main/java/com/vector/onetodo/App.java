@@ -67,7 +67,7 @@ public class App extends Application{
                                     TaskData.class);
                             TaskData.getInstance().setList(obj);
                             Log.v("JSON",
-                                    TaskData.getInstance().todos.get(0).notes
+                                    TaskData.getInstance().result.todos.get(0).notes
                                             + "");
                         }
                     }

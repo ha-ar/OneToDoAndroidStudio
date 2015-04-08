@@ -2106,14 +2106,14 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
         int position = 0;
         aq.id(R.id.notes_task).text(todo.getNotes());
         try {
-            for (int i = 0; i < TaskData.getInstance().todos.size(); i++) {
-                if (Integer.valueOf(TaskData.getInstance().todos.get(i).id).equals(todo.getTodo_server_id())) {
+            for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+                if (Integer.valueOf(TaskData.getInstance().result.todos.get(i).id).equals(todo.getTodo_server_id())) {
                     position = i;
                     break;
                 }
             }
-            for (int i = 0; i < TaskData.getInstance().todos.get(position).todo_attachment.size(); i++)
-                showAttachments(TaskData.getInstance().todos.get(position).todo_attachment.get(i));
+            for (int i = 0; i < TaskData.getInstance().result.todos.get(position).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().result.todos.get(position).todo_attachment.get(i));
         }catch (Exception e){
             e.printStackTrace();
         }

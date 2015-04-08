@@ -149,7 +149,7 @@ public class TaskView extends BaseActivity {
         aq.id(R.id.backview).clicked(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager().popBackStack();
+                TaskView.this.finish();
             }
         });
 
@@ -171,22 +171,20 @@ public class TaskView extends BaseActivity {
         ToDoDao toDoDao = App.daoSession.getToDoDao();
         ToDo obj = toDoDao.load(id);
         int serverTaskPosition = -1;
-        Log.e("size", TaskData.getInstance().todos.size()+"");
-        for(int i = 0; i < TaskData.getInstance().todos.size(); i++){
+        Log.e("size", TaskData.getInstance().result.todos.size()+"");
+        for(int i = 0; i < TaskData.getInstance().result.todos.size(); i++){
             try {
-                if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().todos.get(i).id)) {
+                if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
                     serverTaskPosition = i;
                     break;
                 }
 
             }catch (NullPointerException e){e.printStackTrace();}
         }
-        if(serverTaskPosition == -1)
-            return;
 
         try{
-            for(int i = 0; i < TaskData.getInstance().todos.get(serverTaskPosition).todo_attachment.size(); i++)
-                showAttachments(TaskData.getInstance().todos.get(serverTaskPosition).todo_attachment.get(i));
+            for(int i = 0; i < TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.get(i));
         }catch (Exception npe){
             npe.printStackTrace();
         }

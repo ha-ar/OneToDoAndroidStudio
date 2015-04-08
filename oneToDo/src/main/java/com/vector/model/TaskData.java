@@ -20,14 +20,20 @@ public class TaskData {
     public void clearList() {
         taskdata = null;
     }
+
+    public String notification_count;
+
 	public void setList(TaskData obj) {
 		taskdata = obj;
 	}
 
+        @SerializedName("result")
+        public Result result = new Result();
 
-	
-		@SerializedName("todos")
-		public ArrayList<Todos> todos=new ArrayList<>();
+        public class Result{
+            @SerializedName("todos")
+            public ArrayList<Todos> todos = new ArrayList<>();
+        }
 
 		public class Todos {
 

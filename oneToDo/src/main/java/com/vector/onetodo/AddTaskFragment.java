@@ -1879,18 +1879,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
 
-        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-        if(reminderTime != 0){
-            alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
-            alarm.SetNormalAlarm(getActivity());
-        }
-        if(r_repeat != 0){
-            alarm.setRepeatAlarm(getActivity(), r_repeat);
-        }
-        else{
-            alarm.SetNormalAlarm(getActivity());
-        }
-
         // ********************* Data add hit Async task ******************//
         AddToServer aSync = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
                 locationType, notes, repeatDate,repeat_forever, MaxId,
@@ -1962,14 +1950,14 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         int position = 0;
         aq.id(R.id.notes_task).text(todo.getNotes());
         try {
-            for (int i = 0; i < TaskData.getInstance().todos.size(); i++) {
-                if (Integer.valueOf(TaskData.getInstance().todos.get(i).id).equals(todo.getTodo_server_id())) {
+            for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+                if (Integer.valueOf(TaskData.getInstance().result.todos.get(i).id).equals(todo.getTodo_server_id())) {
                     position = i;
                     break;
                 }
             }
-            for (int i = 0; i < TaskData.getInstance().todos.get(position).todo_attachment.size(); i++)
-                showAttachments(TaskData.getInstance().todos.get(position).todo_attachment.get(i));
+            for (int i = 0; i < TaskData.getInstance().result.todos.get(position).todo_attachment.size(); i++)
+                showAttachments(TaskData.getInstance().result.todos.get(position).todo_attachment.get(i));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -2009,6 +1997,21 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
         App.updateTaskList(getActivity());
+        setAlarm(todo);
+    }
+
+    private void setAlarm(ToDo todo){
+        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+        if(todo.getReminder().getTime() != 0){
+            alarm.setReminderAlarm(getActivity(), todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+            alarm.SetNormalAlarm(getActivity());
+        }
+        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
+            alarm.setRepeatAlarm(getActivity(), todo.getRepeat().getRepeat_until());
+        }
+        else{
+            alarm.SetNormalAlarm(getActivity());
+        }
     }
     private void showAttachments(String imageUrl){
         aq.id(R.id.attachment_layout).visible();

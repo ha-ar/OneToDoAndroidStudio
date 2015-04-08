@@ -542,7 +542,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				location_del.dismiss();
 			}
 		});
@@ -551,7 +550,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Remove(viewl.getId() + "" + itempos);
 				((TextView) viewl).setText("New");
 				GradientDrawable mDrawable = (GradientDrawable) getResources()
@@ -567,7 +565,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				label_edit.dismiss();
 				location_del.show();
 			}
@@ -577,7 +574,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method
 				aqd.id(R.id.label_title).text("Edit");
 				aqd.id(R.id.save).text("Save");
 				label_view = viewl;

@@ -27,6 +27,10 @@ public class AssignedTaskData {
 		public class Task {
 			@SerializedName("id")
 			public String id;
+            @SerializedName("first_name")
+            public String first_name;
+            @SerializedName("last_name")
+            public String last_name;
 			@SerializedName("user_id")
 			public String senderId;
 			@SerializedName("type")
