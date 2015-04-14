@@ -126,6 +126,8 @@ public class MainActivity extends BaseActivity implements
         setContentView(R.layout.activity_main);
         aq = new AQuery(this);
 
+
+
         ////////////////////////////////////////////////////////////////////
         PlusOptions plus = new PlusOptions.Builder().build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -163,6 +165,7 @@ public class MainActivity extends BaseActivity implements
 
         // **************************Api Call for Landing data
         if (Constants.user_id != -1) {
+
             aq.ajax("http://api.heuristix.net/one_todo/v1/tasks/"
                             + Constants.user_id, JSONObject.class,
                     new AjaxCallback<JSONObject>() {
@@ -208,10 +211,17 @@ public class MainActivity extends BaseActivity implements
                                 Notify_adapter adapter = new Notify_adapter(MainActivity.this);
                                 notif_list.setAdapter(adapter);
                             }
+
                         }
                     });
+
+            init();
+        } else {
+
+            init();
+
         }
-        init();
+
 
     }
 
@@ -508,10 +518,13 @@ public class MainActivity extends BaseActivity implements
 
 
         // ***** LeftMenudrawer Mange Account feld**********//
+
         if (App.prefs.getUserId() == -1) {
+
             aq.id(R.id.manage_img).image(R.drawable.verify_number);
-            aq.id(R.id.manage_text).text("Verify number");
+            aq.id(R.id.manage_text).text("Verify your Number");
         } else {
+
             aq.id(R.id.manage_img).image(R.drawable.manage_account);
             aq.id(R.id.manage_text).text("Manage Account");
             aq.id(R.id.username).text(App.prefs.getUserName());
@@ -522,6 +535,7 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View arg0) {
+
                 if (check1 == 0) {
                     check1 = 1;
                     aq.id(R.id.manage_account)

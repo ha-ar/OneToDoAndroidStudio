@@ -15,6 +15,7 @@ public class AppPrefs {
 	private String USER_ID = "user_id";
 	private String INITIALS = "initials";
 	private String USER_NAME = "user_name";
+    private String USER_LEVEL = "user_level";
 	private String USER_NUMBER = "user_number";
 	private String USER_EMAIL = "user_email";
 	private String DATE_FORMAT = "date_format";
@@ -49,7 +50,7 @@ public class AppPrefs {
 
 	/**
 	 * Save preference value against given key
-	 * 
+	 *
 	 * @param mContext
 	 * @param sharedPrefTitle
 	 * @param sharedPrefValue
@@ -101,13 +102,14 @@ public class AppPrefs {
 		prefsEditor.putInt(USER_ID, _user_id).commit();
 	}
 
+    public void setUserLevel(String level){prefsEditor.putString(USER_LEVEL, level).commit();}
+    public String getUserLevel() {return appSharedPrefs.getString(USER_LEVEL, "");}
+
 	public void setInitials(String initial) {
 		prefsEditor.putString(INITIALS, initial).commit();
 	}
 
-	public String getInitials() {
-		return appSharedPrefs.getString(INITIALS, "GU");
-	}
+	public String getInitials() {return appSharedPrefs.getString(INITIALS, "GU");}
 
 	public void setUserName(String userName) {
 		prefsEditor.putString(USER_NAME, userName).commit();

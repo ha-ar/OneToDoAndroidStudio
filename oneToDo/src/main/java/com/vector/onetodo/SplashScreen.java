@@ -2,6 +2,7 @@ package com.vector.onetodo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -42,48 +44,67 @@ public class SplashScreen extends BaseActivity {
 		
 		if(App.prefs.getUserId() != -1){
 			Constants.user_id = App.prefs.getUserId();
-			showUserLandingActivity();
-		}
-		
-		String html = "ONE" + "<br />" + "todo";
-		aq.id(R.id.title).text(Html.fromHtml(html));
+//			showUserLandingActivity();
 
-		aq.id(R.id.intro_1)
-				.text(Html
-						.fromHtml("<b>"
-								+ "ONE-todo"
-								+ "</b>"
-								+ " is a cross-palteform organiser app for both individuals and groups."));
-		aq.id(R.id.intro_2)
-				.text(Html
-						.fromHtml("<b>"
-								+ "ONE-todo"
-								+ "</b>"
-								+ " provides real time collaboration for group activities."));
-		aq.id(R.id.intro_3)
-				.text(Html
-						.fromHtml("<b>"
-								+ "ONE-todo"
-								+ "</b>"
-								+ " works with phone number so you  don’t need any log-in or password."));
-		aq.id(R.id.intro_4).text(
-				Html.fromHtml("<b>" + "ONE-todo" + "</b>"
-						+ " keeps everything at one place."));
 
-		aq.id(R.id.intro_5).text(Html.fromHtml("To-do's"));
-		aq.id(R.id.intro_6).text(Html.fromHtml("Events"));
-		aq.id(R.id.intro_7).text(Html.fromHtml("Appointments"));
-		aq.id(R.id.intro_8).text(Html.fromHtml("Schedules"));
-		aq.id(R.id.intro_9).text(Html.fromHtml("Projects"));
+        //khurram's Code
+//        SharedPreferences userDetails = this.getSharedPreferences("userdetails", MODE_PRIVATE);
+//        showUserDetailsActivity();
+//        App.prefs.saveSharedPrefValue(this,"userLevel","basic");
+//        Constants.user_level = App.prefs.getUserLevel();
 
-		aq.id(R.id.button1).clicked(new OnClickListener() {
+            String user_level = App.prefs.getSharedPrefValue(this, "user_level");
+        if(user_level.equals("guest")) {
+            showUserDetailsActivity();
+        }else{
+//            CharSequence text = "Hello toast!";
+//            int duration = Toast.LENGTH_SHORT;
+//            Toast toast = Toast.makeText(this,user_level ,duration);
+//            toast.show();
+//            Constants.user_id = App.prefs.getUserId();
+//            showUserDetailsActivity();
+            showUserLandingActivity();
+        }
+        }else {
+            String html = "ONE" + "<br />" + "todo";
+            aq.id(R.id.title).text(Html.fromHtml(html));
 
-			@Override
-			public void onClick(View arg0) {
-				showUserDetailsActivity();
-			}
-		});
-		
+            aq.id(R.id.intro_1)
+                    .text(Html
+                            .fromHtml("<b>"
+                                    + "ONE-todo"
+                                    + "</b>"
+                                    + " is a cross-paltform organiser app for both individuals and groups."));
+            aq.id(R.id.intro_2)
+                    .text(Html
+                            .fromHtml("<b>"
+                                    + "ONE-todo"
+                                    + "</b>"
+                                    + " provides real time collaboration for group activities."));
+            aq.id(R.id.intro_3)
+                    .text(Html
+                            .fromHtml("<b>"
+                                    + "ONE-todo"
+                                    + "</b>"
+                                    + " works with phone number so you  don’t need any log-in or password."));
+            aq.id(R.id.intro_4).text(
+                    Html.fromHtml("<b>" + "ONE-todo" + "</b>"
+                            + " keeps everything at one place."));
+
+            aq.id(R.id.intro_5).text(Html.fromHtml("To-do's"));
+            aq.id(R.id.intro_6).text(Html.fromHtml("Events"));
+            aq.id(R.id.intro_7).text(Html.fromHtml("Appointments"));
+            aq.id(R.id.intro_8).text(Html.fromHtml("Schedules"));
+            aq.id(R.id.intro_9).text(Html.fromHtml("Projects"));
+
+            aq.id(R.id.button1).clicked(new OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    showUserDetailsActivity();
+                }
+            });
+        }
 	}
 
 	private void showUserDetailsActivity() {
@@ -105,7 +126,7 @@ public class SplashScreen extends BaseActivity {
 		Intent intent = new Intent();
 		intent.setClass(this, MainActivity.class);
 		this.startActivity(intent);
-		this.finish(); 
+		this.finish();
 	}
 	
 	 static void registerInBackground(final Context context)  {

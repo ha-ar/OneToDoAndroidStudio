@@ -355,6 +355,8 @@ public class Accounts extends Fragment {
                     nameinfo.dismiss();
                     aq.id(R.id.user_name).text(userName);
                     App.prefs.setUserName(userName);
+                    Toast.makeText(getActivity(), "done",
+                            Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity(), "Name cannot be empty",
                             Toast.LENGTH_SHORT).show();
