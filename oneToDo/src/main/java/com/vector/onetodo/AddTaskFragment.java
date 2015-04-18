@@ -242,6 +242,11 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
                 return true;
             case R.id.action_comment:
+                 getActivity().getSupportFragmentManager()
+                         .beginTransaction()
+                         .replace(R.id.container, new AddTaskComment())
+                         .addToBackStack(null)
+                         .commit();
                 return true;
             case R.id.action_show_hide:
                 popupWindowTask.showAtLocation(

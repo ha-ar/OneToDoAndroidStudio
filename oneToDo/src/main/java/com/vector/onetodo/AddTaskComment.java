@@ -165,7 +165,7 @@ public class AddTaskComment extends Fragment {
 
 		public class Holder {
 			ImageView img;
-			TextView comment, name, date;
+			TextView comment, name, date, initials;
 		}
 
 		@Override
@@ -182,13 +182,15 @@ public class AddTaskComment extends Fragment {
 						.findViewById(R.id.comment_comment);
 				holder.name = (TextView) row.findViewById(R.id.comment_name);
 				holder.date = (TextView) row.findViewById(R.id.comment_date);
+				holder.initials = (TextView) row.findViewById(R.id.initials);
 				row.setTag(holder);
 			} else {
 				holder = (Holder) row.getTag();
 			}
-			holder.name.setText("Usman ameer");
-			holder.date.setText("Today, " + time.get(position));
+			holder.name.setText(App.prefs.getUserName());
+			holder.date.setText(time.get(position));
 			holder.comment.setText(commment.get(position));
+			holder.initials.setText(App.prefs.getInitials());
 			return row;
 		}
 	}
