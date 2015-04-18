@@ -11,6 +11,7 @@ public class Constants {
 	public static String FB_APP_ID = "830264356984345";
 	public final static String ICON_FONT = "onetodo.ttf";
 	public static int user_id=-1;
+    public static String user_level="guest";
 	public static boolean date,time,week;
 	public final static String MORE = "";
 

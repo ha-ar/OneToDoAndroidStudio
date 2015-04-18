@@ -169,8 +169,10 @@ public class CountrySelector extends Fragment {
 
             @Override
             public void onClick(View v) {
-                alert.dismiss();
-                showUserDetailsActivity();
+
+//                alert.dismiss();
+                registerGuest();
+                //showUserDetailsActivity();
             }
         });
 
@@ -192,65 +194,161 @@ public class CountrySelector extends Fragment {
 		getActivity()
 				.overridePendingTransition(R.anim.fade_out, R.anim.fade_in);
 	}
+    private void registerGuest(){
+        String user_level = App.prefs.getSharedPrefValue(getActivity(), "user_level");
+        if (user_level != null && !user_level.isEmpty()){
+            showUserDetailsActivity();
+        }else {
+//            CharSequence text = "Hello toast!";
+//            int duration = Toast.LENGTH_SHORT;
+//            Toast toast = Toast.makeText(getActivity(),user_level ,duration);
+//            toast.show();
+            Map<String, String> params = new HashMap<String, String>();
+//        params.put("user[email]"," ");
+            params.put("user[password]", "");
+            params.put("user[level]", "guest");
+            params.put("user[gcm_id]", App.prefs.getGcmid());
+            params.put("user[registration_type]", "");
+            params.put("user[registration_type_id]", "");
+            params.put("user[device_type_id]", Secure.getString(getActivity().getContentResolver(), Secure.ANDROID_ID));
+            params.put("user[device_type]", Build.MODEL + "");
+            params.put("user[mobile_no]", "");
+            params.put("user[country]", "");
+            params.put("user[date_created]", Utils.getCurrentYear(1) + "-" + Utils.getCurrentMonthDigit(1) + "-" + Utils.getCurrentDayDigit(1) + " " + Utils.getCurrentHours() + ":" + Utils.getCurrentMins() + ":00");
+            //String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
+            //App.prefs.setInitials(name[0].substring(0, 1).toUpperCase()+ name[1].substring(0, 1).toUpperCase());
+            params.put("user_profile[first_name]", "");
+            params.put("user_profile[last_name]", "");
+            params.put("user_profile[gender]", "");
+            params.put("user_profile[birthday]", "");
+            params.put("user_profile[profile_image]", "");
 
-	private void registerUser() {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("user[email]", System.nanoTime() + "");
-		params.put("user[password]", "");
-		params.put("user[gcm_id]", App.prefs.getGcmid());
-		params.put("user[registration_type]", "not using yet");
-		params.put("user[registration_type_id]", "not using yet");
-		params.put(
-				"user[device_type_id]",
-                Secure.getString(getActivity().getContentResolver(),
-                        Secure.ANDROID_ID));
+            ProgressDialog dialog = new ProgressDialog(getActivity());
+            dialog.setMessage("Registering...Please wait.");
+            aq.progress(dialog).ajax(
+                    "http://api.heuristix.net/one_todo/v1/user/register", params,
+                    JSONObject.class, new AjaxCallback<JSONObject>() {
+                        @Override
+                        public void callback(String url, JSONObject json,
+                                             AjaxStatus status) {
+                            int id = -1;
+                            try {
+                                JSONObject obj1 = new JSONObject(json.toString());
+                                message = obj1.getBoolean("error");
+                                id = obj1.getInt("result");
 
-		params.put("user[device_type]", Build.MODEL + "");
-		params.put("user[mobile_no]", aq.id(R.id.country).getText().toString());
-		params.put("user[country]", SplashScreen.country);
-		params.put(
-				"user[date_created]",
-				Utils.getCurrentYear(1) + "-" + Utils.getCurrentMonthDigit(1)
-						+ "-" + Utils.getCurrentDayDigit(1) + " "
-						+ Utils.getCurrentHours() + ":"
-						+ Utils.getCurrentMins() + ":00");
-
-		String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
-		App.prefs.setInitials(name[0].substring(0, 1).toUpperCase()
-				+ name[1].substring(0, 1).toUpperCase());
-		params.put("user_profile[first_name]", name[0]);
-		params.put("user_profile[last_name]", name[1]);
-		params.put("user_profile[gender]", "male");
-		params.put("user_profile[birthday]", "27");
-		params.put("user_profile[profile_image]", "//comingsoon");
-
-		ProgressDialog dialog = new ProgressDialog(getActivity());
-		dialog.setMessage("Registering...Please wait.");
-		aq.progress(dialog).ajax(
-				"http://api.heuristix.net/one_todo/v1/user/register", params,
-				JSONObject.class, new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-						int id = -1;
-						try {
-
-							JSONObject obj1 = new JSONObject(json.toString());
-							message = obj1.getBoolean("error");
-							id = obj1.getInt("result");
-
-						} catch (Exception e) {
-						}
-						if (id != -1) {
-							Constants.user_id = id;
-							App.prefs.setUserId(id);
-                            showUserDetailsActivity();
+                            } catch (Exception e) {
+                            }
+                            if (id != -1) {
+                                Constants.user_id = id;
+                                App.prefs.setUserId(id);
+                                App.prefs.saveSharedPrefValue(getActivity(), "user_level", "guest");
+                                showUserDetailsActivity();
 //							addContacts();
-						}
-						Log.v("Response", json.toString());
+                            }
+                            Log.v("Response", json.toString());
 
-					}
-				});
+                        }
+                    });
+        }
+    }
+	private void registerUser() {
+        String user_level = App.prefs.getSharedPrefValue(getActivity(), "user_level");
+        Map<String, String> params = new HashMap<String, String>();
+        ProgressDialog dialog = new ProgressDialog(getActivity());
+        if (user_level != null && !user_level.isEmpty() && user_level.equals("guest")){
+
+            params.put("id", Constants.user_id + "");
+            params.put("user[mobile_no]", aq.id(R.id.country).getText().toString());
+            params.put("user[country]", SplashScreen.country);
+            params.put("user[level]", "normal");
+            String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
+            App.prefs.setInitials(name[0].substring(0, 1).toUpperCase() + name[1].substring(0, 1).toUpperCase());
+            params.put("user_profile[first_name]", name[0]);
+            params.put("user_profile[last_name]", name[1]);
+            dialog.setMessage("Updating Information...Please wait.");
+            aq.progress(dialog).ajax(
+                    "http://api.heuristix.net/one_todo/v1/user/update", params,
+                    JSONObject.class, new AjaxCallback<JSONObject>() {
+                        @Override
+                        public void callback(String url, JSONObject json,
+                                             AjaxStatus status) {
+                            int id = -1;
+                            try {
+
+                                JSONObject obj1 = new JSONObject(json.toString());
+                                message = obj1.getBoolean("error");
+                                id = obj1.getInt("result");
+
+                            } catch (Exception e) {
+                            }
+                            if (id != -1) {
+                                App.prefs.saveSharedPrefValue(getActivity(), "user_level", "normal");
+                                App.prefs.setUserName("Khurram Nawaz");
+                                showUserDetailsActivity();
+//                                Constants.user_id = id;
+//                                App.prefs.setUserId(id);
+//                                App.prefs.setUserLevel("normal");
+
+//							addContacts();
+                            }
+                            Log.v("Response", json.toString());
+
+                        }
+                    });
+//            showUserDetailsActivity();
+        }else {
+
+            params.put("user[email]", System.nanoTime() + "");
+            params.put("user[password]", "");
+            params.put("user[level]", "normal");
+            params.put("user[gcm_id]", App.prefs.getGcmid());
+            params.put("user[registration_type]", "not using yet");
+            params.put("user[registration_type_id]", "not using yet");
+            params.put("user[device_type_id]", Secure.getString(getActivity().getContentResolver(), Secure.ANDROID_ID));
+            params.put("user[device_type]", Build.MODEL + "");
+            params.put("user[mobile_no]", aq.id(R.id.country).getText().toString());
+            params.put("user[country]", SplashScreen.country);
+            params.put("user[date_created]", Utils.getCurrentYear(1) + "-" + Utils.getCurrentMonthDigit(1) + "-" + Utils.getCurrentDayDigit(1) + " " + Utils.getCurrentHours() + ":" + Utils.getCurrentMins() + ":00");
+            final String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
+            App.prefs.setInitials(name[0].substring(0, 1).toUpperCase() + name[1].substring(0, 1).toUpperCase());
+            params.put("user_profile[first_name]", name[0]);
+            params.put("user_profile[last_name]", name[1]);
+            params.put("user_profile[gender]", "male");
+            params.put("user_profile[birthday]", "27");
+            params.put("user_profile[profile_image]", "//comingsoon");
+
+
+            dialog.setMessage("Registering...Please wait.");
+            aq.progress(dialog).ajax(
+                    "http://api.heuristix.net/one_todo/v1/user/register", params,
+                    JSONObject.class, new AjaxCallback<JSONObject>() {
+                        @Override
+                        public void callback(String url, JSONObject json,
+                                             AjaxStatus status) {
+                            int id = -1;
+                            try {
+
+                                JSONObject obj1 = new JSONObject(json.toString());
+                                message = obj1.getBoolean("error");
+                                id = obj1.getInt("result");
+
+                            } catch (Exception e) {
+                            }
+                            if (id != -1) {
+                                Constants.user_id = id;
+                                App.prefs.setUserId(id);
+                                App.prefs.setUserName(name[0] + name[1]);
+//                                App.prefs.setUserLevel("normal");
+                                App.prefs.saveSharedPrefValue(getActivity(), "user_level", "normal");
+                                showUserDetailsActivity();
+//							addContacts();
+                            }
+                            Log.v("Response", json.toString());
+
+                        }
+                    });
+        }
 	}
 
 	private void addContacts() {
