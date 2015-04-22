@@ -61,6 +61,8 @@ public class Geofences{
                 .subscribe(new Action1<AddGeofenceResult>() {
                     @Override
                     public void call(AddGeofenceResult addGeofenceResult) {
+                        Log.e("geofence added", addGeofenceResult.getStatusCode()+"");
+                        Log.e("geofence added name", addGeofenceResult.getName()+"");
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -78,6 +80,7 @@ public class Geofences{
                     .setExpirationDuration(expiry)
                     .setTransitionTypes(enterOrExit)
                     .build();
+
             return new GeofencingRequest.Builder().addGeofence(geofence).build();
         } catch (NumberFormatException ex) {
             return null;

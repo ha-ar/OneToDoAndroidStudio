@@ -105,6 +105,8 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".GeofenceBroadcastReceiver" />
+
         <service android:name=".GcmIntentService" />
 
         <activity

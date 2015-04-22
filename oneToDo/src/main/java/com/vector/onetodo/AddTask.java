@@ -856,8 +856,7 @@ public class AddTask extends FragmentActivity {
                             .getText().toString() + "";
                 }
 
-                if (!(aq.id(R.id.before_event).getText().toString().equals("") || aq
-                        .id(R.id.before_event).getText().toString() == null)) {
+                if (!(aq.id(R.id.before_event).getText().toString().equals(""))) {
                     is_alertEmail = aq.id(R.id.email_radio_event).getCheckBox()
                             .isChecked();
                     is_alertNotification = aq.id(R.id.notification_radio_event)
@@ -919,9 +918,7 @@ public class AddTask extends FragmentActivity {
                             .getText().toString() + "";
                 }
 
-                if (!(aq.id(R.id.before_schedule).getText().toString()
-                        .equals("") || aq.id(R.id.before_schedule).getText()
-                        .toString() == null)) {
+                if (!(aq.id(R.id.before_schedule).getText().toString().equals(""))) {
                     is_alertEmail = aq.id(R.id.email_radio_sch).getCheckBox()
                             .isChecked();
                     is_alertNotification = aq.id(R.id.notification_radio_sch)
@@ -972,9 +969,7 @@ public class AddTask extends FragmentActivity {
                             .getText().toString() + "";
                 }
 
-                if (!(aq.id(R.id.before_appoinment).getText().toString()
-                        .equals("") || aq.id(R.id.before_appoinment).getText()
-                        .toString() == null)) {
+                if (!(aq.id(R.id.before_appoinment).getText().toString().equals(""))) {
                     is_alertEmail = aq.id(R.id.email_radio_appoin)
                             .getCheckBox().isChecked();
                     is_alertNotification = aq
@@ -1065,7 +1060,7 @@ public class AddTask extends FragmentActivity {
                     Log.e("reminder time", reminderTime+"");
                 } else {
                     //TODO set notification by GEO fence
-                    Geofences geoFence = new Geofences(this);
+                    Geofences geoFence = new Geofences(AddTask.this);
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";

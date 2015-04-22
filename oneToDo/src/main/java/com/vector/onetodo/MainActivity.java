@@ -1,5 +1,6 @@
 package com.vector.onetodo;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -117,6 +118,7 @@ public class MainActivity extends BaseActivity implements
     public static List<Todos> Today, Tomorrow, Upcoming;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawerLayout;
+    public static Activity act;
 
     // ************** Phone Contacts
 
@@ -125,7 +127,7 @@ public class MainActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         aq = new AQuery(this);
-
+        act = this;
 
 
         ////////////////////////////////////////////////////////////////////

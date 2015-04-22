@@ -45,7 +45,7 @@ public class App extends Application{
 		ex_db = ex_database_helper_obj.getWritableDatabase();
 		daoMaster = new DaoMaster(ex_db);
 		daoSession = daoMaster.newSession();
-        gpsTracker = new GPSTracker(getApplicationContext());
+        gpsTracker = new GPSTracker(this);
 
         pref = this.getSharedPreferences("Location", 0);
         label = this.getSharedPreferences("Label", 0);

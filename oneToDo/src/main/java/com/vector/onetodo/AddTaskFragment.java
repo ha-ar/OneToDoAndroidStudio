@@ -126,7 +126,6 @@ import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddTaskFragment extends Fragment implements onTaskAdded {
 
-    private List<NameValuePair> pairs;
     private Editor editor, editorattach;
     private String pLabel = null;
     private int mPosition = -1;
@@ -160,7 +159,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             R.id.spinner_labels_task };
     public static EditText taskTitle;
     public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
-    protected static final int RESULT_CODE = 123;
     private static final int TAKE_PICTURE = 1;
     public static final int RESULT_GALLERY = 0;
     public static final int PICK_CONTACT = 2;
@@ -185,6 +183,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private RepeatDao repeatdao;
     private CommentDao commentdao;
     private AttachDao attachDao;
+
+    private AlarmManagerBroadcastReceiver alarm;
 
     //in case of edit to do object is required
     private ToDo todo;
@@ -1464,7 +1464,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         HttpEntity entity = null;
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        pairs = new ArrayList<>();
+        List<NameValuePair> pairs = new ArrayList<>();
         pairs.add(new BasicNameValuePair("image", encoded));
 
         try {
@@ -1766,16 +1766,16 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 if (before.contains("On Arrive")) {
                     is_locationtype = 0;
                     locationType = "On Arrive";
-                    geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, startDateInMilli);
+                    Log.e("lat", App.gpsTracker.getLatitude()+"");
+                    geoFence.addGeofence(App.gpsTracker.getLatitude(), App.gpsTracker.getLongitude(), 10, Geofence.GEOFENCE_TRANSITION_ENTER, startDateInMilli);
                 } else if (before.contains("On Leave")) {
                     is_locationtype = 1;
                     locationType = "On Leave";
-                    geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, startDateInMilli);
+                    geoFence.addGeofence(App.gpsTracker.getLatitude(), App.gpsTracker.getLongitude(), 10, Geofence.GEOFENCE_TRANSITION_EXIT, startDateInMilli);
                 }
             }
         }
         long r_repeat = 0;
-        if (repeat != null) {
             if (repeat.contains("once") || repeat.contains("Once")) {
                 r_repeat = 0;
                 repeat = "once";
@@ -1795,7 +1795,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 r_repeat = Constants.YEAR;
                 repeat = "yearly";
             }
-        }
         if(isProjectSubTask){
             SubTask subTask = new SubTask();
             subTask.title = title;
@@ -1881,7 +1880,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             todo.setId(todoId);
             tododao.update(todo);
         }
-
+        alarm = new AlarmManagerBroadcastReceiver();
         TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
 
         // ********************* Data add hit Async task ******************//
@@ -2001,21 +2000,20 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
-        App.updateTaskList(getActivity());
-        setAlarm(todo);
+        App.updateTaskList(MainActivity.act);
+        setAlarm();
     }
 
-    private void setAlarm(ToDo todo){
-        AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+    private void setAlarm(){
         if(todo.getReminder().getTime() != 0){
-            alarm.setReminderAlarm(getActivity(), todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
-            alarm.SetNormalAlarm(getActivity());
+            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+            alarm.SetNormalAlarm(MainActivity.act);
         }
         if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
-            alarm.setRepeatAlarm(getActivity(), todo.getRepeat().getRepeat_until());
+            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
         }
         else{
-            alarm.SetNormalAlarm(getActivity());
+            alarm.SetNormalAlarm(MainActivity.act);
         }
     }
     private void showAttachments(String imageUrl){

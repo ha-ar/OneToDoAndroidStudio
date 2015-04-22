@@ -57,8 +57,8 @@ public class AddTaskComment extends Fragment {
 
 		Loadcommentmax();
 		MinId = MaxId;
-		comment = new ArrayList<String>();
-		commenttime = new ArrayList<String>();
+		comment = new ArrayList<>();
+		commenttime = new ArrayList<>();
 
 		aq.id(R.id.textView1).text(AddTaskFragment.title);
 		adapter = new comment_A(getActivity());
