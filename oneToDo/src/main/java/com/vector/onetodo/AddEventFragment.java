@@ -1147,7 +1147,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		String tempCurrentHours = String.format("%02d", currentHours);
 		String tempCurrentMins = String.format("%02d", currentMin);
 
-		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == 0) {
+		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == View.VISIBLE) {
 			aq.id(R.id.day_field_to).text(currentDay)
 			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
 			aq.id(R.id.date_field_to).text(
@@ -1160,7 +1160,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		}
 
-		if (aq.id(R.id.date_time_include_from).getView().getVisibility() == 0) {
+		if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
 			aq.id(R.id.day_field_from).text(currentDay);
 			aq.id(R.id.date_field_from).text(
 					tempCurrentDayDigit
@@ -2124,7 +2124,23 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
         App.updateTaskList(getActivity());
+         setAlarm();
     }
+
+    private void setAlarm(){
+        AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
+        if(todo.getReminder().getTime() != 0){
+            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
+        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
+            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
+        }
+        else{
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
+    }
+
     private void showAttachments(String imageUrl){
         aq.id(R.id.attachment_layout).visible();
         try {

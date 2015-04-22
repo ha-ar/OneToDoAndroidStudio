@@ -2041,4 +2041,17 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
         tododao.insert(todo);
     }
 
+    private void setAlarm(){
+        AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
+        if(todo.getReminder().getTime() != 0){
+            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
+        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
+            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
+        }
+        else{
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
+    }
 }

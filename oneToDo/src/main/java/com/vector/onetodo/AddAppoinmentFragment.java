@@ -104,7 +104,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 	private int pposition = -1;
 	private int itempos = -1;
 	public static  EditText taskTitle;
-
+    private String title= null;
 	private Editor editor;
 	private View label_view, viewl;
 
@@ -1229,5 +1229,20 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+        setAlarm();
+    }
+
+    private void setAlarm(){
+        AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
+        if(todo.getReminder().getTime() != 0){
+            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
+        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
+            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
+        }
+        else{
+            alarm.SetNormalAlarm(MainActivity.act);
+        }
     }
 }
