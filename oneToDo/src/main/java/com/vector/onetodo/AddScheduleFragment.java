@@ -2039,6 +2039,8 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+		App.updateTaskList(MainActivity.act);
+		setAlarm();
     }
 
     private void setAlarm(){

@@ -230,7 +230,7 @@ public class MainActivity extends BaseActivity implements
     private void callNotificationClicked(String notificationId){
         Map<String, String> params = new HashMap<>();
         params.put("id", notificationId);
-        aq.ajax("http://api.heuristix.net/one_todo/v1/notification/notification"
+        aq.ajax("http://api.heuristix.net/one_todo/v1/notification"
                         + Constants.user_id, params ,JSONObject.class,
                 new AjaxCallback<JSONObject>() {
                     @Override
@@ -942,6 +942,9 @@ public class MainActivity extends BaseActivity implements
         super.onBackPressed();
         if (this.getSupportFragmentManager().getBackStackEntryCount() == 0) {
             refreshMenu();
+            SharedPreferences commentPrefs = getSharedPreferences("Comment", 0);
+            SharedPreferences.Editor editor = commentPrefs.edit();
+            editor.clear();
         }
     }
 

@@ -126,30 +126,41 @@ import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddTaskFragment extends Fragment implements onTaskAdded {
 
-    private Editor editor, editorattach;
-    private String pLabel = null;
-    private int mPosition = -1;
-    private int itemPosition = -1;
-    private int MaxId = -1;
+    public static final int RESULT_GALLERY = 0;
+    public static final int PICK_CONTACT = 2;
+    public static final int RESULT_DROPBOX = 3;
+    public static final int RESULT_GOOGLEDRIVE = 4;
+    private static final int TAKE_PICTURE = 1;
+    public static EditText taskTitle;
+    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
+    public static View allView;
+    public static Activity act;
+    public static String assignedSelectedID = "";
+    static LinearLayout ll_linear;
+    static int FragmentCheck = 0;
+    static String repeatDate = "";
+    static String title = null;
+    static Dialog add_new_label_alert,
+            date_time_alert, attach, location_del, label_edit;
+    static int currentHours, currentMin, currentDayDigit, currentYear,
+            currentMonDigit;
     private static int Tag = 0;
-    private PopupWindow popupWindowAttach;
     private static AQuery aq;
     private static AQuery aq_edit;
     private static AQuery aqd;
     private static AQuery aq_del;
     private static AQuery aq_menu;
+    private static View previousSelected;
     int labelPosition = -1;
     ImageView last;
-    static LinearLayout ll_linear;
-    static int FragmentCheck = 0;
-    static String repeatDate = "";
-    static String title = null;
     View label_view = null, viewl;
-    static Dialog add_new_label_alert,
-            date_time_alert, attach, location_del, label_edit;
-    static int currentHours, currentMin, currentDayDigit, currentYear,
-            currentMonDigit;
     int dayPosition;
+    private Editor editor, editorattach;
+    private String pLabel = null;
+    private int mPosition = -1;
+    private int itemPosition = -1;
+    private int MaxId = -1;
+    private PopupWindow popupWindowAttach;
     private String currentDay, currentMon, setMon;
     private int[] collapsingViews = { R.id.title_task_layout1,
             R.id.date_time_include, R.id.before_grid_view_linear,
@@ -157,18 +168,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private int[] allViews = { R.id.task_title1, R.id.time_date,
             R.id.location_task, R.id.before1, R.id.repeat_task_lay,
             R.id.spinner_labels_task };
-    public static EditText taskTitle;
-    public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
-    private static final int TAKE_PICTURE = 1;
-    public static final int RESULT_GALLERY = 0;
-    public static final int PICK_CONTACT = 2;
-    public static final int RESULT_DROPBOX = 3;
-    public static final int RESULT_GOOGLEDRIVE = 4;
     private Uri imageUri;
-    public static View allView;
-    public static Activity act;
-    private static View previousSelected;
-    public static String assignedSelectedID = "";
     private int lastCheckedId = -1;
     private ArrayAdapter<String> adapterTask;
     private PopupWindow popupWindowTask;
@@ -192,6 +192,17 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private long todoId;
 
     private ArrayList<Attach> attachArrayList = new ArrayList<>();
+    private DragSortListView.DropListener onDropTask = new DragSortListView.DropListener() {
+        @Override
+        public void drop(int from, int to) {
+            if (from != to) {
+                String item = adapterTask.getItem(from);
+                adapterTask.remove(item);
+                adapterTask.insert(item, to);
+                inflateLayouts();
+            }
+        }
+    };
 
     public static AddTaskFragment newInstance(int position, boolean isEditMode, long todoId) {
         AddTaskFragment myFragment = new AddTaskFragment();
@@ -201,6 +212,27 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         args.putBoolean("isEditMode", isEditMode);
         myFragment.setArguments(args);
         return myFragment;
+    }
+
+    public static void updateAssign(String name){
+        aq.id(R.id.task_assign).text(name);
+    }
+
+    public static void inflateLayouts() {
+        GridLayout gridLayout = (GridLayout) allView
+                .findViewById(R.id.inner_container);
+        gridLayout.removeAllViews();
+        for (int key : inflatingLayouts.keySet()) {
+            View child = act.getLayoutInflater().inflate(
+                    inflatingLayouts.get(key), null);
+            GridLayout.LayoutParams param = new GridLayout.LayoutParams();
+            param.height = LayoutParams.WRAP_CONTENT;
+            param.width = LayoutParams.MATCH_PARENT;
+            param.rowSpec = GridLayout.spec(key);
+            child.setId(inflatingLayouts.get(key));
+            child.setLayoutParams(param);
+            gridLayout.addView(child);
+        }
     }
 
     @Override
@@ -259,7 +291,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onResume() {
@@ -1034,11 +1065,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
     }
 
-
-    public static void updateAssign(String name){
-        aq.id(R.id.task_assign).text(name);
-    }
-
     private void toggleCheckList(View switchView) {
         View newView;
         try {
@@ -1070,47 +1096,11 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
     }
 
-
     private void showRightDateAndTimeForDialog() {
         String fff = String.valueOf(currentDayDigit).replace("th", "");
         setMon = fff + " " + currentMon + " " + currentYear;
         repeatDate = currentYear + "-" + (currentMonDigit + 1) + "-"
                 + currentDayDigit + " 00:00:00";
-    }
-
-    public static void inflateLayouts() {
-        GridLayout gridLayout = (GridLayout) allView
-                .findViewById(R.id.inner_container);
-        gridLayout.removeAllViews();
-        for (int key : inflatingLayouts.keySet()) {
-            View child = act.getLayoutInflater().inflate(
-                    inflatingLayouts.get(key), null);
-            GridLayout.LayoutParams param = new GridLayout.LayoutParams();
-            param.height = LayoutParams.WRAP_CONTENT;
-            param.width = LayoutParams.MATCH_PARENT;
-            param.rowSpec = GridLayout.spec(key);
-            child.setId(inflatingLayouts.get(key));
-            child.setLayoutParams(param);
-            gridLayout.addView(child);
-        }
-    }
-
-    private class GeneralOnClickListner implements OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            v.setFocusableInTouchMode(true);
-            v.requestFocus();
-            showCurrentView(v);
-            setAllOtherFocusableFalse(v);
-            if (v.getId() == R.id.location_before
-                    || v.getId() == R.id.task_title1
-                    || v.getId() == R.id.location_task)
-                Utils.showKeyboard(getActivity());
-            else
-                Utils.hidKeyboard(getActivity());
-        }
-
     }
 
     private void setAllOtherFocusableFalse(View v) {
@@ -1366,61 +1356,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     }
 
-    public class AddTaskBeforePagerFragment extends FragmentStatePagerAdapter {
-
-        public AddTaskBeforePagerFragment(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return 2; // just Add Task & Add Event
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "By time";
-                case 1:
-                    return "At location";
-                default:
-                    return "";// not the case
-
-            }
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            return AddTaskBeforeFragment.newInstance(position, isEditMode, todo != null ? todo.getReminder().getShowable_format() : "");
-        }
-    }
-
-    private class LabelEditClickListener implements OnItemLongClickListener {
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
-                                       int position, long arg3) {
-            if (((TextView) arg1).getText().toString().equals("New")
-                    || position < 3) {
-
-            } else {
-                aqd.id(R.id.add_label_text).text(
-                        ((TextView) arg1).getText().toString());
-                aq_del.id(R.id.body).text(
-                        "Label " + ((TextView) arg1).getText().toString()
-                                + " will be deleted");
-                aq_edit.id(R.id.add_task_edit_title).text(
-                        "Label: " + ((TextView) arg1).getText().toString());
-                viewl = arg1;
-                itemPosition = position;
-                label_edit.show();
-            }
-            return false;
-        }
-    }
-
     private String getImageName(Uri uri){
         String fileName = "";
         String scheme = uri.getScheme();
@@ -1441,6 +1376,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
         return fileName;
     }
+
     private Bitmap getBitmap(Uri fileName){
         Bitmap bm = null;
         try {
@@ -1537,50 +1473,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         MaxId = App.attach.getInt("Max", 0);
     }
 
-
-    public class LabelImageAdapter extends BaseAdapter {
-        private Context mContext;
-
-        public LabelImageAdapter(Context c) {
-            mContext = c;
-        }
-
-        public int getCount() {
-            return 10;
-        }
-
-        public Object getItem(int position) {
-            return null;
-        }
-
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        // create a new ImageView for each item referenced by the Adapter
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView;
-            if (convertView == null) {
-                imageView = new ImageView(mContext);
-                imageView.setLayoutParams(new GridView.LayoutParams(Utils
-                        .convertDpToPixel(40, mContext), Utils
-                        .convertDpToPixel(40, mContext)));
-            } else {
-                imageView = (ImageView) convertView;
-            }
-
-            GradientDrawable mDrawable = (GradientDrawable) getResources()
-                    .getDrawable(R.drawable.label_background_dialog);
-
-            mDrawable.setColor(Color
-                    .parseColor(Constants.label_colors_dialog[position]));
-
-            imageView.setBackground(mDrawable);
-            return imageView;
-        }
-
-    }
-
     private void dragAndDrop(){
 
         final LayoutInflater inflater = (LayoutInflater) getActivity()
@@ -1635,44 +1527,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         listViewTask.setOnTouchListener(controllerTask);
         listViewTask.setOnItemClickListener(new ListClickListenerTask());
-    }
-
-    private DragSortListView.DropListener onDropTask = new DragSortListView.DropListener() {
-        @Override
-        public void drop(int from, int to) {
-            if (from != to) {
-                String item = adapterTask.getItem(from);
-                adapterTask.remove(item);
-                adapterTask.insert(item, to);
-                inflateLayouts();
-            }
-        }
-    };
-
-    public class ListClickListenerTask implements OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
-            position = position + 1;
-            if (position == 2) {
-                position = position + 1;
-            } else if (position > 1) {
-                position = position + 1;
-            }
-
-            int layoutId = inflatingLayouts.get(position);
-
-            CheckedTextView checkedTextView = (CheckedTextView) view
-                    .findViewById(R.id.checkbox);
-            if (checkedTextView.isChecked()) {
-                aq.id(layoutId).visible();
-            } else {
-                aq.id(layoutId).gone();
-            }
-
-        }
-
     }
 
     private void saveTask(){
@@ -1891,7 +1745,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         getActivity().getSupportFragmentManager().popBackStack();
     }
 
-
     private void db_initialize() {
         checklistdao = App.daoSession.getCheckListDao();
         labeldao = App.daoSession.getLabelDao();
@@ -1907,6 +1760,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         super.onDestroy();
         Constants.Project_task_check = 0;
     }
+
     private void populateValues() {
 
         todo = tododao.load(todoId);
@@ -1942,7 +1796,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             aq.id(R.id.spinner_labels_task).text(todo.getLabel().getLabel_name());
             GradientDrawable mDrawable = (GradientDrawable) getResources()
                     .getDrawable(R.drawable.label_background);
-            mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+            if (mDrawable != null) {
+                mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+            }
 
             aq.id(R.id.spinner_labels_task).getView().setBackground(mDrawable);
             aq.id(R.id.spinner_labels_task).getTextView().setTextColor(Color.WHITE);
@@ -2000,6 +1856,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+        editorattach.clear();
         App.updateTaskList(MainActivity.act);
         setAlarm();
     }
@@ -2016,6 +1873,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             alarm.SetNormalAlarm(MainActivity.act);
         }
     }
+
     private void showAttachments(String imageUrl){
         aq.id(R.id.attachment_layout).visible();
         try {
@@ -2100,5 +1958,149 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private class GeneralOnClickListner implements OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            v.setFocusableInTouchMode(true);
+            v.requestFocus();
+            showCurrentView(v);
+            setAllOtherFocusableFalse(v);
+            if (v.getId() == R.id.location_before
+                    || v.getId() == R.id.task_title1
+                    || v.getId() == R.id.location_task)
+                Utils.showKeyboard(getActivity());
+            else
+                Utils.hidKeyboard(getActivity());
+        }
+
+    }
+
+    public class AddTaskBeforePagerFragment extends FragmentStatePagerAdapter {
+
+        public AddTaskBeforePagerFragment(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return 2; // just Add Task & Add Event
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "By time";
+                case 1:
+                    return "At location";
+                default:
+                    return "";// not the case
+
+            }
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            return AddTaskBeforeFragment.newInstance(position, isEditMode, todo != null ? todo.getReminder().getShowable_format() : "");
+        }
+    }
+
+    private class LabelEditClickListener implements OnItemLongClickListener {
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
+                                       int position, long arg3) {
+            if (((TextView) arg1).getText().toString().equals("New")
+                    || position < 3) {
+
+            } else {
+                aqd.id(R.id.add_label_text).text(
+                        ((TextView) arg1).getText().toString());
+                aq_del.id(R.id.body).text(
+                        "Label " + ((TextView) arg1).getText().toString()
+                                + " will be deleted");
+                aq_edit.id(R.id.add_task_edit_title).text(
+                        "Label: " + ((TextView) arg1).getText().toString());
+                viewl = arg1;
+                itemPosition = position;
+                label_edit.show();
+            }
+            return false;
+        }
+    }
+
+    public class LabelImageAdapter extends BaseAdapter {
+        private Context mContext;
+
+        public LabelImageAdapter(Context c) {
+            mContext = c;
+        }
+
+        public int getCount() {
+            return 10;
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView imageView;
+            if (convertView == null) {
+                imageView = new ImageView(mContext);
+                imageView.setLayoutParams(new GridView.LayoutParams(Utils
+                        .convertDpToPixel(40, mContext), Utils
+                        .convertDpToPixel(40, mContext)));
+            } else {
+                imageView = (ImageView) convertView;
+            }
+
+            GradientDrawable mDrawable = (GradientDrawable) getResources()
+                    .getDrawable(R.drawable.label_background_dialog);
+
+            if (mDrawable != null) {
+                mDrawable.setColor(Color
+                        .parseColor(Constants.label_colors_dialog[position]));
+            }
+
+            imageView.setBackground(mDrawable);
+            return imageView;
+        }
+
+    }
+
+    public class ListClickListenerTask implements OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                                long id) {
+            position = position + 1;
+            if (position == 2) {
+                position = position + 1;
+            } else if (position > 1) {
+                position = position + 1;
+            }
+
+            int layoutId = inflatingLayouts.get(position);
+
+            CheckedTextView checkedTextView = (CheckedTextView) view
+                    .findViewById(R.id.checkbox);
+            if (checkedTextView.isChecked()) {
+                aq.id(layoutId).visible();
+            } else {
+                aq.id(layoutId).gone();
+            }
+
+        }
+
     }
 }

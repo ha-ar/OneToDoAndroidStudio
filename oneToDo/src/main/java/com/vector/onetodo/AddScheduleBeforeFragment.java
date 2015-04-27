@@ -79,9 +79,6 @@ public class AddScheduleBeforeFragment extends Fragment {
  
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
-        dialoglayout5 = inflater5.inflate(R.layout.add_location,
-                null, false);
-
 		View dialoglayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
 				null, false);
 		aq_del = new AQuery(dialoglayout7);
@@ -255,6 +252,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 		} else {
 			set();
 			// ***************************location dialog
+			dialoglayout5 = inflater5.inflate(R.layout.add_location,
+					null, false);
 
 			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
 					.findViewById(R.id.adress);
