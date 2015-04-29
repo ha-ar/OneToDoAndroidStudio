@@ -35,6 +35,8 @@ public class AssignedTaskData {
 			public String senderId;
 			@SerializedName("type")
 			public String type;
+			@SerializedName("todo_type_id")
+			public String todoTypeId;
 			@SerializedName("time")
 			public String time;
 			@SerializedName("title")

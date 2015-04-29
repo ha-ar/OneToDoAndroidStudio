@@ -274,11 +274,11 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
                 return true;
             case R.id.action_comment:
-                 getActivity().getSupportFragmentManager()
-                         .beginTransaction()
-                         .replace(R.id.container, new AddTaskComment())
-                         .addToBackStack(null)
-                         .commit();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, new AddTaskComment())
+                        .addToBackStack(null)
+                        .commit();
                 return true;
             case R.id.action_show_hide:
                 popupWindowTask.showAtLocation(
@@ -336,6 +336,11 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         inflatingLayouts.put(10, R.layout.add_task_attach);
 
         inflateLayouts();
+
+        if(isEditMode){
+            populateValues();
+        }
+
         aq.id(R.id.task_assign).clicked(new OnClickListener() {
 
             @Override
@@ -556,8 +561,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                     if (labelPosition != -1) {
                         GradientDrawable mDrawable = (GradientDrawable) getResources()
                                 .getDrawable(R.drawable.label_background);
-                        mDrawable.setColor(Color
-                                .parseColor(Constants.label_colors_dialog[labelPosition]));
+                        if (mDrawable != null) {
+                            mDrawable.setColor(Color
+                                    .parseColor(Constants.label_colors_dialog[labelPosition]));
+                        }
                         Save(label_view.getId() + "" + itemPosition, label_text
                                 .getText().toString(), labelPosition);
                         labelPosition = -1;
@@ -609,8 +616,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                     GradientDrawable mDrawable = (GradientDrawable) getResources()
                                             .getDrawable(
                                                     R.drawable.label_background);
-                                    mDrawable.setColor(Color
-                                            .parseColor(Constants.label_colors[position]));
+                                    if (mDrawable != null) {
+                                        mDrawable.setColor(Color
+                                                .parseColor(Constants.label_colors[position]));
+                                    }
                                     textView.setBackground(mDrawable);
                                 }
                                 if (pLabel != null) {
@@ -619,8 +628,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                     GradientDrawable mDrawable = (GradientDrawable) getResources()
                                             .getDrawable(
                                                     R.drawable.label_background);
-                                    mDrawable.setColor(Color
-                                            .parseColor(Constants.label_colors_dialog[mPosition]));
+                                    if (mDrawable != null) {
+                                        mDrawable.setColor(Color
+                                                .parseColor(Constants.label_colors_dialog[mPosition]));
+                                    }
                                     textView.setBackground(mDrawable);
                                 }
                                 return textView;
@@ -1060,9 +1071,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         View switchView = aq.id(R.id.add_sub_task).getView();
         toggleCheckList(switchView);
 
-        if(isEditMode){
-            populateValues();
-        }
     }
 
     private void toggleCheckList(View switchView) {
@@ -1532,7 +1540,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private void saveTask(){
         assignedId.clear();
         assignedId.add(AddTaskFragment.assignedSelectedID);
-        if (aq.id(R.id.task_title1).getText().toString().equals("")) {
+        if (aq.id(R.id.task_title1).getText().toString().isEmpty()) {
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();
             return;
@@ -1547,10 +1555,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 + currentDayDigit + " "
                 + currentHours + ":"
                 + currentMin +":00";
-        String end_date = null;
 
         String location = aq.id(R.id.location_task).getText().toString();
-        boolean is_time = false, is_location = false;
+        boolean is_time = true, is_location = false;
         String r_location = null, location_tag = "";
         String before = aq.id(R.id.before).getText().toString();
         if (before.contains("On Arrive") || before.contains("On Leave")) {
@@ -1563,8 +1570,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
 
         boolean is_alertEmail = false, is_alertNotification = false;
-        if (!(aq.id(R.id.before).getText().toString().equals("") || aq
-                .id(R.id.before).getText().toString() == null)) {
+        if (!aq.id(R.id.before).getText().toString().isEmpty()) {
             try{
                 is_alertEmail = aq.id(R.id.email_radio).getCheckBox()
                         .isChecked();
@@ -1590,7 +1596,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         String notes = aq.id(R.id.notes_task).getText().toString();
 //            assignedId.add(AddTaskFragment.assignedSelectedID);
 
-        Date startDate = null, endDate = null;
+        Date startDate, endDate;
         long startDateInMilli = 0, endDateInMilli = 0;
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
@@ -1599,18 +1605,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        try {
-            endDate = sdf1.parse(end_date);
-            endDateInMilli = endDate.getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (NullPointerException npe) {
-            end_date = null;
-        }
         int reminderTime = 0, is_locationtype = 0;
         String locationType = null;
         Log.e("before", before);
-        if (before != null || before.isEmpty()) {
+        if (!before.isEmpty()) {
             if (is_time) {
                 reminderTime = Utils.getReminderTime(before);
                 Log.e("reminder time", reminderTime+"");
@@ -1630,30 +1628,30 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             }
         }
         long r_repeat = 0;
-            if (repeat.contains("once") || repeat.contains("Once")) {
-                r_repeat = 0;
-                repeat = "once";
-            } else if (repeat.contains("daily") || repeat.contains("daily")) {
-                r_repeat = Constants.DAY;
-                repeat = "daily";
-            } else if (repeat.contains("weekly")
-                    || repeat.contains("Weekly")) {
-                r_repeat = Constants.WEEK;
-                repeat = "weekly";
-            } else if (repeat.contains("monthly")
-                    || repeat.contains("Monthly")) {
-                r_repeat = Constants.MONTH;
-                repeat = "monthly";
-            } else if (repeat.contains("yearly")
-                    || repeat.contains("Yearly")) {
-                r_repeat = Constants.YEAR;
-                repeat = "yearly";
-            }
+        if (repeat.contains("once") || repeat.contains("Once")) {
+            r_repeat = 0;
+            repeat = "once";
+        } else if (repeat.contains("daily") || repeat.contains("daily")) {
+            r_repeat = Constants.DAY;
+            repeat = "daily";
+        } else if (repeat.contains("weekly")
+                || repeat.contains("Weekly")) {
+            r_repeat = Constants.WEEK;
+            repeat = "weekly";
+        } else if (repeat.contains("monthly")
+                || repeat.contains("Monthly")) {
+            r_repeat = Constants.MONTH;
+            repeat = "monthly";
+        } else if (repeat.contains("yearly")
+                || repeat.contains("Yearly")) {
+            r_repeat = Constants.YEAR;
+            repeat = "yearly";
+        }
         if(isProjectSubTask){
             SubTask subTask = new SubTask();
             subTask.title = title;
             subTask.startDate = start_date;
-            subTask.endDate = end_date;
+            subTask.endDate = ""; // nothing required
             subTask.location = location;
             subTask.isLocationBased = is_location;
             subTask.reminderLocation = r_location;
@@ -1695,7 +1693,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         reminder.setLocation(r_location);
         reminder.setShowable_format(before);
         reminder.setLocation_type(is_locationtype);
-        if ((!location_tag.equals("New")) && location_tag != null) {
+        if ((!location_tag.equals("New"))) {
             reminder.setLocation_tag(location_tag);
         }
 
@@ -1738,7 +1736,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
 
         // ********************* Data add hit Async task ******************//
-        AddToServer aSync = new AddToServer(title, 1, start_date, end_date, is_location, r_location, location_tag,
+        AddToServer aSync = new AddToServer(title, 1, start_date, "", is_location, r_location, location_tag,
                 locationType, notes, repeatDate,repeat_forever, MaxId,
                 AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddTaskFragment.this);
         aSync.execute();
@@ -1947,12 +1945,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
             by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-
-//            if (selectedImage.getLastPathSegment().contains(".")) {
-//                text.setText(selectedImage.getLastPathSegment());
-//            } else {
-//                text.setText(selectedImage.getLastPathSegment() + "." + type);
-//            }
             size.setText("(7024 KB)");
             item.addView(child);
         } catch (Exception e) {

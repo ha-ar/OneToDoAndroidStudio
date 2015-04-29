@@ -17,7 +17,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.vector.model.AssignedTaskData;
 import com.vector.onetodo.db.gen.ToDo;
-import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
 
 public class GcmIntentService extends IntentService {
@@ -139,7 +138,7 @@ public class GcmIntentService extends IntentService {
         todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
         todo.setLocation(AssignedTaskData.getInstance().task.get(0).location);
         todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
-        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).type));
+        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
         App.daoSession.getToDoDao().insert(todo);
     }
 }

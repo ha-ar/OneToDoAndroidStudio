@@ -104,15 +104,9 @@
                 <category android:name="com.vector.onetodo" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".GeofenceBroadcastReceiver" />
-
         <service android:name=".GcmIntentService" />
 
-        <activity
-            android:name=".SearchableActivity"
-            android:label="@string/title_activity_searchable" >
-        </activity>
     </application>
 
 </manifest>

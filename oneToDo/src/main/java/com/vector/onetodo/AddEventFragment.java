@@ -56,7 +56,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -345,6 +344,12 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
 				.clicked(new GeneralOnClickListner());
 
+
+		//to edit a task
+		if(isEditMode){
+			populateValues();
+		}
+
 		// **************************************TypeFaces
 
 		// *****************Title
@@ -457,43 +462,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 					@Override
 					public void onDateChanged(DatePicker view, int year,
 											  int monthOfYear, int dayOfMonth) {
-						currentYear = year;
-						currentMonDigit = monthOfYear;
-						currentDayDigit = dayOfMonth;
-						Calendar cal = Calendar.getInstance();
-						cal.set(year, monthOfYear, dayOfMonth);
-						currentDay = cal.getDisplayName(Calendar.DAY_OF_WEEK,
-								Calendar.SHORT, Locale.US);
-						currentMon = cal.getDisplayName(Calendar.MONTH,
-								Calendar.SHORT, Locale.US);
-						showRightDateAndTime();
-					}
 
-				});
-
-		// Time picker implementation
-		TimePicker tPicker = (TimePicker) aq.id(R.id.time_picker).getView();
-		tPicker.setIs24HourView(true);
-		tPicker.setOnTimeChangedListener(new OnTimeChangedListener() {
-
-			@Override
-			public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-				currentHours = hourOfDay;
-				currentMin = minute;
-				showRightDateAndTime();
-			}
-		});
-
-		// Date picker implementation
-		DatePicker dPickerEvent = (DatePicker) aq
-				.id(R.id.date_picker_event_end).getView();
-		showRightDateAndTime();
-		dPickerEvent.init(currentYear, currentMonDigit, currentDayDigit,
-				new OnDateChangedListener() {
-
-					@Override
-					public void onDateChanged(DatePicker view, int year,
-											  int monthOfYear, int dayOfMonth) {
 						endEventYear = year;
 						endEventMonDigit = monthOfYear;
 						endEventDayDigit = dayOfMonth;
@@ -510,6 +479,44 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				});
 
 		// Time picker implementation
+		TimePicker tPicker = (TimePicker) aq.id(R.id.time_picker).getView();
+		tPicker.setIs24HourView(true);
+		tPicker.setOnTimeChangedListener(new OnTimeChangedListener() {
+
+			@Override
+			public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+				endEventHours = hourOfDay;
+				endEventMin = minute;
+				showRightDateAndTime();
+
+			}
+		});
+
+		// Date picker implementation
+		DatePicker dPickerEvent = (DatePicker) aq
+				.id(R.id.date_picker_event_end).getView();
+		showRightDateAndTime();
+		dPickerEvent.init(currentYear, currentMonDigit, currentDayDigit,
+				new OnDateChangedListener() {
+
+					@Override
+					public void onDateChanged(DatePicker view, int year,
+											  int monthOfYear, int dayOfMonth) {
+						currentYear = year;
+						currentMonDigit = monthOfYear;
+						currentDayDigit = dayOfMonth;
+						Calendar cal = Calendar.getInstance();
+						cal.set(year, monthOfYear, dayOfMonth);
+						currentDay = cal.getDisplayName(Calendar.DAY_OF_WEEK,
+								Calendar.SHORT, Locale.US);
+						currentMon = cal.getDisplayName(Calendar.MONTH,
+								Calendar.SHORT, Locale.US);
+						showRightDateAndTime();
+					}
+
+				});
+
+		// Time picker implementation
 		TimePicker tPickerEvent = (TimePicker) aq
 				.id(R.id.time_picker_event_end).getView();
 		tPickerEvent.setIs24HourView(true);
@@ -517,8 +524,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-				endEventHours = hourOfDay;
-				endEventMin = minute;
+				currentHours = hourOfDay;
+				currentMin = minute;
 				showRightDateAndTime();
 			}
 		});
@@ -786,8 +793,10 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 					if (Label_postion != -1) {
 						GradientDrawable mDrawable = (GradientDrawable) getResources()
 								.getDrawable(R.drawable.label_background);
-						mDrawable.setColor(Color
-								.parseColor(Constants.label_colors_dialog[Label_postion]));
+						if (mDrawable != null) {
+							mDrawable.setColor(Color
+									.parseColor(Constants.label_colors_dialog[Label_postion]));
+						}
 						Save(label_view.getId() + "" + itempos, label_text
 								.getText().toString(), Label_postion);
 						Label_postion = -1;
@@ -844,7 +853,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 													R.drawable.label_background);
 									if (mDrawable != null) {
 										mDrawable.setColor(Color
-                                                .parseColor(Constants.label_colors[position]));
+												.parseColor(Constants.label_colors[position]));
 									}
 									textView.setBackground(mDrawable);
 								}
@@ -856,7 +865,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 													R.drawable.label_background);
 									if (mDrawable != null) {
 										mDrawable.setColor(Color
-                                                .parseColor(Constants.label_colors_dialog[pposition]));
+												.parseColor(Constants.label_colors_dialog[pposition]));
 									}
 									textView.setBackground(mDrawable);
 								}
@@ -1140,31 +1149,32 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		View switchView = aq.id(R.id.add_sub_event).getView();
 		toggleCheckList(switchView);
 
-		if(isEditMode){
-			populateValues();
-		}
 
 	}
 
 	private void showRightDateAndTime() {
-		String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
-		String tempCurrentHours = String.format("%02d", currentHours);
-		String tempCurrentMins = String.format("%02d", currentMin);
 
 		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == View.VISIBLE) {
-			aq.id(R.id.day_field_to).text(currentDay)
+			String tempCurrentDayDigit = String.format("%02d", endEventDayDigit);
+			String tempCurrentHours = String.format("%02d", endEventHours);
+			String tempCurrentMins = String.format("%02d", endEventMin);
+
+			aq.id(R.id.day_field_to).text(endEventDay)
 			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
 			aq.id(R.id.date_field_to).text(
 					tempCurrentDayDigit
-							+ Utils.getDayOfMonthSuffix(currentDayDigit))
+							+ Utils.getDayOfMonthSuffix(endEventDayDigit))
 			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
-			aq.id(R.id.month_year_field_to).text(currentMon);
+			aq.id(R.id.month_year_field_to).text(endEventMon);
 			aq.id(R.id.time_to)
 					.text(tempCurrentHours + " : " + tempCurrentMins);
 
 		}
 
-		if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
+		else if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
+			String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
+			String tempCurrentHours = String.format("%02d", currentHours);
+			String tempCurrentMins = String.format("%02d", currentMin);
 			aq.id(R.id.day_field_from).text(currentDay);
 			aq.id(R.id.date_field_from).text(
 					tempCurrentDayDigit
@@ -1357,9 +1367,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
 				by.setText("By "+App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
 				filename = selectedImage;
-				File myFile = new File(selectedImage.toString());
-
-				myFile.getAbsolutePath();
 				imageupload();
 				if (selectedImage.getLastPathSegment().contains(".")) {
 					text.setText(selectedImage.getLastPathSegment());
@@ -1669,8 +1676,10 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 			GradientDrawable mDrawable = (GradientDrawable) getResources()
 					.getDrawable(R.drawable.label_background_dialog);
-			mDrawable.setColor(Color
-					.parseColor(Constants.label_colors_dialog[position]));
+			if (mDrawable != null) {
+				mDrawable.setColor(Color
+						.parseColor(Constants.label_colors_dialog[position]));
+			}
 			imageView.setBackground(mDrawable);
 
 			return imageView;
@@ -1814,13 +1823,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				WindowManager.LayoutParams.WRAP_CONTENT, true);
 		popupWindowEvent.setBackgroundDrawable(new BitmapDrawable());
 		popupWindowEvent.setOutsideTouchable(true);
-		popupWindowEvent.setOnDismissListener(new OnDismissListener() {
-
-			@Override
-			public void onDismiss() {
-//                layout_MainMenu.getForeground().setAlpha(0);
-			}
-		});
 	}
 	public class ListClickListenerEvent implements OnItemClickListener {
 
@@ -1846,211 +1848,205 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	}
 
-	private void saveEvent(){
+	private void saveEvent() {
 		assignedId.clear();
 
-		if (!(aq.id(R.id.event_title).getText().toString().equals(""))) {
-
-			MaxId = App.attach.getInt("2Max", 0);
-
-			title = aq.id(R.id.event_title).getText().toString();
-
-			ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_event).getView();
-			boolean is_allday = switCh.isChecked();
-
-			String start_date = AddEventFragment.currentYear+ "-"
-					+ (AddEventFragment.currentMonDigit + 1) + "-"
-					+  AddEventFragment.currentDayDigit + " "
-					+ AddEventFragment.currentHours + ":"
-					+ AddEventFragment.currentMin +":00";
-			String end_date = AddEventFragment.endEventYear + "-"
-					+ (AddEventFragment.endEventMonDigit + 1) + "-"
-					+ AddEventFragment.endEventDayDigit + " "
-					+ AddEventFragment.endEventHours + ":"
-					+ AddEventFragment.endEventMin +":00";
-
-			String location = aq.id(R.id.location_event).getText().toString();
-			String r_location= "", location_tag="";
-			boolean is_time = false, is_location = false;
-			String before = aq.id(R.id.before_event).getText().toString();
-			if (before.contains("On Arrive") || before.contains("On Leave")) {
-				is_time = false;
-				is_location = true;
-				r_location = aq.id(R.id.location_before_event).getText()
-						.toString();
-				location_tag = ((TextView) AddEventBeforeFragment.viewP)
-						.getText().toString() + "";
-			}
-
-			boolean is_alertEmail = false, is_alertNotification = false;
-			if (!(aq.id(R.id.before_event).getText().toString().equals("") || aq
-					.id(R.id.before_event).getText().toString() == null)) {
-				is_alertEmail = aq.id(R.id.email_radio_event).getCheckBox()
-						.isChecked();
-				is_alertNotification = aq.id(R.id.notification_radio_event)
-						.getCheckBox().isChecked();
-			}
-
-			boolean repeat_forever = aq.id(R.id.repeat_forever_radio).isChecked();
-			String repeat = aq.id(R.id.repeat_event).getText().toString();
-			repeatdate = AddEventFragment.repeatdate;
-
-			String label_name = aq.id(R.id.spinner_labels_event).getText()
-					.toString();
-			if(!(aq.id(R.id.add_sub_event).getView() instanceof EditText))
-				toggleCheckList(aq.id(R.id.add_sub_event).getView());
-			String checklist_data = aq.id(R.id.add_sub_event).getEditText()
-					.getText().toString();
-
-			String notes = aq.id(R.id.notes_event).getText().toString();
-			for (String key : AssignMultipleFragment.selectedInvitees.keySet())
-				assignedId.add(key);
-
-			Date startDate, endDate;
-			long startDateInMilli = 0, endDateInMilli = 0;
-			SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			try {
-				startDate = sdf1.parse(start_date);
-				startDateInMilli = startDate.getTime();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			try {
-				endDate = sdf1.parse(end_date);
-				endDateInMilli = endDate.getTime();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			} catch (NullPointerException npe) {
-				end_date = null;
-			}
-			int reminderTime = 0, is_locationtype = 0;
-			String locationType = null;
-			Log.e("before", before);
-			if (before != null || before.isEmpty()) {
-				if (is_time) {
-					reminderTime = Utils.getReminderTime(before);
-					Log.e("reminder time", reminderTime+"");
-				} else {
-					//TODO set notification by GEO fence
-					Geofences geoFence = new Geofences(getActivity());
-					if (before.contains("On Arrive")) {
-						is_locationtype = 0;
-						locationType = "On Arrive";
-						geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
-					} else if (before.contains("On Leave")) {
-						is_locationtype = 1;
-						locationType = "On Leave";
-						geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
-					}
-				}
-			}
-			long r_repeat = 0;
-			if (repeat != null) {
-				if (repeat.contains("once") || repeat.contains("Once")) {
-					r_repeat = 0;
-					repeat = "once";
-				} else if (repeat.contains("daily") || repeat.contains("daily")) {
-					r_repeat = Constants.DAY;
-					repeat = "daily";
-				} else if (repeat.contains("weekly")
-						|| repeat.contains("Weekly")) {
-					r_repeat = Constants.WEEK;
-					repeat = "weekly";
-				} else if (repeat.contains("monthly")
-						|| repeat.contains("Monthly")) {
-					r_repeat = Constants.MONTH;
-					repeat = "monthly";
-				} else if (repeat.contains("yearly")
-						|| repeat.contains("Yearly")) {
-					r_repeat = Constants.YEAR;
-					repeat = "yearly";
-				}
-			}
-			AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-
-			todo = new ToDo();
-			todo.setUser_id(Constants.user_id);
-			todo.setTodo_type_id(2);
-			todo.setTitle(title);
-			todo.setStart_date(startDateInMilli);
-			todo.setEnd_date(endDateInMilli);
-			todo.setIs_allday(is_allday);
-			todo.setLocation(location);
-			todo.setNotes(notes);
-			todo.setIs_done(false);
-			todo.setIs_delete(false);
-
-			Label label = new Label();
-			label.setLabel_name(label_name);
-			label.setLabel_color(labelColor);
-			labeldao.insert(label);
-			todo.setLabel(label);
-
-
-			Reminder reminder = new Reminder();
-			reminder.setIs_alertEmail(is_alertEmail);
-			reminder.setIs_alertNotification(is_alertNotification);
-			reminder.setIs_time_location(is_location);
-			reminder.setLocation(r_location);
-			reminder.setLocation_type(is_locationtype);
-			if ((!location_tag.equals("New")) && location_tag != null) {
-				reminder.setLocation_tag(location_tag);
-			}
-
-			reminder.setTime((long) reminderTime);
-			reminderdao.insert(reminder);
-			todo.setReminder(reminder);
-
-			Repeat repeaT = new Repeat();
-			repeaT.setRepeat_interval(repeat);
-			repeaT.setRepeat_until(r_repeat);
-			repeaT.setIs_forever(repeat_forever);
-			repeatdao.insert(repeaT);
-			todo.setRepeat(repeaT);
-
-			CheckList checklist = new CheckList();
-			checklist.setTitle(checklist_data);
-			checklistdao.insert(checklist);
-			todo.setCheckList(checklist);
-
-			if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-				for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-
-					Comment commenT = new Comment();
-					commenT.setComment(AddTaskComment.comment.get(i));
-					commenT.setToDo(todo);
-					commentdao.insert(commenT);
-				}
-			}
-
-			Friends friend = new Friends();
-			friend.setEmail("email");
-			friendsdao.insert(friend);
-			todo.setReminder(reminder);
-
-			TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
-
-			if(reminderTime != 0){
-				alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
-				alarm.SetNormalAlarm(getActivity());
-			}
-			if(r_repeat != 0){
-				alarm.setRepeatAlarm(getActivity(), r_repeat);
-			}
-			else{
-				alarm.SetNormalAlarm(getActivity());
-			}
-
-
-			AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
-					locationType, notes, repeatdate,repeat_forever, MaxId,
-					AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddEventFragment.this);
-			asyn.execute();
-			getActivity().getSupportFragmentManager().popBackStack();
-
-		}else
+		if (aq.id(R.id.event_title).getText().toString().isEmpty()) {
 			Toast.makeText(getActivity(), "Please enter title",
 					Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		MaxId = App.attach.getInt("2Max", 0);
+
+		title = aq.id(R.id.event_title).getText().toString();
+
+		ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_event).getView();
+		boolean is_allday = switCh.isChecked();
+
+		String start_date = AddEventFragment.currentYear+ "-"
+				+ (AddEventFragment.currentMonDigit + 1) + "-"
+				+  AddEventFragment.currentDayDigit + " "
+				+ AddEventFragment.currentHours + ":"
+				+ AddEventFragment.currentMin +":00";
+		String end_date = AddEventFragment.endEventYear + "-"
+				+ (AddEventFragment.endEventMonDigit + 1) + "-"
+				+ AddEventFragment.endEventDayDigit + " "
+				+ AddEventFragment.endEventHours + ":"
+				+ AddEventFragment.endEventMin +":00";
+
+		String location = aq.id(R.id.location_event).getText().toString();
+		String r_location= "", location_tag="";
+		boolean is_time = true, is_location = false;
+		String before = aq.id(R.id.before_event).getText().toString();
+		if (before.contains("On Arrive") || before.contains("On Leave")) {
+			is_time = false;
+			is_location = true;
+			r_location = aq.id(R.id.location_before_event).getText()
+					.toString();
+			location_tag = ((TextView) AddEventBeforeFragment.viewP)
+					.getText().toString() + "";
+		}
+
+		boolean is_alertEmail = false, is_alertNotification = false;
+		if (!(aq.id(R.id.before_event).getText().toString().isEmpty())) {
+			is_alertEmail = aq.id(R.id.email_radio_event).getCheckBox()
+					.isChecked();
+			is_alertNotification = aq.id(R.id.notification_radio_event)
+					.getCheckBox().isChecked();
+		}
+
+		boolean repeat_forever = aq.id(R.id.repeat_forever_radio).isChecked();
+		String repeat = aq.id(R.id.repeat_event).getText().toString();
+
+		String label_name = aq.id(R.id.spinner_labels_event).getText()
+				.toString();
+		if(!(aq.id(R.id.add_sub_event).getView() instanceof EditText))
+			toggleCheckList(aq.id(R.id.add_sub_event).getView());
+		String checklist_data = aq.id(R.id.add_sub_event).getEditText()
+				.getText().toString();
+
+		String notes = aq.id(R.id.notes_event).getText().toString();
+		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
+			assignedId.add(key);
+
+		Date startDate, endDate;
+		long startDateInMilli = 0, endDateInMilli = 0;
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			startDate = sdf1.parse(start_date);
+			startDateInMilli = startDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		try {
+			endDate = sdf1.parse(end_date);
+			endDateInMilli = endDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (NullPointerException npe) {
+			end_date = null;
+		}
+		int reminderTime = 0, is_locationtype = 0;
+		String locationType = null;
+		Log.e("before", before);
+		if (is_time) {
+			reminderTime = Utils.getReminderTime(before);
+			Log.e("reminder time", reminderTime+"");
+		} else {
+			//TODO set notification by GEO fence
+			Geofences geoFence = new Geofences(getActivity());
+			if (before.contains("On Arrive")) {
+				is_locationtype = 0;
+				locationType = "On Arrive";
+				geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
+			} else if (before.contains("On Leave")) {
+				is_locationtype = 1;
+				locationType = "On Leave";
+				geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
+			}
+		}
+		long r_repeat = 0;
+		if (repeat.contains("once") || repeat.contains("Once")) {
+			r_repeat = 0;
+			repeat = "once";
+		} else if (repeat.contains("daily") || repeat.contains("daily")) {
+			r_repeat = Constants.DAY;
+			repeat = "daily";
+		} else if (repeat.contains("weekly")
+				|| repeat.contains("Weekly")) {
+			r_repeat = Constants.WEEK;
+			repeat = "weekly";
+		} else if (repeat.contains("monthly")
+				|| repeat.contains("Monthly")) {
+			r_repeat = Constants.MONTH;
+			repeat = "monthly";
+		} else if (repeat.contains("yearly")
+				|| repeat.contains("Yearly")) {
+			r_repeat = Constants.YEAR;
+			repeat = "yearly";
+		}
+		AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
+
+		todo = new ToDo();
+		todo.setUser_id(Constants.user_id);
+		todo.setTodo_type_id(2);
+		todo.setTitle(title);
+		todo.setStart_date(startDateInMilli);
+		todo.setEnd_date(endDateInMilli);
+		todo.setIs_allday(is_allday);
+		todo.setLocation(location);
+		todo.setNotes(notes);
+		todo.setIs_done(false);
+		todo.setIs_delete(false);
+
+		Label label = new Label();
+		label.setLabel_name(label_name);
+		label.setLabel_color(labelColor);
+		labeldao.insert(label);
+		todo.setLabel(label);
+
+
+		Reminder reminder = new Reminder();
+		reminder.setIs_alertEmail(is_alertEmail);
+		reminder.setIs_alertNotification(is_alertNotification);
+		reminder.setIs_time_location(is_location);
+		reminder.setLocation(r_location);
+		reminder.setLocation_type(is_locationtype);
+		if ((!location_tag.equals("New"))) {
+			reminder.setLocation_tag(location_tag);
+		}
+
+		reminder.setTime((long) reminderTime);
+		reminderdao.insert(reminder);
+		todo.setReminder(reminder);
+
+		Repeat repeaT = new Repeat();
+		repeaT.setRepeat_interval(repeat);
+		repeaT.setRepeat_until(r_repeat);
+		repeaT.setIs_forever(repeat_forever);
+		repeatdao.insert(repeaT);
+		todo.setRepeat(repeaT);
+
+		CheckList checklist = new CheckList();
+		checklist.setTitle(checklist_data);
+		checklistdao.insert(checklist);
+		todo.setCheckList(checklist);
+
+		if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+			for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+
+				Comment commenT = new Comment();
+				commenT.setComment(AddTaskComment.comment.get(i));
+				commenT.setToDo(todo);
+				commentdao.insert(commenT);
+			}
+		}
+
+		Friends friend = new Friends();
+		friend.setEmail("email");
+		friendsdao.insert(friend);
+		todo.setReminder(reminder);
+
+		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+
+		if(reminderTime != 0){
+			alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
+			alarm.SetNormalAlarm(getActivity());
+		}
+		if(r_repeat != 0){
+			alarm.setRepeatAlarm(getActivity(), r_repeat);
+		}
+		else{
+			alarm.SetNormalAlarm(getActivity());
+		}
+
+
+		AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
+				locationType, notes, repeatdate,repeat_forever, MaxId,
+				AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddEventFragment.this);
+		asyn.execute();
+		getActivity().getSupportFragmentManager().popBackStack();
 	}
 	private void db_initialize() {
 		checklistdao = App.daoSession.getCheckListDao();
@@ -2097,7 +2093,9 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			aq.id(R.id.spinner_labels_event).text(todo.getLabel().getLabel_name());
 			GradientDrawable mDrawable = (GradientDrawable) getResources()
 					.getDrawable(R.drawable.label_background);
-			mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+			if (mDrawable != null) {
+				mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+			}
 			aq.id(R.id.spinner_labels_event).getView().setBackground(mDrawable);
 			aq.id(R.id.spinner_labels_event).getTextView().setTextColor(Color.WHITE);
 		}

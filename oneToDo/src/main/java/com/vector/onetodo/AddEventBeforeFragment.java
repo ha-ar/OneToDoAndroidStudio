@@ -212,7 +212,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 							} else {
 
-								if (Constants.beforeArray[position] == "On Time") {
+								if (Constants.beforeArray[position].equals("On Time")) {
 									before.setText(Constants.beforeArray[position]);
 								} else {
 									before.setText(Constants.beforeArray[position]
@@ -335,7 +335,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 						@Override
 						public void onCheckedChanged(RadioGroup group,
-								int checkedId) {
+													 int checkedId) {
 							if (previousSelectedLocation != null) {
 								((RadioButton) previousSelectedLocation)
 										.setTextColor(getResources().getColor(
@@ -362,7 +362,6 @@ public class AddEventBeforeFragment extends Fragment {
 			aq.id(R.id.pre_defined_11).getTextView()
 					.setOnLongClickListener(new LocationEditClickListener());
 
-			View temp = aq.id(R.id.pre_defined_11).getView();
 			aq.id(R.id.pre_defined_11).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_21).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_31).clicked(new LocationTagClickListener());
@@ -445,9 +444,7 @@ public class AddEventBeforeFragment extends Fragment {
 
 		@Override
 		public boolean onLongClick(final View view) {
-			if (((TextView) view).getText().toString().equals("New")) {
-
-			} else {
+			if (!((TextView) view).getText().toString().equals("New")) {
 				load(view.getId());
 				aqd.id(R.id.adress).text(padress);
 				aqd.id(R.id.home).text(((TextView) view).getText().toString());
