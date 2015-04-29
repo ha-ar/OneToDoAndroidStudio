@@ -98,6 +98,9 @@ public class TaskListAdapter extends BaseAdapter {
 		holder.location.setText(listToShow.get(position).getLocation());
         final Holder finalHolder = holder;
 
+		if (listToShow.get(position).getIs_done() == null)
+			listToShow.get(position).setIs_done(false);
+		
         if(listToShow.get(position).getIs_done()){
             holder.completeTask.setChecked(true);
             finalHolder.title.setPaintFlags(finalHolder.title.getPaintFlags()
