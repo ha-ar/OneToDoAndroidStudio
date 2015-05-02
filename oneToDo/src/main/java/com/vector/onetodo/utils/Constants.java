@@ -13,19 +13,16 @@ public class Constants {
 	public static int user_id=-1;
     public static String user_level="guest";
 	public static boolean date,time,week;
-	public final static String MORE = "";
+	public static final int TODAY = 0, TOMORROW = 1, UPCOMING = 2;
 
 	public static String SENDER_ID="184279149655";
 	public static String RegId="";
 	public final static String[] CONTACTS_EVOKING_WORDS = { "call", "message",
 			"sms", "text", "ring", "dial", "phone", "telephone", "mobile",
 			"ping", "buzz", "email", "mail" };
-	public static String NORMAL_TYPEFACE = "HelveticaNeue.otf";
-	public static String LIGHT_TYPEFACE = "HelveticaNeue-Light.otf";
 	public static String MED_TYPEFACE = "HelveticaNeue-Medium.otf";
-	public static String BOLD_TYPEFACE = "HelveticaNeueLTStd-Bd.otf";
 	public static String ROMAN_TYPEFACE = "HelveticaNeueLTStd-Roman.otf";
-	public static float density = 0, dp = 0;
+	public static float density = 0;
 	public static List<String> Name,Contact;
 	
 	public static String[] label_colors_dialog = { "#790000", "#005826", "#0D004C", "#ED145B", "#E0D400",

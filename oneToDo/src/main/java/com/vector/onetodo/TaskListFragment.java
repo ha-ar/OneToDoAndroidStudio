@@ -3,16 +3,16 @@ package com.vector.onetodo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao.Properties;
+import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.Utils;
 
 import java.text.ParseException;
@@ -20,9 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import de.greenrobot.dao.query.WhereCondition;
 
-public class TaskListFragment extends ScrollTabHolderFragment implements
-        OnScrollListener {
+public class TaskListFragment extends Fragment{
 
     public static ListView[] listView = new ListView[3];
     public static QueryBuilder<ToDo> todayQuery, tomorrowQuery, upcomingQuery;
@@ -77,7 +77,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
         });
 
         currentDate = new long[3];
-        String date_string = null;
+        String date_string;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         for (int i = 0; i <= 2; i++) {
             date_string = Utils.getCurrentYear(i) + "-"
@@ -97,7 +97,7 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setAdapter(getActivity(), position);
+        setAdapter(getActivity(), position, MainActivity.currentCondition);
 
     }
     public static void todayQuery() {
@@ -118,47 +118,61 @@ public class TaskListFragment extends ScrollTabHolderFragment implements
                         .orderAsc(Properties.Start_date);
     }
 
+    private static void filteredQuery(WhereCondition properties, int day){
 
-    public static void setAdapter(Context context, int position) {
+        switch (day){
+            case Constants.TODAY:
+                todayQuery =  App.daoSession.getToDoDao().queryBuilder().where(
+                        Properties.Start_date.between(currentDate[0], currentDate[1]), properties)
+                        .orderAsc(Properties.Start_date);
+            case Constants.TOMORROW:
+                tomorrowQuery = App.daoSession.getToDoDao().queryBuilder().where(
+                        Properties.Start_date.between(currentDate[1], currentDate[2]), properties)
+                        .orderAsc(Properties.Start_date);
+            case Constants.UPCOMING:
+                upcomingQuery = App.daoSession.getToDoDao().queryBuilder().where(
+                        Properties.Start_date.gt(currentDate[2]), properties)
+                        .orderAsc(Properties.Start_date);
 
-        switch (position) {
-            case 0:
-                todayQuery();
-                todayAdapter = new TaskListAdapter(context, todayQuery.list());
-                listView[0].setAdapter(todayAdapter);
-                break;
-            case 1:
-                tomorrowQuery();
-                tomorrowAdapter = new TaskListAdapter(context,
-                        tomorrowQuery.list());
-                listView[1].setAdapter(tomorrowAdapter);
-                break;
-            case 2:
-                upComingQuery();
-                upComingAdapter = new TaskListAdapter(context,
-                        upcomingQuery.list());
-                listView[2].setAdapter(upComingAdapter);
-                break;
-            default:
-                // nothing
-                break;
         }
     }
 
-    @Override
-    public void onScrollStateChanged(AbsListView absListView, int i) {
 
+    public static void setAdapter(Context context, int position, WhereCondition property) {
+
+        switch (position) {
+            case 0:
+                if (property == null)
+                    todayQuery();
+                else filteredQuery(property, position);
+
+                todayAdapter = new TaskListAdapter(context, todayQuery.list());
+                listView[0].setAdapter(todayAdapter);
+                todayAdapter.notifyDataSetChanged();
+                break;
+            case 1:
+                if (property == null)
+                tomorrowQuery();
+                else filteredQuery(property,position);
+                tomorrowAdapter = new TaskListAdapter(context,
+                        tomorrowQuery.list());
+                listView[1].setAdapter(tomorrowAdapter);
+                tomorrowAdapter.notifyDataSetChanged();
+                break;
+            case 2:
+                if(property == null)
+                    upComingQuery();
+                else filteredQuery(property,position);
+
+                upComingAdapter = new TaskListAdapter(context,
+                        upcomingQuery.list());
+                listView[2].setAdapter(upComingAdapter);
+                upComingAdapter.notifyDataSetChanged();
+                break;
+            default:
+
+                break;
+        }
     }
-
-    @Override
-    public void onScroll(AbsListView absListView, int i, int i2, int i3) {
-
-    }
-
-    @Override
-    public void adjustScroll(int scrollHeight) {
-
-    }
-
 
 }

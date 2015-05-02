@@ -29,6 +29,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -41,7 +42,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -86,6 +86,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import de.greenrobot.dao.query.WhereCondition;
+
 ;
 
 public class MainActivity extends BaseActivity implements
@@ -113,12 +115,16 @@ public class MainActivity extends BaseActivity implements
     static LabelDao labeldao;
     static List<ToDo> todo_obj;
     public static ViewPager pager;
-    public TabPagerAdapter tabPagerAdapter;
+    private TabPagerAdapter tabPagerAdapter;
+    private LabelPagerAdapter labelAdapter;
     private PagerSlidingTabStrip tabs;
     public static List<Todos> Today, Tomorrow, Upcoming;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private DrawerLayout drawerLayout;
     public static Activity act;
+    public static WhereCondition currentCondition = null;
+
+    private final int TYPE = 10000, ALL = 10001, TASK = 10002, EVENT = 10003, SCHEDULE = 10004, APPOINTMENT = 10005;
 
     // ************** Phone Contacts
 
@@ -159,7 +165,6 @@ public class MainActivity extends BaseActivity implements
         db_initialize();
         todo_obj = tododao.loadAll();
         alarm = new AlarmManagerBroadcastReceiver();
-        startRepeatingTimer();
 
         // ***** Initializing Registration shared preferences **********//
         Constants.user_id = App.prefs.getUserId();
@@ -175,11 +180,11 @@ public class MainActivity extends BaseActivity implements
                         public void callback(String url, JSONObject json,
                                              AjaxStatus status) {
                             if (json != null) {
+                                Log.v("JSON", json.toString());
                                 Gson gson = new Gson();
                                 TaskData obj = gson.fromJson(json.toString(),
                                         TaskData.class);
                                 TaskData.getInstance().setList(obj);
-                                Log.v("JSON", json.toString());
                             }
                         }
                     });
@@ -254,6 +259,14 @@ public class MainActivity extends BaseActivity implements
         getMenuInflater().inflate(R.menu.main, menu);
 
         this.menu = menu;
+
+        SubMenu submenu = menu.addSubMenu(0, TYPE, 1, "By Type");
+        submenu.addSubMenu(0,ALL,100,"All");
+        submenu.addSubMenu(0,TASK,101,"Task");
+        submenu.addSubMenu(0,EVENT,102,"Event");
+        submenu.addSubMenu(0,SCHEDULE,103,"Schedule");
+        submenu.addSubMenu(0,APPOINTMENT,104,"Appointment");
+
         SearchManager manager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView search = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
@@ -321,27 +334,31 @@ public class MainActivity extends BaseActivity implements
             case R.id.action_notification:
                 toggleRightDrawer();
                 break;
-
+            case R.id.action_label:
+                initLabelsFragment();
+            case TYPE:
+                initTabFragment();
+            case TASK:
+                currentCondition = ToDoDao.Properties.Todo_type_id.eq(1);
+                break;
+            case EVENT:
+                currentCondition = ToDoDao.Properties.Todo_type_id.eq(2);
+                break;
+            case SCHEDULE:
+                currentCondition = ToDoDao.Properties.Todo_type_id.eq(3);
+                break;
+            case APPOINTMENT:
+                currentCondition = ToDoDao.Properties.Todo_type_id.eq(4);
+                break;
+            case ALL:
+                currentCondition = null;
             default:
                 break;
         }
-        if (id == R.id.action_settings) {
-            return true;
-        }
-//		if (id == R.id.action_gmail) {
-//			if (!mGoogleApiClient.isConnected())
-//			{
-//				g_plus_LogIn();
-//			}
-//			return true;
-//		}
-//		if (id == R.id.action_facebook) {
-//			{
-//				Fb_Clicked();
-//			}
-//			return true;
-//		}
-
+        //update all pages manually
+        TaskListFragment.setAdapter(this, 0, currentCondition);
+        TaskListFragment.setAdapter(this, 1, currentCondition);
+        TaskListFragment.setAdapter(this, 2, currentCondition);
         return super.onOptionsItemSelected(item);
     }
 
@@ -520,7 +537,7 @@ public class MainActivity extends BaseActivity implements
 
 
         // ***** LeftMenudrawer Mange Account feld**********//
-
+        initTabFragment();
         if (App.prefs.getUserId() == -1) {
 
             aq.id(R.id.manage_img).image(R.drawable.verify_number);
@@ -591,13 +608,10 @@ public class MainActivity extends BaseActivity implements
 
                 if (date != null) {
                     if (date.equals(today)) {
-                        Log.e("Today", date + "   " + today);
                         Today.add((TaskData.getInstance().result.todos.get(i)));
                     } else if (date.equals(tomorrow)) {
-                        Log.v("Tomorrow", date + "   " + tomorrow);
                         Tomorrow.add((TaskData.getInstance().result.todos.get(i)));
                     } else if (date.after(tomorrow)) {
-                        Log.v("upcoming", date + "   " + tomorrow);
                         Upcoming.add((TaskData.getInstance().result.todos.get(i)));
                     }
                 }
@@ -804,8 +818,8 @@ public class MainActivity extends BaseActivity implements
                 Fragment fr = new Calender();
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction(); //
-				transaction.setCustomAnimations(R.anim.slide_in,
-				R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
+                transaction.setCustomAnimations(R.anim.slide_in,
+                        R.anim.slide_out, R.anim.slide_in, R.anim.slide_out);
                 transaction.replace(R.id.container_inner, fr);
                 transaction.addToBackStack("CALENDAR");
                 transaction.commit();
@@ -867,62 +881,40 @@ public class MainActivity extends BaseActivity implements
             updateDate(Work);
         }
 
-        // Initialize the ViewPager and set an adapter
-        pager = (ViewPager) findViewById(R.id.pager);
-        tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
-        pager.setAdapter(tabPagerAdapter);
-
-        // Bind the tabs to the ViewPager
-        tabs = (PagerSlidingTabStrip) aq.id(R.id.tabs).getView();
-        tabs.setShouldExpand(false);
-        tabs.setDividerColorResource(android.R.color.transparent);
-        // tabs.setIndicatorColorResource(R.color.graytab);
-        tabs.setUnderlineColorResource(android.R.color.transparent);
-        tabs.setTextSize(Utils.getPxFromDp(this, 13));
-        tabs.setIndicatorHeight(Utils.getPxFromDp(this, 3));
-        tabs.setIndicatorColor(Color.parseColor("#ffffff"));
-        tabs.setSmoothScrollingEnabled(true);
-        tabs.setShouldExpand(true);
-        // tabs.setTextColorResource(R.color.graytab);
-        tabs.setAllCaps(false);
-        tabs.setTypeface(null, Typeface.NORMAL);
-
-        tabs.setViewPager(pager);
-        tabPagerAdapter.notifyDataSetChanged();
 
         aq.id(R.id.add_task_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(0, false, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(pager_number, false, 0)).commit();
             }
         });
         aq.id(R.id.add_event_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(0,false, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(pager_number,false, 0)).commit();
             }
         });
         aq.id(R.id.add_schedule_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddScheduleFragment.newInstance(0, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddScheduleFragment.newInstance(pager_number, 0)).commit();
             }
         });
         aq.id(R.id.add_appointment_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddAppoinmentFragment.newInstance(0, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddAppoinmentFragment.newInstance(pager_number, 0)).commit();
             }
         });
         aq.id(R.id.add_project_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddProjectFragment.newInstance(0, 0)).commit();
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddProjectFragment.newInstance(pager_number, 0)).commit();
             }
         });
 
@@ -963,6 +955,27 @@ public class MainActivity extends BaseActivity implements
                         + Utils.getCurrentYear(days));
     }
 
+    private void initTabFragment(){
+        // Initialize the ViewPager and set an adapter
+        pager = (ViewPager) findViewById(R.id.pager);
+        tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(tabPagerAdapter);
+
+        // Bind the tabs to the ViewPager
+        tabs = (PagerSlidingTabStrip) aq.id(R.id.tabs).getView();
+        tabs.setShouldExpand(false);
+        tabs.setDividerColorResource(android.R.color.transparent);
+        // tabs.setIndicatorColorResource(R.color.graytab);
+        tabs.setUnderlineColorResource(android.R.color.transparent);
+        tabs.setTextSize(Utils.getPxFromDp(this, 13));
+        tabs.setIndicatorHeight(Utils.getPxFromDp(this, 3));
+        tabs.setIndicatorColor(Color.parseColor("#ffffff"));
+        tabs.setSmoothScrollingEnabled(true);
+        tabs.setShouldExpand(true);
+        tabs.setAllCaps(false);
+        tabs.setTypeface(null, Typeface.NORMAL);
+        tabs.setViewPager(pager);
+    }
     public class TabPagerAdapter extends FragmentPagerAdapter {
 
         public TabPagerAdapter(FragmentManager fm) {
@@ -993,7 +1006,7 @@ public class MainActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            ScrollTabHolderFragment fragment = TaskListFragment
+            Fragment fragment = TaskListFragment
                     .newInstance(position);
 
             return fragment;
@@ -1001,15 +1014,59 @@ public class MainActivity extends BaseActivity implements
 
     }
 
-    public void startRepeatingTimer() {
-        // Context context = this.getApplicationContext();
-        if (alarm != null) {
-            // alarm.SetAlarm(this);
 
-        } else {
-            Toast.makeText(this, "Alarm is null", Toast.LENGTH_SHORT).show();
-        }
+
+    private void initLabelsFragment(){
+
+        pager = (ViewPager) findViewById(R.id.pager);
+        labelAdapter = new LabelPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(labelAdapter);
+
+        // Bind the tabs to the ViewPager
+        tabs = (PagerSlidingTabStrip) aq.id(R.id.tabs).getView();
+        tabs.setShouldExpand(false);
+        tabs.setDividerColorResource(android.R.color.transparent);
+        // tabs.setIndicatorColorResource(R.color.graytab);
+        tabs.setUnderlineColorResource(android.R.color.transparent);
+        tabs.setTextSize(Utils.getPxFromDp(this, 13));
+        tabs.setIndicatorHeight(Utils.getPxFromDp(this, 3));
+        tabs.setIndicatorColor(Color.parseColor("#ffffff"));
+        tabs.setSmoothScrollingEnabled(true);
+        tabs.setShouldExpand(true);
+        tabs.setAllCaps(false);
+        tabs.setTypeface(null, Typeface.NORMAL);
+        tabs.setViewPager(pager);
     }
+
+    public class LabelPagerAdapter extends FragmentPagerAdapter {
+
+        public LabelPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+
+        @Override
+        public int getCount() {
+
+            return TaskData.getInstance().labels.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            Log.e("name",TaskData.getInstance().labels.get(position));
+            if(TaskData.getInstance().labels.get(position) != null)
+                return TaskData.getInstance().labels.get(position);
+            else
+                return "No Label";
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return TaskByLabelFragment.newInstance(position, TaskData.getInstance().labels.get(position), TaskData.getInstance().labels.size());
+        }
+
+    }
+
 
 
     public void db_initialize() {

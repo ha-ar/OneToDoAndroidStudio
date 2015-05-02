@@ -27,8 +27,8 @@ public class Geofences{
         mContext = context;
     }
 
-    public void clearGeofence() {
-        reactiveLocationProvider.removeGeofences(createNotificationBroadcastPendingIntent()).subscribe(new Action1<RemoveGeofencesResult.PendingIntentRemoveGeofenceResult>() {
+    public void clearGeofence(int todoId, int enterOrExit) {
+        reactiveLocationProvider.removeGeofences(createNotificationBroadcastPendingIntent(todoId, enterOrExit)).subscribe(new Action1<RemoveGeofencesResult.PendingIntentRemoveGeofenceResult>() {
             @Override
             public void call(RemoveGeofencesResult.PendingIntentRemoveGeofenceResult pendingIntentRemoveGeofenceResult) {
             }
@@ -41,15 +41,19 @@ public class Geofences{
     }
 
 
-    private PendingIntent createNotificationBroadcastPendingIntent() {
-        return PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, GeofenceBroadcastReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
+    private PendingIntent createNotificationBroadcastPendingIntent(int todoId, int enterOrExit) {
+
+        Intent intent = new Intent(mContext, GeofenceIntentService.class);
+        intent.putExtra("todo_id", todoId);
+        intent.putExtra("enter_or_exit", enterOrExit);
+        return PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public void addGeofence(double lat, double lang, int radius, int enterOrExit, long expiry) {
-        final GeofencingRequest geofencingRequest = createGeofencingRequest(lat, lang, radius, enterOrExit, expiry);
+    public void addGeofence(double lat, double lang, int radius, int enterOrExit, long expiry, int todoId) {
+        final GeofencingRequest geofencingRequest = createGeofencingRequest(31.4835811 , 74.2836712, radius, enterOrExit, expiry);
         if (geofencingRequest == null) return;
 
-        final PendingIntent pendingIntent = createNotificationBroadcastPendingIntent();
+        final PendingIntent pendingIntent = createNotificationBroadcastPendingIntent(todoId, enterOrExit);
         reactiveLocationProvider
                 .removeGeofences(pendingIntent)
                 .flatMap(new Func1<RemoveGeofencesResult.PendingIntentRemoveGeofenceResult, Observable<AddGeofenceResult>>() {
@@ -68,6 +72,7 @@ public class Geofences{
                     @Override
                     public void call(Throwable throwable) {
                         Log.d(TAG, "Error adding geofence.", throwable);
+                        Log.d(TAG,throwable.getMessage());
                     }
                 });
     }

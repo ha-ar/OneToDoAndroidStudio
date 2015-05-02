@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.vector.onetodo.LatLong;
 import com.vector.onetodo.R;
 
 import java.io.IOException;
@@ -224,6 +225,26 @@ public class GPSTracker extends Service implements LocationListener {
         }
 
         return null;
+    }
+    public LatLong getLocationFromAddress(String strAddress) {
+
+        Geocoder coder = new Geocoder(this);
+        List<Address> address = null;
+        LatLong location;
+
+            try {
+                address = coder.getFromLocationName(strAddress, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (address == null) {
+                return null;
+            }
+            Address address1 = address.get(0);
+            location = new LatLong();
+            location.latitude = (long) address1.getLatitude();
+            location.longitude = (long) address1.getLongitude();
+            return location;
     }
 
     /**

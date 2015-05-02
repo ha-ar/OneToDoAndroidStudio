@@ -70,7 +70,6 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
-import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
@@ -1908,11 +1907,9 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, endDateInMilli);
                     } else if (before.contains("On Leave")) {
                         is_locationtype = 1;
                         locationtype = "On Leave";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, endDateInMilli);
                     }
                 }
             }
@@ -2000,7 +1997,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
             todo.setReminder(reminder);
             tododao.insert(todo);
 
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
             if(reminderTime != 0){
                 alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);

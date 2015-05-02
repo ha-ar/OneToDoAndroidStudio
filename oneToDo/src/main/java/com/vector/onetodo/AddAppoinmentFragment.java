@@ -55,7 +55,6 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
-import com.google.android.gms.location.Geofence;
 import com.vector.model.TaskAdded;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
@@ -1108,11 +1107,9 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
                     } else if (before.contains("On Leave")) {
                         is_locationtype = 1;
                         locationtype = "On Leave";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
                     }
                 }
             }
@@ -1199,7 +1196,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
             todo.setReminder(reminder);
             tododao.insert(todo);
 
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
                 alarm.SetNormalAlarm(getActivity());
 

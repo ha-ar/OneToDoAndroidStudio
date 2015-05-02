@@ -30,7 +30,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.androidquery.AQuery;
-import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.TypeFaces;
@@ -1064,11 +1063,9 @@ public class AddTask extends FragmentActivity {
                     if (before.contains("On Arrive")) {
                         is_locationtype = 0;
                         locationtype = "On Arrive";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
                     } else if (before.contains("On Leave")) {
                         is_locationtype = 1;
                         locationtype = "On Leave";
-                        geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
                     }
                 }
             }

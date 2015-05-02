@@ -185,6 +185,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private AttachDao attachDao;
 
     private AlarmManagerBroadcastReceiver alarm;
+    private Geofences geoFence;
 
     //in case of edit to do object is required
     private ToDo todo;
@@ -567,7 +568,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                         }
                         Save(label_view.getId() + "" + itemPosition, label_text
                                 .getText().toString(), labelPosition);
-                        labelPosition = -1;
                         label_view.setBackground(mDrawable);
                         ((TextView) label_view).setText(label_text.getText()
                                 .toString());
@@ -580,6 +580,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                         aq.id(R.id.spinner_labels_task).getTextView()
                                 .setTextColor(Color.WHITE);
                         labelColor = Constants.label_colors_dialog[labelPosition];
+                        labelPosition = -1;
 
                     }
                 }
@@ -1613,20 +1614,16 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 reminderTime = Utils.getReminderTime(before);
                 Log.e("reminder time", reminderTime+"");
             } else {
-                //TODO set notification by GEO fence
-                Geofences geoFence = new Geofences(getActivity());
                 if (before.contains("On Arrive")) {
                     is_locationtype = 0;
                     locationType = "On Arrive";
-                    Log.e("lat", App.gpsTracker.getLatitude()+"");
-                    geoFence.addGeofence(App.gpsTracker.getLatitude(), App.gpsTracker.getLongitude(), 10, Geofence.GEOFENCE_TRANSITION_ENTER, startDateInMilli);
                 } else if (before.contains("On Leave")) {
                     is_locationtype = 1;
                     locationType = "On Leave";
-                    geoFence.addGeofence(App.gpsTracker.getLatitude(), App.gpsTracker.getLongitude(), 10, Geofence.GEOFENCE_TRANSITION_EXIT, startDateInMilli);
                 }
             }
         }
+        Log.e("lat long", App.gpsTracker.getLatitude()+" , "+ App.gpsTracker.getLongitude());
         long r_repeat = 0;
         if (repeat.contains("once") || repeat.contains("Once")) {
             r_repeat = 0;
@@ -1714,11 +1711,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         checklistdao.insert(checklist);
         todo.setCheckList(checklist);
 
-//        for(Attach attach : attachArrayList) {
-//            attach.set
-//            attachDao.insert(attach);
-//        }
-
         if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
             for (int i = 0; i < AddTaskComment.comment.size(); i++) {
                 Comment commenT = new Comment();
@@ -1733,7 +1725,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             tododao.update(todo);
         }
         alarm = new AlarmManagerBroadcastReceiver();
-        TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+        geoFence = new Geofences(getActivity());
 
         // ********************* Data add hit Async task ******************//
         AddToServer aSync = new AddToServer(title, 1, start_date, "", is_location, r_location, location_tag,
@@ -1855,7 +1847,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
         editorattach.clear();
+        TaskListFragment.setAdapter(MainActivity.act,dayPosition, null);
         App.updateTaskList(MainActivity.act);
+        if(todo.getReminder().getLocation() != null)
+            addGeofence(todo);
         setAlarm();
     }
 
@@ -1872,6 +1867,17 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
     }
 
+    private void addGeofence(ToDo todo){
+
+        LatLong location = App.gpsTracker.getLocationFromAddress(todo.getReminder().getLocation());
+        geoFence.addGeofence(location.latitude, location.longitude, 200, getEnterOrExit(todo.getReminder().getLocation_type()), todo.getStart_date(), todo.getId().intValue());
+    }
+
+    private int getEnterOrExit(int type){
+        if(type == 0)
+            return Geofence.GEOFENCE_TRANSITION_ENTER;
+        else return Geofence.GEOFENCE_TRANSITION_EXIT;
+    }
     private void showAttachments(String imageUrl){
         aq.id(R.id.attachment_layout).visible();
         try {

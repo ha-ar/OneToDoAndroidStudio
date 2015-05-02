@@ -39,6 +39,7 @@ public class AddEventBeforeFragment extends Fragment {
 	private View viewl;
 
 	public static View viewP;
+	private View dialoglayout5;
 
 	View button = null;
 	private static View previousSelected;
@@ -73,6 +74,8 @@ public class AddEventBeforeFragment extends Fragment {
 		else
 			view = inflater.inflate(R.layout.add_event_location, container,
 					false);
+		dialoglayout5 = inflater.inflate(R.layout.add_location_event,
+				null, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -254,9 +257,7 @@ public class AddEventBeforeFragment extends Fragment {
 			// ***************************location dialog
 
 			set();
-			LayoutInflater inflater6 = getActivity().getLayoutInflater();
-			View dialoglayout5 = inflater6.inflate(R.layout.add_location_event,
-					null, false);
+
 			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
 					.findViewById(R.id.adress);
 			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(

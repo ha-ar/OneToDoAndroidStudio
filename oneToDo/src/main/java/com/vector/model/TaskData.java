@@ -3,6 +3,7 @@ package com.vector.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TaskData {
 
@@ -22,6 +23,8 @@ public class TaskData {
     }
 
     public String notification_count;
+
+    public HashMap<Integer,String> labels = new HashMap<Integer,String>();
 
 	public void setList(TaskData obj) {
 		taskdata = obj;
@@ -95,7 +98,7 @@ public class TaskData {
 			public ArrayList<String> todo_attachment;
 
             @SerializedName("invitee_list")
-            public ArrayList<Invitee> invitee_list;
+            public Invitee invitee_list;
 		
 	}
 

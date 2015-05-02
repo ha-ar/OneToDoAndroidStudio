@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
- <item
+    <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_action_search"
         android:title="Search"
@@ -11,10 +11,6 @@
         android:icon="@drawable/bell"
         android:title="Notifications"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/action_type"
-        android:title="By Type"
-        app:showAsAction="never"/>
     <item
         android:id="@+id/action_label"
         android:title="By Label"

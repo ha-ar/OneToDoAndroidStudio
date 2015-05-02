@@ -69,7 +69,6 @@ import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
-import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
@@ -1885,7 +1884,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			r_location = aq.id(R.id.location_before_event).getText()
 					.toString();
 			location_tag = ((TextView) AddEventBeforeFragment.viewP)
-					.getText().toString() + "";
+					.getText().toString();
 		}
 
 		boolean is_alertEmail = false, is_alertNotification = false;
@@ -1939,11 +1938,9 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			if (before.contains("On Arrive")) {
 				is_locationtype = 0;
 				locationType = "On Arrive";
-				geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_ENTER);
 			} else if (before.contains("On Leave")) {
 				is_locationtype = 1;
 				locationType = "On Leave";
-				geoFence.addGeofence(App.gpsTracker.getLatitude(),App.gpsTracker.getLongitude(), 100, Geofence.GEOFENCE_TRANSITION_EXIT, Geofence.GEOFENCE_TRANSITION_EXIT);
 			}
 		}
 		long r_repeat = 0;
@@ -2028,7 +2025,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		friendsdao.insert(friend);
 		todo.setReminder(reminder);
 
-		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
 		if(reminderTime != 0){
 			alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);

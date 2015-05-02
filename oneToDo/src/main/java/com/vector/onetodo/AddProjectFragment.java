@@ -993,7 +993,7 @@ public class AddProjectFragment extends Fragment {
                 }
             }
 
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position);
+            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
             // ********************* Data add hit Asyntask
 
