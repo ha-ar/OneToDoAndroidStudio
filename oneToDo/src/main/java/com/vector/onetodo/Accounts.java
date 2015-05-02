@@ -42,8 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.feio.android.checklistview.interfaces.Constants;
-
 public class Accounts extends Fragment {
 
     private AQuery aq;
@@ -412,27 +410,11 @@ public class Accounts extends Fragment {
                 nameinfo.dismiss();
             }
         });
-        aq_changeemail.id(R.id.ok_event).clicked(new  OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                changeemail.dismiss();
-            }
-        });
-        aq_changeemail.id(R.id.cancel_event).clicked(new  OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                changeemail.dismiss();
-            }
-        });
         aq_changephone.id(R.id.ok_event).clicked(new  OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
                 changephone.dismiss();
             }
         });
@@ -440,7 +422,6 @@ public class Accounts extends Fragment {
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
                 changephone.dismiss();
             }
         });

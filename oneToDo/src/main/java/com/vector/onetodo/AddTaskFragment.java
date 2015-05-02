@@ -820,7 +820,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 }
                 ((TextView) view).setTextColor(Color.WHITE);
                 view.setSelected(true);
-                if (Constants.repeatArray[position] == "Never") {
+                if (Constants.repeatArray[position].equals("Never")) {
                     aq.id(R.id.repeat).text(Constants.repeatArray[position]);
                 } else {
                     aq.id(R.id.repeat).text(Constants.repeatArray[position]);
@@ -894,8 +894,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
             @Override
             public void onClick(View arg0) {
-                if (aq.id(R.id.repeat).getText().toString().equals("Never")) {
-                } else {
+                if (!aq.id(R.id.repeat).getText().toString().equals("Never")) {
                     aq.id(R.id.repeat).text(
                             ((TextView) previousSelected).getText().toString());
                 }
@@ -1730,7 +1729,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         // ********************* Data add hit Async task ******************//
         AddToServer aSync = new AddToServer(title, 1, start_date, "", is_location, r_location, location_tag,
                 locationType, notes, repeatDate,repeat_forever, MaxId,
-                AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddTaskFragment.this);
+                AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, label_name, "", before, "", AddTaskFragment.this);
         aSync.execute();
         getActivity().getSupportFragmentManager().popBackStack();
     }
@@ -1846,8 +1845,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
-        editorAttach.clear();
-        editorComment.clear();
+        editorAttach.clear().commit();
+        editorComment.clear().commit();
         TaskListFragment.setAdapter(MainActivity.act,dayPosition, null);
         App.updateTaskList(MainActivity.act);
         if(todo.getReminder().getLocation() != null)
