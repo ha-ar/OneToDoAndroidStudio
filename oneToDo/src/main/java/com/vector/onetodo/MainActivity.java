@@ -537,7 +537,7 @@ public class MainActivity extends BaseActivity implements
 
 
         // ***** LeftMenudrawer Mange Account feld**********//
-        initTabFragment();
+        initLabelsFragment();
         if (App.prefs.getUserId() == -1) {
 
             aq.id(R.id.manage_img).image(R.drawable.verify_number);
@@ -923,9 +923,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        if (tabPagerAdapter != null) {
-            tabPagerAdapter.notifyDataSetChanged();
-        }
+
 
     }
 
@@ -1047,16 +1045,15 @@ public class MainActivity extends BaseActivity implements
 
         @Override
         public int getCount() {
-
-            return TaskData.getInstance().labels.size();
+            return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Log.e("name",TaskData.getInstance().labels.get(position));
-            if(TaskData.getInstance().labels.get(position) != null)
-                return TaskData.getInstance().labels.get(position);
-            else
+//            Log.e("name",TaskData.getInstance().labels.get(position));
+//            if(TaskData.getInstance().labels.get(position) != null)
+//                return TaskData.getInstance().labels.get(position);
+//            else
                 return "No Label";
         }
 
