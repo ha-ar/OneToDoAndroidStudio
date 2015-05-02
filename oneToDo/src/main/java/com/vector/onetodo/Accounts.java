@@ -3,6 +3,7 @@ package com.vector.onetodo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,17 +28,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.vector.onetodo.utils.Utils;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import it.feio.android.checklistview.interfaces.Constants;
 
 public class Accounts extends Fragment {
 
     private AQuery aq;
+    private Boolean message;
     private AQuery aq_changephone;
     private AQuery aq_changeemail;
     private AQuery aq_name;
@@ -320,10 +331,41 @@ public class Accounts extends Fragment {
 
             @Override
             public void onClick(View v) {
-                String email = aq_changeemail.id(R.id.enteremail).getText().toString();
+                final String email = aq_changeemail.id(R.id.enteremail).getText().toString();
                 if(!email.isEmpty() && email.contains("@")){
-                    App.prefs.setUserEmail(email);
-                    changeemail.dismiss();
+
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("user_id", String.valueOf(App.prefs.getUserId()));
+                    params.put("set", "email");
+                    params.put("value", email);
+                    params.put("table", "user");
+                    ProgressDialog dialog = new ProgressDialog(getActivity());
+                    dialog.setMessage("Updating...Please wait.");
+                    aq.progress(dialog).ajax(
+                            "http://api.heuristix.net/one_todo/v1/user/account", params,
+                            JSONObject.class, new AjaxCallback<JSONObject>() {
+                                @Override
+                                public void callback(String url, JSONObject json,
+                                                     AjaxStatus status) {
+                                    int id = -1;
+                                    try {
+                                        JSONObject obj1 = new JSONObject(json.toString());
+                                        message = obj1.getBoolean("error");
+                                        id = obj1.getInt("result");
+
+                                    } catch (Exception e) {
+                                    }
+                                    if (id != -1) {
+                                        Log.v("Response", json.toString());
+							            App.prefs.setUserEmail(email);
+                                        aq.id(R.id.email1).text(App.prefs.getUserEmail());
+                                        changeemail.dismiss();
+                                    }
+
+
+                                }
+                            });
+
                 }else{
                     Toast.makeText(getActivity(), "Invalid email address", Toast.LENGTH_SHORT).show();
                 }
@@ -406,6 +448,7 @@ public class Accounts extends Fragment {
         aq.id(R.id.initials).text(App.prefs.getInitials());
         aq.id(R.id.user_name).text(App.prefs.getUserName());
         aq.id(R.id.user_number).text(App.prefs.getUserNumber());
+
         aq.id(R.id.email1).text(App.prefs.getUserEmail());
     }
 
