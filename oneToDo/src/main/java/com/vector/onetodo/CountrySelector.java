@@ -262,7 +262,7 @@ public class CountrySelector extends Fragment {
             params.put("user[mobile_no]", aq.id(R.id.country).getText().toString());
             params.put("user[country]", SplashScreen.country);
             params.put("user[level]", "normal");
-            String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
+            final String[] name = App.prefs.getUserName().split(" ");// Utils.getUserName(getActivity()).split(" ");
             App.prefs.setInitials(name[0].substring(0, 1).toUpperCase() + name[1].substring(0, 1).toUpperCase());
             params.put("user_profile[first_name]", name[0]);
             params.put("user_profile[last_name]", name[1]);
@@ -283,8 +283,11 @@ public class CountrySelector extends Fragment {
                             } catch (Exception e) {
                             }
                             if (id != -1) {
+                                Constants.user_id = id;
+                                App.prefs.setUserId(id);
+                                App.prefs.setUserName(name[0] +" "+ name[1]);
+                                App.prefs.setUserNumber(aq.id(R.id.country).getText().toString());
                                 App.prefs.saveSharedPrefValue(getActivity(), "user_level", "normal");
-                                App.prefs.setUserName("Khurram Nawaz");
                                 showUserDetailsActivity();
 //                                Constants.user_id = id;
 //                                App.prefs.setUserId(id);
@@ -338,8 +341,8 @@ public class CountrySelector extends Fragment {
                             if (id != -1) {
                                 Constants.user_id = id;
                                 App.prefs.setUserId(id);
-                                App.prefs.setUserName(name[0] + name[1]);
-//                                App.prefs.setUserLevel("normal");
+                                App.prefs.setUserName(name[0] +" "+ name[1]);
+                                App.prefs.setUserNumber(aq.id(R.id.country).getText().toString());
                                 App.prefs.saveSharedPrefValue(getActivity(), "user_level", "normal");
                                 showUserDetailsActivity();
 //							addContacts();
