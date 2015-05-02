@@ -406,6 +406,7 @@ public class Accounts extends Fragment {
         aq.id(R.id.initials).text(App.prefs.getInitials());
         aq.id(R.id.user_name).text(App.prefs.getUserName());
         aq.id(R.id.user_number).text(App.prefs.getUserNumber());
+        
         aq.id(R.id.email1).text(App.prefs.getUserEmail());
     }
 
