@@ -8,9 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.vector.onetodo.db.gen.LabelDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao.Properties;
+
+import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
 
@@ -88,13 +89,18 @@ public class TaskByLabelFragment extends Fragment{
     private static QueryBuilder<ToDo> filteredQuery(){
         return App.daoSession.getToDoDao()
                 .queryBuilder()
-                .where(LabelDao.Properties.Label_name.eq(labelName))
                 .orderAsc(Properties.Start_date);
     }
 
 
     public static void setAdapter(Context context, int position) {
-        labelAdapter[position] = new TaskListAdapter(context, filteredQuery().list());
+        List<ToDo> list = filteredQuery().list();
+        for(ToDo todo : filteredQuery().list()){
+            if(todo.getLabel().getLabel_name() != null)
+                if(todo.getLabel().getLabel_name().equals(labelName))
+                    list.add(todo);
+        }
+        labelAdapter[position] = new TaskListAdapter(context, list);
         listView[position].setAdapter(labelAdapter[position]);
         labelAdapter[0].notifyDataSetChanged();
     }

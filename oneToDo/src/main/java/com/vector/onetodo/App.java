@@ -31,7 +31,7 @@ public class App extends Application{
 	public static DaoSession daoSession;
 	public static DaoMaster daoMaster;
     public static GPSTracker gpsTracker;
-    public static SharedPreferences pref, label, attach;
+    public static SharedPreferences pref, label, attach, comment;
 
     
     @Override
@@ -50,6 +50,7 @@ public class App extends Application{
         pref = this.getSharedPreferences("Location", 0);
         label = this.getSharedPreferences("Label", 0);
         attach = this.getSharedPreferences("Attach", 0);
+        comment = this.getSharedPreferences("Comment", 0);
 
     }
 

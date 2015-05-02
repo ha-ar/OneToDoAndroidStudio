@@ -77,7 +77,6 @@ import com.vector.onetodo.db.gen.Attach;
 import com.vector.onetodo.db.gen.AttachDao;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
-import com.vector.onetodo.db.gen.Comment;
 import com.vector.onetodo.db.gen.CommentDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
@@ -155,7 +154,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     ImageView last;
     View label_view = null, viewl;
     int dayPosition;
-    private Editor editor, editorattach;
+    private Editor editor, editorAttach, editorComment;
     private String pLabel = null;
     private int mPosition = -1;
     private int itemPosition = -1;
@@ -247,7 +246,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
 
         editor = App.label.edit();
-        editorattach = App.attach.edit();
+        editorAttach = App.attach.edit();
+        editorComment = App.comment.edit();
         initActionBar();
         aq = new AQuery(getActivity(), view);
         act = getActivity();
@@ -1472,10 +1472,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     public void SaveAttach(int id, String path, String type) {
         // 0 - for private mode
-        editorattach.putInt("Max", id);
-        editorattach.putString(1 + "path" + id, path);
-        editorattach.putString(1 + "type" + id, type); // Storing float
-        editorattach.commit();
+        editorAttach.putInt("Max", id);
+        editorAttach.putString(1 + "path" + id, path);
+        editorAttach.putString(1 + "type" + id, type); // Storing float
+        editorAttach.commit();
     }
 
     public void LoadAttachmax() {
@@ -1711,14 +1711,14 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         checklistdao.insert(checklist);
         todo.setCheckList(checklist);
 
-        if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-            for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-                Comment commenT = new Comment();
-                commenT.setComment(AddTaskComment.comment.get(i));
-                commenT.setToDo(todo);
-                commentdao.insert(commenT);
-            }
-        }
+//        if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+//            for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+//                Comment commenT = new Comment();
+//                commenT.setComment(AddTaskComment.comment.get(i));
+//                commentdao.insert(commenT);
+//                commenT.setToDo(todo);
+//            }
+//        }
 
         if(isEditMode){
             todo.setId(todoId);
@@ -1846,7 +1846,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
-        editorattach.clear();
+        editorAttach.clear();
+        editorComment.clear();
         TaskListFragment.setAdapter(MainActivity.act,dayPosition, null);
         App.updateTaskList(MainActivity.act);
         if(todo.getReminder().getLocation() != null)

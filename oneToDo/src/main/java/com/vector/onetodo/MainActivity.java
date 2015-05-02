@@ -356,9 +356,9 @@ public class MainActivity extends BaseActivity implements
                 break;
         }
         //update all pages manually
-        TaskListFragment.setAdapter(this, 0, currentCondition);
-        TaskListFragment.setAdapter(this, 1, currentCondition);
-        TaskListFragment.setAdapter(this, 2, currentCondition);
+//        TaskListFragment.setAdapter(this, 0, currentCondition);
+//        TaskListFragment.setAdapter(this, 1, currentCondition);
+//        TaskListFragment.setAdapter(this, 2, currentCondition);
         return super.onOptionsItemSelected(item);
     }
 
@@ -537,7 +537,7 @@ public class MainActivity extends BaseActivity implements
 
 
         // ***** LeftMenudrawer Mange Account feld**********//
-        initLabelsFragment();
+        initTabFragment();
         if (App.prefs.getUserId() == -1) {
 
             aq.id(R.id.manage_img).image(R.drawable.verify_number);

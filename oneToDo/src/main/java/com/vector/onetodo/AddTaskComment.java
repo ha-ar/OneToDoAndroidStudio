@@ -218,4 +218,8 @@ public class AddTaskComment extends Fragment {
 		editor.commit();
 	}
 
+	public void removeAllComments(){
+		editor.clear().commit();
+	}
+
 }
