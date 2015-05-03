@@ -29,6 +29,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -62,6 +63,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
@@ -95,7 +98,14 @@ import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
 import net.simonvt.timepicker.TimePicker;
 import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,7 +113,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
@@ -1234,7 +1246,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 text.setText(Utils.getImageName(getActivity(), selectedImage));
                 Bitmap bm = Utils.getBitmap(getActivity(), selectedImage);
                 byte[] bitmapArray = Utils.getImageByteArray(bm);
-                App.uploadAttachments(aq, bitmapArray);
+                uploadAttachments(aq, bitmapArray);
 
                 size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
                 item.addView(child);
@@ -1384,6 +1396,46 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     public void LoadAttachmax() {
         MaxId = App.attach.getInt("Max", 0);
+    }
+    private void uploadAttachments(AQuery aq, byte[] byteArray) {
+
+        HttpEntity entity = null;
+        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        List<NameValuePair> pairs = new ArrayList<>();
+        pairs.add(new BasicNameValuePair("image", encoded));
+
+        try {
+            entity = new UrlEncodedFormEntity(pairs, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, HttpEntity> param = new HashMap<>();
+        param.put(AQuery.POST_ENTITY, entity);
+
+        aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
+                JSONObject.class, new AjaxCallback<JSONObject>() {
+                    @Override
+                    public void callback(String url, JSONObject json,
+                                         AjaxStatus status) {
+                        String path = null;
+                        try {
+                            Log.e("attachment", json.toString());
+                            JSONObject obj1 = new JSONObject(json.toString());
+                            path = obj1.getString("path");
+                            LoadAttachmax();
+                            if (MaxId == 0) {
+                                MaxId = 1;
+                            } else {
+                                MaxId = MaxId + 1;
+                            }
+                            SaveAttach(MaxId, path, "type");
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+                });
     }
 
     private void dragAndDrop(){

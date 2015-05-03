@@ -104,10 +104,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1371,8 +1368,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				text.setText(Utils.getImageName(getActivity(), selectedImage));
 				Bitmap bm = Utils.getBitmap(getActivity(), selectedImage);
 				byte[] bitmapArray = Utils.getImageByteArray(bm);
-				App.uploadAttachments(aq, bitmapArray);
-
+				uploadAttachments(aq, bitmapArray);
 				size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
 				item.addView(child);
 
@@ -1681,36 +1677,20 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				+ currentDayDigit + " 00:00:00";
 	}
 
-	public void imageupload() {
+	private void uploadAttachments(AQuery aq, byte[] byteArray) {
 
 		HttpEntity entity = null;
-
-		Bitmap bm = null;
-		try {
-			bm = MediaStore.Images.Media.getBitmap(getActivity()
-					.getContentResolver(), filename);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if (bm != null) {
-			bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		}
-		byte[] byteArray = baos.toByteArray();
 		String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-		pairs = new ArrayList<>();
+		List<NameValuePair> pairs = new ArrayList<>();
 		pairs.add(new BasicNameValuePair("image", encoded));
 
 		try {
 			entity = new UrlEncodedFormEntity(pairs, "UTF-8");
-
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
-		Map<String, HttpEntity> param = new HashMap<String, HttpEntity>();
+		Map<String, HttpEntity> param = new HashMap<>();
 		param.put(AQuery.POST_ENTITY, entity);
 
 		aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
@@ -1720,25 +1700,24 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 										 AjaxStatus status) {
 						String path = null;
 						try {
-
+							Log.e("attachment", json.toString());
 							JSONObject obj1 = new JSONObject(json.toString());
 							path = obj1.getString("path");
-
+							Loadattachmax();
+							if (MaxId == 0) {
+								MaxId = 1;
+							} else {
+								MaxId = MaxId + 1;
+							}
+							Saveattach(MaxId, path, "type");
 						} catch (Exception e) {
-						}
 
-						Loadattachmax();
-						if (MaxId == 0) {
-							MaxId = 1;
-						} else {
-							MaxId = MaxId + 1;
 						}
-						Saveattach(MaxId, path, "type");
-						Log.v("Response", json.toString());
 
 					}
 				});
 	}
+
 
 	public void Saveattach(int id, String path, String type) {
 		// 0 - for private mode

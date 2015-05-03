@@ -17,6 +17,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.vector.model.AssignedTaskData;
 import com.vector.onetodo.db.gen.CheckList;
+import com.vector.onetodo.db.gen.Reminder;
 import com.vector.onetodo.db.gen.Repeat;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
@@ -141,6 +142,12 @@ public class GcmIntentService extends IntentService {
         todo.setLocation(AssignedTaskData.getInstance().task.get(0).location);
         todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
         todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
+
+
+        Reminder reminder = new Reminder();
+        reminder.setLocation(AssignedTaskData.getInstance().task.get(0).time);
+        App.daoSession.getReminderDao().insert(reminder);
+        todo.setReminder(reminder);
 
         Repeat repeat = new Repeat();
         repeat.setIs_forever(false);

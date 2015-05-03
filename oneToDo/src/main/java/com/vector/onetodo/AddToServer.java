@@ -152,7 +152,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         if (before != null) {
             if (!is_location) {
                 pairs.add(new BasicNameValuePair("todo_reminder[time]",
-                        r_time + ""));
+                        reminder+""));
             } else {
                 pairs.add(new BasicNameValuePair("todo_reminder[location]",
                         r_location));
@@ -178,8 +178,6 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                     "todo[location]", location));
         }
 
-        pairs.add(new BasicNameValuePair(
-                "todo_reminder[time]", repeat));
         for (int i = 1; i <= MaxId; i++) {
             pairs.add(new BasicNameValuePair("todo_attachment[" + (i - 1)
                     + "][attachment_path]", App.attach.getString(titleCheck
@@ -188,7 +186,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
 
         MaxId = 0;
         Log.e("comment size", comment+"");
-        if ((comment != null) && (comment.size() > 0)) {
+        if ((comment != null) && (comment.size() > 0) && (commentTime != null)) {
             for (int i = 0; i < comment.size(); i++) {
                 pairs.add(new BasicNameValuePair("todo_comment[" + (i - 1)
                         + "][user_id]", Constants.user_id + ""));
