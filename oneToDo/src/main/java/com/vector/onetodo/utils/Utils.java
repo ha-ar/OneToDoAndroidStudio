@@ -18,6 +18,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 
 import com.vector.onetodo.App;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -377,4 +379,44 @@ public class Utils {
 
 
     }
+
+	public static String getImageName(Context ctx, Uri uri){
+		String fileName = "";
+		String scheme = uri.getScheme();
+		if (scheme.equals("file")) {
+			fileName = uri.getLastPathSegment();
+		}
+		else if (scheme.equals("content")) {
+			String[] proj = { MediaStore.Images.Media.TITLE };
+			Cursor cursor = ctx.getContentResolver().query(uri, proj, null, null, null);
+			if (cursor != null && cursor.getCount() != 0) {
+				int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE);
+				cursor.moveToFirst();
+				fileName = cursor.getString(columnIndex);
+			}
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return fileName;
+	}
+
+	public static Bitmap getBitmap(Context ctx, Uri fileName){
+		Bitmap bm = null;
+		try {
+			bm = MediaStore.Images.Media.getBitmap(ctx
+					.getContentResolver(), fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bm;
+	}
+
+	public static byte[] getImageByteArray(Bitmap bm){
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		if (bm != null) {
+			bm.compress(Bitmap.CompressFormat.PNG, 50, baos);
+		}
+		return baos.toByteArray();
+	}
 }

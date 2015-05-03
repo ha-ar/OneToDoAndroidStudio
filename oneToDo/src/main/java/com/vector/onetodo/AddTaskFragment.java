@@ -29,7 +29,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -63,8 +62,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
@@ -98,16 +95,7 @@ import net.simonvt.datepicker.DatePicker.OnDateChangedListener;
 import net.simonvt.timepicker.TimePicker;
 import net.simonvt.timepicker.TimePicker.OnTimeChangedListener;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,9 +103,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
@@ -255,6 +241,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         db_initialize();
         isEditMode = getArguments().getBoolean("isEditMode");
         todoId = getArguments().getLong("todoId");
+        setRetainInstance(true);
         return view;
     }
 
@@ -275,11 +262,13 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
                 return true;
             case R.id.action_comment:
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container, AddTaskComment.newInstance(false, -1))
-                        .addToBackStack(null)
-                        .commit();
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.setCustomAnimations(R.anim.slide_right,
+                        R.anim.slide_left, R.anim.slide_right, R.anim.slide_left);
+                transaction.replace(R.id.content_task, AddTaskComment.newInstance(false, -1));
+                transaction.addToBackStack(null);
+                transaction.commit();
                 return true;
             case R.id.action_show_hide:
                 popupWindowTask.showAtLocation(
@@ -291,11 +280,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     private void initActionBar(){
@@ -1247,10 +1231,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
                 by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-                text.setText(getImageName(selectedImage));
-                Bitmap bm = getBitmap(selectedImage);
-                byte[] bitmapArray = getImageByteArray(bm);
-                uploadAttachments(bitmapArray);
+                text.setText(Utils.getImageName(getActivity(), selectedImage));
+                Bitmap bm = Utils.getBitmap(getActivity(), selectedImage);
+                byte[] bitmapArray = Utils.getImageByteArray(bm);
+                App.uploadAttachments(aq, bitmapArray);
 
                 size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
                 item.addView(child);
@@ -1364,86 +1348,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     }
 
-    private String getImageName(Uri uri){
-        String fileName = "";
-        String scheme = uri.getScheme();
-        if (scheme.equals("file")) {
-            fileName = uri.getLastPathSegment();
-        }
-        else if (scheme.equals("content")) {
-            String[] proj = { MediaStore.Images.Media.TITLE };
-            Cursor cursor = getActivity().getContentResolver().query(uri, proj, null, null, null);
-            if (cursor != null && cursor.getCount() != 0) {
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE);
-                cursor.moveToFirst();
-                fileName = cursor.getString(columnIndex);
-            }
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return fileName;
-    }
 
-    private Bitmap getBitmap(Uri fileName){
-        Bitmap bm = null;
-        try {
-            bm = MediaStore.Images.Media.getBitmap(getActivity()
-                    .getContentResolver(), fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bm;
-    }
-
-    private byte[] getImageByteArray(Bitmap bm){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (bm != null) {
-            bm.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-        }
-        return baos.toByteArray();
-    }
-
-    public void uploadAttachments(byte[] byteArray) {
-
-        HttpEntity entity = null;
-        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("image", encoded));
-
-        try {
-            entity = new UrlEncodedFormEntity(pairs, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        Map<String, HttpEntity> param = new HashMap<>();
-        param.put(AQuery.POST_ENTITY, entity);
-
-        aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
-                JSONObject.class, new AjaxCallback<JSONObject>() {
-                    @Override
-                    public void callback(String url, JSONObject json,
-                                         AjaxStatus status) {
-                        String path = null;
-                        try {
-
-                            JSONObject obj1 = new JSONObject(json.toString());
-                            path = obj1.getString("path");
-                        } catch (Exception e) {
-                        }
-
-                        LoadAttachmax();
-                        if (MaxId == 0) {
-                            MaxId = 1;
-                        } else {
-                            MaxId = MaxId + 1;
-                        }
-                        SaveAttach(MaxId, path, "type");
-
-                    }
-                });
-    }
 
     public void Save(String id, String name, int label_position) {
         // 0 - for private mode
@@ -1558,7 +1463,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         String location = aq.id(R.id.location_task).getText().toString();
         boolean is_time = true, is_location = false;
-        String r_location = null, location_tag = "";
+        String r_location = "", location_tag = "";
         String before = aq.id(R.id.before).getText().toString();
         if (before.contains("On Arrive") || before.contains("On Leave")) {
             is_time = false;
@@ -1844,13 +1749,21 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
         tododao.insert(todo);
+
         editorAttach.clear().commit();
         editorComment.clear().commit();
-        TaskListFragment.setAdapter(MainActivity.act,dayPosition, null);
+
+        //have to refresh them all
+        TaskListFragment.setAdapter(MainActivity.act, 0, null);
+        TaskListFragment.setAdapter(MainActivity.act, 1, null);
+        TaskListFragment.setAdapter(MainActivity.act, 2, null);
+
         App.updateTaskList(MainActivity.act);
-        if(todo.getReminder().getLocation() != null)
+
+        if (!todo.getReminder().getLocation().isEmpty())
             addGeofence(todo);
-        setAlarm();
+
+        setAlarm(); //set alarm accordingly
     }
 
     private void setAlarm(){

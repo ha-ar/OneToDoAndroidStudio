@@ -230,20 +230,19 @@ public class GPSTracker extends Service implements LocationListener {
 
         Geocoder coder = new Geocoder(this);
         List<Address> address = null;
-        LatLong location;
+        LatLong location = new LatLong();;
 
             try {
                 address = coder.getFromLocationName(strAddress, 1);
+                Address address1 = address.get(0);
+                location.latitude = (long) address1.getLatitude();
+                location.longitude = (long) address1.getLongitude();
             } catch (IOException e) {
                 e.printStackTrace();
             }
             if (address == null) {
                 return null;
             }
-            Address address1 = address.get(0);
-            location = new LatLong();
-            location.latitude = (long) address1.getLatitude();
-            location.longitude = (long) address1.getLongitude();
             return location;
     }
 

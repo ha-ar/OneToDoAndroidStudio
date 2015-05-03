@@ -69,6 +69,7 @@ import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
@@ -187,6 +188,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	private boolean isEditMode = false;
 	private long todoId;
 	private String labelColor;
+	private Geofences geoFence;
+	private AlarmManagerBroadcastReceiver alarm;
 
 	public static AddEventFragment newInstance(int position, boolean isEditMode, long todoId) {
 		AddEventFragment myFragment = new AddEventFragment();
@@ -215,6 +218,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		dragAndDrop();
 		isEditMode = getArguments().getBoolean("isEditMode");
 		todoId = getArguments().getLong("todoId");
+		setRetainInstance(true);
 		return view;
 	}
 
@@ -1360,32 +1364,18 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 						.findViewById(R.id.image_added_by);
 				TextView size = (TextView) child
 						.findViewById(R.id.image_added_size);
+
 				Calendar cal = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
-				by.setText("By "+App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-				filename = selectedImage;
-				imageupload();
-				if (selectedImage.getLastPathSegment().contains(".")) {
-					text.setText(selectedImage.getLastPathSegment());
+				by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+				text.setText(Utils.getImageName(getActivity(), selectedImage));
+				Bitmap bm = Utils.getBitmap(getActivity(), selectedImage);
+				byte[] bitmapArray = Utils.getImageByteArray(bm);
+				App.uploadAttachments(aq, bitmapArray);
 
-				} else {
-					text.setText(selectedImage.getLastPathSegment() + "."
-							+ type);
-
-				}
-
-				size.setText("(" + (new File(selectedImage.getPath()).length())
-						/ 1024 + " KB)");
-				child.findViewById(R.id.image_cancel).setOnClickListener(
-						new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								item.removeView(child);
-							}
-						});
-
+				size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
 				item.addView(child);
+
 			} catch (Exception e) {
 				Toast.makeText(getActivity(), "Failed to load",
 						Toast.LENGTH_SHORT).show();
@@ -1961,7 +1951,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			r_repeat = Constants.YEAR;
 			repeat = "yearly";
 		}
-		AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
 
 		todo = new ToDo();
 		todo.setUser_id(Constants.user_id);
@@ -2025,21 +2014,12 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
-		if(reminderTime != 0){
-			alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
-			alarm.SetNormalAlarm(getActivity());
-		}
-		if(r_repeat != 0){
-			alarm.setRepeatAlarm(getActivity(), r_repeat);
-		}
-		else{
-			alarm.SetNormalAlarm(getActivity());
-		}
-
+		alarm = new AlarmManagerBroadcastReceiver();
+		geoFence = new Geofences(getActivity());
 
 		AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
 				locationType,location, notes, repeatdate,repeat_forever, MaxId,
-				AddTaskComment.comment, null, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddEventFragment.this);
+				AddTaskComment.comment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddEventFragment.this);
 		asyn.execute();
 		getActivity().getSupportFragmentManager().popBackStack();
 	}
@@ -2121,11 +2101,12 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		todo.setTodo_server_id(TaskAdded.getInstance().id);
 		tododao.insert(todo);
 		App.updateTaskList(getActivity());
+		if (!todo.getReminder().getLocation().isEmpty())
+			addGeofence(todo);
 		setAlarm();
 	}
 
 	private void setAlarm(){
-		AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
 		if(todo.getReminder().getTime() != 0){
 			alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
 			alarm.SetNormalAlarm(MainActivity.act);
@@ -2138,6 +2119,17 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		}
 	}
 
+	private void addGeofence(ToDo todo){
+
+		LatLong location = App.gpsTracker.getLocationFromAddress(todo.getReminder().getLocation());
+		geoFence.addGeofence(location.latitude, location.longitude, 200, getEnterOrExit(todo.getReminder().getLocation_type()), todo.getStart_date(), todo.getId().intValue());
+	}
+
+	private int getEnterOrExit(int type){
+		if(type == 0)
+			return Geofence.GEOFENCE_TRANSITION_ENTER;
+		else return Geofence.GEOFENCE_TRANSITION_EXIT;
+	}
 	private void showAttachments(String imageUrl){
 		aq.id(R.id.attachment_layout).visible();
 		try {
