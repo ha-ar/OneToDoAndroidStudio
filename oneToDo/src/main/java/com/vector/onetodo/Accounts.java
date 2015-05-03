@@ -358,6 +358,7 @@ public class Accounts extends Fragment {
 							            App.prefs.setUserEmail(email);
                                         aq.id(R.id.email1).text(App.prefs.getUserEmail());
                                         changeemail.dismiss();
+                                        Toast.makeText(getActivity(), "done",Toast.LENGTH_SHORT).show();
                                     }
 
 
@@ -391,12 +392,40 @@ public class Accounts extends Fragment {
             public void onClick(View v) {
                 String userName = aq_name.id(R.id.entername).getText()
                         .toString();
+                final String[] name = userName.split(" ");
                 if (!userName.isEmpty()) {
-                    nameinfo.dismiss();
-                    aq.id(R.id.user_name).text(userName);
-                    App.prefs.setUserName(userName);
-                    Toast.makeText(getActivity(), "done",
-                            Toast.LENGTH_SHORT).show();
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("user_id", String.valueOf(App.prefs.getUserId()));
+                    params.put("set", "first_name,last_name");
+                    params.put("value", name[0]+","+ name[1]);
+                    params.put("table", "user_profile");
+                    ProgressDialog dialog = new ProgressDialog(getActivity());
+                    dialog.setMessage("Updating...Please wait.");
+                    aq.progress(dialog).ajax(
+                            "http://api.heuristix.net/one_todo/v1/user/account", params,
+                            JSONObject.class, new AjaxCallback<JSONObject>() {
+                                @Override
+                                public void callback(String url, JSONObject json,
+                                                     AjaxStatus status) {
+                                    int id = -1;
+                                    try {
+                                        JSONObject obj1 = new JSONObject(json.toString());
+                                        message = obj1.getBoolean("error");
+                                        id = obj1.getInt("result");
+
+                                    } catch (Exception e) {
+                                    }
+                                    if (id != -1) {
+                                        Log.v("Response", json.toString());
+                                        App.prefs.setUserName(name[0]+" "+name[1]);
+                                        aq.id(R.id.user_name).text(App.prefs.getUserName());
+                                        nameinfo.dismiss();
+                                        Toast.makeText(getActivity(), "done",Toast.LENGTH_SHORT).show();
+                                    }
+
+
+                                }
+                            });
                 } else {
                     Toast.makeText(getActivity(), "Name cannot be empty",
                             Toast.LENGTH_SHORT).show();
