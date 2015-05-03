@@ -187,6 +187,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         }
 
         MaxId = 0;
+        Log.e("comment size", comment+"");
         if ((comment != null) && (comment.size() > 0)) {
             for (int i = 0; i < comment.size(); i++) {
                 pairs.add(new BasicNameValuePair("todo_comment[" + (i - 1)

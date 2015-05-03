@@ -1692,7 +1692,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         if ((!location_tag.equals("New"))) {
             reminder.setLocation_tag(location_tag);
         }
-
         reminder.setTime((long) reminderTime);
         reminderdao.insert(reminder);
         todo.setReminder(reminder);

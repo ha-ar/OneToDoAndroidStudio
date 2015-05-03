@@ -134,22 +134,22 @@ public class GcmIntentService extends IntentService {
 
     private void saveDataToDB(){
         ToDo todo = new ToDo();
-        todo.setTitle(AssignedTaskData.getInstance().task.mTask.title);
-        todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.mTask.startDate));
-        todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.mTask.endDate));
-        todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.mTask.id));
-        todo.setLocation(AssignedTaskData.getInstance().task.mTask.location);
-        todo.setNotes(AssignedTaskData.getInstance().task.mTask.notes);
-        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.mTask.todoTypeId));
+        todo.setTitle(AssignedTaskData.getInstance().task.get(0).title);
+        todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).startDate));
+        todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).endDate));
+        todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
+        todo.setLocation(AssignedTaskData.getInstance().task.get(0).location);
+        todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
+        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
 
         Repeat repeat = new Repeat();
         repeat.setIs_forever(false);
-        repeat.setRepeat_interval(AssignedTaskData.getInstance().task.mTask.repeatInterval);
+        repeat.setRepeat_interval(AssignedTaskData.getInstance().task.get(0).repeatInterval);
         App.daoSession.getRepeatDao().insert(repeat);
         todo.setRepeat(repeat);
 
         CheckList checkList = new CheckList();
-        checkList.setTitle(AssignedTaskData.getInstance().task.mTask.checkListData);
+        checkList.setTitle(AssignedTaskData.getInstance().task.get(0).checkListData);
         App.daoSession.getCheckListDao().insert(checkList);
         todo.setCheckList(checkList);
 

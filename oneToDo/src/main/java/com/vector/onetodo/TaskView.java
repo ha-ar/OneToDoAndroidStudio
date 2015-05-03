@@ -205,8 +205,8 @@ public class TaskView extends BaseActivity {
         }else{
 
             try {
-                for (int i = 0; i < AssignedTaskData.getInstance().task.attachments.size(); i++)
-                    showAttachments(AssignedTaskData.getInstance().task.attachments.get(i));
+                for (int i = 0; i < AssignedTaskData.getInstance().task.get(1).attachments.size(); i++)
+                    showAttachments(AssignedTaskData.getInstance().task.get(1).attachments.get(i));
             } catch (Exception npe) {
                 npe.printStackTrace();
             }

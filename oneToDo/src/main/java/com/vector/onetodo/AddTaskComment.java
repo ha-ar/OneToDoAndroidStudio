@@ -234,7 +234,11 @@ public class AddTaskComment extends Fragment {
 			} else{
 				userName = TaskComments.getInstance().comments.get(position).name;
 				String[] temp = TaskComments.getInstance().comments.get(position).name.split(" ");
-				initials = Utils.getInitials(temp[0],temp[1]);
+				try {
+					initials = Utils.getInitials(temp[0], temp[1]);
+				}catch (Exception e){
+					initials = "GU";
+				}
 			}
 
 			holder.name.setText(userName);

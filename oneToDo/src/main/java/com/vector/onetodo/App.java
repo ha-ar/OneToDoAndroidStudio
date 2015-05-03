@@ -63,13 +63,12 @@ public class App extends Application{
                     public void callback(String url, JSONObject json,
                                          AjaxStatus status) {
                         if (json != null) {
+                            Log.v("JSON APP TAKS", json.toString());
                             Gson gson = new Gson();
                             TaskData obj = gson.fromJson(json.toString(),
                                     TaskData.class);
                             TaskData.getInstance().setList(obj);
-                            Log.v("JSON",
-                                    TaskData.getInstance().result.todos.get(0).notes
-                                            + "");
+
                         }
                     }
                 });

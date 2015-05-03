@@ -22,20 +22,10 @@ public class AssignedTaskData {
 
 
 	@SerializedName("task")
-	public Task task = new Task();
+	public ArrayList<Task> task = new ArrayList<>();
 
 	public class Task {
 
-		@SerializedName("0")
-		public MTask mTask;
-		@SerializedName("todo_comment")
-		public ArrayList<Comment> comments;
-		@SerializedName("todo_attachment")
-		public ArrayList<String> attachments;
-
-	}
-
-	public class MTask{
 		@SerializedName("id")
 		public String id;
 		@SerializedName("first_name")
@@ -66,11 +56,9 @@ public class AssignedTaskData {
 		public String checkListData;
 		@SerializedName("notes")
 		public String  notes;
+		@SerializedName("todo_attachment")
+		public ArrayList<String> attachments;
+
 	}
 
-	public class Comment{
-		public String comment;
-		public String name;
-		public String time;
-	}
 }
