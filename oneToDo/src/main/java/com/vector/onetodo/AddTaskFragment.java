@@ -277,7 +277,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             case R.id.action_comment:
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.container, new AddTaskComment())
+                        .replace(R.id.container, AddTaskComment.newInstance(false, -1))
                         .addToBackStack(null)
                         .commit();
                 return true;
@@ -1728,8 +1728,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         // ********************* Data add hit Async task ******************//
         AddToServer aSync = new AddToServer(title, 1, start_date, "", is_location, r_location, location_tag,
-                locationType, notes, repeatDate,repeat_forever, MaxId,
-                AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, label_name, "", before, "", AddTaskFragment.this);
+                locationType, location, notes, repeatDate,repeat_forever, MaxId,
+                AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddTaskFragment.this);
         aSync.execute();
         getActivity().getSupportFragmentManager().popBackStack();
     }

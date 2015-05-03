@@ -75,9 +75,7 @@ import com.vector.model.TaskAdded;
 import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
-import com.vector.onetodo.db.gen.Comment;
 import com.vector.onetodo.db.gen.CommentDao;
-import com.vector.onetodo.db.gen.Friends;
 import com.vector.onetodo.db.gen.FriendsDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
@@ -2009,20 +2007,20 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		checklist.setTitle(checklist_data);
 		checklistdao.insert(checklist);
 		todo.setCheckList(checklist);
-
-		if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-			for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-
-				Comment commenT = new Comment();
-				commenT.setComment(AddTaskComment.comment.get(i));
-				commenT.setToDo(todo);
-				commentdao.insert(commenT);
-			}
-		}
-
-		Friends friend = new Friends();
-		friend.setEmail("email");
-		friendsdao.insert(friend);
+//
+//		if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
+//			for (int i = 0; i < AddTaskComment.comment.size(); i++) {
+//
+//				Comment commenT = new Comment();
+//				commenT.setComment(AddTaskComment.comment.get(i));
+//				commenT.setToDo(todo);
+//				commentdao.insert(commenT);
+//			}
+//		}
+//
+//		Friends friend = new Friends();
+//		friend.setEmail("email");
+//		friendsdao.insert(friend);
 		todo.setReminder(reminder);
 
 		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
@@ -2040,8 +2038,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 
 		AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
-				locationType, notes, repeatdate,repeat_forever, MaxId,
-				AddTaskComment.comment, null, checklist_data, assignedId, repeat, label_name, "", before, "", AddEventFragment.this);
+				locationType,location, notes, repeatdate,repeat_forever, MaxId,
+				AddTaskComment.comment, null, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddEventFragment.this);
 		asyn.execute();
 		getActivity().getSupportFragmentManager().popBackStack();
 	}

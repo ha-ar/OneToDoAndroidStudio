@@ -200,6 +200,7 @@ public class MainActivity extends BaseActivity implements
                     }
                     Intent intent = new Intent(MainActivity.this, TaskView.class);
                     intent.putExtra("todo_id", todoId);
+                    intent.putExtra("is_assigned_task", false);
                     startActivity(intent);
                     callNotificationClicked(NotificationData.getInstance().result.get(position).id);
                 }
@@ -356,9 +357,9 @@ public class MainActivity extends BaseActivity implements
                 break;
         }
         //update all pages manually
-//        TaskListFragment.setAdapter(this, 0, currentCondition);
-//        TaskListFragment.setAdapter(this, 1, currentCondition);
-//        TaskListFragment.setAdapter(this, 2, currentCondition);
+        TaskListFragment.setAdapter(this, 0, currentCondition);
+        TaskListFragment.setAdapter(this, 1, currentCondition);
+        TaskListFragment.setAdapter(this, 2, currentCondition);
         return super.onOptionsItemSelected(item);
     }
 
@@ -956,6 +957,7 @@ public class MainActivity extends BaseActivity implements
     private void initTabFragment(){
         // Initialize the ViewPager and set an adapter
         pager = (ViewPager) findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(3);
         tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(tabPagerAdapter);
 

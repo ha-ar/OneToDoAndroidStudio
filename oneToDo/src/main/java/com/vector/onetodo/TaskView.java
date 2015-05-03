@@ -36,6 +36,7 @@ public class TaskView extends BaseActivity {
     AlertDialog alert;
     ParallaxScrollView parallax;
     ImageView image;
+    private boolean isAssignedTask = false;
     private PopupWindow popupWindowTask;
     long todoId;
 
@@ -50,20 +51,27 @@ public class TaskView extends BaseActivity {
     }
 
     private void init() {
-        if(getIntent().getBooleanExtra("is_assigned_task", false)){
-            populateAssignedTaskData();
-        }else{
-            todoId = getIntent().getLongExtra("todo_id", -1);
-            ShowTaskViewData(todoId);
-        }
+        isAssignedTask = getIntent().getBooleanExtra("is_assigned_task", false);
+        todoId = getIntent().getLongExtra("todo_id", -1);
+        ShowTaskViewData(todoId);
 
         final View view1 = getLayoutInflater().inflate(
                 R.layout.landing_menu, null, false);
         aq_menu = new AQuery(this, view1);
         aq_menu.id(R.id.menu_item1).text("RSVP");
-        aq_menu.id(R.id.menu_item2).visibility(View.GONE);
         aq_menu.id(R.id.menu_item3).visibility(View.GONE);
-        popupWindowTask = new PopupWindow(view1, Utils.getDpValue(100,
+        aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupWindowTask.dismiss();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+        popupWindowTask = new PopupWindow(view1, Utils.getDpValue(150,
                 this), WindowManager.LayoutParams.WRAP_CONTENT, true);
         popupWindowTask.setBackgroundDrawable(getResources().getDrawable(
                 android.R.drawable.dialog_holo_light_frame));
@@ -116,12 +124,14 @@ public class TaskView extends BaseActivity {
                     popupWindowTask.dismiss();
                 else {
                     popupWindowTask.showAsDropDown(aq.id(R.id.imageView4)
-                            .getView(), 5, 5);
+                            .getView(), 0, 0);
                 }
             }
         });
         parallax.setImageViewToParallax(image);
 
+        if(isAssignedTask)
+            aq.id(R.id.btn_edit).getView().setVisibility(View.INVISIBLE);
         aq.id(R.id.btn_edit).clicked(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,22 +182,36 @@ public class TaskView extends BaseActivity {
         ToDo obj = toDoDao.load(id);
         int serverTaskPosition = -1;
         Log.e("size", TaskData.getInstance().result.todos.size()+"");
-        for(int i = 0; i < TaskData.getInstance().result.todos.size(); i++){
-            try {
-                if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
-                    serverTaskPosition = i;
-                    break;
+
+        if(!isAssignedTask) {
+            for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+                try {
+                    if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
+                        serverTaskPosition = i;
+                        break;
+                    }
+
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
+            }
 
-            }catch (NullPointerException e){e.printStackTrace();}
+            try {
+                for (int i = 0; i < TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.size(); i++)
+                    showAttachments(TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.get(i));
+            } catch (Exception npe) {
+                npe.printStackTrace();
+            }
+        }else{
+
+            try {
+                for (int i = 0; i < AssignedTaskData.getInstance().task.attachments.size(); i++)
+                    showAttachments(AssignedTaskData.getInstance().task.attachments.get(i));
+            } catch (Exception npe) {
+                npe.printStackTrace();
+            }
         }
 
-        try{
-            for(int i = 0; i < TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.size(); i++)
-                showAttachments(TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.get(i));
-        }catch (Exception npe){
-            npe.printStackTrace();
-        }
 
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
@@ -272,46 +296,46 @@ public class TaskView extends BaseActivity {
         }
     }
 
-    private void populateAssignedTaskData(){
-        AssignedTaskData obj = AssignedTaskData.getInstance();
-        aq.id(R.id.title).text(obj.task.get(0).title);
-        try {
-            aq.id(R.id.repeat).text(obj.task.get(0).repeatUntil);
-            aq.id(R.id.repeat_layout).visible();
-        }catch (NullPointerException npe){}
-
-        String strDate = String.valueOf(obj.task.get(0).startDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(Utils.milliFromServerDate(strDate));
-        strDate = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT,
-                Locale.US)
-                + " "
-                + calendar.get(Calendar.DAY_OF_MONTH)
-                + " "
-                + calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
-                Locale.US) + " " + calendar.get(Calendar.YEAR);
-        aq.id(R.id.time).text(strDate);
-        try{
-            aq.id(R.id.location).text(obj.task.get(0).location);
-            aq.id(R.id.location_layout).visible();
-        }catch (NullPointerException npe){}
-        try {
-//            aq.id(R.id.reminder).text("Remind before " + obj.task.get(0). / 60000 + " mins");
-        }catch (NullPointerException npe){}
-        try {
-            aq.id(R.id.repeat_view).text(obj.task.get(0).repeatUntil);
-            aq.id(R.id.repeat_layout).visible();
-        }catch (NullPointerException npe){}
-        try {
-            aq.id(R.id.check_list).text(obj.task.get(0).checkListData);
-            aq.id(R.id.check_list_layout).visible();
-            toggleCheckList(aq.id(R.id.check_list).getView());
-        }catch (NullPointerException npe){}
-        try{
-            aq.id(R.id.notes).text(obj.task.get(0).notes);
-            aq.id(R.id.notes_layout).visible();
-        }catch (NullPointerException npe){}
-    }
+//    private void populateAssignedTaskData(){
+//        AssignedTaskData obj = AssignedTaskData.getInstance();
+//        aq.id(R.id.title).text(obj.task.get(0).title);
+//        try {
+//            aq.id(R.id.repeat).text(obj.task.get(0).repeatUntil);
+//            aq.id(R.id.repeat_layout).visible();
+//        }catch (NullPointerException npe){}
+//
+//        String strDate = String.valueOf(obj.task.get(0).startDate);
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(Utils.milliFromServerDate(strDate));
+//        strDate = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT,
+//                Locale.US)
+//                + " "
+//                + calendar.get(Calendar.DAY_OF_MONTH)
+//                + " "
+//                + calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
+//                Locale.US) + " " + calendar.get(Calendar.YEAR);
+//        aq.id(R.id.time).text(strDate);
+//        try{
+//            aq.id(R.id.location).text(obj.task.get(0).location);
+//            aq.id(R.id.location_layout).visible();
+//        }catch (NullPointerException npe){}
+//        try {
+////            aq.id(R.id.reminder).text("Remind before " + obj.task.get(0). / 60000 + " mins");
+//        }catch (NullPointerException npe){}
+//        try {
+//            aq.id(R.id.repeat_view).text(obj.task.get(0).repeatUntil);
+//            aq.id(R.id.repeat_layout).visible();
+//        }catch (NullPointerException npe){}
+//        try {
+//            aq.id(R.id.check_list).text(obj.task.get(0).checkListData);
+//            aq.id(R.id.check_list_layout).visible();
+//            toggleCheckList(aq.id(R.id.check_list).getView());
+//        }catch (NullPointerException npe){}
+//        try{
+//            aq.id(R.id.notes).text(obj.task.get(0).notes);
+//            aq.id(R.id.notes_layout).visible();
+//        }catch (NullPointerException npe){}
+//    }
     private void toggleCheckList(View switchView) {
         View newView;
         try {

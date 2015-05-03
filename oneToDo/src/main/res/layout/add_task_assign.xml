@@ -47,11 +47,10 @@
 
             <ImageView
                 android:id="@+id/assign_add"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/assign_menu"
-                android:alpha="0.3"
                 android:background="@drawable/accept" />
 
             <ImageView

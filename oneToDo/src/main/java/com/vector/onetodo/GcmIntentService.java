@@ -16,8 +16,13 @@ import com.androidquery.callback.AjaxStatus;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.vector.model.AssignedTaskData;
+import com.vector.onetodo.db.gen.CheckList;
+import com.vector.onetodo.db.gen.Repeat;
 import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
+
+import java.util.List;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -120,9 +125,6 @@ public class GcmIntentService extends IntentService {
                     Gson gson = new Gson();
                     AssignedTaskData.getInstance().setList(gson.fromJson(json, AssignedTaskData.class));
                     saveDataToDB();
-                    NotificationHandler nHandler;
-                    nHandler = NotificationHandler.getInstance(getApplicationContext());
-                    nHandler.createSimpleNotification2(getApplicationContext(), title, message, todoId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -132,13 +134,30 @@ public class GcmIntentService extends IntentService {
 
     private void saveDataToDB(){
         ToDo todo = new ToDo();
-        todo.setTitle(AssignedTaskData.getInstance().task.get(0).title);
-        todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).startDate));
-        todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).endDate));
-        todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
-        todo.setLocation(AssignedTaskData.getInstance().task.get(0).location);
-        todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
-        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
+        todo.setTitle(AssignedTaskData.getInstance().task.mTask.title);
+        todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.mTask.startDate));
+        todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.mTask.endDate));
+        todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.mTask.id));
+        todo.setLocation(AssignedTaskData.getInstance().task.mTask.location);
+        todo.setNotes(AssignedTaskData.getInstance().task.mTask.notes);
+        todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.mTask.todoTypeId));
+
+        Repeat repeat = new Repeat();
+        repeat.setIs_forever(false);
+        repeat.setRepeat_interval(AssignedTaskData.getInstance().task.mTask.repeatInterval);
+        App.daoSession.getRepeatDao().insert(repeat);
+        todo.setRepeat(repeat);
+
+        CheckList checkList = new CheckList();
+        checkList.setTitle(AssignedTaskData.getInstance().task.mTask.checkListData);
+        App.daoSession.getCheckListDao().insert(checkList);
+        todo.setCheckList(checkList);
+
         App.daoSession.getToDoDao().insert(todo);
+
+        List<ToDo> addedTodo = App.daoSession.getToDoDao().queryBuilder().orderDesc(ToDoDao.Properties.Id).list();
+        NotificationHandler nHandler;
+        nHandler = NotificationHandler.getInstance(getApplicationContext());
+        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(), addedTodo.get(0).getLocation(), addedTodo.get(0).getId());
     }
 }

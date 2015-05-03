@@ -88,7 +88,7 @@ public class NotificationHandler {
         mNotificationManager.notify(0, mBuilder.build());
 
     }
-	public void createSimpleNotification2(Context context,String title,String message, String todo_id) {
+	public void createSimpleNotification2(Context context,String title,String message, long todo_id) {
 		// Creates an explicit intent for an Activity
 	
 		Intent resultIntent = new Intent(context, TaskView.class);

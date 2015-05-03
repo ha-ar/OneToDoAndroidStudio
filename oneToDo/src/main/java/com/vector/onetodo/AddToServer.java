@@ -42,7 +42,8 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     private String locationType;
     private boolean repeat_forever;
     private String repeatDate;
-    private int MaxId;
+    private String location;
+    private int MaxId, reminder;
     private List<String> comment = new ArrayList<>();
     private List<String> commentTime = new ArrayList<>();
     private String checklist_data;
@@ -53,9 +54,9 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     private onTaskAdded mCallBack;
 
     AddToServer(String title, int titleCheck, String start_date, String end_date,
-                boolean is_location, String r_location, String location_tag, String locationType,
+                boolean is_location, String r_location, String location_tag, String locationType, String location,
                 String notes, String repeatDate, boolean repeat_forever, int MaxId, List<String> comment,
-                List<String> commentTime, String checklist_data, ArrayList<String> assignedID, String repeat,
+                List<String> commentTime, String checklist_data, ArrayList<String> assignedID, String repeat, int reminder,
                 String label_name, String labelColor, String before, String r_time, onTaskAdded mCallBack){
 
         this.title = title;
@@ -79,6 +80,8 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         this.repeat = repeat;
         this.label_name = label_name;
         this.labelColor = labelColor;
+        this.reminder = reminder;
+        this.location = location;
         this.mCallBack = mCallBack;
 
     }
@@ -170,6 +173,13 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                 pairs.add(new BasicNameValuePair(
                         "todo_repeat[repeat_until]", repeatDate));
         }
+        if (location != null) {
+            pairs.add(new BasicNameValuePair(
+                    "todo[location]", location));
+        }
+
+        pairs.add(new BasicNameValuePair(
+                "todo_reminder[time]", repeat));
         for (int i = 1; i <= MaxId; i++) {
             pairs.add(new BasicNameValuePair("todo_attachment[" + (i - 1)
                     + "][attachment_path]", App.attach.getString(titleCheck
@@ -177,7 +187,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         }
 
         MaxId = 0;
-        if (comment != null && comment.size() > 0) {
+        if ((comment != null) && (comment.size() > 0)) {
             for (int i = 0; i < comment.size(); i++) {
                 pairs.add(new BasicNameValuePair("todo_comment[" + (i - 1)
                         + "][user_id]", Constants.user_id + ""));

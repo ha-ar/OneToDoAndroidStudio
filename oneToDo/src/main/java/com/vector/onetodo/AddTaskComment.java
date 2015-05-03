@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,27 +16,51 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
+import com.google.gson.Gson;
+import com.vector.model.TaskComments;
+import com.vector.onetodo.db.gen.ToDo;
+import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AddTaskComment extends Fragment {
 
-	AQuery aq;
+	private AQuery aq;
 	public static List<String> commment, date, time, comment, commenttime;
-	String hms;
-	comment_A adapter;
-	SharedPreferences sprefrences;
-	Editor editor;
-	int MaxId, MinId;
+	private String hms;
+	private comment_A adapter;
+	private SharedPreferences sprefrences;
+	private Editor editor;
+	private int MaxId, serverID;
+	private boolean isAssignedTask;
+	private long todoId;
+
+	public static AddTaskComment newInstance(boolean isAssignedTask, long todoId) {
+		AddTaskComment myFragment = new AddTaskComment();
+		Bundle args = new Bundle();
+		args.putBoolean("is_assigned_task", isAssignedTask);
+		args.putLong("todo_id", todoId);
+		myFragment.setArguments(args);
+		return myFragment;
+	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		setRetainInstance(true);
 		View view = inflater.inflate(R.layout.comment, container, false);
+		isAssignedTask = getArguments().getBoolean("is_assigned_task");
+		todoId = getArguments().getLong("todo_id", -1);
 		commment = new ArrayList<>();
 		time = new ArrayList<>();
 		date = new ArrayList<>();
@@ -55,32 +80,43 @@ public class AddTaskComment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		Loadcommentmax();
-		MinId = MaxId;
+//		Loadcommentmax();
 		comment = new ArrayList<>();
 		commenttime = new ArrayList<>();
 
-		aq.id(R.id.textView1).text(AddTaskFragment.title);
 		adapter = new comment_A(getActivity());
 
-		if (MaxId != 0) {
-			for (int i = 1; i <= MaxId; i++) {
-				commment.add(sprefrences.getString(1 + "comment" + i, null));
-				time.add(sprefrences.getString(1 + "time" + i, null));
-
-				aq.id(R.id.nocooment_layout).visibility(View.GONE);
-				aq.id(R.id.comment_list).visibility(View.VISIBLE);
-				adapter.notifyDataSetChanged();
-				aq.id(R.id.comment_list).getListView().setAdapter(adapter);
-				aq.id(R.id.comment).text("");
-			}
+//		if ((todoId == -1) && (MaxId > 0)) {
+//			for (int i = 1; i <= MaxId; i++) {
+//				commment.add(sprefrences.getString(1 + "comment" + i, null));
+//				time.add(sprefrences.getString(1 + "time" + i, null));
+//
+//				aq.id(R.id.nocooment_layout).visibility(View.GONE);
+//				aq.id(R.id.comment_list).visibility(View.VISIBLE);
+//				adapter.notifyDataSetChanged();
+//				aq.id(R.id.comment_list).getListView().setAdapter(adapter);
+//				aq.id(R.id.comment).text("");
+//			}
+//			aq.id(R.id.nocooment_layout).visibility(View.GONE);
+//			aq.id(R.id.comment_list).visibility(View.VISIBLE);
+//			adapter.notifyDataSetChanged();
+//			aq.id(R.id.comment_list).getListView().setAdapter(adapter);
+//			aq.id(R.id.comment).text("");
+//		}else
+//
+		ToDo obj;
+		if(todoId != -1){
+			ToDoDao toDoDao = App.daoSession.getToDoDao();
+			obj = toDoDao.load(todoId);
+			serverID = obj.getTodo_server_id();
+			getComments(obj.getTodo_server_id());
 		}
 
 		aq.id(R.id.comment_attachment).clicked(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				AddTaskFragment.attach.show();
+//				AddTaskFragment.attach.show();
 			}
 		});
 
@@ -106,20 +142,21 @@ public class AddTaskComment extends Fragment {
 											.toDays(millis))),
 							TimeUnit.MILLISECONDS.toMinutes(millis)
 									- TimeUnit.HOURS
-											.toMinutes(TimeUnit.MILLISECONDS
-													.toHours(millis)),
+									.toMinutes(TimeUnit.MILLISECONDS
+											.toHours(millis)),
 							TimeUnit.MILLISECONDS.toSeconds(millis)
 									- TimeUnit.MINUTES
-											.toSeconds(TimeUnit.MILLISECONDS
-													.toMinutes(millis)));
-					Loadcommentmax();
-					MaxId = MaxId + 1;
-					Savecomment(MaxId,
-							aq.id(R.id.comment).getText().toString(), hms);
-					time.add(hms);
-					date.add(Utils.getCurrentYear(1) + "-"
+									.toSeconds(TimeUnit.MILLISECONDS
+											.toMinutes(millis)));
+//					Loadcommentmax();
+//					MaxId = MaxId + 1;
+//					Savecomment(MaxId,
+//							aq.id(R.id.comment).getText().toString(), hms);
+					String dateTime = Utils.getCurrentYear(1) + "-"
 							+ Utils.getCurrentMonthDigit(1) + "-"
-							+ Utils.getCurrentDayDigit(1) + " " + hms);
+							+ Utils.getCurrentDayDigit(1) + " " + hms;
+					time.add(hms);
+					date.add(dateTime);
 
 					comment.add(aq.id(R.id.comment).getText()
 							.toString());
@@ -130,14 +167,16 @@ public class AddTaskComment extends Fragment {
 					aq.id(R.id.nocooment_layout).visibility(View.GONE);
 					aq.id(R.id.comment_list).visibility(View.VISIBLE);
 					commment.add(aq.id(R.id.comment).getText().toString());
-					int size = commment.size();
-					size = size + 1 - 1;
+
+
+					TaskComments.getInstance().addComment(aq.id(R.id.comment).getText().toString(), App.prefs.getUserName(), hms);
+					sendComments(aq.id(R.id.comment).getText().toString(),dateTime);
 					adapter.notifyDataSetChanged();
 					aq.id(R.id.comment_list).getListView().setAdapter(adapter);
 					aq.id(R.id.comment).text("");
 				}
 			}
-		}); 
+		});
 	}
 
 	public class comment_A extends BaseAdapter {
@@ -187,14 +226,25 @@ public class AddTaskComment extends Fragment {
 			} else {
 				holder = (Holder) row.getTag();
 			}
-			holder.name.setText(App.prefs.getUserName());
+			String userName = "", initials= "";
+
+			if(todoId == -1) {
+				userName = App.prefs.getUserName();
+				initials = App.prefs.getInitials();
+			} else{
+				userName = TaskComments.getInstance().comments.get(position).name;
+				String[] temp = TaskComments.getInstance().comments.get(position).name.split(" ");
+				initials = Utils.getInitials(temp[0],temp[1]);
+			}
+
+			holder.name.setText(userName);
 			holder.date.setText(time.get(position));
 			holder.comment.setText(commment.get(position));
-			holder.initials.setText(App.prefs.getInitials());
+			holder.initials.setText(initials);
 			return row;
 		}
 	}
- 
+
 	public void Savecomment(int id, String comment, String time) {
 		// 0 - for private mode
 		editor.putInt("cMax", id);
@@ -218,8 +268,53 @@ public class AddTaskComment extends Fragment {
 		editor.commit();
 	}
 
-	public void removeAllComments(){
-		editor.clear().commit();
+
+	private void getComments(int todoID){
+		aq.progress(aq.id(R.id.dialog).getProgressBar()).ajax("http://api.heuristix.net/one_todo/v1/comment/"
+						+ todoID, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+										 AjaxStatus status) {
+						if (json != null) {
+							Gson gson = new Gson();
+							TaskComments obj = gson.fromJson(json.toString(),
+									TaskComments.class);
+							TaskComments.getInstance().setObj(obj);
+							for (int i = 0; i < TaskComments.getInstance().comments.size(); i++) {
+								commment.add(TaskComments.getInstance().comments.get(i).comment);
+								time.add(TaskComments.getInstance().comments.get(i).time);
+							}
+							aq.id(R.id.nocooment_layout).visibility(View.GONE);
+							aq.id(R.id.comment_list).visibility(View.VISIBLE);
+							adapter.notifyDataSetChanged();
+							aq.id(R.id.comment_list).getListView().setAdapter(adapter);
+							aq.id(R.id.comment).text("");
+						}
+
+					}
+				});
+	}
+	private void sendComments(String comment, String dateTime){
+		if(todoId == -1)
+			return;
+
+		Map<String, String> params = new HashMap<>();
+		params.put("todo_id", String.valueOf(serverID));
+		params.put("user_id", String.valueOf(App.prefs.getUserId()));
+		params.put("comment", comment);
+		params.put("date_time", dateTime);
+		aq.ajax("http://api.heuristix.net/one_todo/v1/comment", params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+										 AjaxStatus status) {
+						if (json != null) {
+							Log.e("Comment added", json.toString());
+						}
+
+					}
+				});
 	}
 
 }

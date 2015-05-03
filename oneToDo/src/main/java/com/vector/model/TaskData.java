@@ -99,7 +99,7 @@ public class TaskData {
 
             @SerializedName("invitee_list")
             public Invitee invitee_list;
-		
+
 	}
 
     public class Comments{
