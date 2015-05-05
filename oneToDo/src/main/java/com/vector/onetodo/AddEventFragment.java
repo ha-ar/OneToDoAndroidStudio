@@ -144,7 +144,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	private int pposition = -1;
 	private int itempos = -1;
 	private int MaxId = -1;
-	private Editor editor, editorattach;
+	private Editor editor, editorAttach, editorComment;
 	private AlertDialog add_new_label_alert, date_time_alert, label_edit, location_del,
 			attach_alert;
 	public static int currentHours, currentMin, currentDayDigit, currentYear,
@@ -206,7 +206,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
 		editor = App.label.edit();
-		editorattach = App.attach.edit();
+		editorAttach = App.attach.edit();
+		editorComment = App.comment.edit();
 		Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
 		if (toolbar != null)
 			((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
@@ -243,6 +244,13 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 				return true;
 			case R.id.action_comment:
+				FragmentManager manager = getFragmentManager();
+				FragmentTransaction transaction = manager.beginTransaction();
+				transaction.setCustomAnimations(R.anim.slide_right,
+						R.anim.slide_left, R.anim.slide_right, R.anim.slide_left);
+				transaction.replace(R.id.content, AddTaskComment.newInstance(false, -1));
+				transaction.addToBackStack(null);
+				transaction.commit();
 				return true;
 			case R.id.action_show_hide:
 				popupWindowEvent.showAtLocation(
@@ -267,8 +275,16 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		currentDayDigit = Utils.getCurrentDayDigit(dayPosition);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
-		currentHours = Utils.getCurrentHours();
+		currentHours = Utils.getCurrentHours() + 1;
 		currentMin = Utils.getCurrentMins();
+
+		endEventYear = Utils.getCurrentYear(dayPosition);
+		endEventMonDigit = Utils.getCurrentMonthDigit(dayPosition);
+		endEventDayDigit = Utils.getCurrentDayDigit(dayPosition) + 1;
+		endEventDay = Utils.getCurrentDay(dayPosition + 1, Calendar.SHORT);
+		endEventMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
+		endEventHours = Utils.getCurrentHours();
+		endEventMin = Utils.getCurrentMins();
 
 		inflatingLayoutsEvents.put(0, R.layout.add_event_title);
 		inflatingLayoutsEvents.put(1, R.layout.add_event_assign);
@@ -411,7 +427,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			}
 		});
 
-		// *********************** Title End
 
 		// ******************************ALL DAY sWITCH
 
@@ -454,6 +469,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				.getView();
 		int density = getResources().getDisplayMetrics().densityDpi;
 		showRightDateAndTime();
+		dPicker.setMinDate(System.currentTimeMillis() - 1000);
 		dPicker.init(currentYear, currentMonDigit, currentDayDigit,
 				new OnDateChangedListener() {
 
@@ -1152,35 +1168,35 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private void showRightDateAndTime() {
 
-		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == View.VISIBLE) {
-			String tempCurrentDayDigit = String.format("%02d", endEventDayDigit);
-			String tempCurrentHours = String.format("%02d", endEventHours);
-			String tempCurrentMins = String.format("%02d", endEventMin);
+//		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == View.VISIBLE) {
+		String tempCurrentDayDigit = String.format("%02d", endEventDayDigit);
+		String tempCurrentHours = String.format("%02d", endEventHours);
+		String tempCurrentMins = String.format("%02d", endEventMin);
 
-			aq.id(R.id.day_field_to).text(endEventDay)
+		aq.id(R.id.day_field_to).text(endEventDay)
 			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
-			aq.id(R.id.date_field_to).text(
-					tempCurrentDayDigit
-							+ Utils.getDayOfMonthSuffix(endEventDayDigit))
+		aq.id(R.id.date_field_to).text(
+				tempCurrentDayDigit
+						+ Utils.getDayOfMonthSuffix(endEventDayDigit))
 			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
-			aq.id(R.id.month_year_field_to).text(endEventMon);
-			aq.id(R.id.time_to)
-					.text(tempCurrentHours + " : " + tempCurrentMins);
+		aq.id(R.id.month_year_field_to).text(endEventMon);
+		aq.id(R.id.time_to)
+				.text(tempCurrentHours + " : " + tempCurrentMins);
 
-		}
+//		}
 
-		else if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
-			String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
-			String tempCurrentHours = String.format("%02d", currentHours);
-			String tempCurrentMins = String.format("%02d", currentMin);
-			aq.id(R.id.day_field_from).text(currentDay);
-			aq.id(R.id.date_field_from).text(
-					tempCurrentDayDigit
-							+ Utils.getDayOfMonthSuffix(currentDayDigit));
-			aq.id(R.id.month_year_field_from).text(currentMon);
-			aq.id(R.id.time_from).text(
-					tempCurrentHours + " : " + tempCurrentMins);
-		}
+//		else if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
+		String tempEndDayDigit = String.format("%02d", currentDayDigit);
+		String tempEndHours = String.format("%02d", currentHours);
+		String tempEndMins = String.format("%02d", currentMin);
+		aq.id(R.id.day_field_from).text(currentDay);
+		aq.id(R.id.date_field_from).text(
+				tempEndDayDigit
+						+ Utils.getDayOfMonthSuffix(currentDayDigit));
+		aq.id(R.id.month_year_field_from).text(currentMon);
+		aq.id(R.id.time_from).text(
+				tempEndHours + " : " + tempEndMins);
+//		}
 	}
 
 	private void showRightDateAndTimeForDialog(View day, View month) {
@@ -1721,10 +1737,10 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	public void Saveattach(int id, String path, String type) {
 		// 0 - for private mode
-		editorattach.putInt("2Max", id);
-		editorattach.putString(2 + "path" + id, path);
-		editorattach.putString(2 + "type" + id, type); // Storing float
-		editorattach.commit();
+		editorAttach.putInt("2Max", id);
+		editorAttach.putString(2 + "path" + id, path);
+		editorAttach.putString(2 + "type" + id, type); // Storing float
+		editorAttach.commit();
 	}
 
 	public void Loadattachmax() {
@@ -1737,9 +1753,9 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	}
 
 	public void Removeattach(int id) {
-		editorattach.remove(2 + "path" + id); // will delete key name
-		editorattach.remove(2 + "type" + id); // will delete key email
-		editorattach.commit();
+		editorAttach.remove(2 + "path" + id); // will delete key name
+		editorAttach.remove(2 + "type" + id); // will delete key email
+		editorAttach.commit();
 	}
 
 	private void dragAndDrop(){
@@ -1816,6 +1832,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private void saveEvent() {
 		assignedId.clear();
+		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
+			assignedId.add(key);
 
 		if (aq.id(R.id.event_title).getText().toString().isEmpty()) {
 			Toast.makeText(getActivity(), "Please enter title",
@@ -1827,19 +1845,27 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		title = aq.id(R.id.event_title).getText().toString();
 
-		ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_event).getView();
-		boolean is_allday = switCh.isChecked();
+		ToggleButton mSwitch = (ToggleButton) aq.id(R.id.switch_event).getView();
+		boolean isAllDay = mSwitch.isChecked();
 
-		String start_date = AddEventFragment.currentYear+ "-"
-				+ (AddEventFragment.currentMonDigit + 1) + "-"
-				+  AddEventFragment.currentDayDigit + " "
-				+ AddEventFragment.currentHours + ":"
-				+ AddEventFragment.currentMin +":00";
-		String end_date = AddEventFragment.endEventYear + "-"
-				+ (AddEventFragment.endEventMonDigit + 1) + "-"
-				+ AddEventFragment.endEventDayDigit + " "
-				+ AddEventFragment.endEventHours + ":"
-				+ AddEventFragment.endEventMin +":00";
+		if(isAllDay){
+			currentHours = 0;
+			currentMin = 0;
+			endEventHours = 0;
+			endEventMin = 0;
+		}
+
+		String start_date = currentYear+ "-"
+				+ (currentMonDigit + 1) + "-"
+				+ currentDayDigit + " "
+				+ currentHours + ":"
+				+ currentMin +":00";
+
+		String end_date = endEventYear + "-"
+				+ (endEventMonDigit + 1) + "-"
+				+ endEventDayDigit + " "
+				+ endEventHours + ":"
+				+ endEventMin +":00";
 
 		String location = aq.id(R.id.location_event).getText().toString();
 		String r_location= "", location_tag="";
@@ -1873,8 +1899,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				.getText().toString();
 
 		String notes = aq.id(R.id.notes_event).getText().toString();
-		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
-			assignedId.add(key);
+
 
 		Date startDate, endDate;
 		long startDateInMilli = 0, endDateInMilli = 0;
@@ -1900,8 +1925,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			reminderTime = Utils.getReminderTime(before);
 			Log.e("reminder time", reminderTime+"");
 		} else {
-			//TODO set notification by GEO fence
-			Geofences geoFence = new Geofences(getActivity());
 			if (before.contains("On Arrive")) {
 				is_locationtype = 0;
 				locationType = "On Arrive";
@@ -1937,7 +1960,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		todo.setTitle(title);
 		todo.setStart_date(startDateInMilli);
 		todo.setEnd_date(endDateInMilli);
-		todo.setIs_allday(is_allday);
+		todo.setIs_allday(isAllDay);
 		todo.setLocation(location);
 		todo.setNotes(notes);
 		todo.setIs_done(false);
@@ -1975,31 +1998,21 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		checklist.setTitle(checklist_data);
 		checklistdao.insert(checklist);
 		todo.setCheckList(checklist);
-//
-//		if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-//			for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-//
-//				Comment commenT = new Comment();
-//				commenT.setComment(AddTaskComment.comment.get(i));
-//				commenT.setToDo(todo);
-//				commentdao.insert(commenT);
-//			}
-//		}
-//
-//		Friends friend = new Friends();
-//		friend.setEmail("email");
-//		friendsdao.insert(friend);
-		todo.setReminder(reminder);
 
 		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
 
 		alarm = new AlarmManagerBroadcastReceiver();
 		geoFence = new Geofences(getActivity());
 
-		AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_location, r_location, location_tag,
-				locationType,location, notes, repeatdate,repeat_forever, MaxId,
-				AddTaskComment.comment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddEventFragment.this);
-		asyn.execute();
+		if(isEditMode){
+			todo.setId(todoId);
+			tododao.update(todo);
+		}else {
+			AddToServer asyn = new AddToServer(title, 2, start_date, end_date, isAllDay, is_location, r_location, location_tag,
+					locationType, location, notes, repeatdate, repeat_forever, MaxId,
+					AddTaskComment.comment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime, label_name, "", before, "", AddEventFragment.this);
+			asyn.execute();
+		}
 		getActivity().getSupportFragmentManager().popBackStack();
 	}
 	private void db_initialize() {
@@ -2079,6 +2092,15 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	public void taskAdded() {
 		todo.setTodo_server_id(TaskAdded.getInstance().id);
 		tododao.insert(todo);
+
+		editorAttach.clear().commit();
+		editorComment.clear().commit();
+
+		//have to refresh them all
+		TaskListFragment.setAdapter(MainActivity.act, 0, null);
+		TaskListFragment.setAdapter(MainActivity.act, 1, null);
+		TaskListFragment.setAdapter(MainActivity.act, 2, null);
+
 		App.updateTaskList(getActivity());
 		if (!todo.getReminder().getLocation().isEmpty())
 			addGeofence(todo);

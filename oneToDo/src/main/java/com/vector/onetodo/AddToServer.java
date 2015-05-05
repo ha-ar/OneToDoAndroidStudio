@@ -8,6 +8,7 @@ import com.vector.model.TaskAdded;
 import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -51,9 +52,10 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     private String repeat;
     private String label_name;
     private String labelColor;
+    private boolean isAllDay;
     private onTaskAdded mCallBack;
 
-    AddToServer(String title, int titleCheck, String start_date, String end_date,
+    AddToServer(String title, int titleCheck, String start_date, String end_date, boolean isAllDay,
                 boolean is_location, String r_location, String location_tag, String locationType, String location,
                 String notes, String repeatDate, boolean repeat_forever, int MaxId, List<String> comment,
                 List<String> commentTime, String checklist_data, ArrayList<String> assignedID, String repeat, int reminder,
@@ -82,6 +84,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         this.labelColor = labelColor;
         this.reminder = reminder;
         this.location = location;
+        this.isAllDay = isAllDay;
         this.mCallBack = mCallBack;
 
     }
@@ -97,14 +100,22 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
 
         try {
             response = client.execute(post);
-        } catch (IOException e1) {
+        } catch (Exception e1) {
             e1.printStackTrace();
             this.cancel(true);
         }
         String temp = "";
         try {
-            temp = EntityUtils.toString(response.getEntity());
-            Log.e("Task Added?", temp);
+            int responseCode = response.getStatusLine().getStatusCode();
+            switch(responseCode) {
+                case 200:
+                    HttpEntity entity = response.getEntity();
+                    if(entity != null) {
+                        temp = EntityUtils.toString(entity);
+                    }
+                    break;
+            }
+            Log.e("Task Added Response", temp);
             Gson gson = new Gson();
             TaskAdded obj = gson.fromJson(temp,
                     TaskAdded.class);
@@ -145,6 +156,8 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         if (end_date != null) {
             pairs.add(new BasicNameValuePair("todo[end_date]", end_date));
         }
+        pairs.add(new BasicNameValuePair(
+                "todo[is_allday]", (isAllDay) ? 1+"" : 0+""));
 
         if (notes != null)
             pairs.add(new BasicNameValuePair("todo[notes]", notes));
@@ -175,7 +188,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         }
         if (location != null) {
             pairs.add(new BasicNameValuePair(
-                    "todo[location]", location));
+                    "todo[todo_location]", location));
         }
 
         for (int i = 1; i <= MaxId; i++) {
@@ -220,7 +233,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
             }
         }
 
-        for (int i = 0; i < MaxId; i++) {
+            for (int i = 0; i < MaxId; i++) {
             pairs.add(new BasicNameValuePair("todo_attachment[" + i
                     + "][attachment_path]", App.attach.getString(titleCheck
                     + "path" + i, null)));

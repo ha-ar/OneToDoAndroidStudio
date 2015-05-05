@@ -336,7 +336,7 @@ public class MainActivity extends BaseActivity implements
                 toggleRightDrawer();
                 break;
             case R.id.action_label:
-                initLabelsFragment();
+//                initLabelsFragment();
             case TYPE:
                 initTabFragment();
             case TASK:

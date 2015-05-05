@@ -2011,7 +2011,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
             }
 
 
-            AddToServer asyn = new AddToServer(title, 3, start_date, end_date, is_location, r_location, location_tag,
+            AddToServer asyn = new AddToServer(title, 3, start_date, end_date, is_allday, is_location, r_location, location_tag,
                     locationtype,location, notes, repeatdate,repeat_forever, MaxId,
                     AddTaskComment.comment, null, checklist_data, assignedId, repeat,reminderTime, label_name, "", before, "", AddScheduleFragment.this);
             asyn.execute();

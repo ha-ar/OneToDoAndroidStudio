@@ -61,8 +61,10 @@ public class NotificationHandler {
     public void createNotification(Context context, Intent intent) {
         // Creates an explicit intent for an Activity
 
+		long todoId = intent.getExtras().getLong("id");
         Intent resultIntent = new Intent(context, TaskView.class);
-        resultIntent.putExtra("todo_id", intent.getExtras().getLong("id"));
+        resultIntent.putExtra("todo_id", todoId);
+		boolean isAllDay = App.daoSession.getToDoDao().load(todoId).getIs_allday();
 
         // Creating a artificial activity stack for the notification activity
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -76,12 +78,13 @@ public class NotificationHandler {
         // Building the notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(intent.getExtras().getString("title"))
-                .setContentText(intent.getExtras().getString("location")) // notification text
-                .addAction(0, "Snooze", resultPending)
-                .addAction(0, "Done", resultPending)
-                .setContentIntent(resultPending); // notification intent
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(intent.getExtras().getString("title"))
+				.setContentText(intent.getExtras().getString("location")) // notification text
+				.addAction(0, "Snooze", resultPending)
+				.addAction(0, "Done", resultPending)
+				.setOngoing(isAllDay)
+				.setContentIntent(resultPending); // notification intent
 
         // mId allows you to update the notification later on.
 //        mBuilder.addflags |= Notification.FLAG_AUTO_CANCEL;

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -172,17 +171,11 @@ public class AddTaskAssign extends Fragment {
 
 	public class TabPagerAdapter extends FragmentPagerAdapter {
 
-		private SparseArrayCompat<ProjectsScrollHolder> mScrollTabHolders;
-		private ProjectsScrollHolder mListener;
 
 		public TabPagerAdapter(FragmentManager fm) {
 			super(fm);
-			mScrollTabHolders = new SparseArrayCompat<ProjectsScrollHolder>();
 		}
 
-		public void setTabHolderScrollingContent(ProjectsScrollHolder listener) {
-			mListener = listener;
-		}
 
 		@Override
 		public int getCount() {
@@ -203,10 +196,6 @@ public class AddTaskAssign extends Fragment {
 
 		}
 
-		public SparseArrayCompat<ProjectsScrollHolder> getScrollTabHolders() {
-			return mScrollTabHolders;
-		}
-
 		@Override
 		public Fragment getItem(int position) {
 			ProjectsTabHolder fragment;
@@ -217,10 +206,6 @@ public class AddTaskAssign extends Fragment {
 				fragment = AssignListFragment
 					.newInstance(position);
 
-			mScrollTabHolders.put(position, fragment);
-			if (mListener != null) {
-				fragment.setScrollTabHolder(mListener);
-			}
 			return fragment;
 		}
 	}

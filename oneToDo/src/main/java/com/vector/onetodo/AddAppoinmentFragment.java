@@ -1202,7 +1202,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
             // ********************* Data add hit Asyntask
 
-            AddToServer asyn = new AddToServer(title, 4, start_date, end_date, is_location, r_location, location_tag,
+            AddToServer asyn = new AddToServer(title, 4, start_date, end_date, is_allday, is_location, r_location, location_tag,
                     locationtype, location,notes, repeatdate,false, 0,
                     AddTaskComment.comment, null, checklist_data, assignedId, repeat,reminderTime, label_name, "", before, "", AddAppoinmentFragment.this);
             asyn.execute();

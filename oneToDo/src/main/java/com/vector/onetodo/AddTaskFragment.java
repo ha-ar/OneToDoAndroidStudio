@@ -169,7 +169,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private int lastCheckedId = -1;
     private ArrayAdapter<String> adapterTask;
     private PopupWindow popupWindowTask;
-    private String labelColor;
+    private String labelColor = "";
     private boolean isProjectSubTask = false;
     private ArrayList<String> assignedId = new ArrayList<>();
 
@@ -317,7 +317,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         currentDayDigit = Utils.getCurrentDayDigit(dayPosition);
         currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
         currentMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
-        currentHours = Utils.getCurrentHours();
+        currentHours = Utils.getCurrentHours() + 1;
         currentMin = Utils.getCurrentMins();
 
         inflatingLayouts.put(0, R.layout.add_task_title);
@@ -361,11 +361,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
                     @Override
                     public void onClick(View v) {
-                        if (Constants.Project_task_check == 1) {
+                        if (Constants.Project_task_check == 1)
                             getFragmentManager().popBackStack();
-                        } else {
+                        else
                             getActivity().finish();
-                        }
                     }
                 });
 
@@ -384,15 +383,12 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
                 .clicked(new GeneralOnClickListner());
 //                .text(App.gpsTracker.getLocality(getActivity()));
-        AutoCompleteTextView locationTextView = (AutoCompleteTextView)aq.id(R.id.location_task).getView();
+        AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.location_task).getView();
         locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 
         aq.id(R.id.spinner_label_layout).clicked(new GeneralOnClickListner());
-
         aq.id(R.id.before1).clicked(new GeneralOnClickListner());
-
         aq.id(R.id.repeat_task_lay).clicked(new GeneralOnClickListner());
-
         aq.id(R.id.grid_text)
                 .typeface(
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
@@ -406,8 +402,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         popupWindowAttach.setBackgroundDrawable(getResources().getDrawable(
                 android.R.drawable.dialog_holo_light_frame));
         popupWindowAttach.setOutsideTouchable(true);
-
-        // *****************Title
 
         LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
@@ -431,12 +425,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             @Override
             public void onTextChanged(CharSequence s, int start, int before,
                                       int count) {
-
-//                if (taskTitle.getText().length() > 0)
-//                    AddTask.btn.setAlpha(10);
-
                 aq.id(R.id.completed_task).textColorId(R.color.active);
-
             }
 
             @Override
@@ -455,6 +444,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         DatePicker dPicker = (DatePicker) aq.id(R.id.date_picker).getView();
         int density = getResources().getDisplayMetrics().densityDpi;
         showRightDateAndTime();
+        dPicker.setMinDate(System.currentTimeMillis() - 1000);
         dPicker.init(currentYear, currentMonDigit, currentDayDigit,
                 new OnDateChangedListener() {
 
@@ -480,6 +470,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         // Time picker implementation
         TimePicker tPicker = (TimePicker) aq.id(R.id.time_picker).getView();
         tPicker.setIs24HourView(true);
+        tPicker.setCurrentMinute(currentMin);
+        tPicker.setCurrentHour(currentHours);
         tPicker.setOnTimeChangedListener(new OnTimeChangedListener() {
 
             @Override
@@ -1506,7 +1498,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         MaxId = App.attach.getInt("Max", 0);
         title = aq.id(R.id.task_title1).getText().toString();
 
-        boolean is_allday = false;
+        boolean isAllDay = false;
         String start_date = currentYear + "-"
                 + (currentMonDigit + 1) + "-"
                 + currentDayDigit + " "
@@ -1551,9 +1543,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 .getText().toString();
 
         String notes = aq.id(R.id.notes_task).getText().toString();
-//            assignedId.add(AddTaskFragment.assignedSelectedID);
 
-        Date startDate, endDate;
+        Date startDate;
         long startDateInMilli = 0, endDateInMilli = 0;
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
@@ -1579,7 +1570,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 }
             }
         }
-        Log.e("lat long", App.gpsTracker.getLatitude()+" , "+ App.gpsTracker.getLongitude());
         long r_repeat = 0;
         if (repeat.contains("once") || repeat.contains("Once")) {
             r_repeat = 0;
@@ -1626,7 +1616,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         todo.setTitle(title);
         todo.setStart_date(startDateInMilli);
         todo.setEnd_date(endDateInMilli);
-        todo.setIs_allday(is_allday);
+        todo.setIs_allday(isAllDay);
         todo.setLocation(location);
         todo.setNotes(notes);
         todo.setIs_done(false);
@@ -1636,7 +1626,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         label.setLabel_name(label_name);
         label.setLabel_color(labelColor);
         labeldao.insert(label);
-
         todo.setLabel(label);
 
         Reminder reminder = new Reminder();
@@ -1678,15 +1667,15 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         if(isEditMode){
             todo.setId(todoId);
             tododao.update(todo);
+        }else {
+            // ********************* Data add hit Async task ******************//
+            AddToServer aSync = new AddToServer(title, 1, start_date, "", isAllDay, is_location, r_location, location_tag,
+                    locationType, location, notes, repeatDate, repeat_forever, MaxId,
+                    AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime, label_name, "", before, "", AddTaskFragment.this);
+            aSync.execute();
         }
         alarm = new AlarmManagerBroadcastReceiver();
         geoFence = new Geofences(getActivity());
-
-        // ********************* Data add hit Async task ******************//
-        AddToServer aSync = new AddToServer(title, 1, start_date, "", is_location, r_location, location_tag,
-                locationType, location, notes, repeatDate,repeat_forever, MaxId,
-                AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime,label_name, "", before, "", AddTaskFragment.this);
-        aSync.execute();
         getActivity().getSupportFragmentManager().popBackStack();
     }
 
@@ -1710,9 +1699,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         todo = tododao.load(todoId);
         aq.id(R.id.task_title1).text(todo.getTitle());
-        long reminder = todo.getReminder().getTime();
+        long startDate = todo.getStart_date();
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(reminder);
+        cal.setTimeInMillis(startDate);
         currentYear = cal.get(Calendar.YEAR);
         currentMonDigit = cal.get(Calendar.MONTH) + 1;
         currentDayDigit = cal.get(Calendar.DAY_OF_MONTH);
@@ -1741,7 +1730,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             aq.id(R.id.spinner_labels_task).text(todo.getLabel().getLabel_name());
             GradientDrawable mDrawable = (GradientDrawable) getResources()
                     .getDrawable(R.drawable.label_background);
-            if (mDrawable != null) {
+            if ((mDrawable != null)  &&(!todo.getLabel().getLabel_color().isEmpty())){
                 mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
             }
 
