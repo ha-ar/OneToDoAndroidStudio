@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.vector.model.TaskAdded;
 import com.vector.onetodo.interfaces.onTaskAdded;
 import com.vector.onetodo.utils.Constants;
@@ -97,34 +98,28 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         } catch (UnsupportedEncodingException e1) {
             e1.printStackTrace();
         }
-
         try {
             response = client.execute(post);
         } catch (Exception e1) {
             e1.printStackTrace();
             this.cancel(true);
         }
-        String temp = "";
+        String temp = "test";
         try {
-            int responseCode = response.getStatusLine().getStatusCode();
-            switch(responseCode) {
-                case 200:
-                    HttpEntity entity = response.getEntity();
-                    if(entity != null) {
-                        temp = EntityUtils.toString(entity);
-                    }
-                    break;
+            HttpEntity entity = response.getEntity();
+            if(entity != null) {
+                temp = EntityUtils.toString(entity);
             }
             Log.e("Task Added Response", temp);
             Gson gson = new Gson();
             TaskAdded obj = gson.fromJson(temp,
                     TaskAdded.class);
             TaskAdded.getInstance().setObj(obj);
-        } catch (org.apache.http.ParseException | IOException | NullPointerException e) {
+        } catch (org.apache.http.ParseException | IOException | NullPointerException |
+                JsonSyntaxException e) {
             e.printStackTrace();
             this.cancel(true);
         }
-
         return null;
     }
 
@@ -233,7 +228,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
             }
         }
 
-            for (int i = 0; i < MaxId; i++) {
+        for (int i = 0; i < MaxId; i++) {
             pairs.add(new BasicNameValuePair("todo_attachment[" + i
                     + "][attachment_path]", App.attach.getString(titleCheck
                     + "path" + i, null)));

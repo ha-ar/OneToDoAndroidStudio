@@ -64,6 +64,8 @@ public class Constants {
     public static int MONTH = 31 * 24 * 60 * 60 * 1000;
     public static int YEAR = 12 * 31 * 24 * 60 * 60 * 1000;
 
-    public static String[] layoutsName = { "Assign", "Due date", "Location", "Reminder", "Repeat",
+    public static String[] layoutsName = { "Assign", "Date", "Location", "Reminder", "Repeat",
             "Label", "Subtasks", "Notes", "Attachment" };
+	public static String[] addTaskLayouts = {"Task", "Assign", "Details" ,"Date", "Location", "Reminder", "Repeat",
+			"Label", "Subtasks", "Notes", "Attachment" };
 }

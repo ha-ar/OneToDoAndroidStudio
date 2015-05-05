@@ -11,8 +11,8 @@
 
     <CheckedTextView
         android:id="@+id/checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_gravity="center"
         android:background="@drawable/blue_chechk_box"
         android:checked="true" />

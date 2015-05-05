@@ -12,8 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +21,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,9 +40,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -53,7 +49,6 @@ import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -68,16 +63,17 @@ import android.widget.ToggleButton;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
 import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
+import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
-import com.vector.onetodo.db.gen.Comment;
 import com.vector.onetodo.db.gen.CommentDao;
-import com.vector.onetodo.db.gen.Friends;
 import com.vector.onetodo.db.gen.FriendsDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
@@ -105,10 +101,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -123,7 +116,6 @@ import java.util.Map;
 
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
@@ -135,12 +127,10 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 	static int FragmentCheck = 0;
 	int Tag = 0;
 	private PopupWindow popupWindowAttach;
-	static List<java.lang.Object> names;
 	int Label_postion = -1;
 	View label_view;
 	GradientDrawable label_color;
 	String color,title=null;
-	static String checkedId2 = null;
 	public static EditText taskTitle;
 	private Uri imageUri;
 	ImageView last;
@@ -148,12 +138,12 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 	int pposition = -1;
 	int itempos = -1;
 	int MaxId = -1;
-    private static final int TAKE_PICTURE = 1;
+	private static final int TAKE_PICTURE = 1;
 	private static View previousSelected;
 	static LinearLayout lll;
 	static int currentHours, currentMin, currentDayDigit, currentYear,
-	currentMonDigit, endEventHours, endEventMin, endEventDayDigit, endEventYear, endEventMonDigit;
-    private String currentDay, currentMon, endEventDay, endEventMon;
+			currentMonDigit, endEventHours, endEventMin, endEventDayDigit, endEventYear, endEventMonDigit;
+	private String currentDay, currentMon, endEventDay, endEventMon;
 	private int[] collapsingViews = { R.id.sch_time_date_to_include,
 			R.id.sch_time_date_from_include, R.id.sch_repeat_grid_layout,
 			R.id.sch_label_grid, R.id.before_grid_view_linear_schedule };
@@ -163,93 +153,109 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			R.id.sch_location, R.id.repeat_schedule_lay, R.id.sch_label_layout,
 			R.id.before_schedule_lay, R.id.schedule_all_lay };
 	public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<Integer, Integer>();
-	Editor editor, editorattach;
+	Editor editor, editorAttach, editorComment;
 	AlertDialog date_time_alert, add_new_label_alert, date_time,label_edit,location_del,attach_alert;
 	protected static final int RESULT_CODE = 123;
 	public static final int RESULT_GALLERY = 0;
 	public static final int PICK_CONTACT = 2;
-    public static final int RESULT_DROPBOX = 3;
-    public static final int RESULT_GOOGLE = 4;
+	public static final int RESULT_DROPBOX = 3;
+	public static final int RESULT_GOOGLE = 4;
 	public static View allView, viewl;
 	public static Activity act;
-    private ArrayList<String> assignedId = new ArrayList<>();
-    private PopupWindow popupWindowSchedule;
-    private ToDoDao tododao;
-    private CheckListDao checklistdao;
-    private FriendsDao friendsdao;
-    private LabelDao labeldao;
-    private ReminderDao reminderdao;
-    private RepeatDao repeatdao;
-    private CommentDao commentdao;
+	private ArrayList<String> assignedId = new ArrayList<>();
+	private PopupWindow popupWindowSchedule;
+	private ToDoDao tododao;
+	private CheckListDao checklistdao;
+	private FriendsDao friendsdao;
+	private LabelDao labeldao;
+	private ReminderDao reminderdao;
+	private RepeatDao repeatdao;
+	private CommentDao commentdao;
 
-    private ToDo todo;
+	private ToDo todo;
+	private boolean isEditMode = false;
+	private long todoId;
+	private AlarmManagerBroadcastReceiver alarm;
+	private Geofences geoFence;
 
 
-    public static AddScheduleFragment newInstance(int position, int dayPosition) {
+	public static AddScheduleFragment newInstance(int position, boolean isEditMode, long todoId) {
 		AddScheduleFragment myFragment = new AddScheduleFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
-		args.putInt("dayPosition", dayPosition);
+		args.putLong("todoId", todoId);
+		args.putBoolean("isEditMode", isEditMode);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		setRetainInstance(true);
 		View view = inflater.inflate(R.layout.scheduale_fragment, container,
 				false);
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
-        if (toolbar != null)
-            ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
-        initActionBar();
-        dragAndDrop();
+		Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
+		if (toolbar != null)
+			((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
+		initActionBar();
+		db_initialize();
+		dragAndDrop();
+		isEditMode = getArguments().getBoolean("isEditMode");
+		todoId = getArguments().getLong("todoId");
 		return view;
 	}
-    private void initActionBar(){
-        ((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("Schedule");
-        ((ActionBarActivity) getActivity()).getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-        ((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setHasOptionsMenu(true);
-    }
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.todo_menu, menu);
-    }
+	private void initActionBar(){
+		((ActionBarActivity) getActivity()).getSupportActionBar().setTitle("Schedule");
+		((ActionBarActivity) getActivity()).getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+		((ActionBarActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		setHasOptionsMenu(true);
+	}
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		menu.clear();
+		inflater.inflate(R.menu.todo_menu, menu);
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getActivity().getSupportFragmentManager().popBackStack();
-                return true;
-            case R.id.action_save_new:
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				getActivity().getSupportFragmentManager().popBackStack();
+				return true;
+			case R.id.action_save_new:
 
-                return true;
-            case R.id.action_comment:
-                return true;
-            case R.id.action_show_hide:
-                popupWindowSchedule.showAtLocation(
-                        aq.id(R.id.content).getView(),
-                        Gravity.CENTER_HORIZONTAL, 0, 0);
-                return true;
-            case R.id.action_accept:
-                saveSchedule();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+				return true;
+			case R.id.action_comment:
+				FragmentManager manager = getFragmentManager();
+				FragmentTransaction transaction = manager.beginTransaction();
+				transaction.setCustomAnimations(R.anim.slide_right,
+						R.anim.slide_left, R.anim.slide_right, R.anim.slide_left);
+				transaction.replace(R.id.content, AddTaskComment.newInstance(false, -1));
+				transaction.addToBackStack(null);
+				transaction.commit();
+				return true;
+			case R.id.action_show_hide:
+				popupWindowSchedule.showAtLocation(
+						aq.id(R.id.content).getView(),
+						Gravity.CENTER_HORIZONTAL, 0, 0);
+				return true;
+			case R.id.action_accept:
+				saveSchedule();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		editor = App.label.edit();
-		editorattach = App.attach.edit();
+		editorAttach = App.attach.edit();
+		editorComment = App.comment.edit();
 		final int dayPosition = getArguments().getInt("dayPosition", 0);
 
 		currentYear = Utils.getCurrentYear(dayPosition);
@@ -257,8 +263,16 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		currentDayDigit = Utils.getCurrentDayDigit(dayPosition);
 		currentDay = Utils.getCurrentDay(dayPosition, Calendar.SHORT);
 		currentMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
-		currentHours = Utils.getCurrentHours();
+		currentHours = Utils.getCurrentHours() + 1;
 		currentMin = Utils.getCurrentMins();
+
+		endEventYear = Utils.getCurrentYear(dayPosition);
+		endEventMonDigit = Utils.getCurrentMonthDigit(dayPosition);
+		endEventDayDigit = Utils.getCurrentDayDigit(dayPosition) + 1;
+		endEventDay = Utils.getCurrentDay(dayPosition + 1, Calendar.SHORT);
+		endEventMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
+		endEventHours = Utils.getCurrentHours();
+		endEventMin = Utils.getCurrentMins();
 
 		allView = getView();
 
@@ -277,6 +291,10 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		inflateLayouts();
 
 		main();
+		//to edit a task
+		if(isEditMode){
+			populateValues();
+		}
 
 	}
 
@@ -293,7 +311,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+									  int count) {
 
 //				if (taskTitle.getText().length() > 0)
 //					AddTask.btn.setAlpha(1);
@@ -303,7 +321,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 					try {
 						String name = typedWords[typedWords.length - 1];
-						 
+
 					} catch (ArrayIndexOutOfBoundsException aiobe) {
 
 					}
@@ -312,7 +330,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+										  int after) {
 
 			}
 
@@ -321,11 +339,19 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			}
 		});
-		// *********************End Title
+		aq.id(R.id.schedule_assign).clicked(new OnClickListener() {
 
-		// ********************* Time Date
-		// ******************************ALL DAY sWITCH
-
+			@Override
+			public void onClick(View arg0) {
+				FragmentManager manager = getFragmentManager();
+				FragmentTransaction transaction = manager.beginTransaction();
+				transaction.setCustomAnimations(R.anim.slide_in1,
+						R.anim.slide_out1);
+				transaction.replace(R.id.content, AddTaskAssign.newInstance(1));
+				transaction.addToBackStack(null);
+				transaction.commit();
+			}
+		});
 		aq.id(R.id.sch_time_to_layout)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
@@ -342,7 +368,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
+										 boolean isChecked) {
 				if (isChecked) {
 					aq.id(R.id.sch_time_from).getTextView()
 							.setVisibility(View.GONE);
@@ -357,7 +383,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 					aq.id(R.id.time_picker).getView()
 							.setVisibility(View.VISIBLE);
 					aq.id(R.id.time_picker_event_end).getView()
-							.setVisibility(View.VISIBLE); 
+							.setVisibility(View.VISIBLE);
 					aq.id(R.id.sch_allday_img).background(R.drawable.allday);
 					aq.id(R.id.sch_time_from).getTextView()
 							.setVisibility(View.VISIBLE);
@@ -368,7 +394,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			}
 		});
 
-		// *******************dATE tIME
 
 		// Date picker implementation
 		final DatePicker dPicker = (DatePicker) aq.id(R.id.date_picker)
@@ -380,7 +405,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 					@Override
 					public void onDateChanged(DatePicker view, int year,
-							int monthOfYear, int dayOfMonth) {
+											  int monthOfYear, int dayOfMonth) {
 						currentYear = year;
 						currentMonDigit = monthOfYear;
 						currentDayDigit = dayOfMonth;
@@ -418,7 +443,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 					@Override
 					public void onDateChanged(DatePicker view, int year,
-							int monthOfYear, int dayOfMonth) {
+											  int monthOfYear, int dayOfMonth) {
 						endEventYear = year;
 						endEventMonDigit = monthOfYear;
 						endEventDayDigit = dayOfMonth;
@@ -465,39 +490,35 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			tPickerEvent.setScaleY(0.7f);
 		}
 
-		// ************************** Date TIme END
-
-		// *************************End time date
-
 		// ***************** Location
 
 		aq.id(R.id.sch_location)
 				.typeface(
 						TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
 				.clicked(new GeneralOnClickListner());
-        AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.sch_location)
-                .getView();
+		AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.sch_location)
+				.getView();
 		PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(
-				getActivity(), android.R.layout.simple_spinner_dropdown_item); 
+				getActivity(), android.R.layout.simple_spinner_dropdown_item);
 		locationTextView.setAdapter(adapter);
 		locationTextView.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-            }
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+									  int count) {
+			}
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+										  int after) {
 
-            }
+			}
 
-            @Override
-            public void afterTextChanged(Editable s) {
+			@Override
+			public void afterTextChanged(Editable s) {
 
-            }
-        });
+			}
+		});
 
 
 		// *******************Repeat
@@ -513,21 +534,16 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 							@Override
 							public View getView(int position, View convertView,
-									ViewGroup parent) {
+												ViewGroup parent) {
 
 								TextView textView = (TextView) super.getView(
 										position, convertView, parent);
 								if (position == 2) {
 									previousSelected = textView;
-									((TextView) textView)
-											.setBackgroundResource(R.drawable.round_buttons_blue);
-									((TextView) textView)
-											.setTextColor(Color.WHITE);
-
+									textView.setBackgroundResource(R.drawable.round_buttons_blue);
+									textView.setTextColor(Color.WHITE);
 								} else
-									((TextView) textView)
-											.setTextColor(getResources()
-													.getColor(R.color._4d4d4d)); 
+									textView.setTextColor(getResources().getColor(R.color._4d4d4d));
 								return textView;
 							}
 
@@ -537,12 +553,12 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+									int position, long id) {
 
 				if (((TextView) previousSelected).getText().toString()
 						.equals("Weekly")) {
 
-					((TextView) previousSelected)
+					previousSelected
 							.setBackgroundResource(R.drawable.round_buttons_white);
 					((TextView) previousSelected).setTextColor(getResources()
 							.getColor(R.color._4d4d4d));
@@ -551,8 +567,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 							.getColor(R.color._4d4d4d));
 				}
 				if (((TextView) view).getText().toString().equals("Weekly")) {
-					((TextView) view)
-							.setBackgroundResource(R.drawable.round_buttons_blue);
+					view.setBackgroundResource(R.drawable.round_buttons_blue);
 				}
 
 				if (((TextView) view).getText().toString().equals("Never")) {
@@ -566,7 +581,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				view.setSelected(true);
 				if (Constants.repeatArray[position] == "Never") {
 
-					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[position]) ;
+					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[position]);
 				} else {
 					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[position]);
 				}
@@ -581,18 +596,19 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		AlertDialog.Builder builder4 = new AlertDialog.Builder(getActivity());
 		builder4.setView(dateTimePickerDialog);
 		date_time_alert = builder4.create();
-	 
+
 
 		// Date picker implementation for forever dialogdate_picker
 		final DatePicker dialogDatePicker = (DatePicker) dateTimePickerDialog
 				.findViewById(R.id.date_picker_dialog);
 		showRightDateAndTimeForDialog();
+		dPicker.setMinDate(System.currentTimeMillis() - 1000);
 		dialogDatePicker.init(currentYear, currentMonDigit, currentDayDigit,
 				new OnDateChangedListener() {
 
 					@Override
 					public void onDateChanged(DatePicker view, int year,
-							int monthOfYear, int dayOfMonth) {
+											  int monthOfYear, int dayOfMonth) {
 						currentYear = year;
 						currentMonDigit = monthOfYear;
 						currentDayDigit = dayOfMonth;
@@ -609,8 +625,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				});
 
 
-		aq.id(R.id.sch_time_radio)
-				.textColor(Color.parseColor("#bababa"));
+		aq.id(R.id.sch_time_radio).textColor(Color.parseColor("#bababa"));
 
 		final TextView set = (TextView) dateTimePickerDialog
 				.findViewById(R.id.set);
@@ -622,14 +637,13 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				set.requestFocus();
 				date_time_alert.dismiss();
 
-				aq.id(R.id.sch_repeat_txt).text(
-						/* setday + " " + */((TextView) previousSelected)
-								.getText().toString() + " until " + setmon1);
+				aq.id(R.id.sch_repeat_txt).text(((TextView) previousSelected)
+						.getText().toString() + " until " + setmon1);
 
 				RadioButton rb = (RadioButton) aq
 						.id(R.id.sch_time_radio).getView();
 
-				rb.setText(setmon1); 
+				rb.setText(setmon1);
 			}
 		});
 		TextView cancel = (TextView) dateTimePickerDialog
@@ -641,7 +655,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				date_time_alert.cancel();
 			}
 		});
-		
+
 		aq.id(R.id.sch_forever_radio).clicked(new OnClickListener() {
 
 			@Override
@@ -679,15 +693,12 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 							getResources().getColor(R.color._4d4d4d));
 					aq.id(R.id.sch_forever_radio).textColor(
 
-					getResources().getColor(R.color._4d4d4d));
+							getResources().getColor(R.color._4d4d4d));
 					date_time_alert.show();
 				}
 			}
 		});
 
-		// *********************End Repeat
-
-		// ******************** Label
 
 		// ******************* label dialog
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
@@ -706,7 +717,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		builder7.setView(dialoglayout7);
 		location_del = builder7.create();
 		aq.id(R.id.sch_label_layout).clicked(new GeneralOnClickListner());
- 
+
 		GridView gridView;
 
 		View vie = getActivity().getLayoutInflater().inflate(
@@ -723,19 +734,14 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				// TODO Auto-generated method stub
+									int position, long id) {
 
 				ImageView img = (ImageView) view;
 				if (last != null) {
-					// Getting the Country TextView
-
 					last.setImageResource(R.color.transparent);
 				}
 				last = img;
-
 				img.setImageResource(R.drawable.select_white);
-
 				Label_postion = position;
 			}
 		});
@@ -764,12 +770,14 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 					if (Label_postion != -1) {
 						GradientDrawable mDrawable = (GradientDrawable) getResources()
 								.getDrawable(R.drawable.label_background);
-						mDrawable.setColor(Color
-								.parseColor(Constants.label_colors_dialog[Label_postion]));
+						if (mDrawable != null) {
+							mDrawable.setColor(Color
+                                    .parseColor(Constants.label_colors_dialog[Label_postion]));
+						}
 						Save(label_view.getId() + "" + itempos, label_text
 								.getText().toString(), Label_postion);
 						Label_postion = -1;
-						((TextView) label_view).setBackground(mDrawable);
+						label_view.setBackground(mDrawable);
 						((TextView) label_view).setText(label_text.getText()
 								.toString());
 						((TextView) label_view).setTextColor(Color.WHITE);
@@ -780,7 +788,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 								.setBackground(label_view.getBackground());
 						aq.id(R.id.sch_label_txt).getTextView()
 								.setTextColor(Color.WHITE);
-					 
+
 					}
 				}
 			}
@@ -805,11 +813,11 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 							@Override
 							public View getView(int position, View convertView,
-									ViewGroup parent) {
+												ViewGroup parent) {
 								TextView textView = (TextView) super.getView(
 										position, convertView, parent);
 								Load(textView.getId() + "" + position);
-							 
+
 
 								if (!textView.getText().toString()
 										.equals("New")) {
@@ -817,8 +825,10 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 									GradientDrawable mDrawable = (GradientDrawable) getResources()
 											.getDrawable(
 													R.drawable.label_background);
-									mDrawable.setColor(Color
-											.parseColor(Constants.label_colors[position]));
+									if (mDrawable != null) {
+										mDrawable.setColor(Color
+                                                .parseColor(Constants.label_colors[position]));
+									}
 									textView.setBackground(mDrawable);
 								}
 								if (plabel != null) {
@@ -827,8 +837,10 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 									GradientDrawable mDrawable = (GradientDrawable) getResources()
 											.getDrawable(
 													R.drawable.label_background);
-									mDrawable.setColor(Color
-											.parseColor(Constants.label_colors_dialog[pposition]));
+									if (mDrawable != null) {
+										mDrawable.setColor(Color
+                                                .parseColor(Constants.label_colors_dialog[pposition]));
+									}
 									textView.setBackground(mDrawable);
 								}
 								return textView;
@@ -841,7 +853,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view,
-							int position, long id) {
+											int position, long id) {
 						itempos = position;
 						label_view = view;
 						if (!((TextView) view).getText().toString()
@@ -852,7 +864,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 									.setBackground(view.getBackground());
 							aq.id(R.id.sch_label_txt).getTextView()
 									.setTextColor(Color.WHITE);
-						 
+
 						} else {
 							add_new_label_alert.show();
 						}
@@ -867,7 +879,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				location_del.dismiss();
 			}
 		});
@@ -876,12 +887,11 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Remove(viewl.getId() + "" + itempos);
 				((TextView) viewl).setText("New");
 				GradientDrawable mDrawable = (GradientDrawable) getResources()
 						.getDrawable(R.drawable.label_simple);
-				((TextView) viewl).setBackground(mDrawable);
+				viewl.setBackground(mDrawable);
 				((TextView) viewl).setTextColor(R.color.mountain_mist);
 
 				location_del.dismiss();
@@ -892,7 +902,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				label_edit.dismiss();
 				location_del.show();
 			}
@@ -902,9 +911,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub=
-				// aqd.id(R.id.sch_label_txt).text(((TextView)
-				// viewl).getText().)
 				aq_label.id(R.id.label_title).text("Edit");
 				aq_label.id(R.id.save).text("Save");
 				label_view = viewl;
@@ -919,7 +925,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 		/**
 		 * View pager for before and location
-		 * 
+		 *
 		 */
 		ViewPager pager = (ViewPager) aq
 				.id(R.id.add_task_before_pager_schedule).getView();
@@ -951,15 +957,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		popupWindowAttach.setBackgroundDrawable(getResources().getDrawable(
 				android.R.drawable.dialog_holo_light_frame));
 		popupWindowAttach.setOutsideTouchable(true);
-		popupWindowAttach.setOnDismissListener(new OnDismissListener() {
-
-			@Override
-			public void onDismiss() {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 
 		View attachment = inflater
@@ -1003,58 +1000,58 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 								.getExternalStorageDirectory()
 								+ File.separator
 								+ "OneToDo" + File.separator, "OneToDo_"
-								+ System.currentTimeMillis() + ".JPG");
+								+ System.currentTimeMillis() + ".png");
 						intent.putExtra(MediaStore.EXTRA_OUTPUT,
 								Uri.fromFile(photo));
 						imageUri = Uri.fromFile(photo);
 						startActivityForResult(intent, TAKE_PICTURE);
 					}
 				});
-        aq_attach
-                .id(R.id.add_attachment_dropbox)
-                .typeface(TypeFaces
-                        .get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        attach_alert.dismiss();
-                        Intent dropboxIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                        dropboxIntent.setType("*/*");
-                        startActivityForResult(dropboxIntent
-                                .createChooser(dropboxIntent.setPackage("com.dropbox.android"), "DropBox") , RESULT_DROPBOX);
-                    }
-                });
-        aq_attach
-                .id(R.id.add_attachment_google)
-                .typeface(TypeFaces
-                        .get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        attach_alert.dismiss();
-                        Intent googleIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                        googleIntent.setType("*/*");
-                        startActivityForResult(googleIntent
-                                .createChooser(googleIntent
-                                        .setPackage("com.google.android.apps.docs") , "Google Drive") , RESULT_GOOGLE);
-                    }
-                });
+		aq_attach
+				.id(R.id.add_attachment_dropbox)
+				.typeface(TypeFaces
+						.get(getActivity(), Constants.ROMAN_TYPEFACE))
+				.clicked(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						attach_alert.dismiss();
+						Intent dropboxIntent = new Intent(Intent.ACTION_GET_CONTENT);
+						dropboxIntent.setType("*/*");
+						startActivityForResult(Intent
+								.createChooser(dropboxIntent.setPackage("com.dropbox.android"), "DropBox") , RESULT_DROPBOX);
+					}
+				});
+		aq_attach
+				.id(R.id.add_attachment_google)
+				.typeface(TypeFaces
+						.get(getActivity(), Constants.ROMAN_TYPEFACE))
+				.clicked(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						attach_alert.dismiss();
+						Intent googleIntent = new Intent(Intent.ACTION_GET_CONTENT);
+						googleIntent.setType("*/*");
+						startActivityForResult(Intent
+								.createChooser(googleIntent
+										.setPackage("com.google.android.apps.docs"), "Google Drive") , RESULT_GOOGLE);
+					}
+				});
 		AlertDialog.Builder attach_builder = new AlertDialog.Builder(
 				getActivity());
 		attach_builder.setView(attachment);
 		attach_alert = attach_builder.create();
-	 
+
 		aq.id(R.id.event_attachment).clicked(new OnClickListener() {
-			
+
 			@Override
-			public void onClick(View v) {		
+			public void onClick(View v) {
 				attach_alert.show();
 			}
 		});
- 
 
-		
-		
+
+
+
 		View switchView = aq.id(R.id.add_sub_sch).getView();
 		toggleCheckList(switchView);
 
@@ -1064,65 +1061,21 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 	private void toggleCheckList(View switchView) {
 		View newView;
-
-		/*
-		 * Here is where the job is done. By simply calling an instance of the
-		 * ChecklistManager we can call its methods.
-		 */
 		try {
-			// Getting instance
 			ChecklistManager mChecklistManager = ChecklistManager
 					.getInstance(getActivity());
-
-			/*
-			 * These method are useful when converting from EditText to
-			 * ChecklistView (but can be set anytime, they'll be used at
-			 * appropriate moment)
-			 */
-
-			// Setting new entries hint text (if not set no hint
-			// will be used)
 			mChecklistManager.setNewEntryHint("Add a subtask...");
-			// Let checked items are moved on bottom
-
 			mChecklistManager.setMoveCheckedOnBottom(1);
-
-			mChecklistManager
-					.setCheckListChangedListener(new CheckListChangedListener() {
-
-						@Override
-						public void onCheckListChanged() {
-
-						}
-					});
-
-			// Decide if keep or remove checked items when converting
-			// back to simple text from checklist
 			mChecklistManager.setKeepChecked(true);
-
-			// I want to make checks symbols visible when converting
-			// back to simple text from checklist
 			mChecklistManager.setShowChecks(true);
-
-			// Converting actual EditText into a View that can
-			// replace the source or viceversa
 			newView = mChecklistManager.convert(switchView);
-
-			// Replacing view in the layout
 			mChecklistManager.replaceViews(switchView, newView);
 
-			// Updating the instance of the pointed view for
-			// eventual reverse conversion
-			switchView = newView;
-
 		} catch (ViewNotSupportedException e) {
-			// This exception is fired if the source view class is
-			// not supported
 			e.printStackTrace();
 		}
 	}
 
-	// ***************Main End**********************
 
 	public static void inflateLayouts() {
 		GridLayout gridLayout = (GridLayout) allView
@@ -1137,6 +1090,8 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			param.rowSpec = GridLayout.spec(key);
 			child.setId(inflatingLayouts.get(key));
 			child.setLayoutParams(param);
+			if(!App.prefs.getScheduleLayout(Constants.addTaskLayouts[key]))
+				child.setVisibility(View.GONE);
 			gridLayout.addView(child);
 		}
 	}
@@ -1166,103 +1121,86 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		hideAll();
 
 		switch (v.getId()) {
- 
-		case R.id.sch_time_to_layout:
-			if (aq.id(R.id.sch_time_date_to_include).getView().getVisibility() == View.GONE) {
-				aq.id(R.id.sch_time_date_to_include)
-						.getView()
-						.startAnimation(
-								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
-										200, aq.id(
-												R.id.sch_time_date_to_include)
-												.getView(), true));
 
-				aq.id(R.id.schedule_time_to_layout).background(
-						R.drawable.input_fields_blue);
+			case R.id.sch_time_to_layout:
+				if (aq.id(R.id.sch_time_date_to_include).getView().getVisibility() == View.GONE) {
+					aq.id(R.id.sch_time_date_to_include)
+							.getView()
+							.startAnimation(
+									new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+											200, aq.id(
+											R.id.sch_time_date_to_include)
+											.getView(), true));
 
-			}
-			break;
-		case R.id.sch_time_from_layout:
-			if (aq.id(R.id.sch_time_date_from_include).getView()
-					.getVisibility() == View.GONE) {
-				aq.id(R.id.sch_time_date_from_include)
-						.getView()
-						.startAnimation(
-								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
-										200,
-										aq.id(R.id.sch_time_date_from_include)
-												.getView(), true));
-
-				aq.id(R.id.schedule_time_from_layout).background(
-						R.drawable.input_fields_blue);
-
-			}
-			break;
-
-		case R.id.repeat_schedule_lay:
-			if (aq.id(R.id.sch_repeat_grid_layout).getView().getVisibility() == View.GONE) {
-				if (aq.id(R.id.sch_repeat_txt).getText().toString() == "") {
-					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[2])
-							.visibility(View.VISIBLE);
+					aq.id(R.id.schedule_time_to_layout).background(
+							R.drawable.input_fields_blue);
 
 				}
-				aq.id(R.id.sch_repeat_grid_layout)
-						.getView()
-						.startAnimation(
-								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
-										200, aq.id(R.id.sch_repeat_grid_layout)
-												.getView(), true));
+				break;
+			case R.id.sch_time_from_layout:
+				if (aq.id(R.id.sch_time_date_from_include).getView()
+						.getVisibility() == View.GONE) {
+					aq.id(R.id.sch_time_date_from_include)
+							.getView()
+							.startAnimation(
+									new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+											200,
+											aq.id(R.id.sch_time_date_from_include)
+													.getView(), true));
 
-				aq.id(R.id.sch_repeat).background(R.drawable.input_fields_blue);
-
-			}
-			break;
-		case R.id.before_schedule_lay:
-			if (aq.id(R.id.before_grid_view_linear_schedule).getView()
-					.getVisibility() == View.GONE) {
-				if (aq.id(R.id.before_schedule).getText().toString() == "") {
-					aq.id(R.id.before_schedule)
-
-							.text(Constants.beforeArray[1]
-									+ " Before").visibility(View.VISIBLE);
- 
+					aq.id(R.id.schedule_time_from_layout).background(
+							R.drawable.input_fields_blue);
 
 				}
-				aq.id(R.id.before_grid_view_linear_schedule)
-						.getView()
-						.startAnimation(
-								new ScaleAnimToShow(
-										1.0f,
-										1.0f,
-										1.0f,
-										0.0f,
-										200,
-										aq.id(R.id.before_grid_view_linear_schedule)
-												.getView(), true));
-				aq.id(R.id.before_schedule_layout).background(
-						R.drawable.input_fields_blue);
+				break;
 
-			}
-			break;
-		case R.id.sch_label_layout:
-			if (aq.id(R.id.sch_label_grid).getView().getVisibility() == View.GONE) {
-				aq.id(R.id.sch_label_grid)
-						.getView()
-						.startAnimation(
-								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
-										200, aq.id(R.id.sch_label_grid)
-												.getView(), true));
+			case R.id.repeat_schedule_lay:
+				if (aq.id(R.id.sch_repeat_grid_layout).getView().getVisibility() == View.GONE) {
+					if (!aq.id(R.id.sch_repeat_txt).getText().toString().isEmpty()) {
+						aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[2])
+								.visibility(View.VISIBLE);
+					}
+					aq.id(R.id.sch_repeat_grid_layout).getView()
+							.startAnimation(new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f, 200, aq.id(R.id.sch_repeat_grid_layout).getView(), true));
+					aq.id(R.id.sch_repeat).background(R.drawable.input_fields_blue);
 
-				aq.id(R.id.sch_label_layout).background(
-						R.drawable.input_fields_blue);
-			}
-		default:
-			break;
+				}
+				break;
+			case R.id.before_schedule_lay:
+				if (aq.id(R.id.before_grid_view_linear_schedule).getView()
+						.getVisibility() == View.GONE) {
+					if (!aq.id(R.id.before_schedule).getText().toString().isEmpty()) {
+						aq.id(R.id.before_schedule)
+								.text(Constants.beforeArray[1]
+										+ " Before").visibility(View.VISIBLE);
+					}
+					aq.id(R.id.before_grid_view_linear_schedule)
+							.getView()
+							.startAnimation(new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f, 200, aq.id(R.id.before_grid_view_linear_schedule).getView(), true));
+					aq.id(R.id.before_schedule_layout).background(
+							R.drawable.input_fields_blue);
+
+				}
+				break;
+			case R.id.sch_label_layout:
+				if (aq.id(R.id.sch_label_grid).getView().getVisibility() == View.GONE) {
+					aq.id(R.id.sch_label_grid)
+							.getView()
+							.startAnimation(
+									new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+											200, aq.id(R.id.sch_label_grid)
+											.getView(), true));
+
+					aq.id(R.id.sch_label_layout).background(
+							R.drawable.input_fields_blue);
+				}
+			default:
+				break;
 		}
 
 	}
 
-    private class GeneralOnClickListner implements OnClickListener {
+	private class GeneralOnClickListner implements OnClickListener {
 
 		@Override
 		public void onClick(View v) {
@@ -1306,12 +1244,12 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		@Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
-			case 0:
-				return "Time";
-			case 1:
-				return "Location";
-			default:
-				return "";// not the case
+				case 0:
+					return "Time";
+				case 1:
+					return "Location";
+				default:
+					return "";// not the case
 
 			}
 		}
@@ -1322,35 +1260,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		}
 	}
 
-	public void slideUpDown(final View view) {
-		if (!isPanelShown(view)) {
-			// Show the panel
-			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_up);
 
-			view.startAnimation(bottomUp);
-			view.setVisibility(View.VISIBLE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					R.color.dim_background));
-			((FrameLayout) aq.id(R.id.add_schedule_frame).getView())
-					.setForeground(tintColor);
-		} else {
-			// Hide the Panel
-			Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_down);
-
-			view.startAnimation(bottomDown);
-			view.setVisibility(View.GONE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					android.R.color.transparent));
-			((FrameLayout) aq.id(R.id.add_schedule_frame).getView())
-					.setForeground(tintColor);
-		}
-	}
-
-	private boolean isPanelShown(View view) {
-		return view.getVisibility() == View.VISIBLE;
-	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1358,41 +1268,41 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 		switch (requestCode) {
 
-		case TAKE_PICTURE:
+			case TAKE_PICTURE:
 
-			if (resultCode == Activity.RESULT_OK)
-				showImageURI(imageUri);
-		case RESULT_GALLERY:
-			if (null != data) {
-				showImageURI(data.getData());
-			}
-			break;
-            case RESULT_DROPBOX:
-                if(null != data){
-                    showImageURI(data.getData());
-                }
-                break;
-            case RESULT_GOOGLE:
-                if(null != data){
-                    showImageURI(data.getData());
-                }
-                break;
-		case PICK_CONTACT:
-			if (resultCode == Activity.RESULT_OK) {
-				Uri contactData = data.getData();
-				Cursor c = getActivity().getContentResolver().query(
-						contactData, null, null, null, null);
-				if (c.moveToFirst()) {
-					String name = c
-							.getString(c
-									.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-					AppMsg.makeText(getActivity(), name + " is selected",
-							AppMsg.STYLE_CONFIRM).show();
+				if (resultCode == Activity.RESULT_OK)
+					showImageURI(imageUri);
+			case RESULT_GALLERY:
+				if (data != null) {
+					showImageURI(data.getData());
 				}
-			}
-			break;
-		default:
-			break;
+				break;
+			case RESULT_DROPBOX:
+				if(data != null){
+					showImageURI(data.getData());
+				}
+				break;
+			case RESULT_GOOGLE:
+				if(data != null){
+					showImageURI(data.getData());
+				}
+				break;
+			case PICK_CONTACT:
+				if (resultCode == Activity.RESULT_OK) {
+					Uri contactData = data.getData();
+					Cursor c = getActivity().getContentResolver().query(
+							contactData, null, null, null, null);
+					if (c.moveToFirst()) {
+						String name = c
+								.getString(c
+										.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+						AppMsg.makeText(getActivity(), name + " is selected",
+								AppMsg.STYLE_CONFIRM).show();
+					}
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1400,14 +1310,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
-		Cursor returnCursor = cr.query(selectedImage, null, null, null, null);
-		// returnCursor.moveToFirst();
-
-		MimeTypeMap mime = MimeTypeMap.getSingleton();
-
-		String type = MimeTypeMap.getFileExtensionFromUrl(selectedImage
-				.toString());
-
 		Bitmap bitmap;
 		if (FragmentCheck == 0) {
 			try {
@@ -1420,17 +1322,16 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 				ImageView image = (ImageView) child
 						.findViewById(R.id.image_added);
-				ImageView imagemenu = (ImageView) child
+				ImageView imageMenu = (ImageView) child
 						.findViewById(R.id.image_menu);
 				Tag = Tag + 1;
-				imagemenu.setTag(Tag);
+				imageMenu.setTag(Tag);
 				child.setId(Tag);
 
-				imagemenu.setOnClickListener(new OnClickListener() {
+				imageMenu.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View arg0) {
-						// TODO Auto-generated method stub
 						Toast.makeText(getActivity(),
 								arg0.getId() + "     " + arg0.getTag(),
 								Toast.LENGTH_LONG).show();
@@ -1440,7 +1341,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 						if (popupWindowAttach.isShowing()) {
 							popupWindowAttach.dismiss();
 
-						} else { 
+						} else {
 							popupWindowAttach.showAsDropDown(arg0, 5, 0);
 						}
 					}
@@ -1451,7 +1352,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 							@Override
 							public void onClick(View arg0) {
-								// TODO Auto-generated method stub
 								popupWindowAttach.dismiss();
 							}
 						});
@@ -1460,7 +1360,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								if (ll_iner != null)
 									item.removeView(ll_iner);
 								popupWindowAttach.dismiss();
@@ -1474,35 +1373,17 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 						.findViewById(R.id.image_added_by);
 				TextView size = (TextView) child
 						.findViewById(R.id.image_added_size);
+
 				Calendar cal = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
-				by.setText("By Usman Ameer on " + sdf.format(cal.getTime()));
-				filename = selectedImage; 
-				File myFile = new File(selectedImage.toString());
-
-				myFile.getAbsolutePath();
-				imageupload();
-				if (selectedImage.getLastPathSegment().contains(".")) {
-					text.setText(selectedImage.getLastPathSegment());
-
-				} else {
-					text.setText(selectedImage.getLastPathSegment() + "."
-							+ type);
-
-				}
-
-				size.setText("(" + (new File(selectedImage.getPath()).length())
-						/ 1024 + " KB)");
-				child.findViewById(R.id.image_cancel).setOnClickListener(
-						new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								item.removeView(child); 
-							}
-						});
-
+				by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+				text.setText(Utils.getImageName(getActivity(), selectedImage));
+				Bitmap bm = Utils.getBitmap(getActivity(), selectedImage);
+				byte[] bitmapArray = Utils.getImageByteArray(bm);
+				uploadAttachments(aq, bitmapArray);
+				size.setText("(" + (bm.getByteCount()) / 1024 + " KB)");
 				item.addView(child);
+
 			} catch (Exception e) {
 				Toast.makeText(getActivity(), "Failed to load",
 						Toast.LENGTH_SHORT).show();
@@ -1510,100 +1391,70 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			}
 		}
 	}
-
-
- 
-	public void imageupload() {
+	private void uploadAttachments(AQuery aq, byte[] byteArray) {
 
 		HttpEntity entity = null;
-
-		Bitmap bm = null;
-		try {
-			bm = MediaStore.Images.Media.getBitmap(getActivity()
-					.getContentResolver(), filename);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        if (bm != null) {
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        }
-        byte[] byteArray = baos.toByteArray();
 		String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-		pairs = new ArrayList<NameValuePair>();
+		List<NameValuePair> pairs = new ArrayList<>();
 		pairs.add(new BasicNameValuePair("image", encoded));
 
-	 
 		try {
-			entity = new UrlEncodedFormEntity(pairs, "UTF-8"); 
+			entity = new UrlEncodedFormEntity(pairs, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			// TODO
-			// Auto-generated
-			// catch block
 			e.printStackTrace();
 		}
 
-		Map<String, HttpEntity> param = new HashMap<String, HttpEntity>();
+		Map<String, HttpEntity> param = new HashMap<>();
 		param.put(AQuery.POST_ENTITY, entity);
 
 		aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
 					@Override
 					public void callback(String url, JSONObject json,
-							AjaxStatus status) { 
+										 AjaxStatus status) {
 						String path = null;
 						try {
-
+							Log.e("attachment", json.toString());
 							JSONObject obj1 = new JSONObject(json.toString());
-							path = obj1.getString("path"); 
-
+							path = obj1.getString("path");
+							Loadattachmax();
+							if (MaxId == 0) {
+								MaxId = 1;
+							} else {
+								MaxId = MaxId + 1;
+							}
+							Saveattach(MaxId, path, "type");
 						} catch (Exception e) {
-						}
 
-						Loadattachmax();
-						if (MaxId == 0) {
-							MaxId = 1;
-						} else {
-							MaxId = MaxId + 1;
 						}
-						Saveattach(MaxId, path, "type");
-						Log.v("Response", json.toString());
 
 					}
 				});
 	}
-	
+
 	private void showRightDateAndTime() {
+
 		String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
 		String tempCurrentHours = String.format("%02d", currentHours);
 		String tempCurrentMins = String.format("%02d", currentMin);
+		aq.id(R.id.sch_time_to_day).text(currentDay);
+		aq.id(R.id.sch_time_to_day_month).text(
+				tempCurrentDayDigit
+						+ Utils.getDayOfMonthSuffix(currentDayDigit));
+		aq.id(R.id.sch_time_to_month).text(currentMon);
+		aq.id(R.id.sch_time_to).text(
+				tempCurrentHours + " : " + tempCurrentMins);
 
-		if (aq.id(R.id.sch_time_date_to_include).getView().getVisibility() == 0) {
-			aq.id(R.id.sch_time_to_day).text(currentDay);
-			aq.id(R.id.sch_time_to_day_month).text(
-					tempCurrentDayDigit
-							+ Utils.getDayOfMonthSuffix(currentDayDigit));
-			aq.id(R.id.sch_time_to_month).text(currentMon);
-		 
-			aq.id(R.id.sch_time_to).text(
-					tempCurrentHours + " : " + tempCurrentMins);
-
-		}
-
-		if (aq.id(R.id.sch_time_date_from_include).getView().getVisibility() == 0) {
-			aq.id(R.id.sch_time_from_day).text(currentDay);
-			aq.id(R.id.sch_time_from_day_month).text(
-					tempCurrentDayDigit
-							+ Utils.getDayOfMonthSuffix(currentDayDigit));
-			aq.id(R.id.sch_time_from_month).text(currentMon);
-		 
-			aq.id(R.id.sch_time_from).text(
-					tempCurrentHours + " : " + tempCurrentMins);
-		}
+		String tempEndDayDigit = String.format("%02d", endEventDayDigit);
+		String tempEndHours = String.format("%02d", endEventHours);
+		String tempEndMins = String.format("%02d", endEventMin);
+		aq.id(R.id.sch_time_from_day).text(endEventDay);
+		aq.id(R.id.sch_time_from_day_month).text(
+				tempEndDayDigit
+						+ Utils.getDayOfMonthSuffix(endEventDayDigit));
+		aq.id(R.id.sch_time_from_month).text(endEventMon);
+		aq.id(R.id.sch_time_from).text(
+				tempEndHours + " : " + tempEndMins);
 	}
 
 	private void showRightDateAndTimeForDialog() {
@@ -1618,18 +1469,18 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		// 0 - for private mode
 		editor.putString(3 + "key_label" + id, name); // Storing integer
 		editor.putInt(3 + "key_color_position" + id, label_position); // Storing
-																		// float
+		// float
 		editor.commit();
 	}
 
 	public void Load(String id) {
 		plabel = null;
 		plabel = App.label.getString(3 + "key_label" + id, null); // getting
-																		// String
+		// String
 		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
 
 		pposition = App.label.getInt(3 + "key_color_position" + id, 0); // getting
-																			// String
+		// String
 	}
 
 	public void Remove(String id) {
@@ -1641,12 +1492,9 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
-				int position, long arg3) {
-			// TODO Auto-generated method stub
-			if (((TextView) arg1).getText().toString().equals("New")
-					|| position < 3) {
+									   int position, long arg3) {
+			if (!(((TextView) arg1).getText().toString().equals("New")) || (position < 3)) {
 
-			} else {
 				aq_label.id(R.id.add_label_text).text(
 						((TextView) arg1).getText().toString());
 				aq_label_del.id(R.id.body).text(
@@ -1696,7 +1544,9 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			GradientDrawable mDrawable = (GradientDrawable) getResources()
 					.getDrawable(R.drawable.label_background_dialog);
 
-			mDrawable.setColor(Color.parseColor(Constants.label_colors_dialog[position]));
+			if (mDrawable != null) {
+				mDrawable.setColor(Color.parseColor(Constants.label_colors_dialog[position]));
+			}
 
 			imageView.setBackground(mDrawable);
 
@@ -1704,13 +1554,13 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		}
 
 	}
-	
+
 	public void Saveattach(int id, String path, String type) {
 		// 0 - for private mode
-		editorattach.putInt("3Max", id);
-		editorattach.putString(3 + "path" + id, path);
-		editorattach.putString(3 + "type" + id, type); // Storing float
-		editorattach.commit();
+		editorAttach.putInt("3Max", id);
+		editorAttach.putString(3 + "path" + id, path);
+		editorAttach.putString(3 + "type" + id, type); // Storing float
+		editorAttach.commit();
 	}
 
 	public void Loadattachmax() {
@@ -1723,334 +1573,467 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 	}
 
 	public void Removeattach(int id) {
-		editorattach.remove(3 + "path" + id); // will delete key name
-		editorattach.remove(3 + "type" + id); // will delete key email
-		editorattach.commit();
+		editorAttach.remove(3 + "path" + id); // will delete key name
+		editorAttach.remove(3 + "type" + id); // will delete key email
+		editorAttach.commit();
 	}
 
-    private void dragAndDrop(){
-        final LayoutInflater inflater3 = (LayoutInflater) getActivity()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View viewS = inflater3.inflate(R.layout.popup_menu_schedule,
-                null, false);
+	private void dragAndDrop(){
+		final LayoutInflater inflater3 = (LayoutInflater) getActivity()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final View viewS = inflater3.inflate(R.layout.popup_menu_schedule,
+				null, false);
 
-        popupWindowSchedule = new PopupWindow(viewS, Utils.getDpValue(270, getActivity()),
-                WindowManager.LayoutParams.WRAP_CONTENT, true);
+		popupWindowSchedule = new PopupWindow(viewS, Utils.getDpValue(270, getActivity()),
+				WindowManager.LayoutParams.WRAP_CONTENT, true);
 
-        TextView cancel_schedule = (TextView) viewS
-                .findViewById(R.id.cancel_event);
-        TextView ok_schedule = (TextView) viewS.findViewById(R.id.ok_event);
-        ArrayList<String> arrayListSchedule = new ArrayList<>(
-                Arrays.asList(Constants.layoutsName));
+		TextView cancel_schedule = (TextView) viewS
+				.findViewById(R.id.cancel_event);
+		TextView ok_schedule = (TextView) viewS.findViewById(R.id.ok_event);
+		ArrayList<String> arrayListSchedule = new ArrayList<>(
+				Arrays.asList(Constants.layoutsName));
 
-        DragSortListView listViewSchedule = (DragSortListView) viewS
-                .findViewById(R.id.list_schedule);
-        ArrayAdapter adapterSchedule = new ArrayAdapter<>(getActivity(),
-                R.layout.popup_menu_items_events, R.id.text, arrayListSchedule);
+		DragSortListView listViewSchedule = (DragSortListView) viewS
+				.findViewById(R.id.list_schedule);
+		ArrayAdapter adapterSchedule = new ArrayAdapter<>(getActivity(),
+				R.layout.popup_menu_items_events, R.id.text, arrayListSchedule);
 
-        listViewSchedule.setAdapter(adapterSchedule);
+		listViewSchedule.setAdapter(adapterSchedule);
 
-        for (int i = 0; i < Constants.layoutsName.length; i++)
-            listViewSchedule.setItemChecked(i, true);
+		for (int i = 0; i < Constants.layoutsName.length; i++)
+			listViewSchedule.setItemChecked(i, App.prefs.getScheduleLayout(Constants.layoutsName[i]));
 
-        popupWindowSchedule = new PopupWindow(viewS,
-                Utils.getDpValue(270, getActivity()),
-                WindowManager.LayoutParams.WRAP_CONTENT, true);
-        popupWindowSchedule.setBackgroundDrawable(new BitmapDrawable());
-        popupWindowSchedule.setOutsideTouchable(true);
-        popupWindowSchedule.setOnDismissListener(new OnDismissListener() {
+		popupWindowSchedule = new PopupWindow(viewS,
+				Utils.getDpValue(270, getActivity()),
+				WindowManager.LayoutParams.WRAP_CONTENT, true);
+		popupWindowSchedule.setBackgroundDrawable(new BitmapDrawable());
+		popupWindowSchedule.setOutsideTouchable(true);
+		popupWindowSchedule.setOnDismissListener(new OnDismissListener() {
 
-            @Override
-            public void onDismiss() {
+			@Override
+			public void onDismiss() {
 //                layout_MainMenu.getForeground().setAlpha(0);
-            }
-        });
-        cancel_schedule.setOnClickListener(new OnClickListener() {
+			}
+		});
+		cancel_schedule.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                popupWindowSchedule.dismiss();
+			@Override
+			public void onClick(View v) {
+				popupWindowSchedule.dismiss();
 
-            }
-        });
-        ok_schedule.setOnClickListener(new OnClickListener() {
+			}
+		});
+		ok_schedule.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                popupWindowSchedule.dismiss();
+			@Override
+			public void onClick(View v) {
+				popupWindowSchedule.dismiss();
 
-            }
-        });
+			}
+		});
 
-        DragSortController controllerSchedule = new DragSortController(
-                listViewSchedule);
-        controllerSchedule.setDragHandleId(R.id.drag_handle);
+		DragSortController controllerSchedule = new DragSortController(
+				listViewSchedule);
+		controllerSchedule.setDragHandleId(R.id.drag_handle);
 
-        listViewSchedule.setOnTouchListener(controllerSchedule);
-        listViewSchedule
-                .setOnItemClickListener(new ListClickListenerSchedule());
-    }
+		listViewSchedule.setOnTouchListener(controllerSchedule);
+		listViewSchedule
+				.setOnItemClickListener(new ListClickListenerSchedule());
+	}
 
-    public class ListClickListenerSchedule implements OnItemClickListener {
+	public class ListClickListenerSchedule implements OnItemClickListener {
 
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
-            position = position + 1;
-            if (position == 2) {
-                position = position + 1;
-            } else if (position > 1) {
-                position = position + 1;
-            }
-            int layoutId = inflatingLayouts.get(position);
-            CheckedTextView checkedTextView = (CheckedTextView) view
-                    .findViewById(R.id.checkbox);
-            if (checkedTextView.isChecked()) {
-                aq.id(layoutId).visible();
-            } else {
-                aq.id(layoutId).gone();
-            }
-        }
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+								long id) {
+			position = position + 1;
+			if (position == 2) {
+				position = position + 1;
+			} else if (position > 1) {
+				position = position + 1;
+			}
+			int layoutId = inflatingLayouts.get(position);
+			CheckedTextView checkedTextView = (CheckedTextView) view
+					.findViewById(R.id.checkbox);
+			if (checkedTextView.isChecked()) {
+				aq.id(layoutId).visible();
+				App.prefs.setEventLayout(Constants.addTaskLayouts[position], true);
+			} else {
+				aq.id(layoutId).gone();
+				App.prefs.setEventLayout(Constants.addTaskLayouts[position], false);
+			}
+		}
 
-    }
+	}
 
-    private void saveSchedule(){
-        if (!(aq.id(R.id.sch_title).getText().toString().equals(""))) {
+	private void saveSchedule(){
+		if (aq.id(R.id.sch_title).getText().toString().equals("")) {
+			Toast.makeText(getActivity(), "Please enter title",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
 
-            MaxId = App.attach.getInt("3Max", 0);
+		assignedId.clear();
+		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
+			assignedId.add(key);
 
-            title = aq.id(R.id.sch_title).getText().toString();
+		MaxId = App.attach.getInt("3Max", 0);
+		title = aq.id(R.id.sch_title).getText().toString();
+		ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_sch).getView();
 
-            ToggleButton switCh = (ToggleButton) aq.id(R.id.switch_sch).getView();
+		boolean isAllDay = switCh.isChecked();
 
-            boolean is_allday = switCh.isChecked();
+		if(isAllDay){
+			currentHours = 0;
+			currentMin = 0;
+			endEventHours = 0;
+			endEventMin = 0;
+		}
 
-            String start_date = AddScheduleFragment.currentYear + "-"
-                    + (AddScheduleFragment.currentMonDigit + 1) + "-"
-                    + AddScheduleFragment.currentDayDigit + " "
-                    + AddScheduleFragment.currentHours + ":"
-                    + AddScheduleFragment.currentMin + ":00";
-            String end_date = AddScheduleFragment.endEventYear + "-"
-                    + (AddScheduleFragment.endEventMonDigit + 1) + "-"
-                    + AddScheduleFragment.endEventDayDigit + " "
-                    + AddScheduleFragment.endEventHours + ":"
-                    + AddScheduleFragment.endEventMin + ":00";
-
-            Log.e("start_date", start_date);
-            Log.e("end_date", end_date);
-
-            String location = aq.id(R.id.sch_location).getText().toString();
-
-            String before = aq.id(R.id.before_schedule).getText().toString();
-            boolean is_time = false, is_location = false;
-            String r_location = "", location_tag = "";
-            if (before.contains("On Arrive") || before.contains("On Leave")) {
-                is_time = false;
-                is_location = true;
-                r_location = aq.id(R.id.location_before_sch).getText()
-                        .toString();
-
-                location_tag = ((TextView) AddScheduleBeforeFragment.viewP)
-                        .getText().toString() + "";
-            }
-
-            boolean is_alertEmail = false, is_alertNotification = false;
-            if (!(aq.id(R.id.before_schedule).getText().toString()
-                    .equals("") || aq.id(R.id.before_schedule).getText()
-                    .toString() == null)) {
-                is_alertEmail = aq.id(R.id.email_radio_sch).getCheckBox()
-                        .isChecked();
-                is_alertNotification = aq.id(R.id.notification_radio_sch)
-                        .getCheckBox().isChecked();
-            }
-
-            boolean repeat_forever = aq.id(R.id.sch_forever_radio).isChecked();
-            String repeat = aq.id(R.id.sch_repeat_txt).getText().toString();
-            repeatdate = AddScheduleFragment.repeatdate;
-
-            String label_name = aq.id(R.id.sch_label_txt).getText().toString();
-            if(!(aq.id(R.id.add_sub_sch).getView() instanceof EditText))
-                toggleCheckList(aq.id(R.id.add_sub_sch).getView());
-            String checklist_data = aq.id(R.id.add_sub_sch).getEditText()
-                    .getText().toString();
-
-            String notes = aq.id(R.id.notes_schedule).getText().toString();
-            assignedId.add(AddTaskFragment.assignedSelectedID);
-
-            Date startDate, endDate;
-            long startDateInMilli = 0, endDateInMilli = 0;
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                startDate = sdf1.parse(start_date);
-                startDateInMilli = startDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            try {
-                endDate = sdf1.parse(end_date);
-                endDateInMilli = endDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (NullPointerException npe) {
-                end_date = null;
-            }
-            int reminderTime = 0, is_locationtype = 0;
-            String locationtype = null;
-            Log.e("before", before);
-            if (before != null || before.isEmpty()) {
-                if (is_time) {
-                    reminderTime = Utils.getReminderTime(before);
-                    Log.e("reminder time", reminderTime+"");
-                } else {
-                    //TODO set notification by GEO fence
-                    Geofences geoFence = new Geofences(getActivity());
-                    if (before.contains("On Arrive")) {
-                        is_locationtype = 0;
-                        locationtype = "On Arrive";
-                    } else if (before.contains("On Leave")) {
-                        is_locationtype = 1;
-                        locationtype = "On Leave";
-                    }
-                }
-            }
-            long r_repeat = 0;
-            if (repeat != null) {
-                if (repeat.contains("once") || repeat.contains("Once")) {
-                    r_repeat = 0;
-                    repeat = "once";
-                } else if (repeat.contains("daily") || repeat.contains("daily")) {
-                    r_repeat = Constants.DAY;
-                    repeat = "daily";
-                } else if (repeat.contains("weekly")
-                        || repeat.contains("Weekly")) {
-                    r_repeat = Constants.WEEK;
-                    repeat = "weekly";
-                } else if (repeat.contains("monthly")
-                        || repeat.contains("Monthly")) {
-                    r_repeat = Constants.MONTH;
-                    repeat = "monthly";
-                } else if (repeat.contains("yearly")
-                        || repeat.contains("Yearly")) {
-                    r_repeat = Constants.YEAR;
-                    repeat = "yearly";
-                }
-            }
-            db_initialize();
-            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-
-            todo = new ToDo();
-            todo.setUser_id(Constants.user_id);
-            todo.setTodo_type_id(3);
-            todo.setTitle(title);
-            todo.setStart_date(startDateInMilli);
-            todo.setEnd_date(endDateInMilli);
-            todo.setIs_allday(is_allday);
-            todo.setLocation(location);
-            todo.setNotes(notes);
-            todo.setIs_done(false);
-            todo.setIs_delete(false);
-
-            Label label = new Label();
-            label.setLabel_name(label_name);
-            labeldao.insert(label);
-            todo.setLabel(label);
-
-            Reminder reminder = new Reminder();
-            reminder.setIs_alertEmail(is_alertEmail);
-            reminder.setIs_alertNotification(is_alertNotification);
-            reminder.setIs_time_location(is_location);
-            reminder.setLocation(r_location);
-            reminder.setLocation_type(is_locationtype);
-            if ((!location_tag.equals("New")) && location_tag != null) {
-                reminder.setLocation_tag(location_tag);
-            }
-
-            reminder.setTime((long) reminderTime);
-            reminderdao.insert(reminder);
-            todo.setReminder(reminder);
-
-            Repeat repeaT = new Repeat();
-            repeaT.setRepeat_interval(repeat);
-            repeaT.setRepeat_until(r_repeat);
-            repeaT.setIs_forever(repeat_forever);
-            repeatdao.insert(repeaT);
-            todo.setRepeat(repeaT);
-
-            CheckList checklist = new CheckList();
-            checklist.setTitle(checklist_data);
-            checklistdao.insert(checklist);
-            todo.setCheckList(checklist);
-
-            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
-
-                    Comment commenT = new Comment();
-                    commenT.setComment(AddTaskComment.comment.get(i));
-                    commenT.setToDo(todo);
-                    commentdao.insert(commenT);
-                }
-            }
-
-            Friends friend = new Friends();
-            friend.setEmail("email");
-            friendsdao.insert(friend);
-            todo.setReminder(reminder);
-            tododao.insert(todo);
-
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
-
-            if(reminderTime != 0){
-                alarm.setReminderAlarm(getActivity(), startDateInMilli - reminderTime, title, location);
-                alarm.SetNormalAlarm(getActivity());
-            }
-            if(r_repeat != 0){
-                alarm.setRepeatAlarm(getActivity(), r_repeat);
-            }
-            else{
-                alarm.SetNormalAlarm(getActivity());
-            }
+		String start_date = currentYear + "-"
+				+ (currentMonDigit + 1) + "-"
+				+ currentDayDigit + " "
+				+ currentHours + ":"
+				+ currentMin + ":00";
+		String end_date = endEventYear + "-"
+				+ (endEventMonDigit + 1) + "-"
+				+ endEventDayDigit + " "
+				+ endEventHours + ":"
+				+ endEventMin + ":00";
 
 
-            AddToServer asyn = new AddToServer(title, 3, start_date, end_date, is_allday, is_location, r_location, location_tag,
-                    locationtype,location, notes, repeatdate,repeat_forever, MaxId,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat,reminderTime, label_name, "", before, "", AddScheduleFragment.this);
-            asyn.execute();
+		String location = aq.id(R.id.sch_location).getText().toString();
 
-        }else
-            Toast.makeText(getActivity(), "Please enter title",
-                    Toast.LENGTH_SHORT).show();
+		String before = aq.id(R.id.before_schedule).getText().toString();
+		boolean is_time = true, is_location = false;
+		String r_location = "", location_tag = "";
+		if (before.contains("On Arrive") || before.contains("On Leave")) {
+			is_time = false;
+			is_location = true;
+			r_location = aq.id(R.id.location_before_sch).getText()
+					.toString();
 
-        getActivity().getSupportFragmentManager().popBackStack();
-    }
-    private void db_initialize() {
-        checklistdao = App.daoSession.getCheckListDao();
-        friendsdao = App.daoSession.getFriendsDao();
-        labeldao = App.daoSession.getLabelDao();
-        tododao = App.daoSession.getToDoDao();
-        commentdao = App.daoSession.getCommentDao();
-        repeatdao = App.daoSession.getRepeatDao();
-        reminderdao = App.daoSession.getReminderDao();
-    }
+			location_tag = ((TextView) AddScheduleBeforeFragment.viewP)
+					.getText().toString() ;
+		}
 
-    @Override
-    public void taskAdded() {
-        todo.setTodo_server_id(TaskAdded.getInstance().id);
-        tododao.insert(todo);
-		App.updateTaskList(MainActivity.act);
+		boolean is_alertEmail = false, is_alertNotification = false;
+		if (!(aq.id(R.id.before_schedule).getText().toString()
+				.isEmpty())) {
+			is_alertEmail = aq.id(R.id.email_radio_sch).getCheckBox()
+					.isChecked();
+			is_alertNotification = aq.id(R.id.notification_radio_sch)
+					.getCheckBox().isChecked();
+		}
+
+		boolean repeat_forever = aq.id(R.id.sch_forever_radio).isChecked();
+		String repeat = aq.id(R.id.sch_repeat_txt).getText().toString();
+
+		String label_name = aq.id(R.id.sch_label_txt).getText().toString();
+		if(!(aq.id(R.id.add_sub_sch).getView() instanceof EditText))
+			toggleCheckList(aq.id(R.id.add_sub_sch).getView());
+		String checklist_data = aq.id(R.id.add_sub_sch).getEditText()
+				.getText().toString();
+
+		String notes = aq.id(R.id.notes_schedule).getText().toString();
+
+		Date startDate, endDate;
+		long startDateInMilli = 0, endDateInMilli = 0;
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			startDate = sdf1.parse(start_date);
+			startDateInMilli = startDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		try {
+			endDate = sdf1.parse(end_date);
+			endDateInMilli = endDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (NullPointerException npe) {
+			end_date = null;
+		}
+		int reminderTime = 0, is_locationtype = 0;
+		String locationtype = null;
+		if (is_time) {
+			reminderTime = Utils.getReminderTime(before);
+			Log.e("reminder time", reminderTime+"");
+		} else {
+			if (before.contains("On Arrive")) {
+				is_locationtype = 0;
+				locationtype = "On Arrive";
+			} else if (before.contains("On Leave")) {
+				is_locationtype = 1;
+				locationtype = "On Leave";
+			}
+		}
+		long r_repeat = 0;
+		if (repeat.contains("once") || repeat.contains("Once")) {
+			r_repeat = 0;
+			repeat = "once";
+		} else if (repeat.contains("daily") || repeat.contains("daily")) {
+			r_repeat = Constants.DAY;
+			repeat = "daily";
+		} else if (repeat.contains("weekly")
+				|| repeat.contains("Weekly")) {
+			r_repeat = Constants.WEEK;
+			repeat = "weekly";
+		} else if (repeat.contains("monthly")
+				|| repeat.contains("Monthly")) {
+			r_repeat = Constants.MONTH;
+			repeat = "monthly";
+		} else if (repeat.contains("yearly")
+				|| repeat.contains("Yearly")) {
+			r_repeat = Constants.YEAR;
+			repeat = "yearly";
+		}
+
+		todo = new ToDo();
+		todo.setUser_id(Constants.user_id);
+		todo.setTodo_type_id(3);
+		todo.setTitle(title);
+		todo.setStart_date(startDateInMilli);
+		todo.setEnd_date(endDateInMilli);
+		todo.setIs_allday(isAllDay);
+		todo.setLocation(location);
+		todo.setNotes(notes);
+		todo.setIs_done(false);
+		todo.setIs_delete(false);
+
+		Label label = new Label();
+		label.setLabel_name(label_name);
+		labeldao.insert(label);
+		todo.setLabel(label);
+
+		Reminder reminder = new Reminder();
+		reminder.setIs_alertEmail(is_alertEmail);
+		reminder.setIs_alertNotification(is_alertNotification);
+		reminder.setIs_time_location(is_location);
+		reminder.setLocation(r_location);
+		reminder.setLocation_type(is_locationtype);
+		if ((!location_tag.equals("New"))) {
+			reminder.setLocation_tag(location_tag);
+		}
+
+		reminder.setTime((long) reminderTime);
+		reminderdao.insert(reminder);
+		todo.setReminder(reminder);
+
+		Repeat repeaT = new Repeat();
+		repeaT.setRepeat_interval(repeat);
+		repeaT.setRepeat_until(r_repeat);
+		repeaT.setIs_forever(repeat_forever);
+		repeatdao.insert(repeaT);
+		todo.setRepeat(repeaT);
+
+		CheckList checklist = new CheckList();
+		checklist.setTitle(checklist_data);
+		checklistdao.insert(checklist);
+		todo.setCheckList(checklist);
+
+		alarm = new AlarmManagerBroadcastReceiver();
+		geoFence = new Geofences(getActivity());
+
+		if(isEditMode){
+			todo.setId(todoId);
+			tododao.update(todo);
+		}else {
+			AddToServer asyn = new AddToServer(title, 3, start_date, end_date, isAllDay, is_location, r_location, location_tag,
+					locationtype, location, notes, repeatdate, repeat_forever, MaxId,
+					AddTaskComment.comment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime, label_name, "", before, "", AddScheduleFragment.this);
+			asyn.execute();
+		}
+		getActivity().getSupportFragmentManager().popBackStack();
+
+
+	}
+	private void db_initialize() {
+		checklistdao = App.daoSession.getCheckListDao();
+		friendsdao = App.daoSession.getFriendsDao();
+		labeldao = App.daoSession.getLabelDao();
+		tododao = App.daoSession.getToDoDao();
+		commentdao = App.daoSession.getCommentDao();
+		repeatdao = App.daoSession.getRepeatDao();
+		reminderdao = App.daoSession.getReminderDao();
+	}
+
+	@Override
+	public void taskAdded() {
+		todo.setTodo_server_id(TaskAdded.getInstance().id);
+		tododao.insert(todo);
+
+		editorAttach.clear().commit();
+		editorComment.clear().commit();
+
+		//have to refresh them all
+		TaskListFragment.setAdapter(MainActivity.act, 0, null);
+		TaskListFragment.setAdapter(MainActivity.act, 1, null);
+		TaskListFragment.setAdapter(MainActivity.act, 2, null);
+
+		App.updateTaskList(getActivity());
+		if (!todo.getReminder().getLocation().isEmpty())
+			addGeofence(todo);
 		setAlarm();
-    }
+	}
 
-    private void setAlarm(){
-        AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
-        if(todo.getReminder().getTime() != 0){
-            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
-            alarm.SetNormalAlarm(MainActivity.act);
-        }
-        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
-            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
-        }
-        else{
-            alarm.SetNormalAlarm(MainActivity.act);
-        }
-    }
+	private void populateValues() {
+		todo = tododao.load(todoId);
+		aq.id(R.id.sch_title).text(todo.getTitle());
+
+		long reminder = todo.getReminder().getTime();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(reminder);
+		currentYear = cal.get(Calendar.YEAR);
+		currentMonDigit = cal.get(Calendar.MONTH) + 1;
+		currentDayDigit = cal.get(Calendar.DAY_OF_MONTH);
+		currentHours = cal.get(Calendar.HOUR_OF_DAY);
+		currentMin = cal.get(Calendar.MINUTE);
+		showRightDateAndTime();
+
+		aq.id(R.id.sch_location).text(todo.getLocation());
+		if(todo.getReminder().getShowable_format() != null){
+			aq.id(R.id.before_schedule).text(todo.getReminder().getShowable_format()).visible();
+		}
+
+		if(todo.getRepeat().getShowable_format() != null) {
+			int selectedPosition = 0;
+			for(int i = 0; i < Constants.repeatArray.length; i++){
+				if(Constants.repeatArray[i].equalsIgnoreCase(todo.getRepeat().getShowable_format())){
+					selectedPosition = i;
+					break;
+				}
+			}
+			aq.id(R.id.sch_repeat_grid).getGridView().setItemChecked(selectedPosition, true);
+			aq.id(R.id.sch_repeat_txt).text(todo.getRepeat().getShowable_format()).visible();
+		}
+
+		if(todo.getLabel().getLabel_color() != null) {
+			aq.id(R.id.sch_label_txt).text(todo.getLabel().getLabel_name());
+			GradientDrawable mDrawable = (GradientDrawable) getResources()
+					.getDrawable(R.drawable.label_background);
+			if (mDrawable != null) {
+				mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+			}
+			aq.id(R.id.sch_label_txt).getView().setBackground(mDrawable);
+			aq.id(R.id.sch_label_txt).getTextView().setTextColor(Color.WHITE);
+		}
+
+		toggleCheckList(aq.id(R.id.add_sub_sch).getView());
+		aq.id(R.id.add_sub_sch).text(todo.getCheckList().getTitle());
+		toggleCheckList(aq.id(R.id.add_sub_sch).getView());
+
+		aq.id(R.id.notes_schedule).text(todo.getNotes());
+		int position = 0;
+		try {
+			for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+				if (Integer.valueOf(TaskData.getInstance().result.todos.get(i).id).equals(todo.getTodo_server_id())) {
+					position = i;
+					break;
+				}
+			}
+			for (int i = 0; i < TaskData.getInstance().result.todos.get(position).todo_attachment.size(); i++)
+				showAttachments(TaskData.getInstance().result.todos.get(position).todo_attachment.get(i));
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+	private void setAlarm(){
+		if(todo.getReminder().getTime() != 0){
+			alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+			alarm.SetNormalAlarm(MainActivity.act);
+		}
+		if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
+			alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
+		}
+		else{
+			alarm.SetNormalAlarm(MainActivity.act);
+		}
+	}
+
+	private void addGeofence(ToDo todo){
+
+		LatLong location = App.gpsTracker.getLocationFromAddress(todo.getReminder().getLocation());
+		geoFence.addGeofence(location.latitude, location.longitude, 200, getEnterOrExit(todo.getReminder().getLocation_type()), todo.getStart_date(), todo.getId().intValue());
+	}
+
+	private int getEnterOrExit(int type){
+		if(type == 0)
+			return Geofence.GEOFENCE_TRANSITION_ENTER;
+		else return Geofence.GEOFENCE_TRANSITION_EXIT;
+	}
+	private void showAttachments(String imageUrl){
+		aq.id(R.id.attachment_layout).visible();
+		try {
+			final LinearLayout item = (LinearLayout) aq
+					.id(R.id.added_image_outer_event).visible().getView();
+
+			final View child = getActivity().getLayoutInflater().inflate(
+					R.layout.image_added_layout, null);
+
+			ImageView image = (ImageView) child
+					.findViewById(R.id.image_added);
+
+			ImageView imageMenu = (ImageView) child
+					.findViewById(R.id.image_menu);
+			Tag = Tag + 1;
+			imageMenu.setTag(Tag);
+			child.setId(Tag);
+			imageMenu.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					ll_iner = (LinearLayout) item.findViewById(Integer
+							.parseInt(arg0.getTag().toString()));
+
+					if (popupWindowAttach.isShowing()) {
+						popupWindowAttach.dismiss();
+
+					} else {
+						popupWindowAttach.showAsDropDown(arg0, 5, 0);
+					}
+				}
+			});
+
+			aq_menu.id(R.id.menu_item1).text("Save file")
+					.clicked(new OnClickListener() {
+
+						@Override
+						public void onClick(View arg0) {
+							popupWindowAttach.dismiss();
+						}
+					});
+			aq_menu.id(R.id.menu_item2).text("Delete")
+					.clicked(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if (ll_iner != null){
+								item.removeView(ll_iner);
+							}
+							popupWindowAttach.dismiss();
+						}
+					});
+
+			ImageOptions options = new ImageOptions();
+			options.round = 20;
+
+			AQuery aq = new AQuery(child);
+			aq.id(image).image(imageUrl, options);
+			child.findViewById(R.id.image_menu);
+			TextView text = (TextView) child
+					.findViewById(R.id.image_added_text);
+			TextView by = (TextView) child
+					.findViewById(R.id.image_added_by);
+			TextView size = (TextView) child
+					.findViewById(R.id.image_added_size);
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+			by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+			size.setText("(7024 KB)");
+			item.addView(child);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

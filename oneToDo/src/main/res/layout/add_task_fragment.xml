@@ -108,6 +108,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/light_grey_color"
+                    android:animateLayoutChanges="true"
+                    android:animationCache="true"
                     android:columnCount="1"
                     android:orientation="vertical"
                     android:paddingLeft="20dp"

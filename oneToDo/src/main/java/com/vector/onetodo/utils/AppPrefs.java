@@ -23,6 +23,11 @@ public class AppPrefs {
 	private String STARTING_DAY = "starting_day";
 	private String COUNTRY_CODE = "country_code";
     private String USER_LOCATION = "user_location";
+	private String TASK_OPTIONS = "task_options";
+	private String EVENT_OPTIONS = "event_options";
+	private String SCHEDULE_OPTIONS = "schedule_options";
+	private String APPOINTMENT_OPTIONS = "appointment_options";
+
 
     public AppPrefs(Context context) {
 		this.appSharedPrefs = context.getSharedPreferences(SHARED_NAME,
@@ -172,4 +177,37 @@ public class AppPrefs {
     public void setUserLocation(String userLocation){
         prefsEditor.putString(USER_LOCATION, userLocation).commit();
     }
+
+	public void setTaskLayout(String name, boolean isChecked){
+		prefsEditor.putBoolean(TASK_OPTIONS + "_" + name, isChecked).commit();
+	}
+
+	public boolean getTaskLayout(String name){
+		return appSharedPrefs.getBoolean(TASK_OPTIONS + "_" + name, true);
+	}
+
+	public void setEventLayout(String name, boolean isChecked){
+		prefsEditor.putBoolean(EVENT_OPTIONS + "_" + name, isChecked).commit();
+	}
+
+	public boolean getEventLayout(String name){
+		return appSharedPrefs.getBoolean(EVENT_OPTIONS + "_" + name, true);
+	}
+
+	public void setScheduleLayout(String name, boolean isChecked){
+		prefsEditor.putBoolean(SCHEDULE_OPTIONS + "_" + name, isChecked).commit();
+	}
+
+	public boolean getScheduleLayout(String name){
+		return appSharedPrefs.getBoolean(SCHEDULE_OPTIONS + "_" + name, true);
+	}
+	public void setAppointmentLayout(String name, boolean isChecked){
+		prefsEditor.putBoolean(APPOINTMENT_OPTIONS + "_" + name, isChecked).commit();
+	}
+
+	public boolean getAppintmentLayout(String name){
+		return appSharedPrefs.getBoolean(APPOINTMENT_OPTIONS + "_" + name, true);
+	}
+
+
 }

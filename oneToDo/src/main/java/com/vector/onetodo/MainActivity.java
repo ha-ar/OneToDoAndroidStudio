@@ -887,44 +887,56 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddTaskFragment.newInstance(pager_number, false, 0)).commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, AddTaskFragment.newInstance(pager_number, false, 0))
+                        .commit();
             }
         });
         aq.id(R.id.add_event_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddEventFragment.newInstance(pager_number,false, 0)).commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, AddEventFragment.newInstance(pager_number,false, 0))
+                        .commit();
             }
         });
         aq.id(R.id.add_schedule_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddScheduleFragment.newInstance(pager_number, 0)).commit();
+                getSupportFragmentManager()
+                        .beginTransaction().addToBackStack(null)
+                        .replace(R.id.container, AddScheduleFragment.newInstance(pager_number,false, 0))
+                        .commit();
             }
         });
         aq.id(R.id.add_appointment_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddAppoinmentFragment.newInstance(pager_number, 0)).commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, AddAppoinmentFragment.newInstance(pager_number, 0))
+                        .commit();
             }
         });
         aq.id(R.id.add_project_button).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, AddProjectFragment.newInstance(pager_number, 0)).commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, AddProjectFragment.newInstance(pager_number, 0))
+                        .commit();
             }
         });
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
 
     }
 

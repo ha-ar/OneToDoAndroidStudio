@@ -62,6 +62,7 @@ public class GcmIntentService extends IntentService {
                 // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
                     .equals(messageType)) {
+
                 getAssignedTaskData(extras.getString("title"),extras.getString("message"), extras.getString("todo_id"));
                 // Post notification of received message.
             }

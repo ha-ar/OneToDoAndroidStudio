@@ -41,7 +41,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -119,7 +118,6 @@ import java.util.Map;
 
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
 public class AddEventFragment extends Fragment implements onTaskAdded {
 
@@ -635,7 +633,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				}
 				((TextView) view).setTextColor(Color.WHITE);
 				view.setSelected(true);
-				if (Constants.repeatArray[position] == "Never") {
+				if (Constants.repeatArray[position].equals("Never")) {
 					aq.id(R.id.repeat_event).text(
 							Constants.repeatArray[position]);
 				} else {
@@ -654,7 +652,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		AlertDialog.Builder builder4 = new AlertDialog.Builder(getActivity());
 		builder4.setView(dateTimePickerDialog);
 		date_time_alert = builder4.create();
-		// Date picker implementation for forever dialogdate_picker
 		final DatePicker dialogDatePicker = (DatePicker) dateTimePickerDialog
 				.findViewById(R.id.date_picker_dialog);
 		showRightDateAndTimeForDialog();
@@ -770,16 +767,11 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 				ImageView img = (ImageView) view;
 				if (last != null) {
-					// Getting the Country TextView
-
 					last.setImageResource(R.color.transparent);
 				}
 				last = img;
-
 				img.setImageResource(R.drawable.select_white);
-
 				Label_postion = position;
-
 			}
 		});
 
@@ -814,7 +806,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 						Save(label_view.getId() + "" + itempos, label_text
 								.getText().toString(), Label_postion);
 						Label_postion = -1;
-						((TextView) label_view).setBackground(mDrawable);
+						label_view.setBackground(mDrawable);
 						((TextView) label_view).setText(label_text.getText()
 								.toString());
 						((TextView) label_view).setTextColor(Color.WHITE);
@@ -971,8 +963,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 			@Override
 			public void onClick(View arg0) {
-				// aqd.id(R.id.add_label_text).text(((TextView)
-				// viewl).getText().)
 				AQlabel.id(R.id.label_title_event).text("Edit");
 				AQlabel.id(R.id.save).text("Save");
 				label_view = viewl;
@@ -1037,7 +1027,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 								.getExternalStorageDirectory()
 								+ File.separator
 								+ "OneToDo" + File.separator, "OneToDo_"
-								+ System.currentTimeMillis() + ".JPG");
+								+ System.currentTimeMillis() + ".png");
 						intent.putExtra(MediaStore.EXTRA_OUTPUT,
 								Uri.fromFile(photo));
 						imageUri = Uri.fromFile(photo);
@@ -1168,24 +1158,18 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private void showRightDateAndTime() {
 
-//		if (aq.id(R.id.date_time_include_to).getView().getVisibility() == View.VISIBLE) {
 		String tempCurrentDayDigit = String.format("%02d", endEventDayDigit);
 		String tempCurrentHours = String.format("%02d", endEventHours);
 		String tempCurrentMins = String.format("%02d", endEventMin);
 
-		aq.id(R.id.day_field_to).text(endEventDay)
-			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
+		aq.id(R.id.day_field_to).text(endEventDay);
 		aq.id(R.id.date_field_to).text(
 				tempCurrentDayDigit
-						+ Utils.getDayOfMonthSuffix(endEventDayDigit))
-			/* .textColor(getResources().getColor(R.color.deep_sky_blue)) */;
+						+ Utils.getDayOfMonthSuffix(endEventDayDigit));
 		aq.id(R.id.month_year_field_to).text(endEventMon);
 		aq.id(R.id.time_to)
 				.text(tempCurrentHours + " : " + tempCurrentMins);
 
-//		}
-
-//		else if (aq.id(R.id.date_time_include_from).getView().getVisibility() == View.VISIBLE) {
 		String tempEndDayDigit = String.format("%02d", currentDayDigit);
 		String tempEndHours = String.format("%02d", currentHours);
 		String tempEndMins = String.format("%02d", currentMin);
@@ -1196,7 +1180,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		aq.id(R.id.month_year_field_from).text(currentMon);
 		aq.id(R.id.time_from).text(
 				tempEndHours + " : " + tempEndMins);
-//		}
 	}
 
 	private void showRightDateAndTimeForDialog(View day, View month) {
@@ -1222,6 +1205,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			param.rowSpec = GridLayout.spec(key);
 			child.setId(inflatingLayoutsEvents.get(key));
 			child.setLayoutParams(param);
+			if(!App.prefs.getEventLayout(Constants.addTaskLayouts[key]))
+				child.setVisibility(View.GONE);
 			gridLayout.addView(child);
 		}
 	}
@@ -1265,17 +1250,17 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				if (resultCode == Activity.RESULT_OK)
 					showImageURI(imageUri);
 			case RESULT_GALLERY:
-				if (null != data) {
+				if (data != null) {
 					showImageURI(data.getData());
 				}
 				break;
 			case RESULT_DROPBOX:
-				if(null != data){
+				if(data != null){
 					showImageURI(data.getData());
 				}
 				break;
 			case RESULT_GOOGLEDRIVE:
-				if(null != data){
+				if(data != null){
 					showImageURI(data.getData());
 				}
 				break;
@@ -1302,7 +1287,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	public static void updateAssign(HashMap<String, String> names){
 		StringBuilder builder = new StringBuilder();
 		for(String key : names.keySet()){
-			builder.append(names.get(key)+", ");
+			builder.append(names.get(key)).append(", ");
 		}
 		aq.id(R.id.event_assign).text(builder);
 	}
@@ -1311,9 +1296,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		getActivity().getContentResolver().notifyChange(selectedImage, null);
 		ContentResolver cr = getActivity().getContentResolver();
-		String type = MimeTypeMap.getFileExtensionFromUrl(selectedImage
-				.toString());
-
 		Bitmap bitmap;
 		if (FragmentCheck == 0) {
 			try {
@@ -1326,13 +1308,13 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 				ImageView image = (ImageView) child
 						.findViewById(R.id.image_added);
-				ImageView imagemenu = (ImageView) child
+				ImageView imageMenu = (ImageView) child
 						.findViewById(R.id.image_menu);
 				Tag = Tag + 1;
-				imagemenu.setTag(Tag);
+				imageMenu.setTag(Tag);
 				child.setId(Tag);
 
-				imagemenu.setOnClickListener(new OnClickListener() {
+				imageMenu.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View arg0) {
@@ -1535,60 +1517,17 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private void toggleCheckList(View switchView) {
 		View newView;
-
-		/*
-		 * Here is where the job is done. By simply calling an instance of the
-		 * ChecklistManager we can call its methods.
-		 */
 		try {
-			// Getting instance
 			ChecklistManager mChecklistManager = ChecklistManager
 					.getInstance(getActivity());
-
-			/*
-			 * These method are useful when converting from EditText to
-			 * ChecklistView (but can be set anytime, they'll be used at
-			 * appropriate moment)
-			 */
-
-			// Setting new entries hint text (if not set no hint
-			// will be used)
 			mChecklistManager.setNewEntryHint("Add a subtask...");
-			// Let checked items are moved on bottom
-
 			mChecklistManager.setMoveCheckedOnBottom(1);
-
-			mChecklistManager
-					.setCheckListChangedListener(new CheckListChangedListener() {
-
-						@Override
-						public void onCheckListChanged() {
-
-						}
-					});
-
-			// Decide if keep or remove checked items when converting
-			// back to simple text from checklist
 			mChecklistManager.setKeepChecked(true);
-
-			// I want to make checks symbols visible when converting
-			// back to simple text from checklist
 			mChecklistManager.setShowChecks(true);
-
-			// Converting actual EditText into a View that can
-			// replace the source or viceversa
 			newView = mChecklistManager.convert(switchView);
-
-			// Replacing view in the layout
 			mChecklistManager.replaceViews(switchView, newView);
 
-			// Updating the instance of the pointed view for
-			// eventual reverse conversion
-			switchView = newView;
-
 		} catch (ViewNotSupportedException e) {
-			// This exception is fired if the source view class is
-			// not supported
 			e.printStackTrace();
 		}
 	}
@@ -1598,10 +1537,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
 									   int position, long arg3) {
-			if (((TextView) arg1).getText().toString().equals("New")
-					|| position < 3) {
+			if (!(((TextView) arg1).getText().toString().equals("New")) || (position < 3)) {
 
-			} else {
 				AQlabel.id(R.id.add_label_text_event).text(
 						((TextView) arg1).getText().toString());
 				AQlabel_del.id(R.id.body).text(
@@ -1618,21 +1555,15 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	}
 
 	public void Save(String id, String name, int label_position) {
-		// 0 - for private mode
 		editor.putString(2 + "key_label" + id, name); // Storing integer
 		editor.putInt(2 + "key_color_position" + id, label_position); // Storing
-		// float
 		editor.commit();
 	}
 
 	public void Load(String id) {
 		plabel = null;
 		plabel = App.label.getString(2 + "key_label" + id, null); // getting
-		// String
-		Log.v("View id= ", id + "| " + plabel + " | " + pposition);
-
 		pposition = App.label.getInt(2 + "key_color_position" + id, 0); // getting
-		// String
 	}
 
 	public void Remove(String id) {
@@ -1777,7 +1708,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		listViewEvent.setAdapter(adapterEvent);
 		for (int i = 0; i < arrayListEvent.size(); i++)
-			listViewEvent.setItemChecked(i, true);
+			listViewEvent.setItemChecked(i, App.prefs.getEventLayout(Constants.layoutsName[i]));
 
 		cancel_event.setOnClickListener(new OnClickListener() {
 
@@ -1823,24 +1754,25 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 					.findViewById(R.id.checkbox);
 			if (checkedTextView.isChecked()) {
 				aq.id(layoutId).visible();
+				App.prefs.setEventLayout(Constants.addTaskLayouts[position], true);
 			} else {
 				aq.id(layoutId).gone();
+				App.prefs.setEventLayout(Constants.addTaskLayouts[position], false);
 			}
 		}
 
 	}
 
 	private void saveEvent() {
-		assignedId.clear();
-		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
-			assignedId.add(key);
-
 		if (aq.id(R.id.event_title).getText().toString().isEmpty()) {
 			Toast.makeText(getActivity(), "Please enter title",
 					Toast.LENGTH_SHORT).show();
 			return;
 		}
 
+		assignedId.clear();
+		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
+			assignedId.add(key);
 		MaxId = App.attach.getInt("2Max", 0);
 
 		title = aq.id(R.id.event_title).getText().toString();
@@ -1900,7 +1832,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		String notes = aq.id(R.id.notes_event).getText().toString();
 
-
 		Date startDate, endDate;
 		long startDateInMilli = 0, endDateInMilli = 0;
 		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1920,10 +1851,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		}
 		int reminderTime = 0, is_locationtype = 0;
 		String locationType = null;
-		Log.e("before", before);
 		if (is_time) {
 			reminderTime = Utils.getReminderTime(before);
-			Log.e("reminder time", reminderTime+"");
 		} else {
 			if (before.contains("On Arrive")) {
 				is_locationtype = 0;
@@ -1999,8 +1928,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		checklistdao.insert(checklist);
 		todo.setCheckList(checklist);
 
-		TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
-
 		alarm = new AlarmManagerBroadcastReceiver();
 		geoFence = new Geofences(getActivity());
 
@@ -2073,7 +2000,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 		aq.id(R.id.notes_event).text(todo.getNotes());
 		int position = 0;
-		aq.id(R.id.notes_task).text(todo.getNotes());
 		try {
 			for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
 				if (Integer.valueOf(TaskData.getInstance().result.todos.get(i).id).equals(todo.getTodo_server_id())) {

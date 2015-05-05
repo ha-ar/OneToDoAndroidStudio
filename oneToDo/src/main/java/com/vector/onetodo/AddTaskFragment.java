@@ -74,10 +74,8 @@ import com.mobeta.android.dslv.DragSortListView;
 import com.vector.model.TaskAdded;
 import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.Attach;
-import com.vector.onetodo.db.gen.AttachDao;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
-import com.vector.onetodo.db.gen.CommentDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
 import com.vector.onetodo.db.gen.Reminder;
@@ -178,8 +176,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private LabelDao labeldao;
     private ReminderDao reminderdao;
     private RepeatDao repeatdao;
-    private CommentDao commentdao;
-    private AttachDao attachDao;
 
     private AlarmManagerBroadcastReceiver alarm;
     private Geofences geoFence;
@@ -216,7 +212,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         aq.id(R.id.task_assign).text(name);
     }
 
-    public static void inflateLayouts() {
+    private void inflateLayouts() {
         GridLayout gridLayout = (GridLayout) allView
                 .findViewById(R.id.inner_container);
         gridLayout.removeAllViews();
@@ -229,7 +225,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             param.rowSpec = GridLayout.spec(key);
             child.setId(inflatingLayouts.get(key));
             child.setLayoutParams(param);
+            if(!App.prefs.getTaskLayout(Constants.addTaskLayouts[key]))
+                child.setVisibility(View.GONE);
             gridLayout.addView(child);
+
         }
     }
 
@@ -319,6 +318,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         currentMon = Utils.getCurrentMonth(dayPosition, Calendar.SHORT);
         currentHours = Utils.getCurrentHours() + 1;
         currentMin = Utils.getCurrentMins();
+
 
         inflatingLayouts.put(0, R.layout.add_task_title);
         inflatingLayouts.put(1, R.layout.add_task_assign1);
@@ -1294,12 +1294,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             case R.id.before1:
 
                 if (aq.id(R.id.before_grid_view_linear).getView().getVisibility() == View.GONE) {
-                    if (aq.id(R.id.before).getText().toString() == "") {
-                        aq.id(R.id.before)
-
-                                .text(Constants.beforeArray[1] + " Before")
-                                .visibility(View.VISIBLE);
-
+                    if (!aq.id(R.id.before).getText().toString().isEmpty()) {
+                        aq.id(R.id.before).text(Constants.beforeArray[1] + " Before").visibility(View.VISIBLE);
                     }
                     aq.id(R.id.before_grid_view_linear)
                             .getView()
@@ -1476,8 +1472,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         listViewTask.setAdapter(adapterTask);
         listViewTask.setDropListener(onDropTask);
-        for (int i = 0; i < Constants.layoutsName.length; i++)
-            listViewTask.setItemChecked(i, true);
+        for (int i = 0; i < Constants.layoutsName.length; i++){
+            listViewTask.setItemChecked(i, App.prefs.getTaskLayout(Constants.layoutsName[i]));
+        }
+
 
         DragSortController controllerTask = new DragSortController(listViewTask);
         controllerTask.setDragHandleId(R.id.drag_handle);
@@ -1683,10 +1681,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         checklistdao = App.daoSession.getCheckListDao();
         labeldao = App.daoSession.getLabelDao();
         tododao = App.daoSession.getToDoDao();
-        commentdao = App.daoSession.getCommentDao();
         repeatdao = App.daoSession.getRepeatDao();
         reminderdao = App.daoSession.getReminderDao();
-        attachDao = App.daoSession.getAttachDao();
     }
 
     @Override
@@ -2040,15 +2036,15 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             } else if (position > 1) {
                 position = position + 1;
             }
-
             int layoutId = inflatingLayouts.get(position);
-
             CheckedTextView checkedTextView = (CheckedTextView) view
                     .findViewById(R.id.checkbox);
             if (checkedTextView.isChecked()) {
                 aq.id(layoutId).visible();
+                App.prefs.setTaskLayout(Constants.addTaskLayouts[position], true);
             } else {
                 aq.id(layoutId).gone();
+                App.prefs.setTaskLayout(Constants.addTaskLayouts[position], false);
             }
 
         }
