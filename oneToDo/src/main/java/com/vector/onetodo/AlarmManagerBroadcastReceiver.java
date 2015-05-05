@@ -41,7 +41,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         if(extras != null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
             msgStr.append("One time Timer : ");
-            nHandler.createSimpleNotification(context, intent);
+            nHandler.createNotification(context, intent);
         }else{
             //************ NOTIFICATIONS
             nHandler.createNotification(context, intent);

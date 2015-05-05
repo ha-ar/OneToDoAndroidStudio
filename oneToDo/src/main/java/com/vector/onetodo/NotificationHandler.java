@@ -1,5 +1,6 @@
 package com.vector.onetodo;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -52,6 +53,7 @@ public class NotificationHandler {
 
         // Building the notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+				.setPriority(Notification.PRIORITY_MAX)
                 .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle(intent.getExtras().getString("title"))
@@ -84,6 +86,7 @@ public class NotificationHandler {
 
 		// Building the notification
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+				.setPriority(Notification.PRIORITY_MAX)
                 .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
 				.setSmallIcon(R.drawable.ic_launcher) // notification icon
 				.setContentTitle("Event Invitation")
