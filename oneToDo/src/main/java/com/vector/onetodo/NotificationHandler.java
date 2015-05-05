@@ -32,32 +32,7 @@ public class NotificationHandler {
 	 * Shows a simple notification
 	 * @param context application context
 	 */
-	public void createSimpleNotification(Context context, Intent intent) {
-		// Creates an explicit intent for an Activity
 	
-		Intent resultIntent = new Intent(context, TaskView.class);
-
-		// Creating a artifical activity stack for the notification activity
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-		stackBuilder.addParentStack(MainActivity.class);
-		stackBuilder.addNextIntent(resultIntent);
-
-		// Pending intent to the notification manager
-		PendingIntent resultPending = stackBuilder
-				.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-		// Building the notification
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
-                .setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(intent.getExtras().getString("title"))
-				.setContentText(intent.getExtras().getString("location")) // notification text
-				.setContentIntent(resultPending); // notification intent
-
-		// mId allows you to update the notification later on.
-//        mBuilder.addflags |= Notification.FLAG_AUTO_CANCEL;
-
-		mNotificationManager.notify(0, mBuilder.build());
-	}
     public void createNotification(Context context, Intent intent) {
         // Creates an explicit intent for an Activity
 
@@ -111,8 +86,11 @@ public class NotificationHandler {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
 				.setSmallIcon(R.drawable.ic_launcher) // notification icon
-				.setContentTitle(title)
-				.setContentText(message) // notification text
+				.setContentTitle("Event Invitation")
+				.setContentText("IT-workshop") // notification text
+                .setContentText("Date")
+                .addAction(0, "View", resultPending)
+                .addAction(0, "RSVP", resultPending)
 				.setContentIntent(resultPending); // notification intent
 
 		// mId allows you to update the notification later on.
