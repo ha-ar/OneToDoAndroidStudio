@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.androidquery.AQuery;
@@ -165,15 +166,37 @@ public class Setting extends Fragment {
 			public void onClick(View v) {
 
 				if (check == 1) {
-					App.prefs.setDateFromat(RB.getText().toString().trim());
-					aq.id(R.id.dateformat2).text(RB.getText().toString().trim());
-				} else if (check == 2) {
-					App.prefs.setTimeFormat(RB.getText().toString().trim());
-					aq.id(R.id.timeformat2).text(RB.getText().toString().trim());
-				} else if (check == 3) {
-					App.prefs.setStartingWeekDay(RB.getText().toString().trim());
-						aq.id(R.id.weekstart2).text(RB.getText().toString().trim());
-				}
+                    if( RB.isChecked() ){
+                        App.prefs.setDateFromat(RB.getText().toString().trim());
+                        aq.id(R.id.dateformat2).text(RB.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }else{
+                        App.prefs.setDateFromat(RB1.getText().toString().trim());
+                        aq.id(R.id.dateformat2).text(RB1.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }
+
+				}else if (check == 2) {
+                    if( RB.isChecked() ){
+                        App.prefs.setTimeFormat(RB.getText().toString().trim());
+                        aq.id(R.id.timeformat2).text(RB.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }else{
+                        App.prefs.setTimeFormat(RB1.getText().toString().trim());
+                        aq.id(R.id.timeformat2).text(RB1.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    if( RB.isChecked() ){
+                        App.prefs.setStartingWeekDay(RB.getText().toString().trim());
+                        aq.id(R.id.weekstart2).text(RB.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }else{
+                        App.prefs.setStartingWeekDay(RB1.getText().toString().trim());
+                        aq.id(R.id.weekstart2).text(RB1.getText().toString().trim());
+                        Toast.makeText(getActivity(), "done", Toast.LENGTH_SHORT).show();
+                    }
+                }
 				check = -1;
 				alert.dismiss();
 			}
@@ -187,6 +210,7 @@ public class Setting extends Fragment {
 				// TODO Auto-generated method stub
 
 				if (isChecked == true) {
+
 					aq.id(R.id.sound).textColorId(R.color._4d4d4d);
 					aq.id(R.id.sound1).textColorId(R.color._777777);
 					aq.id(R.id.vibrate).textColorId(R.color._4d4d4d);
