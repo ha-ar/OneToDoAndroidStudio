@@ -508,6 +508,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		DatePicker dPickerEvent = (DatePicker) aq
 				.id(R.id.date_picker_event_end).getView();
 		showRightDateAndTime();
+		dPickerEvent.setMinDate(System.currentTimeMillis() - 1000);
 		dPickerEvent.init(currentYear, currentMonDigit, currentDayDigit,
 				new OnDateChangedListener() {
 

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -298,6 +297,14 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 	}
 
+	public static void updateAssign(HashMap<String, String> names){
+		StringBuilder builder = new StringBuilder();
+		for(String key : names.keySet()){
+			builder.append(names.get(key)).append(", ");
+		}
+		aq.id(R.id.schedule_assign).text(builder);
+	}
+
 	void main() {
 
 		// ****************Title
@@ -400,6 +407,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				.getView();
 		int density = getResources().getDisplayMetrics().densityDpi;
 		showRightDateAndTime();
+		dPicker.setMinDate(System.currentTimeMillis() - 1000);
 		dPicker.init(currentYear, currentMonDigit, currentDayDigit,
 				new OnDateChangedListener() {
 
@@ -438,7 +446,8 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		DatePicker dPickerEvent = (DatePicker) aq
 				.id(R.id.date_picker_event_end).getView();
 		showRightDateAndTime();
-		dPickerEvent.init(currentYear, currentMonDigit, currentDayDigit,
+		dPickerEvent.setMinDate(System.currentTimeMillis() - 1000);
+		dPickerEvent.init(endEventYear, endEventMonDigit, endEventDayDigit,
 				new OnDateChangedListener() {
 
 					@Override
@@ -455,6 +464,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 						endEventMon = cal.getDisplayName(Calendar.MONTH,
 								Calendar.SHORT, Locale.US);
 						showRightDateAndTime();
+
 					}
 
 				});
@@ -751,15 +761,6 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		builderLabel.setView(vie);
 		add_new_label_alert = builderLabel.create();
 
-		add_new_label_alert
-				.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						// TODO Auto-generated method stub
-
-					}
-				});
 		TextView saveLabel = (TextView) vie.findViewById(R.id.save);
 		saveLabel.setOnClickListener(new OnClickListener() {
 
@@ -1256,7 +1257,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 		@Override
 		public Fragment getItem(int position) {
-			return AddScheduleBeforeFragment.newInstance(position);
+			return AddScheduleBeforeFragment.newInstance(position, isEditMode, todo != null ? todo.getReminder().getShowable_format() : "");
 		}
 	}
 
@@ -1267,9 +1268,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		switch (requestCode) {
-
 			case TAKE_PICTURE:
-
 				if (resultCode == Activity.RESULT_OK)
 					showImageURI(imageUri);
 			case RESULT_GALLERY:
@@ -1434,25 +1433,25 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 	private void showRightDateAndTime() {
 
-		String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
-		String tempCurrentHours = String.format("%02d", currentHours);
-		String tempCurrentMins = String.format("%02d", currentMin);
-		aq.id(R.id.sch_time_to_day).text(currentDay);
+		String tempCurrentDayDigit = String.format("%02d", endEventDayDigit);
+		String tempCurrentHours = String.format("%02d", endEventHours);
+		String tempCurrentMins = String.format("%02d", endEventMin);
+		aq.id(R.id.sch_time_to_day).text(endEventDay);
 		aq.id(R.id.sch_time_to_day_month).text(
 				tempCurrentDayDigit
-						+ Utils.getDayOfMonthSuffix(currentDayDigit));
-		aq.id(R.id.sch_time_to_month).text(currentMon);
+						+ Utils.getDayOfMonthSuffix(endEventDayDigit));
+		aq.id(R.id.sch_time_to_month).text(endEventMon);
 		aq.id(R.id.sch_time_to).text(
 				tempCurrentHours + " : " + tempCurrentMins);
 
-		String tempEndDayDigit = String.format("%02d", endEventDayDigit);
-		String tempEndHours = String.format("%02d", endEventHours);
-		String tempEndMins = String.format("%02d", endEventMin);
-		aq.id(R.id.sch_time_from_day).text(endEventDay);
+		String tempEndDayDigit = String.format("%02d", currentDayDigit);
+		String tempEndHours = String.format("%02d", currentHours);
+		String tempEndMins = String.format("%02d", currentMin);
+		aq.id(R.id.sch_time_from_day).text(currentDay);
 		aq.id(R.id.sch_time_from_day_month).text(
 				tempEndDayDigit
-						+ Utils.getDayOfMonthSuffix(endEventDayDigit));
-		aq.id(R.id.sch_time_from_month).text(endEventMon);
+						+ Utils.getDayOfMonthSuffix(currentDayDigit));
+		aq.id(R.id.sch_time_from_month).text(currentMon);
 		aq.id(R.id.sch_time_from).text(
 				tempEndHours + " : " + tempEndMins);
 	}
@@ -1657,10 +1656,10 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 					.findViewById(R.id.checkbox);
 			if (checkedTextView.isChecked()) {
 				aq.id(layoutId).visible();
-				App.prefs.setEventLayout(Constants.addTaskLayouts[position], true);
+				App.prefs.setScheduleLayout(Constants.addTaskLayouts[position], true);
 			} else {
 				aq.id(layoutId).gone();
-				App.prefs.setEventLayout(Constants.addTaskLayouts[position], false);
+				App.prefs.setScheduleLayout(Constants.addTaskLayouts[position], false);
 			}
 		}
 

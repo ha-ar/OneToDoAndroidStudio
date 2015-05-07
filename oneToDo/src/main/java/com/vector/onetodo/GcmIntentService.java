@@ -63,7 +63,11 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
                     .equals(messageType)) {
 
-                getAssignedTaskData(extras.getString("title"),extras.getString("message"), extras.getString("todo_id"));
+                NotificationHandler nHandler;
+                nHandler = NotificationHandler.getInstance(getApplicationContext());
+                nHandler.createSimpleNotification2(getApplicationContext(), "test", "test", 12);
+
+//                getAssignedTaskData(extras.getString("title"),extras.getString("message"), extras.getString("todo_id"));
                 // Post notification of received message.
             }
         }

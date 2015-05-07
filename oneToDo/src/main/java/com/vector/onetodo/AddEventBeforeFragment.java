@@ -124,32 +124,21 @@ public class AddEventBeforeFragment extends Fragment {
 						public void onClick(View arg0) {
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio_event).textColor(
-
 								getResources().getColor(R.color._4d4d4d));
 							} else {
-
-								aq.id(R.id.email_radio_event).textColor(
-										Color.parseColor("#bababa"));
+								aq.id(R.id.email_radio_event).textColor(Color.parseColor("#bababa"));
 							}
 						}
 					});
 
 			aq.id(R.id.before_grid_view_event).getGridView()
-					.setAdapter(
-							new ArrayAdapter<String>(getActivity(),
-									R.layout.grid_layout_textview,
-									Constants.beforeArray) {
-
+					.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.grid_layout_textview, Constants.beforeArray) {
 								@Override
-								public View getView(int position,
-										View convertView, ViewGroup parent) {
+								public View getView(int position, View convertView, ViewGroup parent) {
 
-									TextView textView = (TextView) super
-											.getView(position, convertView,
-													parent);
+									TextView textView = (TextView) super.getView(position, convertView, parent);
                                     if(!isEditMode){
-                                        if (textView.getText().toString()
-                                                .equals("15 Mins")) {
+                                        if (textView.getText().toString().equals("15 Mins")) {
                                             previousSelected = textView;
                                             textView.setBackgroundResource(R.drawable.round_buttons_blue);
                                             textView.setTextColor(Color.WHITE);
@@ -158,8 +147,7 @@ public class AddEventBeforeFragment extends Fragment {
                                     }else{
                                         String[] tokenArray =  selectedItem.split(" ");
                                         String comparable = tokenArray[0]+" "+ tokenArray[1];
-                                        if(textView.getText().toString()
-                                                .equals(comparable)){
+                                        if(textView.getText().toString().equals(comparable)){
                                             previousSelected = textView;
                                             textView.setBackgroundResource(R.drawable.round_buttons_blue);
                                             textView.setTextColor(Color.WHITE);
@@ -173,13 +161,11 @@ public class AddEventBeforeFragment extends Fragment {
 			View dialogLayout = getActivity().getLayoutInflater().inflate(
 					R.layout.custom_number_picker_dialog, null, false);
 
-			final NumberPicker numberPicker = (NumberPicker) dialogLayout
-					.findViewById(R.id.number_picker_dialog);
+			final NumberPicker numberPicker = (NumberPicker) dialogLayout.findViewById(R.id.number_picker_dialog);
 			numberPicker.setMinValue(0);
 			numberPicker.setMaxValue(59);
 
-			final NumberPicker customDays = (NumberPicker) dialogLayout
-					.findViewById(R.id.days_picker_dialog);
+			final NumberPicker customDays = (NumberPicker) dialogLayout.findViewById(R.id.days_picker_dialog);
 			customDays.setMinValue(0);
 			customDays.setMaxValue(Constants.beforevalues.length - 1);
 			customDays.setDisplayedValues(Constants.beforevalues);
@@ -194,40 +180,32 @@ public class AddEventBeforeFragment extends Fragment {
 						public void onItemClick(AdapterView<?> parent,
 								View view, int position, long id) {
 
-							if (((TextView) previousSelected).getText()
-									.toString().equals("15 Mins")) {
-
+							if (((TextView) previousSelected).getText().toString().equals("15 Mins")) {
 								previousSelected.setBackgroundResource(R.drawable.round_buttons_white);
 								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							} else if (previousSelected != null) {
 								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							}
-							if (((TextView) view).getText().toString()
-									.equals("15 Mins")) {
+							if (((TextView) view).getText().toString().equals("15 Mins")) {
 								view.setBackgroundResource(R.drawable.round_buttons_blue);
 							}
 							((TextView) view).setTextColor(Color.WHITE);
 							view.setSelected(true);
 							previousSelected = view;
-							if (Constants.beforeArray[position]
-									.equals("Custom")) {
+							if (Constants.beforeArray[position].equals("Custom")) {
 								alert.show();
-
 							} else {
-
 								if (Constants.beforeArray[position].equals("On Time")) {
 									before.setText(Constants.beforeArray[position]);
 								} else {
-									before.setText(Constants.beforeArray[position]
-											+ " Before");
+									before.setText(Constants.beforeArray[position] + " Before");
 								}
 							}
 
 						}
 
 					});
-			TextView cancelButton = (TextView) dialogLayout
-					.findViewById(R.id.cencel);
+			TextView cancelButton = (TextView) dialogLayout.findViewById(R.id.cencel);
 			cancelButton.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -245,26 +223,19 @@ public class AddEventBeforeFragment extends Fragment {
 					TextView before = (TextView) AddEventFragment.allView
 							.findViewById(R.id.before_event);
 					before.setVisibility(View.VISIBLE);
-					before.setText(numberPicker.getValue() + " "
-							+ Constants.beforevalues[customDays.getValue()]
-							+ " Before");
+					before.setText(numberPicker.getValue() + " " + Constants.beforevalues[customDays.getValue()] + " Before");
 					numberPicker.getValue();
 					alert.dismiss();
 				}
 			});
 
 		} else {
-			// ***************************location dialog
 
 			set();
-
 			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
 					.findViewById(R.id.adress);
-			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
-			AlertDialog.Builder builder5 = new AlertDialog.Builder(
-					getActivity());
+			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
+			AlertDialog.Builder builder5 = new AlertDialog.Builder(getActivity());
 
 			builder5.setView(dialoglayout5);
 			location = builder5.create();
@@ -287,10 +258,7 @@ public class AddEventBeforeFragment extends Fragment {
 				@Override
 				public void onClick(View arg0) {
 					((TextView) viewP).setTextColor(Color.parseColor("#000000"));
-					// ((TextView)
-					// viewP).setBackgroundColor(Color.parseColor("#999999"));
-					aq.id(R.id.location_before_event).text(
-							aqd.id(R.id.adress).getText());
+					aq.id(R.id.location_before_event).text(aqd.id(R.id.adress).getText());
 					((TextView) viewP).setText(aqd.id(R.id.home).getText());
 					viewP.setBackgroundResource(R.drawable.button_shadow);
 					if (button != null) {
@@ -298,12 +266,10 @@ public class AddEventBeforeFragment extends Fragment {
 						viewP.setBackgroundResource(R.drawable.button_shadow);
 						button = viewP;
 					} else {
-
 						button = viewP;
 						viewP.setBackgroundResource(R.drawable.button_shadow);
 					}
-					save(viewP.getId(), aqd.id(R.id.home).getText().toString(),
-							aqd.id(R.id.adress).getText().toString());
+					save(viewP.getId(), aqd.id(R.id.home).getText().toString(), aqd.id(R.id.adress).getText().toString());
 
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
@@ -312,8 +278,7 @@ public class AddEventBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) dialoglayout5
-					.findViewById(R.id.cancel);
+			TextView cancel1 = (TextView) dialoglayout5.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -325,11 +290,8 @@ public class AddEventBeforeFragment extends Fragment {
 			});
 
 			aq.id(R.id.arrive_leave_checkbox_layout).visible();
-			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq
-					.id(R.id.location_before_event).getView();
-			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
+			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.location_before_event).getView();
+			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 
 			((RadioGroup) aq.id(R.id.leave_arrive_radio).getView())
 					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -338,19 +300,13 @@ public class AddEventBeforeFragment extends Fragment {
 						public void onCheckedChanged(RadioGroup group,
 													 int checkedId) {
 							if (previousSelectedLocation != null) {
-								((RadioButton) previousSelectedLocation)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+								((RadioButton) previousSelectedLocation).setTextColor(getResources().getColor(R.color._4d4d4d));
 							}
-							((RadioButton) group.findViewById(checkedId))
-									.setTextColor(Color.WHITE);
-							TextView before = (TextView) getActivity()
-									.findViewById(R.id.before_event);
+							((RadioButton) group.findViewById(checkedId)).setTextColor(Color.WHITE);
+							TextView before = (TextView) getActivity().findViewById(R.id.before_event);
 							before.setVisibility(View.VISIBLE);
-							before.setText("On "
-									+ aq.id(checkedId).getText().toString());
-							previousSelectedLocation = group
-									.findViewById(checkedId);
+							before.setText("On " + aq.id(checkedId).getText().toString());
+							previousSelectedLocation = group.findViewById(checkedId);
 						}
 					});
 			aq.id(R.id.pre_defined_21).getTextView()

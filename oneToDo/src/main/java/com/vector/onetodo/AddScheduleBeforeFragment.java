@@ -23,6 +23,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.vector.onetodo.utils.Constants;
 
 import net.simonvt.numberpicker.NumberPicker;
 
@@ -44,23 +45,30 @@ public class AddScheduleBeforeFragment extends Fragment {
 	static final String[] values = { "Mins", "Hours", "Days", "Weeks",
 			"Months", "Years" };
 	private static View previousSelected;
-    private View dialoglayout5;
+	private View dialoglayout5;
+	private boolean isEditMode = false;
+	private String selectedItem;
 
-	public static AddScheduleBeforeFragment newInstance(int position) {
+	public static AddScheduleBeforeFragment newInstance(int position, boolean isEditMode, String selectedItem) {
 		AddScheduleBeforeFragment myFragment = new AddScheduleBeforeFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
+		args.putBoolean("isEditMode", isEditMode);
+		args.putString("selectedItem", selectedItem);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		position = getArguments().getInt("position", 0);
 
 		editor = App.pref.edit();
 		before = (TextView) getActivity().findViewById(R.id.before_schedule);
+		isEditMode = getArguments().getBoolean("isEditMode", false);
+		selectedItem = getArguments().getString("selectedItem", "");
+
 		View view;
 		if (position == 0)
 			view = inflater.inflate(R.layout.schedule_before_grid, container,
@@ -69,6 +77,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 			view = inflater.inflate(R.layout.schedule_location, container,
 					false);
 
+		dialoglayout5 = inflater.inflate(R.layout.add_location_event,
+				null, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -76,7 +86,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
- 
+
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
 
 		View dialoglayout7 = inflater5.inflate(R.layout.add_task_edit_delete,
@@ -102,7 +112,7 @@ public class AddScheduleBeforeFragment extends Fragment {
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.notification_radio_sch).textColor(
 
-								getResources().getColor(R.color._4d4d4d));
+										getResources().getColor(R.color._4d4d4d));
 							} else {
 
 								aq.id(R.id.notification_radio_sch).textColor(
@@ -118,47 +128,37 @@ public class AddScheduleBeforeFragment extends Fragment {
 						public void onClick(View arg0) {
 							if (((CheckBox) arg0).isChecked()) {
 								aq.id(R.id.email_radio_sch).textColor(
-
-								getResources().getColor(R.color._4d4d4d));
+										getResources().getColor(R.color._4d4d4d));
 							} else {
-
-								aq.id(R.id.email_radio_sch).textColor(
-										Color.parseColor("#bababa"));
+								aq.id(R.id.email_radio_sch).textColor(Color.parseColor("#bababa"));
 							}
 						}
 					});
 
-			aq.id(R.id.before_grid_view_schedule)
-					.getGridView()
-					.setAdapter(
-							new ArrayAdapter<String>(getActivity(),
-									R.layout.grid_layout_textview, beforeArray) {
-
-								@Override
-								public View getView(int position,
-										View convertView, ViewGroup parent) {
-
-									TextView textView = (TextView) super
-											.getView(position, convertView,
-													parent);
-									if (textView.getText().toString()
-											.equals("15 Mins")) {
-
-										previousSelected = textView;
-										((TextView) textView)
-												.setBackgroundResource(R.drawable.round_buttons_blue);
-										((TextView) textView)
-												.setTextColor(Color.WHITE);
-
-									} else
-										((TextView) textView)
-												.setTextColor(getResources()
-														.getColor(
-																R.color._4d4d4d)); 
-									return textView;
+			aq.id(R.id.before_grid_view_schedule).getGridView().setAdapter(
+					new ArrayAdapter<String>(getActivity(), R.layout.grid_layout_textview, beforeArray) {
+						@Override
+						public View getView(int position, View convertView, ViewGroup parent) {
+							TextView textView = (TextView) super.getView(position, convertView, parent);
+							if(!isEditMode){
+								if (textView.getText().toString().equals("15 Mins")) {
+									previousSelected = textView;
+									textView.setBackgroundResource(R.drawable.round_buttons_blue);
+									textView.setTextColor(Color.WHITE);
+								} else
+									textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+							}else{
+								String[] tokenArray =  selectedItem.split(" ");
+								String comparable = tokenArray[0]+" "+ tokenArray[1];
+								if(textView.getText().toString().equals(comparable)){
+									previousSelected = textView;
+									textView.setBackgroundResource(R.drawable.round_buttons_blue);
+									textView.setTextColor(Color.WHITE);
 								}
-
-							});
+							}
+							return textView;
+						}
+					});
 
 			View dialoglayout = getActivity().getLayoutInflater().inflate(
 					R.layout.custom_number_picker_dialog, null, false);
@@ -171,8 +171,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 			final NumberPicker customDays = (NumberPicker) dialoglayout
 					.findViewById(R.id.days_picker_dialog);
 			customDays.setMinValue(0);
-			customDays.setMaxValue(values.length - 1);
-			customDays.setDisplayedValues(values);
+			customDays.setMaxValue(Constants.beforevalues.length - 1);
+			customDays.setDisplayedValues(Constants.beforevalues);
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
 			builder.setView(dialoglayout);
@@ -182,43 +182,29 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 						@Override
 						public void onItemClick(AdapterView<?> parent,
-								View view, int position, long id) {
+												View view, int position, long id) {
 
-							if (((TextView) previousSelected).getText()
-									.toString().equals("15 Mins")) {
-
-								((TextView) previousSelected)
-										.setBackgroundResource(R.drawable.round_buttons_white);
-								((TextView) previousSelected)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+							if (((TextView) previousSelected).getText().toString().equals("15 Mins")) {
+								previousSelected.setBackgroundResource(R.drawable.round_buttons_white);
+								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							} else if (previousSelected != null) {
-								((TextView) previousSelected)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+								((TextView) previousSelected).setTextColor(getResources().getColor(R.color._4d4d4d));
 							}
-							if (((TextView) view).getText().toString()
-									.equals("15 Mins")) {
-								((TextView) view)
-										.setBackgroundResource(R.drawable.round_buttons_blue);
+							if (((TextView) view).getText().toString().equals("15 Mins")) {
+								view.setBackgroundResource(R.drawable.round_buttons_blue);
 							}
 							((TextView) view).setTextColor(Color.WHITE);
 							view.setSelected(true);
 							previousSelected = view;
 							if (beforeArray[position].equals("Custom")) {
 								alert.show();
-
 							} else {
-
-								if (beforeArray[position] == "On Time") {
+								if (beforeArray[position].equals("On Time")) {
 									before.setText(beforeArray[position]);
 								} else {
-									before.setText(beforeArray[position]
-											+ " Before");
+									before.setText(beforeArray[position] + " Before");
 								}
-								 
 							}
-
 						}
 
 					});
@@ -238,48 +224,33 @@ public class AddScheduleBeforeFragment extends Fragment {
 				public void onClick(View v) {
 					numberPicker.clearFocus();
 					customDays.clearFocus();
-					TextView before = (TextView) AddScheduleFragment.allView
-							.findViewById(R.id.before_schedule);
-
+					TextView before = (TextView) AddScheduleFragment.allView.findViewById(R.id.before_schedule);
 					before.setVisibility(View.VISIBLE);
-					before.setText(numberPicker.getValue() + " "
-							+ values[customDays.getValue()] + " Before");
+					before.setText(numberPicker.getValue() + " " + values[customDays.getValue()] + " Before");
 					numberPicker.getValue();
 					alert.dismiss();
 				}
 			});
 
 		} else {
-			set();
+			setColors();
 			// ***************************location dialog
-			dialoglayout5 = inflater5.inflate(R.layout.add_location,
-					null, false);
-
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
-					.findViewById(R.id.adress);
-			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
-			AlertDialog.Builder builder5 = new AlertDialog.Builder(
-					getActivity());
-
+			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5.findViewById(R.id.adress);
+			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
+			AlertDialog.Builder builder5 = new AlertDialog.Builder(getActivity());
 			builder5.setView(dialoglayout5);
 			location = builder5.create();
-
 			location.setOnDismissListener(new OnDismissListener() {
 
 				@Override
 				public void onDismiss(DialogInterface arg0) {
-
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					aqd.id(R.id.home).getTextView().setFocusable(true);
 				}
 			});
 			aqd = new AQuery(dialoglayout5);
-
-			TextView save1 = (TextView) dialoglayout5
-					.findViewById(R.id.save);
+			TextView save1 = (TextView) dialoglayout5.findViewById(R.id.save);
 			save1.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -287,10 +258,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 					if (!(aqd.id(R.id.adress).getText().toString().equals("") && aqd
 							.id(R.id.home).getText().toString().equals(""))) {
 
-						((TextView) viewP).setTextColor(Color
-								.parseColor("#000000")); 
-						aq.id(R.id.location_before_sch)
-								.text(aqd.id(R.id.adress).getText());
+						((TextView) viewP).setTextColor(Color.parseColor("#000000"));
+						aq.id(R.id.location_before_sch).text(aqd.id(R.id.adress).getText());
 						((TextView) viewP).setText(aqd.id(R.id.home).getText());
 
 						if (button != null) {
@@ -298,14 +267,12 @@ public class AddScheduleBeforeFragment extends Fragment {
 							viewP.setBackgroundResource(R.drawable.button_shadow);
 							button = viewP;
 						} else {
-
 							button = viewP;
 							viewP.setBackgroundResource(R.drawable.button_shadow);
 						}
 						save(viewP.getId(), aqd.id(R.id.home).getText()
 								.toString(), aqd.id(R.id.adress).getText()
 								.toString());
-
 						aqd.id(R.id.adress).text("");
 						aqd.id(R.id.home).text("");
 						aqd.id(R.id.save).text("Set");
@@ -314,33 +281,26 @@ public class AddScheduleBeforeFragment extends Fragment {
 				}
 			});
 
-			TextView cancel1 = (TextView) dialoglayout5
-					.findViewById(R.id.cancel);
+			TextView cancel1 = (TextView) dialoglayout5.findViewById(R.id.cancel);
 			cancel1.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View arg0) {
-
 					aqd.id(R.id.add_location_title).text("Set location");
 					aqd.id(R.id.save).text("Set");
 					location.dismiss();
 				}
 			});
 
-			aq.id(R.id.pre_defined_11).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_21).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_31).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_41).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-
+			aq.id(R.id.pre_defined_11).getTextView().setOnLongClickListener(new LocationEditClickListener());
+			aq.id(R.id.pre_defined_21).getTextView().setOnLongClickListener(new LocationEditClickListener());
+			aq.id(R.id.pre_defined_31).getTextView().setOnLongClickListener(new LocationEditClickListener());
+			aq.id(R.id.pre_defined_41).getTextView().setOnLongClickListener(new LocationEditClickListener());
 			aq.id(R.id.pre_defined_11).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_21).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_31).clicked(new LocationTagClickListener());
 			aq.id(R.id.pre_defined_41).clicked(new LocationTagClickListener());
- 
+
 			aq_del.id(R.id.edit_cencel).clicked(new OnClickListener() {
 
 				@Override
@@ -353,11 +313,9 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					((TextView) viewl).setText("New");
 					((TextView) viewl).setTextColor(R.color.grey);
-					((TextView) viewl)
-							.setBackgroundResource(R.color.light_grey_color);
+					viewl.setBackgroundResource(R.color.light_grey_color);
 					remove(viewl.getId());
 					aq.id(R.id.location_before_sch).text("");
 					location_del.dismiss();
@@ -368,7 +326,6 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					location_edit.dismiss();
@@ -380,7 +337,6 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub=
 					aqd.id(R.id.add_location_title).text("Edit");
 					aqd.id(R.id.save).text("SAVE");
 					location_edit.dismiss();
@@ -389,33 +345,22 @@ public class AddScheduleBeforeFragment extends Fragment {
 			});
 
 			aq.id(R.id.arrive_leave_checkbox_layout).visible();
-			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq
-					.id(R.id.location_before_sch).getView();
-			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
+			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.location_before_sch).getView();
+			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 			((RadioGroup) aq.id(R.id.leave_arrive_radio).getView())
 					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 						@Override
 						public void onCheckedChanged(RadioGroup group,
-								int checkedId) {
+													 int checkedId) {
 							if (previousSelectedLocation != null) {
-								((RadioButton) previousSelectedLocation)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
+								((RadioButton) previousSelectedLocation).setTextColor(getResources().getColor(R.color._4d4d4d));
 							}
-							((RadioButton) group.findViewById(checkedId))
-									.setTextColor(Color.WHITE);
-							TextView before = (TextView) getActivity()
-									.findViewById(R.id.before_schedule);
-
+							((RadioButton) group.findViewById(checkedId)).setTextColor(Color.WHITE);
+							TextView before = (TextView) getActivity().findViewById(R.id.before_schedule);
 							before.setVisibility(View.VISIBLE);
-							before.setText("On "
-									+ aq.id(checkedId).getText().toString());
-							previousSelectedLocation = group
-									.findViewById(checkedId);
-							 
+							before.setText("On " + aq.id(checkedId).getText().toString());
+							previousSelectedLocation = group.findViewById(checkedId);
 						}
 					});
 		}
@@ -426,11 +371,8 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-
 			load(v.getId());
-
 			viewP = v;
-
 			if (((TextView) v).getText().toString().equals("New")) {
 				location.show();
 			} else {
@@ -453,20 +395,12 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 		@Override
 		public boolean onLongClick(final View view) {
-			// TODO Auto-generated method stu
-			if (((TextView) view).getText().toString().equals("New")) {
-
-			} else {
+			if (!((TextView) view).getText().toString().equals("New")) {
 				load(view.getId());
 				aqd.id(R.id.adress).text(padress);
 				aqd.id(R.id.home).text(((TextView) view).getText().toString());
-				aq_del.id(R.id.body).text(
-						"Location tag "
-								+ ((TextView) view).getText().toString()
-								+ " will be deleted");
-				aq_edit.id(R.id.add_task_edit_title).text(
-						"Location tag:"
-								+ ((TextView) view).getText().toString());
+				aq_del.id(R.id.body).text("Location tag " + ((TextView) view).getText().toString() + " will be deleted");
+				aq_edit.id(R.id.add_task_edit_title).text("Location tag:" + ((TextView) view).getText().toString());
 				viewl = view;
 				location_edit.show();
 			}
@@ -483,9 +417,9 @@ public class AddScheduleBeforeFragment extends Fragment {
 
 	public void load(long id) {
 		pname = App.pref.getString(3 + "key_name" + id, null); // getting
-																	// String
+		// String
 		padress = App.pref.getString(3 + "key_location" + id, null); // getting
-																			// String
+		// String
 	}
 
 	public void remove(long id) {
@@ -494,54 +428,34 @@ public class AddScheduleBeforeFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void set() {
-		pname = null;
-		pname = App.pref.getString(
-				3 + "key_name" + aq.id(R.id.pre_defined_11).getView().getId(),
-				null);
+	public void setColors() {
+		pname = App.pref.getString(3 + "key_name" + aq.id(R.id.pre_defined_11).getView().getId(), null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_11).text(pname);
-			aq.id(R.id.pre_defined_11).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_11).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
+			aq.id(R.id.pre_defined_11).getTextView().setTextColor(Color.parseColor("#000000"));
+			aq.id(R.id.pre_defined_11).getTextView().setBackgroundResource(R.drawable.button_shadow2);
 		}
 		pname = null;
-		pname = App.pref.getString(
-				3 + "key_name" + aq.id(R.id.pre_defined_21).getView().getId(),
-				null);
+		pname = App.pref.getString(3 + "key_name" + aq.id(R.id.pre_defined_21).getView().getId(), null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_21).text(pname);
-			aq.id(R.id.pre_defined_21).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_21).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
+			aq.id(R.id.pre_defined_21).getTextView().setTextColor(Color.parseColor("#000000"));
+			aq.id(R.id.pre_defined_21).getTextView().setBackgroundResource(R.drawable.button_shadow2);
 
 		}
 		pname = null;
-		pname = App.pref.getString(
-				3 + "key_name" + aq.id(R.id.pre_defined_31).getView().getId(),
-				null);
+		pname = App.pref.getString(3 + "key_name" + aq.id(R.id.pre_defined_31).getView().getId(), null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_31).text(pname);
-			aq.id(R.id.pre_defined_31).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_31).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
+			aq.id(R.id.pre_defined_31).getTextView().setTextColor(Color.parseColor("#000000"));
+			aq.id(R.id.pre_defined_31).getTextView().setBackgroundResource(R.drawable.button_shadow2);
 		}
 		pname = null;
-		pname = App.pref.getString(
-				3 + "key_name" + aq.id(R.id.pre_defined_41).getView().getId(),
-				null);
+		pname = App.pref.getString(3 + "key_name" + aq.id(R.id.pre_defined_41).getView().getId(), null);
 		if (pname != null) {
 			aq.id(R.id.pre_defined_41).text(pname);
-			aq.id(R.id.pre_defined_41).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_41).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
+			aq.id(R.id.pre_defined_41).getTextView().setTextColor(Color.parseColor("#000000"));
+			aq.id(R.id.pre_defined_41).getTextView().setBackgroundResource(R.drawable.button_shadow2);
 		}
 		pname = null;
 	}

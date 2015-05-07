@@ -97,6 +97,11 @@ public class AssignMultipleFragment extends ProjectsTabHolder {
                         //not from event
                     }
                     try{
+                        AddScheduleFragment.updateAssign(selectedInvitees);
+                    }catch (Exception e){
+                        //not from schedule
+                    }
+                    try{
                         AddProjectFragment.updateAssign(selectedInvitees);
                     }catch (Exception e){
                         // not from project
