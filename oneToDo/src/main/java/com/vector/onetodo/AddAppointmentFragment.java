@@ -2,22 +2,14 @@ package com.vector.onetodo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -36,38 +28,28 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
-import com.devspark.appmsg.AppMsg;
+import com.google.android.gms.location.Geofence;
 import com.vector.model.TaskAdded;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
-import com.vector.onetodo.db.gen.Comment;
-import com.vector.onetodo.db.gen.CommentDao;
-import com.vector.onetodo.db.gen.Friends;
-import com.vector.onetodo.db.gen.FriendsDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
 import com.vector.onetodo.db.gen.Reminder;
 import com.vector.onetodo.db.gen.ReminderDao;
-import com.vector.onetodo.db.gen.Repeat;
-import com.vector.onetodo.db.gen.RepeatDao;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.interfaces.onTaskAdded;
@@ -92,9 +74,8 @@ import java.util.Locale;
 
 import it.feio.android.checklistview.ChecklistManager;
 import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
-import it.feio.android.checklistview.interfaces.CheckListChangedListener;
 
-public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
+public class AddAppointmentFragment extends Fragment implements onTaskAdded {
 	private AQuery aq, aqd, aq_del, aq_edit;
 
 	private int Label_postion = -1;
@@ -107,15 +88,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 	private Editor editor;
 	private View label_view, viewl;
 
-	private Uri imageUri;
 	private int dayPosition;
-    private ArrayList<String> assignedId = new ArrayList<>();
-
-	private static final int TAKE_PICTURE = 1;
-
-	static final String[] repeatArray = new String[] { "Once", "Daily",
-			"Weekly", "Monthly", "Yearly" };
-	static LinearLayout lll;
 
 	static int currentHours, currentMin, currentDayDigit, currentYear,
 			currentMonDigit;
@@ -136,32 +109,28 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 	private AlertDialog add_new_label_alert,location_del,label_edit;
 
-	protected static final int RESULT_CODE = 123;
-
-	public static final int RESULT_GALLERY = 0;
-
-	public static final int PICK_CONTACT = 2;
-
 	public static View allView;
 
 	public static Activity act;
     private ToDoDao tododao;
     private CheckListDao checklistdao;
-    private FriendsDao friendsdao;
     private LabelDao labeldao;
     private ReminderDao reminderdao;
-    private RepeatDao repeatdao;
-    private CommentDao commentdao;
 
-    private ToDo todo;
+	private ToDo todo;
+	private boolean isEditMode = false;
+	private long todoId;
+	private String labelColor;
+	private Geofences geoFence;
+	private AlarmManagerBroadcastReceiver alarm;
 
 
-    public static AddAppoinmentFragment newInstance(int position,
-			int dayPosition) {
-		AddAppoinmentFragment myFragment = new AddAppoinmentFragment();
+    public static AddAppointmentFragment newInstance(int position, boolean isEditMode, long todoId) {
+		AddAppointmentFragment myFragment = new AddAppointmentFragment();
 		Bundle args = new Bundle();
 		args.putInt("position", position);
-		args.putInt("dayPosition", dayPosition);
+		args.putLong("todoId", todoId);
+		args.putBoolean("isEditMode", isEditMode);
 		myFragment.setArguments(args);
 		return myFragment;
 	}
@@ -174,10 +143,15 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 		aq = new AQuery(getActivity(), view);
 		act = getActivity();
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
-        if (toolbar != null)
-            ((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
-        initActionBar();
+		editor = App.label.edit();
+		Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar_top);
+		if (toolbar != null)
+			((ActionBarActivity) getActivity()).setSupportActionBar(toolbar);
+		initActionBar();
+		db_initialize();
+		isEditMode = getArguments().getBoolean("isEditMode");
+		todoId = getArguments().getLong("todoId");
+		setRetainInstance(true);
 		return view;
 	}
     private void initActionBar(){
@@ -190,7 +164,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        inflater.inflate(R.menu.todo_menu, menu);
+        inflater.inflate(R.menu.todo_menu_appointment, menu);
     }
 
     @Override
@@ -200,9 +174,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
                 getActivity().getSupportFragmentManager().popBackStack();
                 return true;
             case R.id.action_save_new:
-
-                return true;
-            case R.id.action_comment:
                 return true;
 
             case R.id.action_accept:
@@ -350,8 +321,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 		// ***********************END DATE TIME
 
-		// ***********************bEFORE fRAGMENT
-
 		aq.id(R.id.before_appoinment_lay)
 				.clicked(new GeneralOnClickListner());
 		/**
@@ -380,11 +349,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 		tabs.setShouldExpand(true);
 		tabs.setViewPager(pager);
 
-		// ***********************eND Before pager
-
-		// **********************lABEL
-
-		// ******************* label dialog
 		GridView gridView;
 
 		View vie = getActivity().getLayoutInflater().inflate(
@@ -440,12 +404,14 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 					if (Label_postion != -1) {
 						GradientDrawable mDrawable = (GradientDrawable) getResources()
 								.getDrawable(R.drawable.label_background);
-						mDrawable.setColor(Color
-								.parseColor(Constants.label_colors_dialog[Label_postion]));
+						if (mDrawable != null) {
+							mDrawable.setColor(Color
+                                    .parseColor(Constants.label_colors_dialog[Label_postion]));
+						}
 						Save(label_view.getId() + "" + itempos, label_text
 								.getText().toString(), Label_postion);
 						Label_postion = -1;
-						((TextView) label_view).setBackground(mDrawable);
+						label_view.setBackground(mDrawable);
 						((TextView) label_view).setText(label_text.getText()
 								.toString());
 						((TextView) label_view).setTextColor(Color.WHITE);
@@ -492,8 +458,10 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 									GradientDrawable mDrawable = (GradientDrawable) getResources()
 											.getDrawable(
 													R.drawable.label_background);
-									mDrawable.setColor(Color
-											.parseColor(colors[position]));
+									if (mDrawable != null) {
+										mDrawable.setColor(Color
+                                                .parseColor(colors[position]));
+									}
 									textView.setBackground(mDrawable);
 								}
 								if (plabel != null) {
@@ -502,8 +470,10 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 									GradientDrawable mDrawable = (GradientDrawable) getResources()
 											.getDrawable(
 													R.drawable.label_background);
-									mDrawable.setColor(Color
-											.parseColor(Constants.label_colors_dialog[pposition]));
+									if (mDrawable != null) {
+										mDrawable.setColor(Color
+                                                .parseColor(Constants.label_colors_dialog[pposition]));
+									}
 									textView.setBackground(mDrawable);
 								}
 								return textView;
@@ -553,7 +523,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 				((TextView) viewl).setText("New");
 				GradientDrawable mDrawable = (GradientDrawable) getResources()
 						.getDrawable(R.drawable.label_simple);
-				((TextView) viewl).setBackground(mDrawable);
+				viewl.setBackground(mDrawable);
 				((TextView) viewl).setTextColor(R.color.mountain_mist);
 
 				location_del.dismiss();
@@ -586,6 +556,10 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 		View switchView = aq.id(R.id.add_sub_appoinment).getView();
 		toggleCheckList(switchView);
 
+		//to edit a task
+		if(isEditMode){
+			populateValues();
+		}
 	
 	}
 
@@ -593,56 +567,15 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 	private void toggleCheckList(View switchView) {
 		View newView;
-
-		/*
-		 * Here is where the job is done. By simply calling an instance of the
-		 * ChecklistManager we can call its methods.
-		 */
 		try {
-			// Getting instance
 			ChecklistManager mChecklistManager = ChecklistManager
 					.getInstance(getActivity());
-
-			/*
-			 * These method are useful when converting from EditText to
-			 * ChecklistView (but can be set anytime, they'll be used at
-			 * appropriate moment)
-			 */
-
-			// Setting new entries hint text (if not set no hint
-			// will be used)
 			mChecklistManager.setNewEntryHint("Add a subtask");
-			// Let checked items are moved on bottom
-
 			mChecklistManager.setMoveCheckedOnBottom(1);
-
-			mChecklistManager
-					.setCheckListChangedListener(new CheckListChangedListener() {
-
-						@Override
-						public void onCheckListChanged() {
-
-						}
-					});
-
-			// Decide if keep or remove checked items when converting
-			// back to simple text from checklist
 			mChecklistManager.setKeepChecked(true);
-
-			// I want to make checks symbols visible when converting
-			// back to simple text from checklist
 			mChecklistManager.setShowChecks(true);
-
-			// Converting actual EditText into a View that can
-			// replace the source or viceversa
 			newView = mChecklistManager.convert(switchView);
-
-			// Replacing view in the layout
 			mChecklistManager.replaceViews(switchView, newView);
-
-			// Updating the instance of the pointed view for
-			// eventual reverse conversion
-			switchView = newView;
 
 		} catch (ViewNotSupportedException e) {
 			// This exception is fired if the source view class is
@@ -697,12 +630,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 				aq.id(R.id.date_time_include_appoinment)
 						.getView()
 						.startAnimation(
-								new ScaleAnimToShow(
-										1.0f,
-										1.0f,
-										1.0f,
-										0.0f,
-										200,
+								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f, 200,
 										aq.id(R.id.date_time_include_appoinment)
 												.getView(), true));
 				aq.id(R.id.appoinment_time_date).background(
@@ -714,7 +642,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			if (aq.id(R.id.before_grid_view_linear_appoinment).getView()
 					.getVisibility() == View.GONE) {
-				if (aq.id(R.id.before_appoinment).getText().toString() == "") {
+				if (aq.id(R.id.before_appoinment).getText().toString().isEmpty()) {
 					aq.id(R.id.before_appoinment).text(
 							Constants.beforeArray[1]+" Before").visibility(View.VISIBLE);
 
@@ -722,12 +650,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 				aq.id(R.id.before_grid_view_linear_appoinment)
 						.getView()
 						.startAnimation(
-								new ScaleAnimToShow(
-										1.0f,
-										1.0f,
-										1.0f,
-										0.0f,
-										200,
+								new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f, 200,
 										aq.id(R.id.before_grid_view_linear_appoinment)
 												.getView(), true));
 				aq.id(R.id.before_appoinment_layout).background(
@@ -780,102 +703,7 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 			}
 	}
 
-	public void slideUpDown(final View view) {
-		if (!isPanelShown(view)) {
-			// Show the panel
-			Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_up);
 
-			view.startAnimation(bottomUp);
-			view.setVisibility(View.VISIBLE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					R.color.dim_background));
-			((FrameLayout) aq.id(R.id.add_appoinment_frame).getView())
-					.setForeground(tintColor);
-		} else {
-			// Hide the Panel
-			Animation bottomDown = AnimationUtils.loadAnimation(getActivity(),
-					R.anim.bottom_down);
-
-			view.startAnimation(bottomDown);
-			view.setVisibility(View.GONE);
-			Drawable tintColor = new ColorDrawable(getResources().getColor(
-					android.R.color.transparent));
-			((FrameLayout) aq.id(R.id.add_appoinment_frame).getView())
-					.setForeground(tintColor);
-		}
-	}
-
-	private boolean isPanelShown(View view) {
-		return view.getVisibility() == View.VISIBLE;
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		switch (requestCode) {
-
-		case TAKE_PICTURE:
-
-			if (resultCode == Activity.RESULT_OK)
-				showImageURI(imageUri);
-		case RESULT_GALLERY:
-			if (null != data) {
-				showImageURI(data.getData());
-			}
-			break;
-		case PICK_CONTACT:
-			if (resultCode == Activity.RESULT_OK) {
-				Uri contactData = data.getData();
-				Cursor c = getActivity().getContentResolver().query(
-						contactData, null, null, null, null);
-				if (c.moveToFirst()) {
-					String name = c
-							.getString(c
-									.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-					AppMsg.makeText(getActivity(), name + " is selected",
-							AppMsg.STYLE_CONFIRM).show();
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	private void showImageURI(Uri selectedImage) {
-		getActivity().getContentResolver().notifyChange(selectedImage, null);
-		ContentResolver cr = getActivity().getContentResolver();
-		Bitmap bitmap;
-		try {
-			bitmap = Utils.getBitmap(selectedImage, getActivity(), cr);
-			final LinearLayout item = (LinearLayout) aq
-					.id(R.id.added_image_outer).visible().getView();
-
-			final View child = getActivity().getLayoutInflater().inflate(
-					R.layout.image_added_layout, null);
-			ImageView image = (ImageView) child.findViewById(R.id.image_added);
-			aq.id(image).image(Utils.getRoundedCornerBitmap(bitmap, 20));
-			TextView text = (TextView) child
-					.findViewById(R.id.image_added_text);
-			String filename = selectedImage.getPath();
-			text.setText(filename);
-			child.findViewById(R.id.image_cancel).setOnClickListener(
-					new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							item.removeView(child);
-						}
-					});
-			item.addView(child);
-		} catch (Exception e) {
-			Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT)
-					.show();
-			Log.e("Camera", e.toString());
-		}
-	}
 
 	private void showRightDateAndTime() {
 		String tempCurrentDayDigit = String.format("%02d", currentDayDigit);
@@ -936,7 +764,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 		@Override
 		public boolean onItemLongClick(AdapterView<?> arg0, final View arg1,
 				int position, long arg3) {
-			// TODO Auto-generated method stub
 			if (((TextView) arg1).getText().toString().equals("New")
 					|| position < 3) {
 
@@ -989,8 +816,10 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
 			GradientDrawable mDrawable = (GradientDrawable) getResources()
 					.getDrawable(R.drawable.label_background_dialog);
-			mDrawable.setColor(Color
-					.parseColor(Constants.label_colors_dialog[position]));
+			if (mDrawable != null) {
+				mDrawable.setColor(Color
+                        .parseColor(Constants.label_colors_dialog[position]));
+			}
 			imageView.setBackground(mDrawable);
 			return imageView;
 		}
@@ -1022,7 +851,6 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 	}
     private void saveAppointment() {
 
-        assignedId.clear();
         if (!(aq.id(R.id.appoinment_title).getText().toString().equals(""))) {
 
 //            MaxId = App.attach.getInt("4Max", 0);
@@ -1030,18 +858,18 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
             boolean is_allday = false;
 
-            String start_date = AddAppoinmentFragment.currentYear  + "-"
-                    + (AddAppoinmentFragment.currentMonDigit + 1) + "-"
-                    + AddAppoinmentFragment.currentDayDigit+ " "
-                    + AddAppoinmentFragment.currentHours + ":"
-                    + AddAppoinmentFragment.currentMin + ":00";
-            String end_date = null;
+            String start_date = AddAppointmentFragment.currentYear  + "-"
+                    + (AddAppointmentFragment.currentMonDigit + 1) + "-"
+                    + AddAppointmentFragment.currentDayDigit+ " "
+                    + AddAppointmentFragment.currentHours + ":"
+                    + AddAppointmentFragment.currentMin + ":00";
+            String end_date = "";
 
-            String location = null;
+            String location = "";
 
             String before = aq.id(R.id.before_appoinment).getText().toString();
 
-            boolean is_time = false, is_location = false;
+            boolean is_time = true, is_location = false;
             String r_location = "", location_tag = "";
             if (before.contains("On Arrive") || before.contains("On Leave")) {
                 is_time = false;
@@ -1055,17 +883,16 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
 
             boolean is_alertEmail = false, is_alertNotification = false;
             if (!(aq.id(R.id.before_appoinment).getText().toString()
-                    .equals("") || aq.id(R.id.before_appoinment).getText()
-                    .toString() == null)) {
+                    .equals(""))) {
                 is_alertEmail = aq.id(R.id.email_radio_appoin)
                         .getCheckBox().isChecked();
                 is_alertNotification = aq
                         .id(R.id.notification_radio_appoin).getCheckBox()
                         .isChecked();
             }
-            String repeat = null;
+            String repeat = "";
 
-            String repeatdate = null;
+            String repeatdate = "";
 
             String label_name = aq.id(R.id.spinner_labels_appoin).getText()
                     .toString();
@@ -1095,49 +922,19 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
                 end_date = null;
             }
             int reminderTime = 0, is_locationtype = 0;
-            String locationtype = null;
-            Log.e("before", before);
-            if (before != null || before.isEmpty()) {
-                if (is_time) {
-                    reminderTime = Utils.getReminderTime(before);
-                    Log.e("reminder time", reminderTime+"");
-                } else {
-                    //TODO set notification by GEO fence
-                    Geofences geoFence = new Geofences(getActivity());
-                    if (before.contains("On Arrive")) {
-                        is_locationtype = 0;
-                        locationtype = "On Arrive";
-                    } else if (before.contains("On Leave")) {
-                        is_locationtype = 1;
-                        locationtype = "On Leave";
-                    }
-                }
-            }
-            long r_repeat = 0;
-            if (repeat != null) {
-                if (repeat.contains("once") || repeat.contains("Once")) {
-                    r_repeat = 0;
-                    repeat = "once";
-                } else if (repeat.contains("daily") || repeat.contains("daily")) {
-                    r_repeat = Constants.DAY;
-                    repeat = "daily";
-                } else if (repeat.contains("weekly")
-                        || repeat.contains("Weekly")) {
-                    r_repeat = Constants.WEEK;
-                    repeat = "weekly";
-                } else if (repeat.contains("monthly")
-                        || repeat.contains("Monthly")) {
-                    r_repeat = Constants.MONTH;
-                    repeat = "monthly";
-                } else if (repeat.contains("yearly")
-                        || repeat.contains("Yearly")) {
-                    r_repeat = Constants.YEAR;
-                    repeat = "yearly";
-                }
-            }
-            db_initialize();
-            AlarmManagerBroadcastReceiver alarm = new AlarmManagerBroadcastReceiver();
-
+			String locationType = null;
+			if (is_time) {
+				reminderTime = Utils.getReminderTime(before);
+			} else {
+				if (before.contains("On Arrive")) {
+					is_locationtype = 0;
+					locationType = "On Arrive";
+				} else if (before.contains("On Leave")) {
+					is_locationtype = 1;
+					locationType = "On Leave";
+				}
+			}
+			db_initialize();
             todo = new ToDo();
             todo.setUser_id(Constants.user_id);
             todo.setTodo_type_id(4);
@@ -1169,43 +966,25 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
             reminderdao.insert(reminder);
             todo.setReminder(reminder);
 
-            Repeat repeaT = new Repeat();
-            repeaT.setRepeat_interval(repeat);
-            repeaT.setRepeat_until(r_repeat);
-            repeatdao.insert(repeaT);
-            todo.setRepeat(repeaT);
 
             CheckList checklist = new CheckList();
             checklist.setTitle(checklist_data);
             checklistdao.insert(checklist);
             todo.setCheckList(checklist);
 
-            if (AddTaskComment.comment != null && AddTaskComment.comment.size() > 0) {
-                for (int i = 0; i < AddTaskComment.comment.size(); i++) {
 
-                    Comment commenT = new Comment();
-                    commenT.setComment(AddTaskComment.comment.get(i));
-                    commenT.setToDo(todo);
-                    commentdao.insert(commenT);
-                }
-            }
-
-            Friends friend = new Friends();
-            friend.setEmail("email");
-            friendsdao.insert(friend);
-            todo.setReminder(reminder);
-            tododao.insert(todo);
-
-            TaskListFragment.setAdapter(getActivity(), TaskListFragment.position, null);
-
-                alarm.SetNormalAlarm(getActivity());
-
+			alarm = new AlarmManagerBroadcastReceiver();
+			geoFence = new Geofences(getActivity());
             // ********************* Data add hit Asyntask
-
-            AddToServer asyn = new AddToServer(title, 4, start_date, end_date, is_allday, is_location, r_location, location_tag,
-                    locationtype, location,notes, repeatdate,false, 0,
-                    AddTaskComment.comment, null, checklist_data, assignedId, repeat,reminderTime, label_name, "", before, "", AddAppoinmentFragment.this);
-            asyn.execute();
+			if(isEditMode){
+				todo.setId(todoId);
+				tododao.update(todo);
+			}else {
+				AddToServer asyn = new AddToServer(title, 2, start_date, end_date, is_allday, is_location, r_location, location_tag,
+						locationType, location, notes, repeatdate, false, 0,
+						AddTaskComment.comment, AddTaskComment.commenttime, checklist_data, new ArrayList<String>(), repeat, reminderTime, label_name, "", before, "", AddAppointmentFragment.this);
+				asyn.execute();
+			}
 
         }else
             Toast.makeText(getActivity(), "Please enter title",
@@ -1215,31 +994,81 @@ public class AddAppoinmentFragment extends Fragment implements onTaskAdded {
     }
     private void db_initialize() {
         checklistdao = App.daoSession.getCheckListDao();
-        friendsdao = App.daoSession.getFriendsDao();
         labeldao = App.daoSession.getLabelDao();
         tododao = App.daoSession.getToDoDao();
-        commentdao = App.daoSession.getCommentDao();
-        repeatdao = App.daoSession.getRepeatDao();
         reminderdao = App.daoSession.getReminderDao();
     }
     @Override
     public void taskAdded() {
-        todo.setTodo_server_id(TaskAdded.getInstance().id);
-        tododao.insert(todo);
-        setAlarm();
+		todo.setTodo_server_id(TaskAdded.getInstance().id);
+		tododao.insert(todo);
+
+		//have to refresh them all
+		TaskListFragment.setAdapter(MainActivity.act, 0, null);
+		TaskListFragment.setAdapter(MainActivity.act, 1, null);
+		TaskListFragment.setAdapter(MainActivity.act, 2, null);
+
+		App.updateTaskList(getActivity());
+		if (!todo.getReminder().getLocation().isEmpty())
+			addGeofence(todo);
+		setAlarm();
     }
 
-    private void setAlarm(){
-        AlarmManagerBroadcastReceiver alarm=new AlarmManagerBroadcastReceiver();
-        if(todo.getReminder().getTime() != 0){
-            alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
-            alarm.SetNormalAlarm(MainActivity.act);
-        }
-        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
-            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
-        }
-        else{
-            alarm.SetNormalAlarm(MainActivity.act);
-        }
-    }
+	private void setAlarm(){
+		if(todo.getReminder().getTime() != 0){
+			alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
+			alarm.SetNormalAlarm(MainActivity.act);
+		} else{
+			alarm.SetNormalAlarm(MainActivity.act);
+		}
+	}
+
+	private void addGeofence(ToDo todo){
+
+		LatLong location = App.gpsTracker.getLocationFromAddress(todo.getReminder().getLocation());
+		geoFence.addGeofence(location.latitude, location.longitude, 200, getEnterOrExit(todo.getReminder().getLocation_type()), todo.getStart_date(), todo.getId().intValue());
+	}
+
+	private int getEnterOrExit(int type){
+		if(type == 0)
+			return Geofence.GEOFENCE_TRANSITION_ENTER;
+		else return Geofence.GEOFENCE_TRANSITION_EXIT;
+	}
+
+	private void populateValues() {
+
+
+		todo = tododao.load(todoId);
+		aq.id(R.id.appoinment_title).text(todo.getTitle());
+		long reminder = todo.getReminder().getTime();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(reminder);
+		currentYear = cal.get(Calendar.YEAR);
+		currentMonDigit = cal.get(Calendar.MONTH) + 1;
+		currentDayDigit = cal.get(Calendar.DAY_OF_MONTH);
+		currentHours = cal.get(Calendar.HOUR_OF_DAY);
+		currentMin = cal.get(Calendar.MINUTE);
+		showRightDateAndTime();
+		if(todo.getReminder().getShowable_format() != null){
+			aq.id(R.id.before_appoinment).text(todo.getReminder().getShowable_format()).visible();
+		}
+
+
+		if(todo.getLabel().getLabel_color() != null) {
+			aq.id(R.id.spinner_labels_appoin).text(todo.getLabel().getLabel_name());
+			GradientDrawable mDrawable = (GradientDrawable) getResources()
+					.getDrawable(R.drawable.label_background);
+			if (mDrawable != null) {
+				mDrawable.setColor(Color.parseColor(todo.getLabel().getLabel_color()));
+			}
+			aq.id(R.id.spinner_labels_appoin).getView().setBackground(mDrawable);
+			aq.id(R.id.spinner_labels_appoin).getTextView().setTextColor(Color.WHITE);
+		}
+
+		toggleCheckList(aq.id(R.id.add_sub_appoinment).getView());
+		aq.id(R.id.add_sub_appoinment).text(todo.getCheckList().getTitle());
+		toggleCheckList(aq.id(R.id.add_sub_appoinment).getView());
+
+		aq.id(R.id.notes_appoinment).text(todo.getNotes());
+	}
 }

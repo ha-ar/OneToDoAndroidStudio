@@ -69,6 +69,8 @@ public class AddAppointmentBeforeFragment extends Fragment {
 		else
 			view = inflater.inflate(R.layout.add_appoinment_location,
 					container, false);
+		dialoglayout5 = inflater.inflate(R.layout.add_location_event,
+				null, false);
 		aq = new AQuery(getActivity(), view);
 		return view;
 	}
@@ -76,11 +78,7 @@ public class AddAppointmentBeforeFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		setRetainInstance(true);
 		LayoutInflater inflater5 = getActivity().getLayoutInflater();
-        dialoglayout5 = inflater5.inflate(R.layout.add_location,
-                null, false);
-
 		View dialoglayout6 = inflater5.inflate(R.layout.add_task_edit, null,
 				false);
 		aq_edit = new AQuery(dialoglayout6);
@@ -311,8 +309,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
-
 					aqd.id(R.id.add_location_title).text("Set location");
 					aqd.id(R.id.save).text("Set");
 					location.dismiss();
@@ -338,7 +334,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					location_del.dismiss();
 				}
 			});
@@ -347,7 +342,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					((TextView) viewl).setText("New");
 					((TextView) viewl).setTextColor(R.color.grey);
 					((TextView) viewl)
@@ -362,7 +356,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					aqd.id(R.id.adress).text("");
 					aqd.id(R.id.home).text("");
 					location_edit.dismiss();
@@ -374,7 +367,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub=
 					aqd.id(R.id.add_location_title).text("Edit");
 					aqd.id(R.id.save).text("Save");
 					location_edit.dismiss();
@@ -444,7 +436,6 @@ public class AddAppointmentBeforeFragment extends Fragment {
 
 		@Override
 		public boolean onLongClick(final View view) {
-			// TODO Auto-generated method stu
 			if (((TextView) view).getText().toString().equals("New")) {
 
 			} else {

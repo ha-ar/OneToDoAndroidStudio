@@ -1432,7 +1432,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			case R.id.before_event_lay:
 				if (aq.id(R.id.before_grid_view_linear_event).getView()
 						.getVisibility() == View.GONE) {
-					if (aq.id(R.id.before_event).getText().toString() == "") {
+					if (aq.id(R.id.before_event).getText().toString().equals("")) {
 						aq.id(R.id.before_event)
 								.text(Constants.beforeArray[1] + " Before")
 								.visibility(View.VISIBLE);
@@ -1452,7 +1452,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 				break;
 			case R.id.repeat_event_lay:
 				if (aq.id(R.id.repeat_linear_layout).getView().getVisibility() == View.GONE) {
-					if (aq.id(R.id.repeat_event).getText().toString() == "") {
+					if (aq.id(R.id.repeat_event).getText().toString().equals("")) {
 						aq.id(R.id.repeat_event).text(Constants.repeatArray[2])
 								.visibility(View.VISIBLE);
 

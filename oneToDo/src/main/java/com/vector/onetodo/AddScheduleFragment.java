@@ -541,19 +541,34 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 						new ArrayAdapter<String>(getActivity(),
 								R.layout.grid_layout_textview, Constants.repeatArray) {
 
-
 							@Override
 							public View getView(int position, View convertView,
 												ViewGroup parent) {
 
 								TextView textView = (TextView) super.getView(
 										position, convertView, parent);
-								if (position == 2) {
-									previousSelected = textView;
-									textView.setBackgroundResource(R.drawable.round_buttons_blue);
-									textView.setTextColor(Color.WHITE);
-								} else
-									textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+								if(!isEditMode){
+									if (position == 2) {
+										previousSelected = textView;
+										textView.setBackgroundResource(R.drawable.round_buttons_blue);
+										textView.setTextColor(Color.WHITE);
+									}
+									else
+										textView.setTextColor(getResources().getColor(R.color._4d4d4d));
+								}else{
+									int selectedPosition = 0;
+									for(int i = 0; i < Constants.repeatArray.length; i++){
+										if(Constants.repeatArray[i].equalsIgnoreCase(todo.getRepeat().getShowable_format())){
+											selectedPosition = i;
+											break;
+										}
+									}
+									if (position == selectedPosition) {
+										previousSelected = textView;
+										textView.setBackgroundResource(R.drawable.round_buttons_blue);
+										textView.setTextColor(Color.WHITE);
+									}
+								}
 								return textView;
 							}
 
@@ -589,8 +604,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				}
 				((TextView) view).setTextColor(Color.WHITE);
 				view.setSelected(true);
-				if (Constants.repeatArray[position] == "Never") {
-
+				if (Constants.repeatArray[position].equals( "Never")) {
 					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[position]);
 				} else {
 					aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[position]);
@@ -1157,7 +1171,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 
 			case R.id.repeat_schedule_lay:
 				if (aq.id(R.id.sch_repeat_grid_layout).getView().getVisibility() == View.GONE) {
-					if (!aq.id(R.id.sch_repeat_txt).getText().toString().isEmpty()) {
+					if (aq.id(R.id.sch_repeat_txt).getText().toString().isEmpty()) {
 						aq.id(R.id.sch_repeat_txt).text(Constants.repeatArray[2])
 								.visibility(View.VISIBLE);
 					}
@@ -1170,7 +1184,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 			case R.id.before_schedule_lay:
 				if (aq.id(R.id.before_grid_view_linear_schedule).getView()
 						.getVisibility() == View.GONE) {
-					if (!aq.id(R.id.before_schedule).getText().toString().isEmpty()) {
+					if (aq.id(R.id.before_schedule).getText().toString().isEmpty()) {
 						aq.id(R.id.before_schedule)
 								.text(Constants.beforeArray[1]
 										+ " Before").visibility(View.VISIBLE);

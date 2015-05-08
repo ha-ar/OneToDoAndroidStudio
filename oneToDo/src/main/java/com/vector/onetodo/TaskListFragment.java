@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao.Properties;
@@ -30,6 +31,7 @@ public class TaskListFragment extends Fragment{
             upComingAdapter;
     public static int position;
     private static long[] currentDate;
+    private static RelativeLayout noTasksView;
 
     public static TaskListFragment newInstance(int position) {
         TaskListFragment myFragment = new TaskListFragment();
@@ -49,6 +51,7 @@ public class TaskListFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tasks_list, container, false);
+        noTasksView =  (RelativeLayout) view.findViewById(R.id.no_tasks_text);
         position = getArguments().getInt("position");
         listView[position] = (ListView) view.findViewById(R.id.task_list_view);
         listView[position].setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -148,7 +151,10 @@ public class TaskListFragment extends Fragment{
                     todayQuery();
                 else filteredQuery(property, position);
 
-                todayAdapter = new TaskListAdapter(context, todayQuery.list());
+                if(!todayQuery.list().isEmpty()){
+                    noTasksView.setVisibility(View.GONE);
+                }
+                todayAdapter = new TaskListAdapter(context, todayQuery.list(), position);
                 listView[0].setAdapter(todayAdapter);
                 todayAdapter.notifyDataSetChanged();
                 break;
@@ -156,8 +162,11 @@ public class TaskListFragment extends Fragment{
                 if (property == null)
                     tomorrowQuery();
                 else filteredQuery(property,position);
+                if(!tomorrowQuery.list().isEmpty()){
+                    noTasksView.setVisibility(View.GONE);
+                }
                 tomorrowAdapter = new TaskListAdapter(context,
-                        tomorrowQuery.list());
+                        tomorrowQuery.list(), position);
                 listView[1].setAdapter(tomorrowAdapter);
                 tomorrowAdapter.notifyDataSetChanged();
                 break;
@@ -166,8 +175,11 @@ public class TaskListFragment extends Fragment{
                     upComingQuery();
                 else filteredQuery(property,position);
 
+                if(!upcomingQuery.list().isEmpty()){
+                    noTasksView.setVisibility(View.GONE);
+                }
                 upComingAdapter = new TaskListAdapter(context,
-                        upcomingQuery.list());
+                        upcomingQuery.list(), position);
                 listView[2].setAdapter(upComingAdapter);
                 upComingAdapter.notifyDataSetChanged();
                 break;

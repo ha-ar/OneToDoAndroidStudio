@@ -100,7 +100,7 @@ public class TaskByLabelFragment extends Fragment{
                 if(todo.getLabel().getLabel_name().equals(labelName))
                     list.add(todo);
         }
-        labelAdapter[position] = new TaskListAdapter(context, list);
+        labelAdapter[position] = new TaskListAdapter(context, list, 2);
         listView[position].setAdapter(labelAdapter[position]);
         labelAdapter[0].notifyDataSetChanged();
     }

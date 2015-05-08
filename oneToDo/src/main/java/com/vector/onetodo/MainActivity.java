@@ -292,7 +292,7 @@ public class MainActivity extends BaseActivity implements
                         .orderAsc(ToDoDao.Properties.Start_date).build();
 
                 if(SearchFragment.listView != null) {
-                    SearchFragment.filteredAdapter = new TaskListAdapter(MainActivity.this, SearchFragment.qb.list());
+                    SearchFragment.filteredAdapter = new TaskListAdapter(MainActivity.this, SearchFragment.qb.list(),2);
                     SearchFragment.listView.setAdapter(SearchFragment.filteredAdapter);
                     SearchFragment.filteredAdapter.notifyDataSetChanged();
                 }
@@ -922,7 +922,7 @@ public class MainActivity extends BaseActivity implements
                 getSupportFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
-                        .replace(R.id.container, AddAppoinmentFragment.newInstance(pager_number, 0))
+                        .replace(R.id.container, AddAppointmentFragment.newInstance(pager_number, false, 0))
                         .commit();
             }
         });

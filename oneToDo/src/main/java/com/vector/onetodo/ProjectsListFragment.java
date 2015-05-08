@@ -48,7 +48,7 @@ public class ProjectsListFragment extends Fragment {
         if(position == 0){
             QueryBuilder<ToDo> projectsQuery = MainActivity.tododao.queryBuilder().where(
                     ToDoDao.Properties.Todo_type_id.eq(5));
-            taskAdapter = new TaskListAdapter(getActivity(), projectsQuery.list());
+            taskAdapter = new TaskListAdapter(getActivity(), projectsQuery.list(), 2);
             listView.setAdapter(taskAdapter);
         }
 

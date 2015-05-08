@@ -201,7 +201,7 @@ public class AddTask extends FragmentActivity {
                                 .textColorId(R.color._4d4d4d);
                     }
                 } else if (Position == 3) {
-                    if (AddAppoinmentFragment.taskTitle.length() > 0) {
+                    if (AddAppointmentFragment.taskTitle.length() > 0) {
                         aq_menu.id(R.id.menu_item1)
                                 .textColorId(R.color._4d4d4d);
                         aq_menu.id(R.id.menu_item2)
@@ -336,8 +336,8 @@ public class AddTask extends FragmentActivity {
                                 .textColorId(R.color._4d4d4d);
                     }
                 } else if (Position == 3) {
-                    if (AddAppoinmentFragment.taskTitle.length() > 0) {
-                        title = AddAppoinmentFragment.taskTitle.getText()
+                    if (AddAppointmentFragment.taskTitle.length() > 0) {
+                        title = AddAppointmentFragment.taskTitle.getText()
                                 .toString();
                         aq_menu.id(R.id.menu_item1)
                                 .textColorId(R.color._4d4d4d);
@@ -948,11 +948,11 @@ public class AddTask extends FragmentActivity {
 
                 is_allday = false;
 
-                start_date = AddAppoinmentFragment.currentYear  + "-"
-                        + (AddAppoinmentFragment.currentMonDigit + 1) + "-"
-                        + AddAppoinmentFragment.currentDayDigit+ " "
-                        + AddAppoinmentFragment.currentHours + ":"
-                        + AddAppoinmentFragment.currentMin + ":00";
+                start_date = AddAppointmentFragment.currentYear  + "-"
+                        + (AddAppointmentFragment.currentMonDigit + 1) + "-"
+                        + AddAppointmentFragment.currentDayDigit+ " "
+                        + AddAppointmentFragment.currentHours + ":"
+                        + AddAppointmentFragment.currentMin + ":00";
                 end_date = null;
 
                 location = null;

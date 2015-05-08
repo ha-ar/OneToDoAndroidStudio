@@ -14,25 +14,25 @@
         android:layout_margin="16dp"
         android:padding="16dp"
         android:button="@drawable/task_chechk_box" />
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/completed_task"
+        android:paddingRight="10dp"
+        android:textColor="#808080"
+        android:textSize="8.89sp" />
 
     <LinearLayout
         android:id="@+id/title_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/list_time"
+        android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/completed_task"
-        android:orientation="vertical"
-        android:paddingTop="5dp" >
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:paddingRight="10dp"
-            android:textColor="#808080"
-            android:textSize="8.89sp" />
 
         <TextView
             android:id="@+id/list_title"
@@ -40,24 +40,26 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
+            android:gravity="center"
             android:textColor="@android:color/black"
             android:singleLine="true"
             android:textSize="17.78sp"
             android:textStyle="bold" />
+        <TextView
+            android:id="@+id/list_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/title_layout"
+            android:layout_below="@id/title_layout"
+            android:textColor="#808080"
+            android:visibility="gone"
+            android:paddingBottom="5dp"
+            android:textSize="13.33sp" />
+
     </LinearLayout>
 
     <TextView
-        android:id="@+id/list_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/title_layout"
-        android:layout_below="@+id/title_layout"
-        android:textColor="#808080"
-        android:paddingBottom="5dp"
-        android:textSize="13.33sp" />
-
-    <TextView
-        android:id="@+id/list_time"
+        android:id="@+id/list_start_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -66,34 +68,60 @@
         android:textSize="13.33sp" />
 
     <TextView
-        android:id="@+id/list_time1"
+        android:id="@+id/list_start_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/list_time"
+        android:layout_below="@id/list_start_date"
         android:layout_marginRight="5dp"
         android:textColor="#808080"
         android:textSize="13.33sp" />
 
     <TextView
-        android:id="@+id/list_time2"
+        android:id="@+id/list_end_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/list_time1"
+        android:layout_below="@id/list_start_time"
         android:layout_marginRight="5dp"
         android:textColor="#808080"
         android:textSize="13.33sp" />
 
     <TextView
-        android:id="@+id/list_time3"
+        android:id="@+id/list_end_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/list_time2"
+        android:layout_below="@id/list_end_date"
         android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
         android:textColor="#808080"
         android:textSize="13.33sp" />
+
+    <LinearLayout
+        android:id="@+id/reminder_before"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="10dp"
+        android:layout_below="@id/list_end_date">
+        <ImageView
+            android:id="@+id/repeat_icon"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:background="@drawable/repeat" />
+        <ImageView
+            android:id="@+id/reminder_icon"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:background="@drawable/reminder" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/list_icon"

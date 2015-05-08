@@ -109,7 +109,7 @@ public class Calender extends Fragment {
         taskList = aq.id(R.id.task_list_view).getListView();
         adapter = new TaskListAdapter(getActivity(), particularDateQuery(
                 cal.getTimeInMillis(),
-                cal.getTimeInMillis() + Constants.DAY).list());
+                cal.getTimeInMillis() + Constants.DAY).list(), 0);
         taskList.setAdapter(adapter);
 
 
@@ -120,7 +120,7 @@ public class Calender extends Fragment {
             public void onSelectDate(Date date, View view) {
                 adapter = new TaskListAdapter(getActivity(), particularDateQuery(
                         date.getTime(),
-                        date.getTime() + Constants.DAY).list());
+                        date.getTime() + Constants.DAY).list(), 0);
                 taskList.setAdapter(adapter);
                 if (!isNoWorkDay(date.getTime())) {
                     taskList.setVisibility(View.VISIBLE);

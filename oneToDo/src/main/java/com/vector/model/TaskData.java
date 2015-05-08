@@ -9,7 +9,6 @@ public class TaskData {
 
 	public static TaskData taskdata = null;
 
-
 	public static TaskData getInstance() {
 		if (taskdata == null) {
 			taskdata = new TaskData();
@@ -17,6 +16,9 @@ public class TaskData {
 		return taskdata;
 	}
 
+    public void setList(TaskData obj) {
+        taskdata = obj;
+    }
 
     public void clearList() {
         taskdata = null;
@@ -26,9 +28,6 @@ public class TaskData {
 
     public HashMap<Integer,String> labels = new HashMap<Integer,String>();
 
-	public void setList(TaskData obj) {
-		taskdata = obj;
-	}
 
         @SerializedName("result")
         public Result result = new Result();
