@@ -39,6 +39,8 @@ public class TaskView extends BaseActivity {
     private boolean isAssignedTask = false;
     private PopupWindow popupWindowTask;
     long todoId;
+    private Boolean rsvp = false;
+    private Boolean commentFrg = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,8 @@ public class TaskView extends BaseActivity {
     private void init() {
         isAssignedTask = getIntent().getBooleanExtra("is_assigned_task", false);
         todoId = getIntent().getLongExtra("todo_id", -1);
+        rsvp = getIntent().getBooleanExtra("rsvp", false);
+        commentFrg = getIntent().getBooleanExtra("commentFrg", false);
         ShowTaskViewData(todoId);
 
         final View view1 = getLayoutInflater().inflate(
@@ -108,6 +112,7 @@ public class TaskView extends BaseActivity {
                 alert.show();
             }
         });
+
         aq.id(R.id.backview).clicked(new OnClickListener() {
 
             @Override
@@ -155,6 +160,20 @@ public class TaskView extends BaseActivity {
                 }
             }
         });
+
+        if(rsvp){
+//            Log.d("received intent", "yes");
+            alert.show();
+        }
+        if(commentFrg){
+            Log.d("CommentFRG", "Got into Comment frg");
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
+                    .addToBackStack(null)
+                    .commit();
+        }
+
 
         aq.id(R.id.backview).clicked(new OnClickListener() {
             @Override

@@ -28,6 +28,8 @@ import java.util.List;
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
+    private String notificationtype;
+    private String notificationtMessage;
     NotificationCompat.Builder builder;
     AQuery aq;
 
@@ -65,9 +67,10 @@ public class GcmIntentService extends IntentService {
 
                 NotificationHandler nHandler;
                 nHandler = NotificationHandler.getInstance(getApplicationContext());
-                nHandler.createSimpleNotification2(getApplicationContext(), "test", "test", 12);
-
-//                getAssignedTaskData(extras.getString("title"),extras.getString("message"), extras.getString("todo_id"));
+//                nHandler.createSimpleNotification2(getApplicationContext(), "test", "test", 12);
+                notificationtype = extras.getString("type");
+                notificationtMessage = extras.getString("message");
+                getAssignedTaskData(extras.getString("todo_id"));
                 // Post notification of received message.
             }
         }
@@ -121,7 +124,7 @@ public class GcmIntentService extends IntentService {
         // mId allows you to update the notification later on.
         mNotificationManager.notify(10, mBuilder.build());
     }
-    private void getAssignedTaskData(final String title, final String message, final String todoId){
+    private void getAssignedTaskData( final String todoId){
         aq.ajax("http://api.heuristix.net/one_todo/v1/task/" + todoId, String.class, new AjaxCallback<String>() {
             @Override
             public void callback(String url, String json,
@@ -144,7 +147,7 @@ public class GcmIntentService extends IntentService {
         todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).startDate));
         todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).endDate));
         todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
-        todo.setLocation(AssignedTaskData.getInstance().task.get(0).location);
+        todo.setLocation(AssignedTaskData.getInstance().task.get(0).todoLocation);
         todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
         todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
 
@@ -170,6 +173,7 @@ public class GcmIntentService extends IntentService {
         List<ToDo> addedTodo = App.daoSession.getToDoDao().queryBuilder().orderDesc(ToDoDao.Properties.Id).list();
         NotificationHandler nHandler;
         nHandler = NotificationHandler.getInstance(getApplicationContext());
-        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(), addedTodo.get(0).getLocation(), addedTodo.get(0).getId());
+
+        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(),addedTodo.get(0).getStart_date(), addedTodo.get(0).getLocation(),notificationtype,notificationtMessage, addedTodo.get(0).getId());
     }
 }

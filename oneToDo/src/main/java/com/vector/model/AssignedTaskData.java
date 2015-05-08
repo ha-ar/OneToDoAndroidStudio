@@ -46,8 +46,10 @@ public class AssignedTaskData {
 		public String startDate;
 		@SerializedName("end_date")
 		public String endDate;
-		@SerializedName("location")
-		public String location;
+		@SerializedName("todo_location")
+		public String todoLocation;
+        @SerializedName("location")
+        public String location;
 		@SerializedName("repeat_until")
 		public String repeatUntil;
 		@SerializedName("repeat_interval")
