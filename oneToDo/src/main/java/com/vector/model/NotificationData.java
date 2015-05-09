@@ -19,6 +19,10 @@ public class NotificationData {
         notifications = obj;
 	}
 
+    public void clearList() {
+        notifications = null;
+    }
+
     public ArrayList<Result> result = new ArrayList<>();
 
     public class Result{

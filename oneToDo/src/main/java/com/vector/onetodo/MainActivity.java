@@ -42,6 +42,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -123,6 +124,7 @@ public class MainActivity extends BaseActivity implements
     private DrawerLayout drawerLayout;
     public static Activity act;
     public static WhereCondition currentCondition = null;
+    private boolean isNotificationDrawerSelected = false;
 
     private final int TYPE = 10000, ALL = 10001, TASK = 10002, EVENT = 10003, SCHEDULE = 10004, APPOINTMENT = 10005;
 
@@ -202,7 +204,7 @@ public class MainActivity extends BaseActivity implements
                     intent.putExtra("todo_id", todoId);
                     intent.putExtra("is_assigned_task", false);
                     startActivity(intent);
-                    callNotificationClicked(NotificationData.getInstance().result.get(position).id);
+//                    callNotificationClicked(NotificationData.getInstance().result.get(position).id);
                 }
             });
             aq.ajax("http://api.heuristix.net/one_todo/v1/notifications/"
@@ -257,9 +259,12 @@ public class MainActivity extends BaseActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menu.clear();
+        if(!isNotificationDrawerSelected){
         getMenuInflater().inflate(R.menu.main, menu);
 
         this.menu = menu;
+
+
 
         SubMenu submenu = menu.addSubMenu(0, TYPE, 1, "By Type");
         submenu.addSubMenu(0,ALL,100,"All");
@@ -320,6 +325,11 @@ public class MainActivity extends BaseActivity implements
                 return true;
             }
         });
+        }else{
+            getMenuInflater().inflate(R.menu.menu_notification, menu);
+
+            this.menu = menu;
+        }
         return true;
     }
 
@@ -333,7 +343,15 @@ public class MainActivity extends BaseActivity implements
         int id = item.getItemId();
         switch (id) {
             case R.id.action_notification:
+                isNotificationDrawerSelected = true;
                 toggleRightDrawer();
+                break;
+            case R.id.action_notifi:
+                isNotificationDrawerSelected = false;
+                toggleRightDrawer();
+                break;
+            case R.id.action_clear:
+                clearNotifications();
                 break;
             case R.id.action_label:
 //                initLabelsFragment();
@@ -362,7 +380,26 @@ public class MainActivity extends BaseActivity implements
         TaskListFragment.setAdapter(this, 2, currentCondition);
         return super.onOptionsItemSelected(item);
     }
+    public void clearNotifications(){
+        Log.d("cn", "called............................");
+//;        ProgressDialog dialog = new ProgressDialog(this);
+//        dialog.setMessage("Please wait...");
+        aq.ajax("http://api.heuristix.net/one_todo/v1/notifications/"
+                        + Constants.user_id ,JSONObject.class,
+                new AjaxCallback<JSONObject>() {
+                    @Override
+                    public void callback(String url, JSONObject json,
+                                         AjaxStatus status) {
 
+                        if (json != null) {
+                            ListView emptyList = (ListView) findViewById(R.id.notif_list);
+                            NotificationData.getInstance().clearList();
+                            Notify_adapter adapter = new Notify_adapter(MainActivity.this);
+                            emptyList.setAdapter(adapter);
+                        }
+                    }
+                }.method(AQuery.METHOD_DELETE));
+    }
     //    public void Fb_Clicked() {
 //        Session currentSession = Session.getActiveSession();
 //        if (currentSession == null || currentSession.getState().isClosed()) {
@@ -514,9 +551,12 @@ public class MainActivity extends BaseActivity implements
     }
     private void toggleRightDrawer() {
         if (drawerLayout.isDrawerVisible(Gravity.RIGHT)) {
+            invalidateOptionsMenu();
             drawerLayout.closeDrawer(Gravity.RIGHT);
-            getSupportActionBar().setTitle(R.string.close_drawer);
+            getSupportActionBar().setTitle("Todo's");
         } else {
+            invalidateOptionsMenu();
+
             drawerLayout.openDrawer(Gravity.RIGHT);
             getSupportActionBar().setTitle("Notifications");
         }

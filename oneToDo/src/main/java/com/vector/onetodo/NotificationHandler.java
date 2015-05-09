@@ -12,6 +12,8 @@ import android.widget.RemoteViews;
 
 import com.vector.onetodo.utils.Utils;
 
+import java.text.SimpleDateFormat;
+
 public class NotificationHandler {
 	private static NotificationHandler nHandler;
 	private static NotificationManager mNotificationManager;
@@ -100,7 +102,9 @@ public class NotificationHandler {
 
             expandedView.setTextViewText(R.id.notification_heading, "Assined task");
             expandedView.setTextViewText(R.id.title, title);
-//            expandedView.setTextViewText(R.id.date, Utils.getDate(date, "e d m Y"));
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM MM dd, yyyy");
+            String dateString = sdf.format(date);
+            expandedView.setTextViewText(R.id.date, dateString);
             expandedView.setTextViewText(R.id.action_left, "View");
             expandedView.setTextViewText(R.id.action_right, "Comment");
 
@@ -134,7 +138,10 @@ public class NotificationHandler {
 //            expandedView.setOnClickPendingIntent(R.id.action_left, resultPending);
             expandedView.setTextViewText(R.id.notification_heading, "Event Invitation");
             expandedView.setTextViewText(R.id.title, title);
-//            expandedView.setTextViewText(R.id.date, Utils.getDate(date, "e d m Y"));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM MM dd, yyyy");
+            String dateString = sdf.format(date);
+            expandedView.setTextViewText(R.id.date, dateString);
             expandedView.setTextViewText(R.id.location, location);
             expandedView.setTextViewText(R.id.action_left, "View");
             expandedView.setTextViewText(R.id.action_right, "RSVP");

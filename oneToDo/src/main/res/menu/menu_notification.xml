@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/action_notifi"
+        android:icon="@drawable/bell"
+        android:title="Notifications"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_clear"
+        android:title="Clear All"
+        app:showAsAction="never"/>
+
+</menu>
