@@ -26,7 +26,7 @@ public class TaskData {
 
     public String notification_count;
 
-    public HashMap<Integer,String> labels = new HashMap<Integer,String>();
+    public HashMap<Integer, String> labels = new HashMap<>();
 
 
         @SerializedName("result")

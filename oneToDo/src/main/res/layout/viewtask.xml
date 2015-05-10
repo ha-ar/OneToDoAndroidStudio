@@ -30,85 +30,6 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/viewbg" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_below="@+id/imageView1123"
-                android:orientation="vertical"
-                android:visibility="gone" >
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:padding="15dp" >
-
-                    <ImageView
-                        android:id="@+id/imageView5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/calendar_grey" />
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="20dp"
-                        android:singleLine="true"
-                        android:text="TextView"
-                        android:textColor="@color/_4d4d4d"
-                        android:textSize="13.33sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:padding="15dp" >
-
-                    <ImageView
-                        android:id="@+id/imageView6"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:src="@drawable/invite1" />
-
-                    <TextView
-                        android:id="@+id/textView4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="20dp"
-                        android:singleLine="true"
-                        android:text="TextView"
-                        android:textColor="@color/_4d4d4d"
-                        android:textSize="13.33sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/notification"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/underline_textview"
-                    android:paddingBottom="1dp"
-                    android:paddingLeft="3dp"
-                    android:text="ACTIVE TASKS"
-                    android:textColor="@color/active"
-                    android:textSize="13.33sp" />
-
-                <TextView
-                    android:id="@+id/notification1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/underline_textview"
-                    android:paddingBottom="1dp"
-                    android:paddingLeft="3dp"
-                    android:text="ATTACHMENT"
-                    android:textColor="@color/active"
-                    android:textSize="13.33sp" />
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -138,7 +59,6 @@
                         android:layout_height="wrap_content"
                         android:maxLines="2"
                         android:paddingLeft="23dp"
-                        android:text=""
                         android:textColor="@color/_4d4d4d"
                         android:textSize="13.33sp" />
                 </LinearLayout>

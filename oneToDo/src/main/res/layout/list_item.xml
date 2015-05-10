@@ -24,39 +24,7 @@
         android:textColor="#808080"
         android:textSize="8.89sp" />
 
-    <LinearLayout
-        android:id="@+id/title_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/list_time"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/completed_task"
-        android:orientation="vertical">
 
-
-        <TextView
-            android:id="@+id/list_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:textColor="@android:color/black"
-            android:singleLine="true"
-            android:textSize="17.78sp"
-            android:textStyle="bold" />
-        <TextView
-            android:id="@+id/list_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/title_layout"
-            android:layout_below="@id/title_layout"
-            android:textColor="#808080"
-            android:visibility="gone"
-            android:paddingBottom="5dp"
-            android:textSize="13.33sp" />
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/list_start_date"
@@ -97,6 +65,37 @@
         android:layout_marginBottom="5dp"
         android:textColor="#808080"
         android:textSize="13.33sp" />
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/list_end_time"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/completed_task"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:textColor="@android:color/black"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="17.78sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/list_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#808080"
+            android:visibility="gone"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="13.33sp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/reminder_before"
@@ -135,6 +134,7 @@
         android:textSize="16dp"
         android:visibility="gone"/>
     <View
+        android:id="@+id/todo_id"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:layout_alignParentBottom="true"

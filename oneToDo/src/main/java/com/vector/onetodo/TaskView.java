@@ -183,15 +183,8 @@ public class TaskView extends BaseActivity {
         });
 
     }
-    static int p;
     private static ArrayList<ItemDetails> GetSearchResults() {
         ArrayList<ItemDetails> results = new ArrayList<>();
-        for (p = 0; p < 8; p++) {
-            ItemDetails item_details = new ItemDetails();
-            item_details.setName("ok");
-            item_details.setImage("ok");
-            results.add(item_details);
-        }
         return results;
     }
     private void ShowTaskViewData(long id){

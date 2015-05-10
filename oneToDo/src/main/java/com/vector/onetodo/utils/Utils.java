@@ -44,7 +44,7 @@ public class Utils {
 	public static final Calendar currentDateCal = Calendar
 			.getInstance(Locale.US);
 
-	private static final Calendar tempCal = Calendar.getInstance(Locale.US);
+	private static final Calendar tempCal = Calendar.getInstance(Locale.getDefault());
 
     public static int getPxFromDp(Context context, int val) {
 		Resources r = context.getResources();
@@ -90,6 +90,7 @@ public class Utils {
 		tempCal.add(Calendar.DATE, day);
 		return tempCal.get(Calendar.YEAR);
 	}
+
 
 	public static long getCurrentTime() {
 		return System.currentTimeMillis();

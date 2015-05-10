@@ -1984,7 +1984,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 			aq.id(R.id.repeat_event).text(todo.getRepeat().getShowable_format()).visible();
 		}
 
-		if(todo.getLabel().getLabel_color() != null) {
+		if(todo.getLabel() != null) {
 			aq.id(R.id.spinner_labels_event).text(todo.getLabel().getLabel_name());
 			GradientDrawable mDrawable = (GradientDrawable) getResources()
 					.getDrawable(R.drawable.label_background);

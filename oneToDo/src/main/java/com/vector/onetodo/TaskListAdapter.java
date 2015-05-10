@@ -82,6 +82,8 @@ public class TaskListAdapter extends BaseAdapter {
 		else if (listToShow.get(position).getTodo_type_id() == 5)
 			holder.type.setText("Project");
 
+		view.setId((listToShow.get(position).getId().intValue()));
+
 		holder.title.setText(listToShow.get(position).getTitle());
 		Calendar calendar = Calendar.getInstance();
 		Long startDate = listToShow.get(position).getStart_date();
@@ -93,19 +95,19 @@ public class TaskListAdapter extends BaseAdapter {
 		else holder.startDate.setVisibility(View.INVISIBLE);
 
 		holder.startDate.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK,
-				Calendar.SHORT, Locale.US)
+				Calendar.SHORT, Locale.getDefault())
 				+ " "
 				+ calendar.get(Calendar.DAY_OF_MONTH)
 				+ " "
 				+ calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
-				Locale.US) + " " + calendar.get(Calendar.YEAR));
+				Locale.getDefault()) + " " + calendar.get(Calendar.YEAR));
 
 		holder.startTime.setText(String.format("%02d", calendar.get(Calendar.HOUR))
 				+ ":"
 				+ String.format("%02d", calendar.get(Calendar.MINUTE))
 				+ " "
 				+ calendar.getDisplayName(Calendar.AM_PM, Calendar.SHORT,
-				Locale.US));
+				Locale.getDefault()));
 
 		boolean eventOrSchedule = isEventOrSchedule(listToShow.get(position).getTodo_type_id());
 		if(eventOrSchedule){
@@ -119,6 +121,9 @@ public class TaskListAdapter extends BaseAdapter {
 			holder.reminder.setVisibility(View.VISIBLE);
 		}
 		if(eventOrSchedule){
+			holder.repeat.setVisibility(View.INVISIBLE);
+			holder.reminder.setVisibility(View.INVISIBLE);
+
 			Calendar calendarEnd = Calendar.getInstance();
 			Long endDate = listToShow.get(position).getEnd_date();
 			calendarEnd.setTimeInMillis(endDate);

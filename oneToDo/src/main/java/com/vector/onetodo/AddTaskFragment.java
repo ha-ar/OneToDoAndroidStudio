@@ -134,7 +134,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     static LinearLayout ll_linear;
     static int FragmentCheck = 0;
     static String repeatDate = "";
-    static String title = null;
+    static String title = "";
     static Dialog add_new_label_alert,
             date_time_alert, attach, location_del, label_edit;
     static int currentHours, currentMin, currentDayDigit, currentYear,
@@ -148,10 +148,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private static View previousSelected;
     int labelPosition = -1;
     ImageView last;
-    View label_view = null, viewl;
+    View label_view , viewl;
     int dayPosition;
     private Editor editor, editorAttach, editorComment;
-    private String pLabel = null;
+    private String pLabel = "";
     private int mPosition = -1;
     private int itemPosition = -1;
     private int MaxId = -1;
@@ -1552,7 +1552,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             e.printStackTrace();
         }
         int reminderTime = 0, is_locationtype = 0;
-        String locationType = null;
+        String locationType = "";
         Log.e("before", before);
         if (!before.isEmpty()) {
             if (is_time) {

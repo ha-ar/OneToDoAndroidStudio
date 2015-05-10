@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,14 @@ import com.vector.onetodo.utils.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import de.greenrobot.dao.query.WhereCondition;
+import dev.dworks.libs.astickyheader.SimpleSectionedListAdapter;
+import dev.dworks.libs.astickyheader.SimpleSectionedListAdapter.Section;
 
 public class TaskListFragment extends Fragment{
 
@@ -32,6 +37,8 @@ public class TaskListFragment extends Fragment{
     public static int position;
     private static long[] currentDate;
     private static RelativeLayout noTasksView;
+    private static List<String> upComingHeaders = new ArrayList<>();
+    private static List<Integer> upComingHeadersPosition = new ArrayList<>();
 
     public static TaskListFragment newInstance(int position) {
         TaskListFragment myFragment = new TaskListFragment();
@@ -59,26 +66,17 @@ public class TaskListFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> adpater, View view, int pos,
                                     long _id) {
-                int id = 0;
-                switch (MainActivity.pager.getCurrentItem()) {
-                    case 0:
-                        id = todayQuery.list().get(pos).getId().intValue();
-                        break;
-                    case 1:
-                        id = tomorrowQuery.list().get(pos).getId().intValue();
-                        break;
-                    case 2:
-                        id = upcomingQuery.list().get(pos).getId().intValue();
-                        break;
-
-                }
                 Intent intent = new Intent(getActivity(), TaskView.class);
-                intent.putExtra("todo_id", (long) id);
+                intent.putExtra("todo_id", (long) view.getId());
                 startActivity(intent);
             }
 
         });
+        initDates();
+        return view;
+    }
 
+    private void initDates(){
         currentDate = new long[3];
         String date_string;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -93,9 +91,8 @@ public class TaskListFragment extends Fragment{
                 e.printStackTrace();
             }
         }
-
-        return view;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -121,6 +118,18 @@ public class TaskListFragment extends Fragment{
         upcomingQuery = App.daoSession.getToDoDao().queryBuilder().where(
                 Properties.Start_date.gt(currentDate[2]))
                 .orderAsc(Properties.Start_date);
+
+        int index = 0;
+        for(ToDo todo : upcomingQuery.list()){
+            String header = DateUtils.getRelativeTimeSpanString(todo.getStart_date(), currentDate[0], DateUtils.DAY_IN_MILLIS).toString();
+            if(!upComingHeaders.contains(header)){
+                upComingHeaders.add(header);
+                upComingHeadersPosition.add(index++);
+            }else{
+                index++;
+            }
+        }
+
     }
 
     private static void filteredQuery(WhereCondition properties, int day){
@@ -157,6 +166,8 @@ public class TaskListFragment extends Fragment{
                 todayAdapter = new TaskListAdapter(context, todayQuery.list(), position);
                 listView[0].setAdapter(todayAdapter);
                 todayAdapter.notifyDataSetChanged();
+
+
                 break;
             case 1:
                 if (property == null)
@@ -180,8 +191,15 @@ public class TaskListFragment extends Fragment{
                 }
                 upComingAdapter = new TaskListAdapter(context,
                         upcomingQuery.list(), position);
-                listView[2].setAdapter(upComingAdapter);
-                upComingAdapter.notifyDataSetChanged();
+                ArrayList<Section> sections = new ArrayList<>();
+                for (int i = 0; i < upComingHeaders.size(); i++) {
+                    sections.add(new Section(i == 0 ? 0 : upComingHeadersPosition.get(i), upComingHeaders.get(i)));
+                }
+                SimpleSectionedListAdapter simpleSectionedGridAdapter = new SimpleSectionedListAdapter(context, upComingAdapter,
+                        R.layout.task_list_item_header, R.id.header);
+                simpleSectionedGridAdapter.setSections(sections.toArray(new SimpleSectionedListAdapter.Section[0]));
+                listView[2].setAdapter(simpleSectionedGridAdapter);
+                simpleSectionedGridAdapter.notifyDataSetChanged();
                 break;
             default:
 
