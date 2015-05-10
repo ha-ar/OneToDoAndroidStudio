@@ -68,7 +68,7 @@
     <LinearLayout
         android:id="@+id/title_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_toLeftOf="@+id/list_end_time"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/completed_task"
@@ -78,7 +78,8 @@
             android:id="@+id/list_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:textColor="@android:color/black"
             android:singleLine="true"
@@ -90,7 +91,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#808080"
-            android:visibility="gone"
+            android:visibility="visible"
+            android:gravity="bottom"
             android:singleLine="true"
             android:ellipsize="end"
             android:textSize="13.33sp" />

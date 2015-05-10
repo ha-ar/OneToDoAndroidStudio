@@ -47,6 +47,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:+'
     compile 'io.reactivex:rxjava:1.0.3'
     compile 'com.getbase:floatingactionbutton:1.8.0'
-
-
+    compile 'dev.dworks.libs:astickyheader:0.1.0'
+    //    compile project(':stickyListHeader')
 }

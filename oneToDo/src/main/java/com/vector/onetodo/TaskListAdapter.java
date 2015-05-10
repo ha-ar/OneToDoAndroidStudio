@@ -131,7 +131,7 @@ public class TaskListAdapter extends BaseAdapter {
 			holder.endDate.setText(calendarEnd.getDisplayName(Calendar.DAY_OF_WEEK,
 					Calendar.SHORT, Locale.getDefault())
 					+ " "
-					+ calendar.get(Calendar.DAY_OF_MONTH)
+					+ calendarEnd.get(Calendar.DAY_OF_MONTH)
 					+ " "
 					+ calendarEnd.getDisplayName(Calendar.MONTH, Calendar.SHORT,
 					Locale.getDefault()) + " " + calendarEnd.get(Calendar.YEAR));
