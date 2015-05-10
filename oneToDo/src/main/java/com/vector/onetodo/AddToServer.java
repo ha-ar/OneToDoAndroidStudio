@@ -2,6 +2,7 @@ package com.vector.onetodo;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -124,9 +125,15 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
     }
 
     @Override
+    protected void onCancelled(Void aVoid) {
+        super.onCancelled(aVoid);
+        Toast.makeText(MainActivity.act, "Oops! Something went wrong.", Toast.LENGTH_SHORT).show();
+    }
+
+
+    @Override
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
-
         mCallBack.taskAdded();
     }
 
@@ -154,10 +161,10 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
         pairs.add(new BasicNameValuePair(
                 "todo[is_allday]", (isAllDay) ? 1+"" : 0+""));
 
-        if (notes != null)
+        if (!notes.isEmpty())
             pairs.add(new BasicNameValuePair("todo[notes]", notes));
 
-        if (before != null) {
+        if (!before.isEmpty()) {
             if (!is_location) {
                 pairs.add(new BasicNameValuePair("todo_reminder[time]",
                         reminder+""));
@@ -173,7 +180,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                         "todo_reminder[location_type]", locationType));
             }
         }
-        if (repeat != null) {
+        if (!repeat.isEmpty()) {
             pairs.add(new BasicNameValuePair(
                     "todo_repeat[repeat_interval]", repeat));
 
@@ -181,7 +188,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                 pairs.add(new BasicNameValuePair(
                         "todo_repeat[repeat_until]", repeatDate));
         }
-        if (location != null) {
+        if (!location.isEmpty()) {
             pairs.add(new BasicNameValuePair(
                     "todo[todo_location]", location));
         }
@@ -205,7 +212,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
             }
         }
 
-        if (checklist_data != null)
+        if (!checklist_data.isEmpty())
             pairs.add(new BasicNameValuePair(
                     "todo_checklist[checklist_data]", checklist_data));
 
@@ -233,10 +240,12 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                     + "][attachment_path]", App.attach.getString(titleCheck
                     + "path" + i, null)));
         }
-        pairs.add(new BasicNameValuePair(
-                "todo_label[label_name]", label_name));
-        pairs.add(new BasicNameValuePair(
-                "todo_label[label_color]", labelColor));
+        if(!label_name.equals("Label")) {
+            pairs.add(new BasicNameValuePair(
+                    "todo_label[label_name]", label_name));
+            pairs.add(new BasicNameValuePair(
+                    "todo_label[label_color]", labelColor));
+        }
         MaxId = 0;
 
     }

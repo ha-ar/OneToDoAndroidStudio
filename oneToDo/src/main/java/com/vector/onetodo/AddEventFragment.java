@@ -1774,6 +1774,8 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		assignedId.clear();
 		for (String key : AssignMultipleFragment.selectedInvitees.keySet())
 			assignedId.add(key);
+		AssignMultipleFragment.selectedInvitees.clear();
+
 		MaxId = App.attach.getInt("2Max", 0);
 
 		title = aq.id(R.id.event_title).getText().toString();

@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.ImageOptions;
+import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.vector.model.AssignedTaskData;
-import com.vector.model.ItemDetails;
 import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
@@ -23,7 +23,6 @@ import com.vector.onetodo.utils.Utils;
 import net.appkraft.parallax.ParallaxScrollView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -183,52 +182,22 @@ public class TaskView extends BaseActivity {
         });
 
     }
-    private static ArrayList<ItemDetails> GetSearchResults() {
-        ArrayList<ItemDetails> results = new ArrayList<>();
-        return results;
-    }
     private void ShowTaskViewData(long id){
 //        ArrayList<ItemDetails> items = GetSearchResults();
 //        aq.id(R.id.invitee_list).adapter(new InviteeAdapter(this, items));
         ToDoDao toDoDao = App.daoSession.getToDoDao();
         ToDo obj = toDoDao.load(id);
         int serverTaskPosition = -1;
-        Log.e("size", TaskData.getInstance().result.todos.size()+"");
-
-        if(!isAssignedTask) {
-            for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
-                try {
-                    if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
-                        serverTaskPosition = i;
-                        break;
-                    }
-
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            try {
-                for (int i = 0; i < TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.size(); i++)
-                    showAttachments(TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.get(i));
-            } catch (Exception npe) {
-                npe.printStackTrace();
-            }
-        }else{
-
-            try {
-                for (int i = 0; i < AssignedTaskData.getInstance().task.get(1).attachments.size(); i++)
-                    showAttachments(AssignedTaskData.getInstance().task.get(1).attachments.get(i));
-            } catch (Exception npe) {
-                npe.printStackTrace();
-            }
-        }
-
-
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
         }
         aq.id(R.id.title).text(obj.getTitle());
+        if(obj.getIs_assigned_task() != null && obj.getIs_assigned_task()){
+            aq.id(R.id.sender_name).text("Assigned by "+ obj.getAssignee_name());
+            aq.id(R.id.btn_edit).invisible();
+        }else{
+            aq.id(R.id.sender_name).invisible();
+        }
         try{
             if(!obj.getRepeat().getRepeat_interval().isEmpty()){
                 aq.id(R.id.repeat).text(obj.getRepeat().getRepeat_interval()).visible();
@@ -294,6 +263,69 @@ public class TaskView extends BaseActivity {
                 aq.id(R.id.notes_layout).visible();
             }
         }catch (NullPointerException npe){}
+
+        if(!isAssignedTask) {
+            for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
+                try {
+                    if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
+                        serverTaskPosition = i;
+                        break;
+                    }
+
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                for (int i = 0; i < TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.size(); i++)
+                    showAttachments(TaskData.getInstance().result.todos.get(serverTaskPosition).todo_attachment.get(i));
+            } catch (Exception npe) {
+                npe.printStackTrace();
+            }
+        }else{
+
+            try {
+                for (int i = 0; i < AssignedTaskData.getInstance().task.get(1).attachments.size(); i++)
+                    showAttachments(AssignedTaskData.getInstance().task.get(1).attachments.get(i));
+            } catch (Exception npe) {
+                npe.printStackTrace();
+            }
+        }
+
+        if(!isAssignedTask) {
+            if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list != null) {
+                aq.id(R.id.invitee_layout).visible();
+                if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.accepted != null) {
+                    int size = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.accepted.size();
+                    String[] forCommaSeparated = new String[size];
+                    for (int i = 0; i < size; i++)
+                        forCommaSeparated[i] = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.accepted.get(i).name;
+
+                    String acceptedNames = Joiner.on(", ").join(forCommaSeparated);
+                    aq.id(R.id.accepted).visible().text(acceptedNames);
+                }
+                if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.pending != null) {
+
+                    int size = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.pending.size();
+                    String[] forCommaSeparated = new String[size];
+                    for (int i = 0; i < size; i++)
+                        forCommaSeparated[i] = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.pending.get(i).name;
+
+                    String acceptedNames = Joiner.on(", ").join(forCommaSeparated);
+                    aq.id(R.id.pending).visible().text(acceptedNames);
+                }
+                if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.rejected != null) {
+                    int size = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.accepted.size();
+                    String[] forCommaSeparated = new String[size];
+                    for (int i = 0; i < size; i++)
+                        forCommaSeparated[i] = TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.rejected.get(i).name;
+
+                    String acceptedNames = Joiner.on(", ").join(forCommaSeparated);
+                    aq.id(R.id.rejected).visible().text(acceptedNames);
+                }
+            }
+        }
     }
 
     private void showHideCheckListView() {
@@ -308,7 +340,7 @@ public class TaskView extends BaseActivity {
         }
     }
 
-//    private void populateAssignedTaskData(){
+    //    private void populateAssignedTaskData(){
 //        AssignedTaskData obj = AssignedTaskData.getInstance();
 //        aq.id(R.id.title).text(obj.task.get(0).title);
 //        try {

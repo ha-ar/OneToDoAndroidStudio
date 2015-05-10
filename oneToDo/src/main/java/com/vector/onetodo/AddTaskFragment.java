@@ -55,7 +55,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -1411,13 +1410,18 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                             Log.e("attachment", json.toString());
                             JSONObject obj1 = new JSONObject(json.toString());
                             path = obj1.getString("path");
-                            LoadAttachmax();
-                            if (MaxId == 0) {
-                                MaxId = 1;
-                            } else {
-                                MaxId = MaxId + 1;
+                            boolean error = obj1.getBoolean("error");
+                            if(error)
+                                Toast.makeText(getActivity(),"Error uploading attachment.",Toast.LENGTH_SHORT).show();
+                            else {
+                                LoadAttachmax();
+                                if (MaxId == 0) {
+                                    MaxId = 1;
+                                } else {
+                                    MaxId = MaxId + 1;
+                                }
+                                SaveAttach(MaxId, path, "type");
                             }
-                            SaveAttach(MaxId, path, "type");
                         } catch (Exception e) {
 
                         }
@@ -1441,14 +1445,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 WindowManager.LayoutParams.WRAP_CONTENT, true);
         popupWindowTask.setBackgroundDrawable(new BitmapDrawable());
         popupWindowTask.setOutsideTouchable(true);
-        popupWindowTask.setOnDismissListener(new OnDismissListener() {
-
-            @Override
-            public void onDismiss() {
-//                layout_MainMenu.getForeground().setAlpha(0);
-            }
-        });
-
 
         cancel.setOnClickListener(new OnClickListener() {
 
@@ -1534,6 +1530,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         String label_name = aq.id(R.id.spinner_labels_task).getText()
                 .toString();
+        if(label_name.equals("Label"))
+            label_name = "";
 
         if(!(aq.id(R.id.add_sub_task).getView() instanceof EditText))
             toggleCheckList(aq.id(R.id.add_sub_task).getView());
@@ -1662,6 +1660,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 //            }
 //        }
 
+        alarm = new AlarmManagerBroadcastReceiver();
+        geoFence = new Geofences(getActivity());
+
         if(isEditMode){
             todo.setId(todoId);
             tododao.update(todo);
@@ -1672,8 +1673,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                     AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime, label_name, "", before, "", AddTaskFragment.this);
             aSync.execute();
         }
-        alarm = new AlarmManagerBroadcastReceiver();
-        geoFence = new Geofences(getActivity());
         getActivity().getSupportFragmentManager().popBackStack();
     }
 

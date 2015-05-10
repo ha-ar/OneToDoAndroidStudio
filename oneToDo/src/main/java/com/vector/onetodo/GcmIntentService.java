@@ -150,6 +150,9 @@ public class GcmIntentService extends IntentService {
         todo.setLocation(AssignedTaskData.getInstance().task.get(0).todoLocation);
         todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
         todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
+        todo.setIs_assigned_task(true);
+        todo.setAssignee_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
+        todo.setAssignee_name(AssignedTaskData.getInstance().task.get(0).first_name + " " + AssignedTaskData.getInstance().task.get(0).last_name);
 
 
         Reminder reminder = new Reminder();
