@@ -28,6 +28,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -1482,7 +1483,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
     private void saveTask(){
         assignedId.clear();
-        assignedId.add(AddTaskFragment.assignedSelectedID);
+        if(!TextUtils.isEmpty(assignedSelectedID))
+            assignedId.add(assignedSelectedID);
         if (aq.id(R.id.task_title1).getText().toString().isEmpty()) {
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();

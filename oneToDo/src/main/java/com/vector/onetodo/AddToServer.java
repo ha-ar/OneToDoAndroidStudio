@@ -1,6 +1,7 @@
 package com.vector.onetodo;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -240,7 +241,7 @@ public class AddToServer extends AsyncTask<String, Integer, Void> {
                     + "][attachment_path]", App.attach.getString(titleCheck
                     + "path" + i, null)));
         }
-        if(!label_name.equals("Label")) {
+        if(!label_name.equals("Label") || !TextUtils.isEmpty(label_name)) {
             pairs.add(new BasicNameValuePair(
                     "todo_label[label_name]", label_name));
             pairs.add(new BasicNameValuePair(

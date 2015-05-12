@@ -48,5 +48,6 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.3'
     compile 'com.getbase:floatingactionbutton:1.8.0'
     compile 'dev.dworks.libs:astickyheader:0.1.0'
+    compile 'ch.acra:acra:4.6.2'
     //    compile project(':stickyListHeader')
 }

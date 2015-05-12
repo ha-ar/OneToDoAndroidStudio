@@ -18,7 +18,15 @@ import com.vector.onetodo.utils.AppPrefs;
 import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.GPSTracker;
 
+import org.acra.ACRA;
+import org.acra.ReportingInteractionMode;
+import org.acra.annotation.ReportsCrashes;
 import org.json.JSONObject;
+
+@ReportsCrashes(
+        mode = ReportingInteractionMode.TOAST,
+        mailTo = "hasan.cancer@gmail.com"
+)
 
 public class App extends Application{
 
@@ -32,7 +40,6 @@ public class App extends Application{
     public static DaoMaster daoMaster;
     public static GPSTracker gpsTracker;
     public static SharedPreferences pref, label, attach, comment;
-
 
     @Override
     public void onCreate() {
@@ -51,6 +58,8 @@ public class App extends Application{
         label = this.getSharedPreferences("Label", 0);
         attach = this.getSharedPreferences("Attach", 0);
         comment = this.getSharedPreferences("Comment", 0);
+
+        ACRA.init(this);
 
     }
 

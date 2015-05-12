@@ -293,7 +293,7 @@ public class TaskView extends BaseActivity {
             }
         }
 
-        if(!isAssignedTask) {
+        if(!isAssignedTask && serverTaskPosition != -1) {
             if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list != null) {
                 aq.id(R.id.invitee_layout).visible();
                 if (TaskData.getInstance().result.todos.get(serverTaskPosition).invitee_list.accepted != null) {

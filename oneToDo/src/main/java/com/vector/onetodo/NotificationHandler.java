@@ -10,8 +10,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
-import com.vector.onetodo.utils.Utils;
-
 import java.text.SimpleDateFormat;
 
 public class NotificationHandler {
@@ -45,7 +43,10 @@ public class NotificationHandler {
 		long todoId = intent.getExtras().getLong("id");
         Intent resultIntent = new Intent(context, TaskView.class);
         resultIntent.putExtra("todo_id", todoId);
-		boolean isAllDay = App.daoSession.getToDoDao().load(todoId).getIs_allday();
+        boolean isAllDay = false;
+
+        if(App.daoSession.getToDoDao().load(todoId).getIs_allday() != null)
+		    isAllDay = App.daoSession.getToDoDao().load(todoId).getIs_allday();
 
         // Creating a artificial activity stack for the notification activity
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
