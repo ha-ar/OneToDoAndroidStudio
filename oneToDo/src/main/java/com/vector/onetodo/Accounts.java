@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,7 +14,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,9 +36,16 @@ import com.androidquery.callback.AjaxStatus;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.vector.onetodo.utils.Utils;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,6 +72,9 @@ public class Accounts extends Fragment {
     private Dialog changeemail;
     private Dialog nameinfo;
     private Dialog select_image;
+    private static Boolean boo = false;
+    private static String path = null;
+    private LruCache<String, Bitmap> mMemoryCache;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,6 +91,24 @@ public class Accounts extends Fragment {
         actionBar.setDisplayShowHomeEnabled(true);
         setFont();
         setHasOptionsMenu(true);
+
+        //cashing
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+
+
+
         return view;
     }
 
@@ -419,6 +450,8 @@ public class Accounts extends Fragment {
                                         Log.v("Response", json.toString());
                                         App.prefs.setUserName(name[0]+" "+name[1]);
                                         aq.id(R.id.user_name).text(App.prefs.getUserName());
+                                        TextView textview = (TextView)getActivity().findViewById(R.id.username);
+                                        textview.setText(App.prefs.getUserName());
                                         nameinfo.dismiss();
                                         Toast.makeText(getActivity(), "done",Toast.LENGTH_SHORT).show();
                                     }
@@ -455,7 +488,19 @@ public class Accounts extends Fragment {
             }
         });
 
-        aq.id(R.id.initials).text(App.prefs.getInitials());
+        if(!App.prefs.getUserProfileUri().isEmpty()){
+//            Bitmap bitmp = null;
+//            Uri img = App.prefs.getUserProfileUri();
+//            bitmp = Utils.getBitmap(img, this.getActivity(), this.getActivity().getContentResolver());
+            aq.id(R.id.initials).gone();
+            aq.id(imageEvent).image(App.prefs.getUserProfileUri());
+            aq.id(R.id.image_event)
+                    .background(R.drawable.round_photobutton).visible();
+        }else{
+            aq.id(R.id.initials).text(App.prefs.getInitials());
+        }
+
+
         aq.id(R.id.user_name).text(App.prefs.getUserName());
         aq.id(R.id.user_number).text(App.prefs.getUserNumber());
 
@@ -478,16 +523,136 @@ public class Accounts extends Fragment {
                 }
             case RESULT_GALLERY:
                 if (null != data) {
+
                     Uri selectedImage = data.getData();
-                    aq.id(imageEvent).image(selectedImage.toString());
-                    aq.id(R.id.image_event)
-                            .background(R.drawable.round_photobutton).visible();
-                    aq.id(R.id.initials).gone();
+                    Bitmap bitmap = null;
+                    bitmap = Utils.getBitmap(selectedImage, getActivity(), this.getActivity().getContentResolver());
+
+                    byte[] bitmapArray = Utils.getImageByteArray(bitmap);
+                    //fowlloing if conditions works.... upload successful... but u can see/...updateProfileImage()... not working
+                    //can we do skype :)
+                    if( uploadAttachments(aq, bitmapArray) ){
+
+                    }
+//
+// try {
+//                        bitmap = MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), selectedImage);
+//
+//                        Log.e("bitmap",bitmap+"");
+//                    } catch (FileNotFoundException e) {
+//                        // TODO Auto-generated catch block
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        // TODO Auto-generated catch block
+//                        e.printStackTrace();
+//                    }
+//                    Uri selectedImage = data.getData();
+//                    Log.e("image",selectedImage+"");
+//                    Bundle extras = data.getExtras();
+
+//                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+//                  Log.e("image",imageBitmap+"");
+//  mImageView.setImageBitmap(imageBitmap);
+//                    aq.id(imageEvent).image(imageBitmap);
+
                 }
                 break;
             default:
                 break;
         }
+    }
+    //follwoing function is not being called from above onActivityResult
+    private void updateProfileImage(final AQuery aq){
+        Log.d("in boo", "got into it...............");
+        if(path != null){
+
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("user_id", String.valueOf(App.prefs.getUserId()));
+            params.put("set", "profile_image");
+            params.put("value", path);
+            params.put("table", "user_profile");
+
+            aq.ajax("http://api.heuristix.net/one_todo/v1/user/account", params,
+                    JSONObject.class, new AjaxCallback<JSONObject>() {
+                        @Override
+                        public void callback(String url, JSONObject json,
+                                             AjaxStatus status) {
+                            try {
+                                Log.e("imagd", json.toString());
+                                JSONObject obj2 = new JSONObject(json.toString());
+                                if (!obj2.getBoolean("error")) {
+                                    App.prefs.setUserProfileUri(path);
+                                }
+                            } catch (Exception e) {
+
+                            }
+
+                        }
+                    });
+        }
+    }
+    private Boolean uploadAttachments(final AQuery aq, byte[] byteArray) {
+
+        HttpEntity entity = null;
+        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        List<NameValuePair> pairs = new ArrayList<>();
+        pairs.add(new BasicNameValuePair("user_image", encoded));
+
+        try {
+            entity = new UrlEncodedFormEntity(pairs, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        final Map<String, HttpEntity> param = new HashMap<>();
+
+        param.put(AQuery.POST_ENTITY, entity);
+        ProgressDialog dialog = new ProgressDialog(getActivity());
+        dialog.setMessage("Uploading...Please wait.");
+        aq.progress(dialog).ajax("http://api.heuristix.net/one_todo/v1/uploadUserPicture.php", param,
+                JSONObject.class, new AjaxCallback<JSONObject>() {
+                    @Override
+                    public void callback(String url, JSONObject json,
+                                         AjaxStatus status) {
+
+                        try {
+                            Log.e("attachment", json.toString());
+                            JSONObject obj1 = new JSONObject(json.toString());
+
+                            boolean error = obj1.getBoolean("error");
+                            if (error)
+                                Toast.makeText(getActivity(), "Error uploading attachment.", Toast.LENGTH_SHORT).show();
+                            else {
+                                path = obj1.getString("path");
+                                App.prefs.setUserProfileUri(path);
+
+                                aq.id(R.id.initials).gone();
+                                aq.id(R.id.image_event).gone();
+
+                                aq.id(imageEvent).image(path);
+                                aq.id(R.id.image_event)
+                                        .background(R.drawable.round_photobutton).visible();
+
+                                updateProfileImage(aq);
+
+
+
+
+
+                                boo = true;
+                            }
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+                });
+//        if(boo){
+
+//        }
+
+
+    return boo;
     }
 
     void setFont() {

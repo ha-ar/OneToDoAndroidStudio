@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:animationCache="true"
     android:background="@android:color/white"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/user"
@@ -25,14 +26,6 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/username"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Guest User"
-                android:textColor="@android:color/white"
-                android:textSize="17.78sp" />
-
-            <TextView
                 android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,12 +40,14 @@
             android:id="@+id/manage_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/user_layout"
-            android:layout_marginRight="52dp"
+            android:layout_marginRight="27dp"
             android:drawableBottom="@drawable/ic_down"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp" />
+            android:paddingRight="10dp"
+            android:layout_marginEnd="27dp"
+            android:layout_alignBottom="@+id/user_layout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <TextView
             android:id="@+id/imageView1"
@@ -65,8 +60,46 @@
             android:background="@drawable/round_white"
             android:gravity="center"
             android:text="GU"
+
             android:textColor="@color/active"
             android:textSize="20sp" />
+
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:id="@+id/profile_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/name_circle"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:border_color="#EEEEEE"
+            app:border_width="1dp"
+            app:shadow="true"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/user_layout"
+            android:layout_toEndOf="@+id/user_layout" />
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Guest User"
+            android:textColor="@android:color/white"
+            android:textSize="17.78sp"
+            android:layout_centerVertical="true"
+            android:layout_alignLeft="@+id/user_layout"
+            android:layout_alignStart="@+id/user_layout" />
+        <TextView
+            android:id="@+id/user_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+447890799492"
+            android:textColor="@android:color/white"
+            android:textSize="17.78sp"
+            android:layout_below="@+id/username"
+            android:layout_toRightOf="@+id/user_layout"
+            android:layout_toEndOf="@+id/user_layout" />
     </RelativeLayout>
 
     <LinearLayout
@@ -195,18 +228,6 @@
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:text="Setting"
-        android:textColor="@color/_4d4d4d"
-        android:textSize="15.56sp" />
-
-    <TextView
-        android:id="@+id/help"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="15dp"
-        android:text="Help"
         android:textColor="@color/_4d4d4d"
         android:textSize="15.56sp" />
 

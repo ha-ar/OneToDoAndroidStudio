@@ -1,7 +1,10 @@
 package com.vector.model;
 
+import android.net.Uri;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 public class AssignedTaskData {
@@ -31,7 +34,9 @@ public class AssignedTaskData {
 		@SerializedName("first_name")
 		public String first_name;
 		@SerializedName("last_name")
-		public String last_name;
+        public String last_name;
+        @SerializedName("profile_image")
+        public String profile_image;
 		@SerializedName("user_id")
 		public String senderId;
 		@SerializedName("type")

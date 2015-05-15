@@ -5,18 +5,31 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
+import com.androidquery.AQuery;
+import com.vector.onetodo.utils.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 
 public class NotificationHandler {
 	private static NotificationHandler nHandler;
 	private static NotificationManager mNotificationManager;
 
-	private NotificationHandler () {}
+    private NotificationHandler () {}
 	/**
 	 * Singleton pattern implementation
 	 * @return
@@ -78,7 +91,7 @@ public class NotificationHandler {
         mNotificationManager.notify(0, mBuilder.build());
 
     }
-	public void createSimpleNotification2(Context context,String title,long date,String location, String type,String message,long todo_id) {
+	public void createSimpleNotification2(Context context,String title,long date,String location, String type,String message,String first_name,String last_name, final String profile_image,long todo_id) {
 		// Creates an explicit intent for an Activity
 
             Intent mainIntent = new Intent(context, TaskView.class);
@@ -95,7 +108,7 @@ public class NotificationHandler {
 
 
             //getting Custom layout
-                    RemoteViews expandedView = new RemoteViews(context.getApplicationContext().getPackageName(),R.layout.custom_notification);
+            final RemoteViews expandedView = new RemoteViews(context.getApplicationContext().getPackageName(),R.layout.custom_notification);
         expandedView.setImageViewResource(R.id.image, R.drawable.ic_launcher);
         if(type.equals("assigned_task") != false){ //Simple assigned task notification
 
@@ -213,4 +226,5 @@ public class NotificationHandler {
             mNotificationManager.cancelAll();
         }
     }
+
 }

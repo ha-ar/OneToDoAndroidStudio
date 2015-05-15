@@ -55,6 +55,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.Plus.PlusOptions;
 import com.google.gson.Gson;
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.vector.model.NotificationData;
 import com.vector.model.TaskData;
 import com.vector.model.TaskData.Todos;
@@ -124,6 +125,7 @@ public class MainActivity extends BaseActivity implements
     public static Activity act;
     public static WhereCondition currentCondition = null;
     private boolean isNotificationDrawerSelected = false;
+    CircularImageView imageEvent;
 
     private final int TYPE = 10000, ALL = 10001, TASK = 10002, EVENT = 10003, SCHEDULE = 10004, APPOINTMENT = 10005;
 
@@ -384,7 +386,7 @@ public class MainActivity extends BaseActivity implements
 //;        ProgressDialog dialog = new ProgressDialog(this);
 //        dialog.setMessage("Please wait...");
         aq.ajax("http://api.heuristix.net/one_todo/v1/notifications/"
-                        + Constants.user_id ,JSONObject.class,
+                        + Constants.user_id, JSONObject.class,
                 new AjaxCallback<JSONObject>() {
                     @Override
                     public void callback(String url, JSONObject json,
@@ -543,6 +545,10 @@ public class MainActivity extends BaseActivity implements
         }
     }
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+    @Override
     protected void onActivityResult(int requestCode, int responseCode,
                                     Intent intent) {
         super.onActivityResult(requestCode,responseCode, intent);
@@ -587,7 +593,15 @@ public class MainActivity extends BaseActivity implements
             aq.id(R.id.manage_img).image(R.drawable.manage_account);
             aq.id(R.id.manage_text).text("Manage Account");
             aq.id(R.id.username).text(App.prefs.getUserName());
-            aq.id(R.id.imageView1).text(App.prefs.getInitials());
+            if(!App.prefs.getUserProfileUri().isEmpty()){
+//                aq.id(imageEvent).image(App.prefs.getUserProfileUri());
+//                aq.id(R.id.profile_image).background(R.drawable.round_photobutton).visible();
+                aq.id(R.id.user_number).text(App.prefs.getUserNumber());
+                aq.id(R.id.imageView1).text(App.prefs.getInitials());
+            }else{
+                aq.id(R.id.imageView1).text(App.prefs.getInitials());
+            }
+//
         }
 
         aq.id(R.id.manage_account).clicked(new OnClickListener() {
@@ -768,15 +782,11 @@ public class MainActivity extends BaseActivity implements
             @Override
             public void onClick(View arg0) {
 
-                getSupportFragmentManager().popBackStack("ACCOUNTS",
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 Fragment fr = new Setting();
-                FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.container, fr);
-                transaction.addToBackStack("SETTING");
+                transaction.addToBackStack(null);
                 transaction.commit();
-                drawerLayout.closeDrawer(Gravity.LEFT);
 
             }
         });
@@ -785,17 +795,11 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onClick(View arg0) {
-                getSupportFragmentManager().popBackStack("SETTING",
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 Fragment fr = new Accounts();
-                FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.container, fr);
-                transaction.addToBackStack("ACCOUNTS");
+                transaction.addToBackStack(null);
                 transaction.commit();
-                drawerLayout.closeDrawer(Gravity.LEFT);
-                // }
-
             }
         });
 
