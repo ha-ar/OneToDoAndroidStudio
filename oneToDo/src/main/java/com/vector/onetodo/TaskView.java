@@ -42,6 +42,7 @@ public class TaskView extends BaseActivity {
     private boolean isAssignedTask = false;
     private PopupWindow popupWindowTask;
     long todoId;
+    long todoTypeId;
     private Boolean rsvp = false;
     private Boolean commentFrg = false;
     private ToDo obj;
@@ -68,19 +69,52 @@ public class TaskView extends BaseActivity {
         final View view1 = getLayoutInflater().inflate(
                 R.layout.landing_menu, null, false);
         aq_menu = new AQuery(this, view1);
-        aq_menu.id(R.id.menu_item1).text("RSVP");
+
+        if(todoTypeId == 1){
+            aq_menu.id(R.id.menu_item1).visibility(View.GONE);
+            aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupWindowTask.dismiss();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
+                            .addToBackStack(null)
+                            .commit();
+                }
+            });
+        }else if(todoTypeId == 2){
+            aq_menu.id(R.id.menu_item1).text("RSVP");
+            aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupWindowTask.dismiss();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
+                            .addToBackStack(null)
+                            .commit();
+                }
+            });
+        }else{
+            aq_menu.id(R.id.menu_item1).visibility(View.GONE);
+            aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    popupWindowTask.dismiss();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
+                            .addToBackStack(null)
+                            .commit();
+                }
+            });
+        }
+
+
+
         aq_menu.id(R.id.menu_item3).visibility(View.GONE);
-        aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                popupWindowTask.dismiss();
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.container, AddTaskComment.newInstance(isAssignedTask, todoId))
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
+
         popupWindowTask = new PopupWindow(view1, Utils.getDpValue(150,
                 this), WindowManager.LayoutParams.WRAP_CONTENT, true);
         popupWindowTask.setBackgroundDrawable(getResources().getDrawable(
@@ -190,6 +224,10 @@ public class TaskView extends BaseActivity {
     private void ShowTaskViewData(){
 //        ArrayList<ItemDetails> items = GetSearchResults();
 //        aq.id(R.id.invitee_list).adapter(new InviteeAdapter(this, items));
+
+        ToDoDao toDoDao = App.daoSession.getToDoDao();
+        ToDo obj = toDoDao.load(id);
+        todoTypeId = obj.getTodo_type_id();
         int serverTaskPosition = -1;
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
