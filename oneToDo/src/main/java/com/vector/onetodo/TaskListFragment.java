@@ -102,15 +102,14 @@ public class TaskListFragment extends Fragment{
     }
     public static void todayQuery() {
         todayQuery = App.daoSession.getToDoDao().queryBuilder()
-                .whereOr(Properties.Start_date.between(currentDate[0], currentDate[1]),
-                        Properties.Start_date.between(currentDate[0], currentDate[1]))
+                .where(Properties.Start_date.between(currentDate[0], currentDate[1]))
                 .orderAsc(Properties.Start_date);
     }
 
     public static void tomorrowQuery() {
         tomorrowQuery = App.daoSession.getToDoDao().queryBuilder()
                 .whereOr(Properties.Start_date.between(currentDate[1], currentDate[2]),
-                        Properties.End_date.between(currentDate[1], currentDate[2]))
+                        Properties.End_date.gt(currentDate[0]))
                 .orderAsc(Properties.Start_date);
     }
 

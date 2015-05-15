@@ -45,8 +45,12 @@ public class NotificationHandler {
         resultIntent.putExtra("todo_id", todoId);
         boolean isAllDay = false;
 
-        if(App.daoSession.getToDoDao().load(todoId).getIs_allday() != null)
-		    isAllDay = App.daoSession.getToDoDao().load(todoId).getIs_allday();
+        try {
+            if (App.daoSession.getToDoDao().load(todoId).getIs_allday() != null)
+                isAllDay = App.daoSession.getToDoDao().load(todoId).getIs_allday();
+        }catch (NullPointerException npe){
+            isAllDay = false;
+        }
 
         // Creating a artificial activity stack for the notification activity
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

@@ -1887,7 +1887,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		}
 
 		todo = new ToDo();
-		todo.setUser_id(Constants.user_id);
+		todo.setUser_id(App.prefs.getUserId());
 		todo.setTodo_type_id(2);
 		todo.setTitle(title);
 		todo.setStart_date(startDateInMilli);

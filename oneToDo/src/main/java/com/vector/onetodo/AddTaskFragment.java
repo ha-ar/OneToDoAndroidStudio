@@ -11,6 +11,7 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -65,6 +66,7 @@ import android.widget.Toast;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.BitmapAjaxCallback;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
 import com.devspark.appmsg.AppMsg;
@@ -719,6 +721,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         ViewPager pager = (ViewPager) aq.id(R.id.add_task_before_pager)
                 .getView();
 
+        pager.setOffscreenPageLimit(2);
         pager.setAdapter(new AddTaskBeforePagerFragment(getActivity()
                 .getSupportFragmentManager()));
 
@@ -799,7 +802,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                     view.setBackgroundResource(R.drawable.round_buttons_blue);
                 }
 
-                if (((TextView) view).getText().toString().equals("Never")) {
+                    if (((TextView) view).getText().toString().equals("Never")) {
                     aq.id(R.id.forever_radio).checked(true);
                     aq.id(R.id.time_radio).textColor(
                             Color.parseColor("#bababa"));
@@ -1890,18 +1893,31 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             options.round = 20;
 
             AQuery aq = new AQuery(child);
+
+            final int tint = 0x77AA0000;
+
+            aq.id(image).image(imageUrl, true, true, 0, 0, new BitmapAjaxCallback(){
+
+                @Override
+                public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status){
+                    iv.setImageBitmap(bm);
+                    //do something to the bitmap
+                    iv.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
+                    bm.getByteCount();
+                    TextView size = (TextView) child
+                            .findViewById(R.id.image_added_size);
+                    size.setText("( "+bm.getByteCount() / 1024 + " KB)");
+
+                }
+
+            });
             aq.id(image).image(imageUrl, options);
             child.findViewById(R.id.image_menu);
-            TextView text = (TextView) child
-                    .findViewById(R.id.image_added_text);
             TextView by = (TextView) child
                     .findViewById(R.id.image_added_by);
-            TextView size = (TextView) child
-                    .findViewById(R.id.image_added_size);
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
             by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-            size.setText("(7024 KB)");
             item.addView(child);
         } catch (Exception e) {
             e.printStackTrace();

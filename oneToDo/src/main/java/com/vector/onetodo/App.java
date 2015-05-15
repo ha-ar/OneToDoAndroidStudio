@@ -19,12 +19,10 @@ import com.vector.onetodo.utils.Constants;
 import com.vector.onetodo.utils.GPSTracker;
 
 import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.json.JSONObject;
 
 @ReportsCrashes(
-        mode = ReportingInteractionMode.TOAST,
         mailTo = "hasan.cancer@gmail.com"
 )
 

@@ -42,7 +42,6 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -197,7 +196,7 @@ public class MainActivity extends BaseActivity implements
                     long todoId = -1;
                     for(int i = 0; i < todo_obj.size(); i++){
                         if(Integer.valueOf(NotificationData.getInstance().result.get(position).todo_id).equals(todo_obj.get(i).getTodo_server_id())){
-                            todoId = todo_obj.get(i).getTodo_id();
+                            todoId = todo_obj.get(i).getId();
                         }
                     }
                     Intent intent = new Intent(MainActivity.this, TaskView.class);

@@ -1,6 +1,8 @@
 package com.vector.onetodo;
 
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxStatus;
+import com.androidquery.callback.BitmapAjaxCallback;
 import com.androidquery.callback.ImageOptions;
 import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.vector.model.AssignedTaskData;
@@ -40,6 +44,7 @@ public class TaskView extends BaseActivity {
     long todoId;
     private Boolean rsvp = false;
     private Boolean commentFrg = false;
+    private ToDo obj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +61,9 @@ public class TaskView extends BaseActivity {
         todoId = getIntent().getLongExtra("todo_id", -1);
         rsvp = getIntent().getBooleanExtra("rsvp", false);
         commentFrg = getIntent().getBooleanExtra("commentFrg", false);
-        ShowTaskViewData(todoId);
+        ToDoDao toDoDao = App.daoSession.getToDoDao();
+        obj = toDoDao.load(todoId);
+        ShowTaskViewData();
 
         final View view1 = getLayoutInflater().inflate(
                 R.layout.landing_menu, null, false);
@@ -139,8 +146,6 @@ public class TaskView extends BaseActivity {
         aq.id(R.id.btn_edit).clicked(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                ToDoDao toDoDao = App.daoSession.getToDoDao();
-                ToDo obj = toDoDao.load(todoId);
                 switch (obj.getTodo_type_id()){
                     case 1:
                         getSupportFragmentManager()
@@ -182,11 +187,9 @@ public class TaskView extends BaseActivity {
         });
 
     }
-    private void ShowTaskViewData(long id){
+    private void ShowTaskViewData(){
 //        ArrayList<ItemDetails> items = GetSearchResults();
 //        aq.id(R.id.invitee_list).adapter(new InviteeAdapter(this, items));
-        ToDoDao toDoDao = App.daoSession.getToDoDao();
-        ToDo obj = toDoDao.load(id);
         int serverTaskPosition = -1;
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
@@ -414,23 +417,35 @@ public class TaskView extends BaseActivity {
             options.round = 20;
 
             AQuery aq = new AQuery(child);
-            aq.id(image).image(imageUrl, options);
+
+            final int tint = 0x77AA0000;
+
+            aq.id(image).image(imageUrl, true, true, 0, 0, new BitmapAjaxCallback(){
+
+                @Override
+                public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status){
+                    iv.setImageBitmap(bm);
+                    //do something to the bitmap
+                    iv.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
+                    bm.getByteCount();
+                    TextView size = (TextView) child
+                            .findViewById(R.id.image_added_size);
+                    size.setText("( "+bm.getByteCount() / 1024 + " KB)");
+
+                }
+
+            });
             child.findViewById(R.id.image_menu).setVisibility(View.GONE);
-            TextView text = (TextView) child
-                    .findViewById(R.id.image_added_text);
             TextView by = (TextView) child
                     .findViewById(R.id.image_added_by);
-            TextView size = (TextView) child
-                    .findViewById(R.id.image_added_size);
             Calendar cal = Calendar.getInstance();
+
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
-            by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
-//            if (selectedImage.getLastPathSegment().contains(".")) {
-//                text.setText(selectedImage.getLastPathSegment());
-//            } else {
-//                text.setText(selectedImage.getLastPathSegment() + "." + type);
-//            }
-            size.setText("(7024 KB)");
+            if(obj.getIs_assigned_task() != null && obj.getIs_assigned_task()){
+                by.setText("By " + obj.getAssignee_name()+" on " + sdf.format(cal.getTime()));
+            }else{
+                by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
+            }
             item.addView(child);
         } catch (Exception e) {
             e.printStackTrace();
