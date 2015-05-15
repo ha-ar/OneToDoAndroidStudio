@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -23,6 +24,7 @@ import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
 
+import java.net.URI;
 import java.util.List;
 
 public class GcmIntentService extends IntentService {
@@ -176,7 +178,9 @@ public class GcmIntentService extends IntentService {
         List<ToDo> addedTodo = App.daoSession.getToDoDao().queryBuilder().orderDesc(ToDoDao.Properties.Id).list();
         NotificationHandler nHandler;
         nHandler = NotificationHandler.getInstance(getApplicationContext());
-
-        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(),addedTodo.get(0).getStart_date(), addedTodo.get(0).getLocation(),notificationtype,notificationtMessage, addedTodo.get(0).getId());
+        String first_name = AssignedTaskData.getInstance().task.get(0).first_name;
+        String last_name = AssignedTaskData.getInstance().task.get(0).last_name;
+        String ImgUri = AssignedTaskData.getInstance().task.get(0).profile_image;
+        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(),addedTodo.get(0).getStart_date(), addedTodo.get(0).getLocation(),notificationtype,notificationtMessage,first_name,last_name,ImgUri ,addedTodo.get(0).getId());
     }
 }

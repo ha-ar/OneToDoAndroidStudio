@@ -27,6 +27,7 @@ public class AppPrefs {
 	private String EVENT_OPTIONS = "event_options";
 	private String SCHEDULE_OPTIONS = "schedule_options";
 	private String APPOINTMENT_OPTIONS = "appointment_options";
+    private String PROFILE_URI = "profile_uri";
 
 
     public AppPrefs(Context context) {
@@ -139,6 +140,9 @@ public class AppPrefs {
 	public String getUserEmail() {
 		return appSharedPrefs.getString(USER_EMAIL, "Set email");
 	}
+
+    public void setUserProfileUri(String uri){prefsEditor.putString(PROFILE_URI, uri).commit(); }
+    public  String getUserProfileUri(){return appSharedPrefs.getString(PROFILE_URI, ""); }
 
 	public void setStartingWeekDay(String day) {
 		prefsEditor.putString(STARTING_DAY, day).commit();
