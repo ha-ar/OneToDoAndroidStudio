@@ -402,17 +402,77 @@ public class Utils {
 		return fileName;
 	}
 
-	public static Bitmap getBitmap(Context ctx, Uri fileName){
-		Bitmap bm = null;
-		try {
-			bm = MediaStore.Images.Media.getBitmap(ctx
-					.getContentResolver(), fileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return bm;
-	}
+//	public static Bitmap getBitmap(Context ctx, Uri fileName){
+//		Bitmap bm = null;
+//		try {
+//			bm = MediaStore.Images.Media.getBitmap(ctx
+//					.getContentResolver(), fileName);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return bm;
+//	}
 
+    public static Bitmap getBitmap(Context ctx, Uri filename) {
+
+        Uri uri = filename;
+        InputStream in = null;
+        try {
+            final int IMAGE_MAX_SIZE = 1200000; // 1.2MP
+            in = ctx.getContentResolver().openInputStream(uri);
+
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(in, null, o);
+            in.close();
+
+
+            int scale = 1;
+            while ((o.outWidth * o.outHeight) * (1 / Math.pow(scale, 2)) >
+                    IMAGE_MAX_SIZE) {
+                scale++;
+            }
+            Log.d("Scale", "scale = " + scale + ", orig-width: " + o.outWidth + ",orig-height: " + o.outHeight);
+
+            Bitmap b = null;
+            in = ctx.getContentResolver().openInputStream(uri);
+            if (scale > 1) {
+                scale--;
+                // scale to max possible inSampleSize that still yields an image
+                // larger than target
+                o = new BitmapFactory.Options();
+                o.inSampleSize = scale;
+                b = BitmapFactory.decodeStream(in, null, o);
+
+                // resize to desired dimensions
+                int height = b.getHeight();
+                int width = b.getWidth();
+                Log.d("dim", "1th scale operation dimenions - width: " + width + ",height: " + height);
+
+                double y = Math.sqrt(IMAGE_MAX_SIZE
+                        / (((double) width) / height));
+                double x = (y / height) * width;
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(b, (int) x,
+                        (int) y, true);
+                b.recycle();
+                b = scaledBitmap;
+
+                System.gc();
+            } else {
+                b = BitmapFactory.decodeStream(in);
+            }
+            in.close();
+
+            Log.d("bisize", "bitmap size - width: " + b.getWidth() + ", height: " +
+                    b.getHeight());
+            return b;
+        } catch (IOException e) {
+            Log.e("error", e.getMessage(), e);
+            return null;
+        }
+    }
 	public static byte[] getImageByteArray(Bitmap bm){
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		if (bm != null) {

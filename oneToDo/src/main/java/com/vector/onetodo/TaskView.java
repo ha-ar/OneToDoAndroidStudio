@@ -1,13 +1,16 @@
 package com.vector.onetodo;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -35,17 +38,18 @@ import it.feio.android.checklistview.exceptions.ViewNotSupportedException;
 
 public class TaskView extends BaseActivity {
 
-    AQuery aq, aqd, aq_menu;
+    AQuery aq, aqd, aq_menu,aq_imgAlert;
     AlertDialog alert;
     ParallaxScrollView parallax;
     ImageView image;
     private boolean isAssignedTask = false;
     private PopupWindow popupWindowTask;
     long todoId;
-    long todoTypeId;
+    long todoTypeID;
     private Boolean rsvp = false;
     private Boolean commentFrg = false;
     private ToDo obj;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +74,8 @@ public class TaskView extends BaseActivity {
                 R.layout.landing_menu, null, false);
         aq_menu = new AQuery(this, view1);
 
-        if(todoTypeId == 1){
-            aq_menu.id(R.id.menu_item1).visibility(View.GONE);
+        if(todoTypeID == 1){
+            aq_menu.id(R.id.menu_item1).gone();
             aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -83,8 +87,9 @@ public class TaskView extends BaseActivity {
                             .commit();
                 }
             });
-        }else if(todoTypeId == 2){
+        }else if(todoTypeID == 2){
             aq_menu.id(R.id.menu_item1).text("RSVP");
+
             aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -97,7 +102,7 @@ public class TaskView extends BaseActivity {
                 }
             });
         }else{
-            aq_menu.id(R.id.menu_item1).visibility(View.GONE);
+            aq_menu.id(R.id.menu_item1).gone();
             aq_menu.id(R.id.menu_item2).text("Comments").clicked(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -110,10 +115,10 @@ public class TaskView extends BaseActivity {
                 }
             });
         }
-
-
-
         aq_menu.id(R.id.menu_item3).visibility(View.GONE);
+
+
+
 
         popupWindowTask = new PopupWindow(view1, Utils.getDpValue(150,
                 this), WindowManager.LayoutParams.WRAP_CONTENT, true);
@@ -224,11 +229,8 @@ public class TaskView extends BaseActivity {
     private void ShowTaskViewData(){
 //        ArrayList<ItemDetails> items = GetSearchResults();
 //        aq.id(R.id.invitee_list).adapter(new InviteeAdapter(this, items));
-
-        ToDoDao toDoDao = App.daoSession.getToDoDao();
-        ToDo obj = toDoDao.load(id);
-        todoTypeId = obj.getTodo_type_id();
         int serverTaskPosition = -1;
+        todoTypeID = obj.getTodo_type_id();
         if(obj.getTodo_type_id() == 2){
             aq.id(R.id.imageView1123).image(R.drawable.view_event);
         }
@@ -439,12 +441,18 @@ public class TaskView extends BaseActivity {
     }
 
 
-    private void showAttachments(String imageUrl){
+    private void showAttachments(final String imageUrl){
         aq.id(R.id.attachment_layout).visible();
         try {
             final LinearLayout item = (LinearLayout) aq
                     .id(R.id.added_image_outer).visible().getView();
-
+            item.setClickable(true);
+            item.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    buttonClicked(imageUrl);
+                }
+            });
             final View child = getLayoutInflater().inflate(
                     R.layout.image_added_layout, null);
 
@@ -457,22 +465,30 @@ public class TaskView extends BaseActivity {
             AQuery aq = new AQuery(child);
 
             final int tint = 0x77AA0000;
+            Bitmap preset = aq.getCachedImage(imageUrl);
 
-            aq.id(image).image(imageUrl, true, true, 0, 0, new BitmapAjaxCallback(){
+            if(preset != null){
+                Log.e("cachedImg", preset+"");
+                aq.id(image).image(preset);
+            }
+            else {
+                aq.id(image).image(imageUrl, true, true, 0, 0, new BitmapAjaxCallback() {
 
-                @Override
-                public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status){
-                    iv.setImageBitmap(bm);
-                    //do something to the bitmap
-                    iv.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
-                    bm.getByteCount();
-                    TextView size = (TextView) child
-                            .findViewById(R.id.image_added_size);
-                    size.setText("( "+bm.getByteCount() / 1024 + " KB)");
+                    @Override
+                    public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
+                        iv.setImageBitmap(bm);
+                        //do something to the bitmap
+                        iv.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
+                        bm.getByteCount();
+                        TextView size = (TextView) child
+                                .findViewById(R.id.image_added_size);
+                        size.setText("( " + bm.getByteCount() / 1024 + " KB)");
 
-                }
+                    }
 
-            });
+                });
+            }
+
             child.findViewById(R.id.image_menu).setVisibility(View.GONE);
             TextView by = (TextView) child
                     .findViewById(R.id.image_added_by);
@@ -489,4 +505,29 @@ public class TaskView extends BaseActivity {
             e.printStackTrace();
         }
     }
+
+    private void buttonClicked(final String imgURL){
+        Bitmap imgBitmap = aq.getCachedImage(imgURL);
+        Log.e("imgpp", imgBitmap+"");
+        final Dialog settingsDialog = new Dialog(this);
+        settingsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        settingsDialog.setContentView(getLayoutInflater().inflate(R.layout.image_layout
+                , null));
+
+        ImageView imgView = (ImageView) settingsDialog.findViewById(R.id.mainImage);
+        imgView.setImageBitmap(imgBitmap);
+
+        Button button = (Button) settingsDialog.findViewById(R.id.alertImageButton);
+        button.setOnClickListener(new OnClickListener() {
+
+            public void onClick(View v) {
+                settingsDialog.dismiss();
+            }
+        });
+//        aq_imgAlert = new AQuery(this,settingsDialog);
+        settingsDialog.show();
+
+    }
+
+
 }
