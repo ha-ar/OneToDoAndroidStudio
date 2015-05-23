@@ -5,17 +5,23 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.androidquery.AQuery;
 
 import java.text.SimpleDateFormat;
 
 public class NotificationHandler {
 	private static NotificationHandler nHandler;
 	private static NotificationManager mNotificationManager;
-
+    private AQuery aq;
     private NotificationHandler () {}
 	/**
 	 * Singleton pattern implementation
@@ -78,7 +84,7 @@ public class NotificationHandler {
         mNotificationManager.notify(0, mBuilder.build());
 
     }
-	public void createSimpleNotification2(Context context,String title,long date,String location, String type,String message,String first_name,String last_name, final String profile_image,long todo_id) {
+	public void createSimpleNotification2(Context context,String title,long date,String location, String type,String message,String first_name,String last_name, final Bitmap userImgBitmap,long todo_id) {
 		// Creates an explicit intent for an Activity
 
             Intent mainIntent = new Intent(context, TaskView.class);
@@ -93,10 +99,19 @@ public class NotificationHandler {
             .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
             // Pending intent to the notification manager
 
-
             //getting Custom layout
             final RemoteViews expandedView = new RemoteViews(context.getApplicationContext().getPackageName(),R.layout.custom_notification);
-        expandedView.setImageViewResource(R.id.image, R.drawable.ic_launcher);
+        if(userImgBitmap != null){
+            Log.e("notimg", userImgBitmap+"");
+            Bitmap proxy = Bitmap.createBitmap(userImgBitmap.getWidth(), userImgBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(proxy);
+            c.drawBitmap(userImgBitmap, new Matrix(), null);
+            expandedView.setImageViewBitmap(R.id.noti_image, proxy);
+        }else{
+
+            expandedView.setImageViewResource(R.id.noti_image, R.drawable.ic_launcher);
+        }
+
         if(type.equals("assigned_task") != false){ //Simple assigned task notification
 
             Intent commentIntent = new Intent(context, NotificationButtonClickListener.class);
@@ -119,6 +134,7 @@ public class NotificationHandler {
                     .setTicker("Task Assigned to you !")
                     .setSound(Uri.parse("android.resource://com.vector.onetodo/raw/onetodo_notification"))
                     .setSmallIcon(R.drawable.ic_launcher) // notification icon
+                    .setLargeIcon(userImgBitmap)
                     .setContentTitle(title)
                     .setAutoCancel(true)
                     .setContentText(message) // notification text

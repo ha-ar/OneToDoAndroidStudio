@@ -23,10 +23,9 @@ public class TaskData {
         taskdata = null;
     }
 
-    public String notification_count;
+//    public String notification_count;
 
-    @SerializedName("labels")
-    public ArrayList<String> labels = new ArrayList<>();
+//     public String[] labels = new String[];
 
 
         @SerializedName("result")

@@ -489,13 +489,21 @@ public class Accounts extends Fragment {
         });
 
         if(!App.prefs.getUserProfileUri().isEmpty()){
-//            Bitmap bitmp = null;
-//            Uri img = App.prefs.getUserProfileUri();
-//            bitmp = Utils.getBitmap(img, this.getActivity(), this.getActivity().getContentResolver());
-            aq.id(R.id.initials).gone();
-            aq.id(imageEvent).image(App.prefs.getUserProfileUri());
-            aq.id(R.id.image_event)
-                    .background(R.drawable.round_photobutton).visible();
+            Bitmap imgBitmap = aq.getCachedImage(App.prefs.getUserProfileUri());
+            if(imgBitmap != null){
+
+                aq.id(R.id.initials).gone();
+                aq.id(imageEvent).image(imgBitmap);
+                aq.id(R.id.image_event)
+                        .background(R.drawable.round_photobutton).visible();
+            }else{
+                aq.id(R.id.initials).gone();
+                aq.id(imageEvent).image(App.prefs.getUserProfileUri(),true,true);
+                aq.id(R.id.image_event)
+                        .background(R.drawable.round_photobutton).visible();
+            }
+
+
         }else{
             aq.id(R.id.initials).text(App.prefs.getInitials());
         }
@@ -563,7 +571,6 @@ public class Accounts extends Fragment {
     }
     //follwoing function is not being called from above onActivityResult
     private void updateProfileImage(final AQuery aq){
-        Log.d("in boo", "got into it...............");
         if(path != null){
 
             Map<String, String> params = new HashMap<String, String>();
@@ -629,7 +636,7 @@ public class Accounts extends Fragment {
                                 aq.id(R.id.initials).gone();
                                 aq.id(R.id.image_event).gone();
 
-                                aq.id(imageEvent).image(path);
+                                aq.id(imageEvent).image(path,true,true);
                                 aq.id(R.id.image_event)
                                         .background(R.drawable.round_photobutton).visible();
 

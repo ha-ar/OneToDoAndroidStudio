@@ -1841,6 +1841,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private void addGeofence(ToDo todo){
 
         LatLong location = App.gpsTracker.getLocationFromAddress(todo.getReminder().getLocation());
+        Log.e("latlong", location+"");
         geoFence.addGeofence(location.latitude, location.longitude, 200, getEnterOrExit(todo.getReminder().getLocation_type()), todo.getStart_date(), todo.getId().intValue());
     }
 

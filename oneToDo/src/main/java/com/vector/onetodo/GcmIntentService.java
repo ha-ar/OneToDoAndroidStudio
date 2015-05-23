@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -24,7 +26,11 @@ import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
 import com.vector.onetodo.utils.Utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 public class GcmIntentService extends IntentService {
@@ -32,6 +38,7 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     private String notificationtype;
     private String notificationtMessage;
+    private Bitmap userImgBitmap = null;
     NotificationCompat.Builder builder;
     AQuery aq;
 
@@ -181,6 +188,26 @@ public class GcmIntentService extends IntentService {
         String first_name = AssignedTaskData.getInstance().task.get(0).first_name;
         String last_name = AssignedTaskData.getInstance().task.get(0).last_name;
         String ImgUri = AssignedTaskData.getInstance().task.get(0).profile_image;
-        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(),addedTodo.get(0).getStart_date(), addedTodo.get(0).getLocation(),notificationtype,notificationtMessage,first_name,last_name,ImgUri ,addedTodo.get(0).getId());
+
+        if(aq.getCachedImage(ImgUri) != null){
+            userImgBitmap = aq.getCachedImage(ImgUri);
+        }else{
+            try {
+                URL url = new URL(ImgUri);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                userImgBitmap = BitmapFactory.decodeStream(input);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+        }
+
+
+
+        nHandler.createSimpleNotification2(getApplicationContext(), addedTodo.get(0).getTitle(),addedTodo.get(0).getStart_date(), addedTodo.get(0).getLocation(),notificationtype,notificationtMessage,first_name,last_name,userImgBitmap ,addedTodo.get(0).getId());
     }
 }
