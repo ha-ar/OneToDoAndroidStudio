@@ -594,7 +594,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 .setAdapter(
                         new ArrayAdapter<String>(getActivity(),
                                 R.layout.grid_layout_label_text_view,
-                                Constants.labels_array) {
+                                Constants.labels_array_task) {
 
                             @Override
                             public View getView(int position, View convertView,
@@ -1229,7 +1229,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                             }
                         });
 
-                aq.id(image).image(Utils.getRoundedCornerBitmap(bitmap, 8));
+                aq.id(image).image(Utils.getRoundedCornerBitmap(bitmap, 10));
                 TextView text = (TextView) child
                         .findViewById(R.id.image_added_text);
                 TextView by = (TextView) child

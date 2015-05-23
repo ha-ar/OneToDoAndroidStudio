@@ -824,7 +824,7 @@ public class AddScheduleFragment extends Fragment implements onTaskAdded {
 				.setAdapter(
 						new ArrayAdapter<String>(getActivity(),
 								R.layout.grid_layout_label_text_view,
-								Constants.labels_array) {
+								Constants.labels_array_event) {
 
 							@Override
 							public View getView(int position, View convertView,

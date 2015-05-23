@@ -406,7 +406,7 @@ public class AddProjectFragment extends Fragment {
                 .setAdapter(
                         new ArrayAdapter<String>(getActivity(),
                                 R.layout.grid_layout_label_text_view,
-                                Constants.labels_array) {
+                                Constants.labels_array_task) {
 
                             @Override
                             public View getView(int position, View convertView,

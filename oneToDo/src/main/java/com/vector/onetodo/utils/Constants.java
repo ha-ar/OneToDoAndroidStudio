@@ -1,8 +1,6 @@
 package com.vector.onetodo.utils;
 
 import java.util.List;
-/*
-import com.vector.onetodo.db.gen.LabelName;*/
 
 public class Constants {
 	
@@ -28,13 +26,15 @@ public class Constants {
 	public static String[] label_colors_dialog = { "#790000", "#005826", "#0D004C", "#ED145B", "#E0D400",
 			"#0000FF", "#4B0049", "#005B7F", "#603913", "#005952" };
 	
-	public static String[] labels_array = new String[] { "Personal", "Home",
-			"Work", "New", "New", "New", "New", "New", "New" };
+	public static String[] labels_array_task = new String[] { "Personal", "Home",
+			"Work", "Appt.", "New", "New", "New", "New", "New" };
+	public static String[] labels_array_event = new String[] { "Personal", "Home",
+			"Work", "Schedule", "New", "New", "New", "New", "New" };
 	
 	public static String[] repeatArray = new String[] { "Never", "Daily",
 		"Weekly", "Monthly", "Yearly" };
 	
-	public static String[] label_colors = { "#AC7900", "#4D6600", "#5A0089" };
+	public static String[] label_colors = { "#AC7900", "#4D6600", "#5A0089", "#ED145B" };
 	
 	public static String[] beforeArray = new String[] { "On Time", "15 Mins",
 		"30 Mins", "2 Hours", "Custom" };

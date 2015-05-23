@@ -244,7 +244,7 @@ public class Utils {
 
 	public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Config.ARGB_8888);
+				bitmap.getHeight(), Config.ARGB_4444);
 		Canvas canvas = new Canvas(output);
 
 		final int color = 0xff424242;
@@ -252,12 +252,11 @@ public class Utils {
 		final Rect rect = new Rect(0, 0, (int) (bitmap.getHeight() * 0.9),
 				(bitmap.getHeight()));
 		final RectF rectF = new RectF(rect);
-		final float roundPx = pixels;
 
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(color);
-		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+		canvas.drawRoundRect(rectF, (float) pixels, (float) pixels, paint);
 
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);

@@ -9,19 +9,18 @@
         android:layout_height="55dp"
         android:layout_marginBottom="2.5dp"
         android:layout_marginTop="2.5dp"
+        android:paddingLeft="5dp"
         android:background="@drawable/rounded_edittext" >
 
         <ImageView
             android:id="@+id/image_added"
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:scaleType="centerCrop"
+            android:scaleType="fitXY"
             android:adjustViewBounds="true"
-            android:layout_gravity="center"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="3dp"
             android:layout_marginTop="5dp" />
 
         <RelativeLayout
