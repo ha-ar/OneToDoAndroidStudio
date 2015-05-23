@@ -418,7 +418,7 @@ public class Utils {
         Uri uri = filename;
         InputStream in = null;
         try {
-            final int IMAGE_MAX_SIZE = 1200000; // 1.2MP
+            final int IMAGE_MAX_SIZE = 120000; // 1.2MP
             in = ctx.getContentResolver().openInputStream(uri);
 
             // Decode image size

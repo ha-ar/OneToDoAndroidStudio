@@ -23,6 +23,8 @@
     <uses-permission android:name="android.permission.EMAIL" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -83,9 +85,13 @@
         <receiver android:name=".AlarmManagerBroadcastReceiver" />
 
         <!-- Goolge API Key -->
+        <!--<meta-data-->
+            <!--android:name="com.google.android.maps.v2.API_KEY"-->
+            <!--android:value="AIzaSyBbcJQxZMY5ZJOxVmkiklV0Vja_Y3wioqg" />-->
+
         <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBbcJQxZMY5ZJOxVmkiklV0Vja_Y3wioqg" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDU1pF7RKC1zGYj7arOvPgsWgZ113UeB2E"/>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

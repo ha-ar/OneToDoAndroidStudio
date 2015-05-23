@@ -9,11 +9,14 @@
     <RelativeLayout
         android:id="@+id/notification_upper_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/text_lines"
+        >
         <ImageView
             android:id="@+id/noti_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/ic_launcher"
             />
         <TextView
             android:id="@+id/notification_heading"
@@ -23,20 +26,18 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/noti_image"/>
+            android:layout_alignParentTop="true"
+            android:layout_alignLeft="@+id/title"
+            android:layout_alignStart="@+id/title" />
         <TextView
             android:id="@+id/notification_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date"
+            android:text="12:00"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:textSize="18dp"
+            android:textSize="12dp"
             android:gravity="center"
-            android:layout_marginRight="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_alignBaseline="@+id/notification_heading"
             android:layout_alignBottom="@+id/notification_heading"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
@@ -47,19 +48,21 @@
             android:text="Title"
             android:textColor="@android:color/white"
             android:textSize="14dp"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/noti_image"
-            android:layout_below="@id/notification_heading"/>
+            android:layout_below="@+id/notification_heading"
+            android:layout_alignRight="@+id/textDue"
+            android:layout_alignEnd="@+id/textDue" />
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
+            android:text="Wed 17 Dec"
             android:textColor="@android:color/white"
             android:textSize="12dp"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/noti_image"
-            android:layout_below="@id/title"/>
+            android:layout_below="@+id/title"
+            android:layout_toRightOf="@+id/title"
+            android:layout_toEndOf="@+id/title"
+            android:layout_marginLeft="13dp"
+            android:layout_marginStart="13dp" />
         <TextView
             android:id="@+id/location"
             android:layout_width="wrap_content"
@@ -68,6 +71,26 @@
             android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/noti_image"
             android:layout_below="@id/date"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Due"
+            android:id="@+id/textDue"
+            android:textColor="#ffffffff"
+            android:layout_alignTop="@+id/date"
+            android:layout_alignLeft="@+id/location"
+            android:layout_alignStart="@+id/location" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:id="@+id/ic_small"
+            android:background="@drawable/ic_launcher"
+            android:layout_alignBottom="@+id/textDue"
+            android:layout_alignRight="@+id/notification_date"
+            android:layout_alignEnd="@+id/notification_date"
+            android:layout_alignParentStart="false" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -93,7 +116,7 @@
                 android:textSize="25dp"
                 android:textColor="@android:color/white"
                 android:gravity="center"
-                android:text="" />
+                android:text="View" />
 
             <TextView
                 android:id="@+id/action_right"
@@ -103,7 +126,7 @@
                 android:layout_weight="0.1"
                 android:gravity="center"
                 android:textSize="25dp"
-                android:text="" />
+                android:text="Comment" />
 
         </LinearLayout>
     </RelativeLayout>

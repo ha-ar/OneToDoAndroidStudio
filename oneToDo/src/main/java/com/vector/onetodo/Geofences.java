@@ -50,7 +50,8 @@ public class Geofences{
     }
 
     public void addGeofence(double lat, double lang, int radius, int enterOrExit, long expiry, int todoId) {
-        final GeofencingRequest geofencingRequest = createGeofencingRequest(31.4835811 , 74.2836712, radius, enterOrExit, expiry);
+        final GeofencingRequest geofencingRequest = createGeofencingRequest(lat , lang, radius, enterOrExit, expiry);
+        Log.e("geoFencingRequest", geofencingRequest+"");
         if (geofencingRequest == null) return;
 
         final PendingIntent pendingIntent = createNotificationBroadcastPendingIntent(todoId, enterOrExit);

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -117,7 +118,7 @@ public class MainActivity extends BaseActivity implements
     static List<ToDo> todo_obj;
     public static ViewPager pager;
     private TabPagerAdapter tabPagerAdapter;
-    private LabelPagerAdapter labelAdapter;
+//    private LabelPagerAdapter labelAdapter;
     private PagerSlidingTabStrip tabs;
     public static List<Todos> Today, Tomorrow, Upcoming;
     private ActionBarDrawerToggle actionBarDrawerToggle;
@@ -125,7 +126,7 @@ public class MainActivity extends BaseActivity implements
     public static Activity act;
     public static WhereCondition currentCondition = null;
     private boolean isNotificationDrawerSelected = false;
-    CircularImageView imageEvent;
+    CircularImageView proImgEvent;
 
     private final int TYPE = 10000, ALL = 10001, TASK = 10002, EVENT = 10003, SCHEDULE = 10004, APPOINTMENT = 10005;
 
@@ -594,17 +595,23 @@ public class MainActivity extends BaseActivity implements
             aq.id(R.id.manage_text).text("Manage Account");
             aq.id(R.id.username).text(App.prefs.getUserName());
             if(!App.prefs.getUserProfileUri().isEmpty()){
-//                aq.id(imageEvent).image(App.prefs.getUserProfileUri());
-//                aq.id(R.id.profile_image).background(R.drawable.round_photobutton).visible();
+                aq.id(R.id.imageView1).gone();
+                Bitmap proImgBitmap = aq.getCachedImage(App.prefs.getUserProfileUri());
+                if(proImgBitmap != null){
+                    aq.id(proImgEvent).image(proImgBitmap);
+                }else{
+                    aq.id(proImgEvent).image(App.prefs.getUserProfileUri(),true,true);
+                }
+                aq.id(R.id.profile_image).visible();
                 aq.id(R.id.user_number).text(App.prefs.getUserNumber());
-                aq.id(R.id.imageView1).text(App.prefs.getInitials());
+
             }else{
                 aq.id(R.id.imageView1).text(App.prefs.getInitials());
             }
 //
         }
 
-        aq.id(R.id.manage_account).clicked(new OnClickListener() {
+        aq.id(R.id.user).clicked(new OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
@@ -788,6 +795,18 @@ public class MainActivity extends BaseActivity implements
                 transaction.addToBackStack(null);
                 transaction.commit();
 
+            }
+        });
+
+        aq.id(R.id.about).clicked(new OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                Fragment fr = new AboutFrg();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, fr);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
 
@@ -1071,55 +1090,55 @@ public class MainActivity extends BaseActivity implements
 
 
 
-    private void initLabelsFragment(){
+//    private void initLabelsFragment(){
+//
+//        pager = (ViewPager) findViewById(R.id.pager);
+//        labelAdapter = new LabelPagerAdapter(getSupportFragmentManager());
+//        pager.setAdapter(labelAdapter);
+//
+//        // Bind the tabs to the ViewPager
+//        tabs = (PagerSlidingTabStrip) aq.id(R.id.tabs).getView();
+//        tabs.setShouldExpand(false);
+//        tabs.setDividerColorResource(android.R.color.transparent);
+//        // tabs.setIndicatorColorResource(R.color.graytab);
+//        tabs.setUnderlineColorResource(android.R.color.transparent);
+//        tabs.setTextSize(Utils.getPxFromDp(this, 13));
+//        tabs.setIndicatorHeight(Utils.getPxFromDp(this, 3));
+//        tabs.setIndicatorColor(Color.parseColor("#ffffff"));
+//        tabs.setSmoothScrollingEnabled(true);
+//        tabs.setShouldExpand(true);
+//        tabs.setAllCaps(false);
+//        tabs.setTypeface(null, Typeface.NORMAL);
+//        tabs.setViewPager(pager);
+//    }
 
-        pager = (ViewPager) findViewById(R.id.pager);
-        labelAdapter = new LabelPagerAdapter(getSupportFragmentManager());
-        pager.setAdapter(labelAdapter);
-
-        // Bind the tabs to the ViewPager
-        tabs = (PagerSlidingTabStrip) aq.id(R.id.tabs).getView();
-        tabs.setShouldExpand(false);
-        tabs.setDividerColorResource(android.R.color.transparent);
-        // tabs.setIndicatorColorResource(R.color.graytab);
-        tabs.setUnderlineColorResource(android.R.color.transparent);
-        tabs.setTextSize(Utils.getPxFromDp(this, 13));
-        tabs.setIndicatorHeight(Utils.getPxFromDp(this, 3));
-        tabs.setIndicatorColor(Color.parseColor("#ffffff"));
-        tabs.setSmoothScrollingEnabled(true);
-        tabs.setShouldExpand(true);
-        tabs.setAllCaps(false);
-        tabs.setTypeface(null, Typeface.NORMAL);
-        tabs.setViewPager(pager);
-    }
-
-    public class LabelPagerAdapter extends FragmentPagerAdapter {
-
-        public LabelPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-//            Log.e("name",TaskData.getInstance().labels.get(position));
-//            if(TaskData.getInstance().labels.get(position) != null)
-//                return TaskData.getInstance().labels.get(position);
-//            else
-                return "No Label";
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return TaskByLabelFragment.newInstance(position, TaskData.getInstance().labels.get(position), TaskData.getInstance().labels.size());
-        }
-
-    }
+//    public class LabelPagerAdapter extends FragmentPagerAdapter {
+//
+//        public LabelPagerAdapter(FragmentManager fm) {
+//            super(fm);
+//        }
+//
+//
+//        @Override
+//        public int getCount() {
+//            return 3;
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+////            Log.e("name",TaskData.getInstance().labels.get(position));
+////            if(TaskData.getInstance().labels.get(position) != null)
+////                return TaskData.getInstance().labels.get(position);
+////            else
+//                return "No Label";
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            return TaskByLabelFragment.newInstance(position, TaskData.getInstance().labels.get(position), TaskData.getInstance().labels.size());
+//        }
+//
+//    }
 
 
 

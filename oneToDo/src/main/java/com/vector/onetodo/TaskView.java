@@ -2,8 +2,11 @@ package com.vector.onetodo;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +23,8 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
 import com.androidquery.callback.ImageOptions;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.vector.model.AssignedTaskData;
 import com.vector.model.TaskData;
@@ -48,13 +53,19 @@ public class TaskView extends BaseActivity {
     long todoTypeID;
     private Boolean rsvp = false;
     private Boolean commentFrg = false;
+    private static String taskAddress = "";
     private ToDo obj;
+
+    GoogleMap map;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewtask);
+
+
+
         parallax = (ParallaxScrollView) findViewById(R.id.scrollView123);
         image = (ImageView) findViewById(R.id.imageView1123);
         aq = new AQuery(this);
@@ -262,10 +273,14 @@ public class TaskView extends BaseActivity {
         aq.id(R.id.time).text(strDate);
         try{
             if(!obj.getLocation().isEmpty()) {
+                taskAddress = obj.getLocation();
                 aq.id(R.id.location).text(obj.getLocation());
+                aq.id(R.id.gmap_anchortext).text("map");
                 aq.id(R.id.location_layout).visible();
             }
         }catch (NullPointerException npe){}
+
+
         try{
             if(obj.getReminder().getTime() == 0) {
                 aq.id(R.id.reminder).text("Remind on time");
@@ -308,6 +323,8 @@ public class TaskView extends BaseActivity {
         }catch (NullPointerException npe){}
 
         if(!isAssignedTask) {
+            Log.e("todoSize",TaskData.getInstance().result.todos.size()+"");
+
             for (int i = 0; i < TaskData.getInstance().result.todos.size(); i++) {
                 try {
                     if (obj.getTodo_server_id() == Integer.parseInt(TaskData.getInstance().result.todos.get(i).id)) {
@@ -370,7 +387,30 @@ public class TaskView extends BaseActivity {
             }
         }
     }
-
+//    @Override
+//    public void onMapReady(GoogleMap map) {
+//
+//        if(map != null){
+//            Log.e("mapObj", map+"");
+//            map.addMarker(new MarkerOptions()
+//                    .position(new LatLng(37.7750, 122.4183))
+//                    .title("San Francisco").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//        }
+//
+//
+//    }
+    public void onMapClick(View v){
+        Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4192")
+                .buildUpon()
+                .appendQueryParameter("q", taskAddress
+                )
+                .build();
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+    }
     private void showHideCheckListView() {
 
         if(aq.id(R.id.check_list).getView().getVisibility() == View.VISIBLE){

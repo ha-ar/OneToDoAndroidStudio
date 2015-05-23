@@ -7,6 +7,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -63,12 +64,15 @@ public class AddTaskBeforeFragment extends Fragment {
         selectedItem = getArguments().getString("selectedItem", "");
 		before = (TextView) getActivity().findViewById(R.id.before);
 		View view;
-		if (position == 0)
-			view = inflater.inflate(R.layout.add_task_before_grid, container,
-					false);
-		else
-			view = inflater.inflate(R.layout.add_task_location, container,
-					false);
+		if (position == 0) {
+            view = inflater.inflate(R.layout.add_task_before_grid, container,
+                    false);
+        }else {
+            TextView vi = new TextView(getActivity());
+            vi.setText("Location Based Reminders are coming in pro version");
+            view = vi;
+        }
+//			view = inflater.inflate(R.layout.add_task_location, container,false);
         dialoglayout5 = inflater.inflate(R.layout.add_location,
                 null, false);
 		aq = new AQuery(getActivity(), view);
@@ -249,163 +253,168 @@ public class AddTaskBeforeFragment extends Fragment {
 			});
 
 		} else {
-			set();
+            AlertDialog.Builder popupBuilder = new AlertDialog.Builder(getActivity());
+            TextView myMsg = new TextView(getActivity());
+            myMsg.setText("Location Based reminders are coming soon");
+            myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
+            popupBuilder.setView(myMsg);
+			//set();
 			// ***************************location dialog
-
-			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
-					.findViewById(R.id.adress);
-			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
-			AlertDialog.Builder builder5 = new AlertDialog.Builder(
-					getActivity());
-
-			builder5.setView(dialoglayout5);
-			location = builder5.create();
-
-			location.setOnDismissListener(new OnDismissListener() {
-
-				@Override
-				public void onDismiss(DialogInterface arg0) {
-					aqd.id(R.id.adress).text("");
-					aqd.id(R.id.home).text("");
-					aqd.id(R.id.home).getTextView().setFocusable(true);
-				}
-			});
-			aqd = new AQuery(dialoglayout5);
-
-			TextView save1 = (TextView) dialoglayout5
-					.findViewById(R.id.save);
-			save1.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					if (!(aqd.id(R.id.adress).getText().toString().equals("") && aqd
-							.id(R.id.home).getText().toString().equals(""))) {
-
-						((TextView) viewP).setTextColor(Color
-								.parseColor("#000000"));  
-						aq.id(R.id.location_before).text(
-								aqd.id(R.id.adress).getText());
-						((TextView) viewP).setText(aqd.id(R.id.home).getText());
-
-						if (button != null) {
-							button.setBackgroundResource(R.drawable.button_shadow2);
-							viewP.setBackgroundResource(R.drawable.button_shadow);
-							button = viewP;
-						} else {
-
-							button = viewP;
-							viewP.setBackgroundResource(R.drawable.button_shadow);
-						}
-						save(viewP.getId(), aqd.id(R.id.home).getText()
-								.toString(), aqd.id(R.id.adress).getText()
-								.toString());
-
-						aqd.id(R.id.adress).text("");
-						aqd.id(R.id.home).text("");
-						aqd.id(R.id.save).text("Set");
-						location.dismiss();
-					}
-				}
-			});
-
-			TextView cancel1 = (TextView) dialoglayout5
-					.findViewById(R.id.cancel);
-			cancel1.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					aqd.id(R.id.add_location_title).text("Set location");
-					aqd.id(R.id.save).text("Set");
-					location.dismiss();
-				}
-			});
-
-			aq.id(R.id.pre_defined_1).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_2).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_3).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-			aq.id(R.id.pre_defined_4).getTextView()
-					.setOnLongClickListener(new LocationEditClickListener());
-
-			aq.id(R.id.pre_defined_1).clicked(new LocationTagClickListener());
-			aq.id(R.id.pre_defined_2).clicked(new LocationTagClickListener());
-			aq.id(R.id.pre_defined_3).clicked(new LocationTagClickListener());
-			aq.id(R.id.pre_defined_4).clicked(new LocationTagClickListener());
-			aq_del.id(R.id.edit_cencel).clicked(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					location_del.dismiss();
-				}
-			});
-
-			aq_del.id(R.id.edit_del).clicked(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					((TextView) viewl).setText("New");
-					((TextView) viewl).setTextColor(R.color.grey);
-					viewl.setBackgroundResource(R.color.light_grey_color);
-					remove(viewl.getId());
-					aq.id(R.id.location_before).text("");
-					location_del.dismiss();
-				}
-			});
-
-			aq_edit.id(R.id.add_task_delete).clicked(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					aqd.id(R.id.adress).text("");
-					aqd.id(R.id.home).text("");
-					location_edit.dismiss();
-					location_del.show();
-				}
-			});
-
-			aq_edit.id(R.id.add_task_edit).clicked(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					aqd.id(R.id.add_location_title).text("Edit");
-					aqd.id(R.id.save).text("SAVE");
-					location_edit.dismiss();
-					location.show();
-				}
-			});
-			aq.id(R.id.arrive_leave_checkbox_layout).visible();
-			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq
-					.id(R.id.location_before).getView();
-			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(
-					getActivity(),
-					android.R.layout.simple_spinner_dropdown_item));
-			((RadioGroup) aq.id(R.id.leave_arrive_radio).getView())
-					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-						@Override
-						public void onCheckedChanged(RadioGroup group,
-								int checkedId) {
-							if (previousSelectedLocation != null) {
-								((RadioButton) previousSelectedLocation)
-										.setTextColor(getResources().getColor(
-												R.color._4d4d4d));
-							}
-							((RadioButton) group.findViewById(checkedId))
-									.setTextColor(Color.WHITE);
-							TextView before = (TextView) getActivity()
-									.findViewById(R.id.before);
-
-							before.setVisibility(View.VISIBLE);
-							before.setText("On "
-									+ aq.id(checkedId).getText().toString());
-							previousSelectedLocation = group
-									.findViewById(checkedId); 
-						}
-					});
+//
+//			AutoCompleteTextView locationTextView2 = (AutoCompleteTextView) dialoglayout5
+//					.findViewById(R.id.adress);
+//			locationTextView2.setAdapter(new PlacesAutoCompleteAdapter(
+//					getActivity(),
+//					android.R.layout.simple_spinner_dropdown_item));
+//			AlertDialog.Builder builder5 = new AlertDialog.Builder(
+//					getActivity());
+//
+//			builder5.setView(dialoglayout5);
+//			location = builder5.create();
+//
+//			location.setOnDismissListener(new OnDismissListener() {
+//
+//				@Override
+//				public void onDismiss(DialogInterface arg0) {
+//					aqd.id(R.id.adress).text("");
+//					aqd.id(R.id.home).text("");
+//					aqd.id(R.id.home).getTextView().setFocusable(true);
+//				}
+//			});
+//			aqd = new AQuery(dialoglayout5);
+//
+//			TextView save1 = (TextView) dialoglayout5
+//					.findViewById(R.id.save);
+//			save1.setOnClickListener(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					if (!(aqd.id(R.id.adress).getText().toString().equals("") && aqd
+//							.id(R.id.home).getText().toString().equals(""))) {
+//
+//						((TextView) viewP).setTextColor(Color
+//								.parseColor("#000000"));
+//						aq.id(R.id.location_before).text(
+//								aqd.id(R.id.adress).getText());
+//						((TextView) viewP).setText(aqd.id(R.id.home).getText());
+//
+//						if (button != null) {
+//							button.setBackgroundResource(R.drawable.button_shadow2);
+//							viewP.setBackgroundResource(R.drawable.button_shadow);
+//							button = viewP;
+//						} else {
+//
+//							button = viewP;
+//							viewP.setBackgroundResource(R.drawable.button_shadow);
+//						}
+//						save(viewP.getId(), aqd.id(R.id.home).getText()
+//								.toString(), aqd.id(R.id.adress).getText()
+//								.toString());
+//
+//						aqd.id(R.id.adress).text("");
+//						aqd.id(R.id.home).text("");
+//						aqd.id(R.id.save).text("Set");
+//						location.dismiss();
+//					}
+//				}
+//			});
+//
+//			TextView cancel1 = (TextView) dialoglayout5
+//					.findViewById(R.id.cancel);
+//			cancel1.setOnClickListener(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					aqd.id(R.id.add_location_title).text("Set location");
+//					aqd.id(R.id.save).text("Set");
+//					location.dismiss();
+//				}
+//			});
+//
+//			aq.id(R.id.pre_defined_1).getTextView()
+//					.setOnLongClickListener(new LocationEditClickListener());
+//			aq.id(R.id.pre_defined_2).getTextView()
+//					.setOnLongClickListener(new LocationEditClickListener());
+//			aq.id(R.id.pre_defined_3).getTextView()
+//					.setOnLongClickListener(new LocationEditClickListener());
+//			aq.id(R.id.pre_defined_4).getTextView()
+//					.setOnLongClickListener(new LocationEditClickListener());
+//
+//			aq.id(R.id.pre_defined_1).clicked(new LocationTagClickListener());
+//			aq.id(R.id.pre_defined_2).clicked(new LocationTagClickListener());
+//			aq.id(R.id.pre_defined_3).clicked(new LocationTagClickListener());
+//			aq.id(R.id.pre_defined_4).clicked(new LocationTagClickListener());
+//			aq_del.id(R.id.edit_cencel).clicked(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					location_del.dismiss();
+//				}
+//			});
+//
+//			aq_del.id(R.id.edit_del).clicked(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					((TextView) viewl).setText("New");
+//					((TextView) viewl).setTextColor(R.color.grey);
+//					viewl.setBackgroundResource(R.color.light_grey_color);
+//					remove(viewl.getId());
+//					aq.id(R.id.location_before).text("");
+//					location_del.dismiss();
+//				}
+//			});
+//
+//			aq_edit.id(R.id.add_task_delete).clicked(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					aqd.id(R.id.adress).text("");
+//					aqd.id(R.id.home).text("");
+//					location_edit.dismiss();
+//					location_del.show();
+//				}
+//			});
+//
+//			aq_edit.id(R.id.add_task_edit).clicked(new OnClickListener() {
+//
+//				@Override
+//				public void onClick(View arg0) {
+//					aqd.id(R.id.add_location_title).text("Edit");
+//					aqd.id(R.id.save).text("SAVE");
+//					location_edit.dismiss();
+//					location.show();
+//				}
+//			});
+//			aq.id(R.id.arrive_leave_checkbox_layout).visible();
+//			AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq
+//					.id(R.id.location_before).getView();
+//			locationTextView.setAdapter(new PlacesAutoCompleteAdapter(
+//					getActivity(),
+//					android.R.layout.simple_spinner_dropdown_item));
+//			((RadioGroup) aq.id(R.id.leave_arrive_radio).getView())
+//					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//
+//						@Override
+//						public void onCheckedChanged(RadioGroup group,
+//								int checkedId) {
+//							if (previousSelectedLocation != null) {
+//								((RadioButton) previousSelectedLocation)
+//										.setTextColor(getResources().getColor(
+//												R.color._4d4d4d));
+//							}
+//							((RadioButton) group.findViewById(checkedId))
+//									.setTextColor(Color.WHITE);
+//							TextView before = (TextView) getActivity()
+//									.findViewById(R.id.before);
+//
+//							before.setVisibility(View.VISIBLE);
+//							before.setText("On "
+//									+ aq.id(checkedId).getText().toString());
+//							previousSelectedLocation = group
+//									.findViewById(checkedId);
+//						}
+//					});
 		}
 	}
 
@@ -481,56 +490,56 @@ public class AddTaskBeforeFragment extends Fragment {
 		editor.commit();
 	}
 
-	public void set() {
-		pname = null;
-		pname = App.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
-				null);
-		if (pname != null) {
-			aq.id(R.id.pre_defined_1).text(pname);
-			aq.id(R.id.pre_defined_1).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_1).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
-		}
-		pname = null;
-		pname = App.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
-				null);
-		if (pname != null) {
-			aq.id(R.id.pre_defined_2).text(pname);
-			aq.id(R.id.pre_defined_2).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_2).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
-		}
-		pname = null;
-		pname = App.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
-				null);
-		if (pname != null) {
-			aq.id(R.id.pre_defined_3).text(pname);
-			aq.id(R.id.pre_defined_3).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_3).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
-		}
-		pname = null;
-		pname = App.pref.getString(
-				1 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
-				null);
-		if (pname != null) {
-			aq.id(R.id.pre_defined_4).text(pname);
-			aq.id(R.id.pre_defined_4).getTextView()
-					.setTextColor(Color.parseColor("#000000"));
-			aq.id(R.id.pre_defined_4).getTextView()
-					.setBackgroundResource(R.drawable.button_shadow2);
-
-		}
-		pname = null;
-	}
+//	public void set() {
+//		pname = null;
+//		pname = App.pref.getString(
+//				1 + "key_name" + aq.id(R.id.pre_defined_1).getView().getId(),
+//				null);
+//		if (pname != null) {
+//			aq.id(R.id.pre_defined_1).text(pname);
+//			aq.id(R.id.pre_defined_1).getTextView()
+//					.setTextColor(Color.parseColor("#000000"));
+//			aq.id(R.id.pre_defined_1).getTextView()
+//					.setBackgroundResource(R.drawable.button_shadow2);
+//
+//		}
+//		pname = null;
+//		pname = App.pref.getString(
+//				1 + "key_name" + aq.id(R.id.pre_defined_2).getView().getId(),
+//				null);
+//		if (pname != null) {
+//			aq.id(R.id.pre_defined_2).text(pname);
+//			aq.id(R.id.pre_defined_2).getTextView()
+//					.setTextColor(Color.parseColor("#000000"));
+//			aq.id(R.id.pre_defined_2).getTextView()
+//					.setBackgroundResource(R.drawable.button_shadow2);
+//
+//		}
+//		pname = null;
+//		pname = App.pref.getString(
+//				1 + "key_name" + aq.id(R.id.pre_defined_3).getView().getId(),
+//				null);
+//		if (pname != null) {
+//			aq.id(R.id.pre_defined_3).text(pname);
+//			aq.id(R.id.pre_defined_3).getTextView()
+//					.setTextColor(Color.parseColor("#000000"));
+//			aq.id(R.id.pre_defined_3).getTextView()
+//					.setBackgroundResource(R.drawable.button_shadow2);
+//
+//		}
+//		pname = null;
+//		pname = App.pref.getString(
+//				1 + "key_name" + aq.id(R.id.pre_defined_4).getView().getId(),
+//				null);
+//		if (pname != null) {
+//			aq.id(R.id.pre_defined_4).text(pname);
+//			aq.id(R.id.pre_defined_4).getTextView()
+//					.setTextColor(Color.parseColor("#000000"));
+//			aq.id(R.id.pre_defined_4).getTextView()
+//					.setBackgroundResource(R.drawable.button_shadow2);
+//
+//		}
+//		pname = null;
+//	}
 
 }

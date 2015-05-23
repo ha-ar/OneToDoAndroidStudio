@@ -3,7 +3,20 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        map:cameraZoom="13"
+        map:mapType="normal"
+        map:liteMode="true"
+        />
+
     <net.appkraft.parallax.ParallaxScrollView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/scrollView123"
@@ -13,6 +26,7 @@
         android:overScrollMode="never"
         android:scrollbars="none"
         app:zoomRatio="1.5" >
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -69,7 +83,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
-                    android:visibility="gone"
+                    android:orientation="horizontal"
                     android:paddingBottom="10dp"
                     android:paddingRight="10dp"
                     android:paddingTop="10dp" >
@@ -81,13 +95,27 @@
 
                     <TextView
                         android:id="@+id/location"
+                        android:layout_width="225dp"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="23dp"
+                        android:singleLine="false"
+                        android:text=""
+                        android:textColor="@color/_4d4d4d"
+                        android:textSize="13.33sp"
+                        android:layout_gravity="bottom" />
+
+                    <TextView
+                        android:id="@+id/gmap_anchortext"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingLeft="23dp"
                         android:singleLine="true"
                         android:text=""
                         android:textColor="@color/_4d4d4d"
-                        android:textSize="13.33sp" />
+                        android:textSize="13.33sp"
+                        android:onClick="onMapClick"
+                        android:clickable="true"
+                        android:textAlignment="center" />
                 </LinearLayout>
 
                 <LinearLayout
