@@ -3,7 +3,6 @@ package com.vector.onetodo;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
-import com.androidquery.callback.ImageOptions;
 import com.google.api.client.repackaged.com.google.common.base.Joiner;
 import com.vector.model.AssignedTaskData;
 import com.vector.model.TaskData;
@@ -441,8 +439,9 @@ public class TaskView extends BaseActivity {
     }
 
 
-    private void showAttachments(final String imageUrl){
+    private void showAttachments(String imageUrl){
         aq.id(R.id.attachment_layout).visible();
+        final String image_url = imageUrl;
         try {
             final LinearLayout item = (LinearLayout) aq
                     .id(R.id.added_image_outer).visible().getView();
@@ -450,7 +449,7 @@ public class TaskView extends BaseActivity {
             item.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    buttonClicked(imageUrl);
+                    buttonClicked(image_url);
                 }
             });
             final View child = getLayoutInflater().inflate(
@@ -459,16 +458,11 @@ public class TaskView extends BaseActivity {
             ImageView image = (ImageView) child
                     .findViewById(R.id.image_added);
 
-            ImageOptions options = new ImageOptions();
-            options.round = 20;
 
             AQuery aq = new AQuery(child);
-
-            final int tint = 0x77AA0000;
             Bitmap preset = aq.getCachedImage(imageUrl);
 
             if(preset != null){
-                Log.e("cachedImg", preset+"");
                 aq.id(image).image(preset);
             }
             else {
@@ -476,9 +470,8 @@ public class TaskView extends BaseActivity {
 
                     @Override
                     public void callback(String url, ImageView iv, Bitmap bm, AjaxStatus status) {
-                        iv.setImageBitmap(bm);
+                        iv.setImageBitmap(Utils.getRoundedCornerBitmap(bm, 8));
                         //do something to the bitmap
-                        iv.setColorFilter(tint, PorterDuff.Mode.SRC_ATOP);
                         bm.getByteCount();
                         TextView size = (TextView) child
                                 .findViewById(R.id.image_added_size);

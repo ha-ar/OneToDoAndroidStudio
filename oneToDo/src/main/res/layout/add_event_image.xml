@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/image_button_container_event"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
@@ -26,14 +27,18 @@
         android:visibility="visible" >
     </LinearLayout>
 
-    <ImageView
+    <com.dd.CircularProgressButton
         android:id="@+id/event_attachment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="54dp"
+        android:padding="15dp"
+        android:textColor="@color/cpb_white"
+        android:textSize="18sp"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="5dp"
-        android:background="@drawable/rounded_edittext"
-        android:padding="15dp"
-        android:src="@drawable/ic_plus_button" />
+        app:cpb_cornerRadius="48dp"
+        app:cpb_iconComplete="@drawable/ic_action_accept"
+        app:cpb_iconError="@drawable/ic_action_cancel"
+        app:cpb_textIdle="Upload Attachment" />
 
 </LinearLayout>

@@ -115,12 +115,14 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_margin="5dp"
+            android:visibility="gone"
             android:background="@drawable/repeat" />
         <ImageView
             android:id="@+id/reminder_icon"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_margin="5dp"
+            android:visibility="gone"
             android:background="@drawable/reminder" />
     </LinearLayout>
 

@@ -69,6 +69,7 @@ import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
+import com.dd.CircularProgressButton;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
@@ -199,6 +200,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             }
         }
     };
+    private boolean isAttaching = false;
 
     public static AddTaskFragment newInstance(int position, boolean isEditMode, long todoId) {
         AddTaskFragment myFragment = new AddTaskFragment();
@@ -1227,7 +1229,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                             }
                         });
 
-                aq.id(image).image(Utils.getRoundedCornerBitmap(bitmap, 7));
+                aq.id(image).image(Utils.getRoundedCornerBitmap(bitmap, 8));
                 TextView text = (TextView) child
                         .findViewById(R.id.image_added_text);
                 TextView by = (TextView) child
@@ -1394,6 +1396,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
         List<NameValuePair> pairs = new ArrayList<>();
         pairs.add(new BasicNameValuePair("image", encoded));
+        final CircularProgressButton progressButton = (CircularProgressButton) aq.id(R.id.task_attachment).getView();
+        progressButton.setIndeterminateProgressMode(true);
+        progressButton.setProgress(10);
+        isAttaching = true;
 
         try {
             entity = new UrlEncodedFormEntity(pairs, "UTF-8");
@@ -1406,18 +1412,23 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
         aq.ajax("http://api.heuristix.net/one_todo/v1/upload.php", param,
                 JSONObject.class, new AjaxCallback<JSONObject>() {
+
+
+
                     @Override
                     public void callback(String url, JSONObject json,
                                          AjaxStatus status) {
+
                         String path = null;
                         try {
                             Log.e("attachment", json.toString());
                             JSONObject obj1 = new JSONObject(json.toString());
                             path = obj1.getString("path");
                             boolean error = obj1.getBoolean("error");
-                            if(error)
-                                Toast.makeText(getActivity(),"Error uploading attachment.",Toast.LENGTH_SHORT).show();
-                            else {
+                            if(error) {
+                                Toast.makeText(getActivity(), "Error uploading attachment.", Toast.LENGTH_SHORT).show();
+                                progressButton.setProgress(-1);
+                            } else {
                                 LoadAttachmax();
                                 if (MaxId == 0) {
                                     MaxId = 1;
@@ -1425,7 +1436,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                     MaxId = MaxId + 1;
                                 }
                                 SaveAttach(MaxId, path, "type");
+                                progressButton.setProgress(0);
                             }
+                            isAttaching = false;
                         } catch (Exception e) {
 
                         }
@@ -1485,14 +1498,19 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     }
 
     private void saveTask(){
-        assignedId.clear();
-        if(!TextUtils.isEmpty(assignedSelectedID))
-            assignedId.add(assignedSelectedID);
+        if(isAttaching){
+            Toast.makeText(getActivity(), "Please wait...uploading attachment.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (aq.id(R.id.task_title1).getText().toString().isEmpty()) {
             Toast.makeText(getActivity(), "Please enter title",
                     Toast.LENGTH_SHORT).show();
             return;
         }
+        assignedId.clear();
+        if(!TextUtils.isEmpty(assignedSelectedID))
+            assignedId.add(assignedSelectedID);
 
         MaxId = App.attach.getInt("Max", 0);
         title = aq.id(R.id.task_title1).getText().toString();

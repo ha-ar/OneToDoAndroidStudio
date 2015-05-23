@@ -67,6 +67,7 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.ImageOptions;
 import com.astuetz.PagerSlidingTabStrip;
+import com.dd.CircularProgressButton;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
 import com.mobeta.android.dslv.DragSortController;
@@ -185,6 +186,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	private String labelColor;
 	private Geofences geoFence;
 	private AlarmManagerBroadcastReceiver alarm;
+	private boolean isAttaching = false;
 
 	public static AddEventFragment newInstance(int position, boolean isEditMode, long todoId) {
 		AddEventFragment myFragment = new AddEventFragment();
@@ -1627,6 +1629,12 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private void uploadAttachments(AQuery aq, byte[] byteArray) {
 
+		final CircularProgressButton progressButton = (CircularProgressButton) aq.id(R.id.task_attachment).getView();
+		progressButton.setIndeterminateProgressMode(true);
+		progressButton.setProgress(10);
+
+		isAttaching = true;
+
 		HttpEntity entity = null;
 		String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
 		List<NameValuePair> pairs = new ArrayList<>();
@@ -1651,13 +1659,21 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 							Log.e("attachment", json.toString());
 							JSONObject obj1 = new JSONObject(json.toString());
 							path = obj1.getString("path");
-							Loadattachmax();
-							if (MaxId == 0) {
-								MaxId = 1;
+							boolean error = obj1.getBoolean("error");
+							if(error) {
+								Toast.makeText(getActivity(), "Error uploading attachment.", Toast.LENGTH_SHORT).show();
+								progressButton.setProgress(-1);
 							} else {
-								MaxId = MaxId + 1;
+								Loadattachmax();
+								if (MaxId == 0) {
+									MaxId = 1;
+								} else {
+									MaxId = MaxId + 1;
+								}
+								Saveattach(MaxId, path, "type");
+								progressButton.setProgress(0);
 							}
-							Saveattach(MaxId, path, "type");
+							isAttaching = false;
 						} catch (Exception e) {
 
 						}
@@ -1767,6 +1783,11 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	private void saveEvent() {
 		if (aq.id(R.id.event_title).getText().toString().isEmpty()) {
 			Toast.makeText(getActivity(), "Please enter title",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if(isAttaching){
+			Toast.makeText(getActivity(), "Please wait...uploading attachment.",
 					Toast.LENGTH_SHORT).show();
 			return;
 		}
