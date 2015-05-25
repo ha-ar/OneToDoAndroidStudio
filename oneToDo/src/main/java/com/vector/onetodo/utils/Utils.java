@@ -38,9 +38,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class Utils {
+
+    public static String serverFormat = "yyyy-MM-dd hh:mm:ss";
 	public static final Calendar currentDateCal = Calendar
 			.getInstance(Locale.US);
 
@@ -140,6 +144,27 @@ public class Utils {
 				}
 			}
 		}
+	}
+
+	public static String convertToServerTime(long timeInMillis){
+		Date localTime = new Date(timeInMillis);
+		SimpleDateFormat sdf = new SimpleDateFormat(serverFormat, Locale.getDefault());
+
+		// Convert Local Time to UTC (Works Fine)
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return sdf.format(localTime);
+	}
+
+	public static long convertToLocalTime(String serverDate){
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(serverFormat, Locale.getDefault());
+        try {
+            cal.setTime(sdf.parse(serverDate));
+            return cal.getTimeInMillis() + TimeZone.getDefault().getRawOffset();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
 	}
 
 	public static void hidKeyboard(Activity act) {
@@ -343,7 +368,7 @@ public class Utils {
 
     public static long milliFromServerDate(String date){
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(serverFormat, Locale.getDefault());
         try {
             cal.setTime(sdf.parse(date));
             return cal.getTimeInMillis();

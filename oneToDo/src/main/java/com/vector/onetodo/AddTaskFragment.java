@@ -1638,8 +1638,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         todo.setIs_allday(isAllDay);
         todo.setLocation(location);
         todo.setNotes(notes);
-        todo.setIs_done(false);
-        todo.setIs_delete(false);
+        todo.setIs_checked(false);
 
         Label label = new Label();
         label.setLabel_name(label_name);
@@ -1691,7 +1690,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             tododao.update(todo);
         }else {
             // ********************* Data add hit Async task ******************//
-            AddToServer aSync = new AddToServer(title, 1, start_date, "", isAllDay, is_location, r_location, location_tag,
+            AddToServer aSync = new AddToServer(title, 1, Utils.convertToServerTime(startDateInMilli), "", isAllDay, is_location, r_location, location_tag,
                     locationType, location, notes, repeatDate, repeat_forever, MaxId,
                     AddTaskComment.commment, AddTaskComment.commenttime, checklist_data, assignedId, repeat, reminderTime, label_name, "", before, "", AddTaskFragment.this);
             aSync.execute();

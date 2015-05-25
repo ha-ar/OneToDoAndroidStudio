@@ -77,7 +77,6 @@ import com.vector.model.TaskData;
 import com.vector.onetodo.db.gen.CheckList;
 import com.vector.onetodo.db.gen.CheckListDao;
 import com.vector.onetodo.db.gen.CommentDao;
-import com.vector.onetodo.db.gen.FriendsDao;
 import com.vector.onetodo.db.gen.Label;
 import com.vector.onetodo.db.gen.LabelDao;
 import com.vector.onetodo.db.gen.Reminder;
@@ -174,7 +173,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 
 	private ToDoDao tododao;
 	private CheckListDao checklistdao;
-	private FriendsDao friendsdao;
 	private LabelDao labeldao;
 	private ReminderDao reminderdao;
 	private RepeatDao repeatdao;
@@ -1916,8 +1914,7 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 		todo.setIs_allday(isAllDay);
 		todo.setLocation(location);
 		todo.setNotes(notes);
-		todo.setIs_done(false);
-		todo.setIs_delete(false);
+		todo.setIs_checked(false);
 
 		Label label = new Label();
 		label.setLabel_name(label_name);
@@ -1968,7 +1965,6 @@ public class AddEventFragment extends Fragment implements onTaskAdded {
 	}
 	private void db_initialize() {
 		checklistdao = App.daoSession.getCheckListDao();
-		friendsdao = App.daoSession.getFriendsDao();
 		labeldao = App.daoSession.getLabelDao();
 		tododao = App.daoSession.getToDoDao();
 		commentdao = App.daoSession.getCommentDao();

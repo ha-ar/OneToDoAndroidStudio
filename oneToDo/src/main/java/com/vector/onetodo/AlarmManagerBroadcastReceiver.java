@@ -47,7 +47,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             nHandler.createNotification(context, intent);
             ToDoDao tododao = App.daoSession.getToDoDao();
             ToDo obj = tododao.load(intent.getExtras().getLong("id"));
-            obj.setIs_done(true);
+            obj.setIs_checked(true);
             tododao.update(obj);
             SetNormalAlarm(context);
         }
@@ -62,7 +62,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         tododao = App.daoSession.getToDoDao();
         todo_obj = tododao.loadAll();
         QueryBuilder<ToDo> todo_query;
-        todo_query = tododao.queryBuilder().where(ToDoDao.Properties.Is_done.eq(false)).orderAsc(ToDoDao.Properties.Start_date);
+        todo_query = tododao.queryBuilder().where(ToDoDao.Properties.Is_checked.eq(false)).orderAsc(ToDoDao.Properties.Start_date);
         todoList = todo_query.list();
     }
 

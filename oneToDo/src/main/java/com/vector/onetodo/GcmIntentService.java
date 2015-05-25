@@ -153,15 +153,15 @@ public class GcmIntentService extends IntentService {
     private void saveDataToDB(){
         ToDo todo = new ToDo();
         todo.setTitle(AssignedTaskData.getInstance().task.get(0).title);
-        todo.setStart_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).startDate));
-        todo.setEnd_date(Utils.milliFromServerDate(AssignedTaskData.getInstance().task.get(0).endDate));
+        todo.setStart_date(Utils.convertToLocalTime(AssignedTaskData.getInstance().task.get(0).startDate));
+        todo.setEnd_date(Utils.convertToLocalTime(AssignedTaskData.getInstance().task.get(0).endDate));
         todo.setTodo_server_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
         todo.setLocation(AssignedTaskData.getInstance().task.get(0).todoLocation);
         todo.setNotes(AssignedTaskData.getInstance().task.get(0).notes);
         todo.setTodo_type_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).todoTypeId));
         todo.setIs_assigned_task(true);
-        todo.setAssignee_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
-        todo.setAssignee_name(AssignedTaskData.getInstance().task.get(0).first_name + " " + AssignedTaskData.getInstance().task.get(0).last_name);
+        todo.setUser_id(Integer.valueOf(AssignedTaskData.getInstance().task.get(0).id));
+        todo.setUser_name(AssignedTaskData.getInstance().task.get(0).first_name + " " + AssignedTaskData.getInstance().task.get(0).last_name);
 
 
         Reminder reminder = new Reminder();

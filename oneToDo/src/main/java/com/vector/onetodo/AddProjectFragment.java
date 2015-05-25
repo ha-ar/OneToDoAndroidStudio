@@ -919,8 +919,7 @@ public class AddProjectFragment extends Fragment {
             todo.setStart_date(startDateInMilli);
             todo.setEnd_date(endDateInMilli);
             todo.setIs_allday(is_allday);
-            todo.setIs_done(false);
-            todo.setIs_delete(false);
+            todo.setIs_checked(false);
 
             Label label = new Label();
             label.setLabel_name(label_name);
@@ -946,8 +945,7 @@ public class AddProjectFragment extends Fragment {
                 todoSubTask.setStart_date(subTaskStartDate);
                 todoSubTask.setEnd_date(0l);
                 todoSubTask.setIs_allday(false);
-                todoSubTask.setIs_done(false);
-                todoSubTask.setIs_delete(false);
+                todoSubTask.setIs_checked(false);
 
                 Label labelSubTask = new Label();
                 labelSubTask.setLabel_name(label_name);

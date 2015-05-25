@@ -155,10 +155,10 @@ public class TaskListAdapter extends BaseAdapter {
 
 		final Holder finalHolder = holder;
 
-		if (listToShow.get(position).getIs_done() == null)
-			listToShow.get(position).setIs_done(false);
+		if (listToShow.get(position).getIs_checked() == null)
+			listToShow.get(position).setIs_checked(false);
 
-		if(listToShow.get(position).getIs_done()){
+		if(listToShow.get(position).getIs_checked()){
 			holder.completeTask.setChecked(true);
 			finalHolder.title.setPaintFlags(finalHolder.title.getPaintFlags()
 					| Paint.STRIKE_THRU_TEXT_FLAG);
@@ -173,12 +173,12 @@ public class TaskListAdapter extends BaseAdapter {
 					finalHolder.title.setPaintFlags(finalHolder.title.getPaintFlags()
 							| Paint.STRIKE_THRU_TEXT_FLAG);
 					AlphaManager.setAlpha(finalHolder.title, 0.4F);
-					obj.setIs_done(true);
+					obj.setIs_checked(true);
 				} else {
 					finalHolder.title.setPaintFlags(finalHolder.title.getPaintFlags()
 							& (~Paint.STRIKE_THRU_TEXT_FLAG));
 					AlphaManager.setAlpha(finalHolder.title, 1F);
-					obj.setIs_done(false);
+					obj.setIs_checked(false);
 				}
 				MainActivity.tododao.update(obj);
 			}

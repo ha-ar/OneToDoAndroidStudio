@@ -242,7 +242,7 @@ public class TaskView extends BaseActivity {
         }
         aq.id(R.id.title).text(obj.getTitle());
         if(obj.getIs_assigned_task() != null && obj.getIs_assigned_task()){
-            aq.id(R.id.sender_name).text("Assigned by "+ obj.getAssignee_name());
+            aq.id(R.id.sender_name).text("Assigned by "+ obj.getUser_name());
             aq.id(R.id.btn_edit).invisible();
         }else{
             aq.id(R.id.sender_name).invisible();
@@ -526,7 +526,7 @@ public class TaskView extends BaseActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
             if(obj.getIs_assigned_task() != null && obj.getIs_assigned_task()){
-                by.setText("By " + obj.getAssignee_name()+" on " + sdf.format(cal.getTime()));
+                by.setText("By " + obj.getUser_name()+" on " + sdf.format(cal.getTime()));
             }else{
                 by.setText("By " + App.prefs.getUserName()+" on " + sdf.format(cal.getTime()));
             }

@@ -944,8 +944,7 @@ public class AddAppointmentFragment extends Fragment implements onTaskAdded {
             todo.setIs_allday(is_allday);
             todo.setLocation(location);
             todo.setNotes(notes);
-            todo.setIs_done(false);
-            todo.setIs_delete(false);
+            todo.setIs_checked(false);
 
             Label label = new Label();
             label.setLabel_name(label_name);
