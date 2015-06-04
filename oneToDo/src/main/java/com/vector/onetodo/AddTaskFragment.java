@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -25,7 +24,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -48,9 +46,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
@@ -62,13 +60,13 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
 import com.androidquery.callback.ImageOptions;
-import com.astuetz.PagerSlidingTabStrip;
 import com.dd.CircularProgressButton;
 import com.devspark.appmsg.AppMsg;
 import com.google.android.gms.location.Geofence;
@@ -131,7 +129,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private static final int TAKE_PICTURE = 1;
     public static EditText taskTitle;
     public static HashMap<Integer, Integer> inflatingLayouts = new HashMap<>();
-    public static View allView;
+    private View allView;
     public static Activity act;
     public static String assignedSelectedID = "";
     static LinearLayout ll_linear;
@@ -144,10 +142,10 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             currentMonDigit;
     private static int Tag = 0;
     private static AQuery aq;
-    private static AQuery aq_edit;
-    private static AQuery aqd;
-    private static AQuery aq_del;
-    private static AQuery aq_menu;
+    private AQuery aq_edit;
+    private AQuery aqd;
+    private AQuery aq_del;
+    private AQuery aq_menu;
     private static View previousSelected;
     int labelPosition = -1;
     ImageView last;
@@ -160,12 +158,13 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
     private int MaxId = -1;
     private PopupWindow popupWindowAttach;
     private String currentDay, currentMon, setMon;
-    private int[] collapsingViews = { R.id.title_task_layout1,
-            R.id.date_time_include, R.id.before_grid_view_linear,
+    private int[] collapsingViews = { R.id.title_task_layout1, R.id.show_hide_time, R.id.location_container,
             R.id.repeat_linear_layout, R.id.label_grid_view3 };
+
     private int[] allViews = { R.id.task_title1, R.id.time_date,
-            R.id.location_task, R.id.before1, R.id.repeat_task_lay,
-            R.id.spinner_labels_task };
+            R.id.location_task, R.id.before1, R.id.repeat_task_lay, R.id.show_hide_time,
+            R.id.spinner_labels_task, R.id.time_date_header_container, R.id.time_date, R.id.repeat_layout };
+
     private Uri imageUri;
     private int lastCheckedId = -1;
     private ArrayAdapter<String> adapterTask;
@@ -327,14 +326,16 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         inflatingLayouts.put(0, R.layout.add_task_title);
         inflatingLayouts.put(1, R.layout.add_task_assign1);
         inflatingLayouts.put(2, R.layout.add_task_details);
-        inflatingLayouts.put(3, R.layout.add_task_time_date);
-        inflatingLayouts.put(4, R.layout.add_task_location1);
-        inflatingLayouts.put(5, R.layout.add_task_before);
-        inflatingLayouts.put(6, R.layout.add_task_repeat);
-        inflatingLayouts.put(7, R.layout.add_task_label);
-        inflatingLayouts.put(8, R.layout.add_task_subtask);
-        inflatingLayouts.put(9, R.layout.add_task_notes);
-        inflatingLayouts.put(10, R.layout.add_task_attach);
+        inflatingLayouts.put(3, R.layout.add_task_time_date_header);
+        inflatingLayouts.put(4, R.layout.add_task_location_header);
+
+//        inflatingLayouts.put(5, R.layout.add_task_location1);
+//        inflatingLayouts.put(6, R.layout.add_task_before);
+//        inflatingLayouts.put(7, R.layout.add_task_repeat);
+        inflatingLayouts.put(5, R.layout.add_task_label);
+        inflatingLayouts.put(6, R.layout.add_task_subtask);
+        inflatingLayouts.put(7, R.layout.add_task_notes);
+        inflatingLayouts.put(8, R.layout.add_task_attach);
 
         inflateLayouts();
 
@@ -372,31 +373,42 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                     }
                 });
 
-        aq.id(R.id.time_date)
-                .typeface(
-                        TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new GeneralOnClickListner());
+        aq.id(R.id.time_date).typeface(
+                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new ExpandableOnClickListener());
+        aq.id(R.id.time_location_container).typeface(
+                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new GeneralOnClickListener());
+
+        aq.id(R.id.time_date_header_container).typeface(
+                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new GeneralOnClickListener());
+
+        aq.id(R.id.repeat_layout).typeface(
+                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
+                .clicked(new ExpandableOnClickListener());
 
         aq.id(R.id.task_title1)
                 .typeface(
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new GeneralOnClickListner());
+                .clicked(new GeneralOnClickListener());
 
         aq.id(R.id.location_task)
                 .typeface(
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new GeneralOnClickListner());
+                .clicked(new GeneralOnClickListener());
+        //TODO uncomment below code to get location working
 //                .text(App.gpsTracker.getLocality(getActivity()));
-        AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.location_task).getView();
-        locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
+//        AutoCompleteTextView locationTextView = (AutoCompleteTextView) aq.id(R.id.location_task).getView();
+//        locationTextView.setAdapter(new PlacesAutoCompleteAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item));
 
-        aq.id(R.id.spinner_label_layout).clicked(new GeneralOnClickListner());
-        aq.id(R.id.before1).clicked(new GeneralOnClickListner());
-        aq.id(R.id.repeat_task_lay).clicked(new GeneralOnClickListner());
+        aq.id(R.id.spinner_label_layout).clicked(new GeneralOnClickListener());
+        aq.id(R.id.before1).clicked(new GeneralOnClickListener());
+        aq.id(R.id.repeat_task_lay).clicked(new GeneralOnClickListener());
         aq.id(R.id.grid_text)
                 .typeface(
                         TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE))
-                .clicked(new GeneralOnClickListner());
+                .clicked(new GeneralOnClickListener());
         final View view12 = getActivity().getLayoutInflater().inflate(
                 R.layout.landing_menu, null, false);
         aq_menu = new AQuery(getActivity(), view12);
@@ -508,6 +520,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         gridView = (GridView) vie.findViewById(R.id.add_label_grid);
 
         gridView.setAdapter(new LabelImageAdapter(getActivity()));
+        gridView.setSelection(0);
 
         gridView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -632,6 +645,18 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
                         });
 
+        aq.id(R.id.spinner_labels_task).text("Personal");
+        GradientDrawable mDrawable = (GradientDrawable) getResources()
+                .getDrawable(
+                        R.drawable.label_background);
+        if (mDrawable != null) {
+            mDrawable.setColor(Color
+                    .parseColor(Constants.label_colors[0]));
+        }
+        aq.id(R.id.spinner_labels_task).getTextView().setBackground(mDrawable);
+        aq.id(R.id.spinner_labels_task).getTextView()
+                .setTextColor(Color.WHITE);
+
         aq.id(R.id.label_grid_view).getGridView()
                 .setOnItemClickListener(new OnItemClickListener() {
 
@@ -645,7 +670,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                             aq.id(R.id.spinner_labels_task).text(
                                     ((TextView) view).getText().toString());
                             aq.id(R.id.spinner_labels_task).getTextView()
-                                    .setBackground(view.getBackground());
+                                    .setBackground(view.getBackground ());
                             aq.id(R.id.spinner_labels_task).getTextView()
                                     .setTextColor(Color.WHITE);
 //                            GradientDrawable drawable = (GradientDrawable) view.getBackground();
@@ -720,29 +745,29 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
          * View pager for before and location
          *
          */
-        ViewPager pager = (ViewPager) aq.id(R.id.add_task_before_pager)
-                .getView();
-
-        pager.setOffscreenPageLimit(2);
-        pager.setAdapter(new AddTaskBeforePagerFragment(getActivity()
-                .getSupportFragmentManager()));
-
-        // Bind the tabs to the ViewPager
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) aq.id(
-                R.id.add_task_before_tabs_task).getView();
-        tabs.setDividerColorResource(android.R.color.transparent);
-        tabs.setIndicatorColorResource(R.color._4d4d4d);
-        tabs.setUnderlineColorResource(android.R.color.transparent);
-        tabs.setTextSize(Utils.getPxFromDp(getActivity(), 16));
-        tabs.setIndicatorHeight(Utils.getPxFromDp(getActivity(), 1));
-        tabs.setShouldExpand(false);
-        tabs.setSmoothScrollingEnabled(true);
-        tabs.setAllCaps(false);
-        tabs.setTypeface(
-                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE),
-                Typeface.NORMAL);
-        tabs.setShouldExpand(true);
-        tabs.setViewPager(pager);
+//        ViewPager pager = (ViewPager) aq.id(R.id.add_task_before_pager)
+//                .getView();
+//
+//        pager.setOffscreenPageLimit(2);
+//        pager.setAdapter(new AddTaskBeforePagerFragment(getActivity()
+//                .getSupportFragmentManager()));
+//
+//        // Bind the tabs to the ViewPager
+//        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) aq.id(
+//                R.id.add_task_before_tabs_task).getView();
+//        tabs.setDividerColorResource(android.R.color.transparent);
+//        tabs.setIndicatorColorResource(R.color._4d4d4d);
+//        tabs.setUnderlineColorResource(android.R.color.transparent);
+//        tabs.setTextSize(Utils.getPxFromDp(getActivity(), 16));
+//        tabs.setIndicatorHeight(Utils.getPxFromDp(getActivity(), 1));
+//        tabs.setShouldExpand(false);
+//        tabs.setSmoothScrollingEnabled(true);
+//        tabs.setAllCaps(false);
+//        tabs.setTypeface(
+//                TypeFaces.get(getActivity(), Constants.ROMAN_TYPEFACE),
+//                Typeface.NORMAL);
+//        tabs.setShouldExpand(true);
+//        tabs.setViewPager(pager);
 
         aq.id(R.id.repeat_grid_view).getGridView()
                 .setAdapter(new ArrayAdapter<String>(getActivity(),
@@ -804,20 +829,17 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                     view.setBackgroundResource(R.drawable.round_buttons_blue);
                 }
 
-                    if (((TextView) view).getText().toString().equals("Never")) {
+                if (((TextView) view).getText().toString().equals("Never")) {
                     aq.id(R.id.forever_radio).checked(true);
                     aq.id(R.id.time_radio).textColor(
                             Color.parseColor("#bababa"));
                     aq.id(R.id.forever_radio).textColor(
                             (getResources().getColor(R.color._777777)));
                 }
+
                 ((TextView) view).setTextColor(Color.WHITE);
                 view.setSelected(true);
-                if (Constants.repeatArray[position].equals("Never")) {
-                    aq.id(R.id.repeat).text(Constants.repeatArray[position]);
-                } else {
-                    aq.id(R.id.repeat).text(Constants.repeatArray[position]);
-                }
+                aq.id(R.id.repeat_text).text(Constants.repeatArray[position]);
                 previousSelected = view;
 
             }
@@ -867,7 +889,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 set.requestFocus();
                 date_time_alert.dismiss();
 
-                aq.id(R.id.repeat).text(
+                aq.id(R.id.repeat_text).text(
                         ((TextView) previousSelected).getText().toString()
                                 + " until " + setMon);
                 RadioButton rb = (RadioButton) aq.id(R.id.time_radio).getView();
@@ -887,8 +909,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
             @Override
             public void onClick(View arg0) {
-                if (!aq.id(R.id.repeat).getText().toString().equals("Never")) {
-                    aq.id(R.id.repeat).text(
+                if (!aq.id(R.id.repeat_text).getText().toString().equals("Never")) {
+                    aq.id(R.id.repeat_text).text(
                             ((TextView) previousSelected).getText().toString());
                 }
 
@@ -902,7 +924,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
 
             @Override
             public void onClick(View v) {
-                if (aq.id(R.id.repeat).getText().toString().equals("Never")) {
+                if (aq.id(R.id.repeat_text).getText().toString().equals("Never")) {
                     Toast.makeText(getActivity(), "Please Select ...",
                             Toast.LENGTH_SHORT).show();
                     aq.id(R.id.time_radio).checked(false);
@@ -1064,6 +1086,48 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         View switchView = aq.id(R.id.add_sub_task).getView();
         toggleCheckList(switchView);
 
+        final ToggleButton toggleDate = (ToggleButton) getView().findViewById(
+                R.id.switch_date);
+        final ToggleButton toggleLocation = (ToggleButton) getView().findViewById(
+                R.id.switch_location);
+        toggleDate.setChecked(true);
+        toggleDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                toggleDate(toggleDate, toggleLocation, isChecked);
+            }
+        });
+        toggleLocation.setChecked(false);
+        toggleLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                toggleLocation(toggleDate, toggleLocation, isChecked);
+            }
+        });
+
+    }
+
+    private void toggleDate(ToggleButton toggleDate, ToggleButton toggleLocation, boolean isChecked){
+        if(isChecked){
+            toggleDate.setChecked(true);
+            toggleLocation.setChecked(false);
+        }else{
+            toggleDate.setChecked(false);
+            toggleLocation.setChecked(true);
+        }
+    }
+    private void toggleLocation(ToggleButton toggleDate, ToggleButton toggleLocation, boolean isChecked){
+        if(isChecked){
+            toggleDate.setChecked(false);
+            toggleLocation.setChecked(true);
+        }else{
+            toggleDate.setChecked(true);
+            toggleLocation.setChecked(false);
+        }
     }
 
     private void toggleCheckList(View switchView) {
@@ -1284,16 +1348,24 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         hideAll();
 
         switch (v.getId()) {
-            case R.id.time_date:
-                if (aq.id(R.id.date_time_include).getView().getVisibility() == View.GONE) {
-                    aq.id(R.id.date_time_include)
+            case R.id.time_location_container:
+                if (aq.id(R.id.location_container).getView().getVisibility() == View.GONE) {
+                    aq.id(R.id.location_container)
                             .getView()
                             .startAnimation(
                                     new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
-                                            200, aq.id(R.id.date_time_include)
+                                            200, aq.id(R.id.location_container)
                                             .getView(), true));
-                    aq.id(R.id.calender_layout).background(
-                            R.drawable.input_fields_blue);
+                }
+                break;
+            case R.id.time_date_header_container:
+                if (aq.id(R.id.show_hide_time).getView().getVisibility() == View.GONE) {
+                    aq.id(R.id.show_hide_time)
+                            .getView()
+                            .startAnimation(
+                                    new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+                                            200, aq.id(R.id.show_hide_time)
+                                            .getView(), true));
                 }
                 break;
             case R.id.before1:
@@ -1310,8 +1382,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                             aq.id(R.id.before_grid_view_linear)
                                                     .getView(), true));
 
-                    aq.id(R.id.before_layout).background(
-                            R.drawable.input_fields_blue);
                 }
 
                 break;
@@ -1329,9 +1399,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                             200, aq.id(R.id.repeat_linear_layout)
                                             .getView(), true));
 
-                    aq.id(R.id.repeat_layout).background(
-                            R.drawable.input_fields_blue);
-
                 }
                 break;
             case R.id.spinner_label_layout:
@@ -1343,8 +1410,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                             200, aq.id(R.id.label_grid_view3)
                                             .getView(), true));
 
-                    aq.id(R.id.spinner_label_layout).background(
-                            R.drawable.input_fields_blue);
                 }
 
             default:
@@ -1549,7 +1614,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
 
         boolean repeat_forever = aq.id(R.id.forever_radio).isChecked();
-        String repeat = aq.id(R.id.repeat).getText().toString();
+        String repeat = aq.id(R.id.repeat_text).getText().toString();
 
         String label_name = aq.id(R.id.spinner_labels_task).getText()
                 .toString();
@@ -1740,7 +1805,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 }
             }
             aq.id(R.id.repeat_grid_view).getGridView().setItemChecked(selectedPosition, true);
-            aq.id(R.id.repeat).text(todo.getRepeat().getShowable_format()).visible();
+            aq.id(R.id.repeat_text).text(todo.getRepeat().getShowable_format()).visible();
         }
 
         if(todo.getLabel().getLabel_color() != null) {
@@ -1802,7 +1867,6 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         aq.id(R.id.time_field).text(tempCurrentHours + ":" + tempCurrentMins);
 
     }
-
     @Override
     public void taskAdded() {
         todo.setTodo_server_id(TaskAdded.getInstance().id);
@@ -1829,9 +1893,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
             alarm.setReminderAlarm(MainActivity.act, todo.getStart_date() - todo.getReminder().getTime(), title, todo.getLocation());
             alarm.SetNormalAlarm(MainActivity.act);
         }
-        if(todo.getRepeat().getRepeat_until() != 0){ // TODO change it to real value
-            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
-        }
+//        if(!todo.getRepeat().getRepeat_interval().isEmpty()){ // TODO change it to real value
+//            alarm.setRepeatAlarm(MainActivity.act,todo.getRepeat().getRepeat_until());
+//        }
         else{
             alarm.SetNormalAlarm(MainActivity.act);
         }
@@ -1942,7 +2006,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         }
     }
 
-    private class GeneralOnClickListner implements OnClickListener {
+    private class GeneralOnClickListener implements OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -1958,6 +2022,52 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 Utils.hidKeyboard(getActivity());
         }
 
+    }
+    private class ExpandableOnClickListener implements OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            v.setFocusableInTouchMode(true);
+            v.requestFocus();
+            showExpandableView(v);
+            setAllOtherFocusableFalse(v);
+        }
+
+    }
+    private void showExpandableView(View v){
+
+        switch (v.getId()) {
+            case R.id.time_date:
+                if (aq.id(R.id.date_time_include).getView().getVisibility() == View.GONE) {
+                    aq.id(R.id.date_time_include)
+                            .getView()
+                            .startAnimation(
+                                    new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+                                            200, aq.id(R.id.date_time_include)
+                                            .getView(), true));
+                }else{
+                    aq.id(R.id.date_time_include).getView()
+                            .startAnimation(
+                                    new ScaleAnimToHide(1.0f, 1.0f, 1.0f, 0.0f,
+                                            200, aq.id(R.id.date_time_include).getView(), true));
+                }
+                break;
+            case R.id.repeat_layout:
+                if (aq.id(R.id.repeat_linear_layout).getView().getVisibility() == View.GONE) {
+                    aq.id(R.id.repeat_linear_layout)
+                            .getView()
+                            .startAnimation(
+                                    new ScaleAnimToShow(1.0f, 1.0f, 1.0f, 0.0f,
+                                            200, aq.id(R.id.repeat_linear_layout)
+                                            .getView(), true));
+                }else{
+                    aq.id(R.id.repeat_linear_layout).getView()
+                            .startAnimation(
+                                    new ScaleAnimToHide(1.0f, 1.0f, 1.0f, 0.0f,
+                                            200, aq.id(R.id.repeat_linear_layout).getView(), true));
+                }
+                break;
+        }
     }
 
     public class AddTaskBeforePagerFragment extends FragmentStatePagerAdapter {

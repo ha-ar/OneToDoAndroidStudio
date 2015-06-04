@@ -7,10 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.vector.onetodo.db.gen.ToDo;
 import com.vector.onetodo.db.gen.ToDoDao;
+import com.vector.onetodo.utils.Utils;
 
 import java.util.List;
 
@@ -47,8 +49,12 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             nHandler.createNotification(context, intent);
             ToDoDao tododao = App.daoSession.getToDoDao();
             ToDo obj = tododao.load(intent.getExtras().getLong("id"));
-            obj.setIs_checked(true);
-            tododao.update(obj);
+            if(!TextUtils.isEmpty(obj.getRepeat().getRepeat_interval())){
+                Long updatedDate = obj.getStart_date() + Utils.getRepeatTime(obj.getRepeat().getRepeat_interval());
+                obj.setStart_date(updatedDate);
+                tododao.update(obj);
+            }
+//            obj.setIs_checked(true);
             SetNormalAlarm(context);
         }
 

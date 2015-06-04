@@ -26,14 +26,14 @@
             android:id="@+id/spinner_labels_task"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="Label"
             android:textColor="@color/_4d4d4d"
             android:textColorHint="@color/_999999"
-            android:textSize="17.78sp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout

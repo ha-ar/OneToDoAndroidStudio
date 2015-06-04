@@ -181,7 +181,7 @@ public class Utils {
 
 	public static void showKeyboard(Activity act) {
 		act.getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 	}
 
 	public static int getDpValue(int val, Context ctx) {
@@ -402,8 +402,24 @@ public class Utils {
 
         return days * numbers;
 
+    }
+    public static int getRepeatTime(String time){
+        int numbers = 0;
+        if(time.equalsIgnoreCase("Never"))
+            numbers = 0;
+        else if(time.equalsIgnoreCase("daily"))
+            numbers = Constants.DAY;
+        else if(time.equalsIgnoreCase("weekly"))
+            numbers = Constants.WEEK;
+        else if(time.equalsIgnoreCase("monthly"))
+            numbers = Constants.MONTH;
+        else if(time.equalsIgnoreCase("yearly"))
+            numbers = Constants.YEAR;
+        return numbers;
 
     }
+
+
 
 	public static String getImageName(Context ctx, Uri uri){
 		String fileName = "";
