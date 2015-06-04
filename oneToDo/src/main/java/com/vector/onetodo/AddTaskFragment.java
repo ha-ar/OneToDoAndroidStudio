@@ -1090,7 +1090,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 R.id.switch_date);
         final ToggleButton toggleLocation = (ToggleButton) getView().findViewById(
                 R.id.switch_location);
-        toggleDate.setChecked(true);
+        toggleDate.setChecked(false);
         toggleDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
@@ -1099,6 +1099,8 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 toggleDate(toggleDate, toggleLocation, isChecked);
             }
         });
+        toggleDate.setOnClickListener(new GeneralOnClickListener());
+
         toggleLocation.setChecked(false);
         toggleLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -1108,6 +1110,7 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                 toggleLocation(toggleDate, toggleLocation, isChecked);
             }
         });
+        toggleLocation.setOnClickListener(new GeneralOnClickListener());
 
     }
 
@@ -1348,8 +1351,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
         hideAll();
 
         switch (v.getId()) {
+            case R.id.switch_location:
             case R.id.time_location_container:
-                if (aq.id(R.id.location_container).getView().getVisibility() == View.GONE) {
+                if (aq.id(R.id.switch_location).isChecked() && aq.id(R.id.location_container).getView().getVisibility() == View.GONE) {
                     aq.id(R.id.location_container)
                             .getView()
                             .startAnimation(
@@ -1358,8 +1362,9 @@ public class AddTaskFragment extends Fragment implements onTaskAdded {
                                             .getView(), true));
                 }
                 break;
+            case R.id.switch_date:
             case R.id.time_date_header_container:
-                if (aq.id(R.id.show_hide_time).getView().getVisibility() == View.GONE) {
+                if (aq.id(R.id.switch_date).isChecked() && aq.id(R.id.show_hide_time).getView().getVisibility() == View.GONE) {
                     aq.id(R.id.show_hide_time)
                             .getView()
                             .startAnimation(
