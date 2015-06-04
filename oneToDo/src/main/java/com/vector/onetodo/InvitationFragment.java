@@ -1,17 +1,12 @@
 package com.vector.onetodo;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -20,8 +15,11 @@ import android.widget.Toast;
 
 import com.vector.onetodo.utils.Utils;
 
-public class InvitationFragment extends Invitationtabholder implements
-		OnScrollListener {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class InvitationFragment extends Fragment {
 
 	private ListView listView;
 	private int position;
@@ -73,7 +71,6 @@ public class InvitationFragment extends Invitationtabholder implements
 		super.onViewCreated(view, savedInstanceState);
 		position = getArguments().getInt("position");
 		setadapter(getActivity(), position);
-		listView.setOnScrollListener(this);
 		listView.setAdapter(new LandingAdapter(getActivity()));
 
 	}
@@ -145,27 +142,6 @@ public class InvitationFragment extends Invitationtabholder implements
 		RelativeLayout Details_layout;
 	}
 
-	@Override
-	public void adjustScroll(int scrollHeight) {
-		if (scrollHeight == 0 && listView.getFirstVisiblePosition() >= 1) {
-			return;
-		}
-
-		listView.setSelectionFromTop(1, scrollHeight);
-	}
-
-	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount) {
-		if (mScrollTabHolder != null)
-			mScrollTabHolder.onScroll(view, firstVisibleItem, visibleItemCount,
-					totalItemCount, position);
-	}
-
-	@Override
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		// nothing
-	}
 
 	private void setadapter(Context context, int position) { 
 		LandingAdapter adapter = new LandingAdapter(getActivity());

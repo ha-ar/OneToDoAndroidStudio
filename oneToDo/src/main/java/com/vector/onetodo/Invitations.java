@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.view.Display;
@@ -15,27 +14,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 
 import com.androidquery.AQuery;
 import com.astuetz.PagerSlidingTabStrip;
 import com.vector.onetodo.utils.Utils;
 
 
-public class Invitations extends Fragment implements InvitationScrollHolder {
+public class Invitations extends Fragment{
 
 	private ViewPager pager;
 	private TabPagerAdapter1 tabPagerAdapter;
-	AQuery aq;
-	Html html;
+	private AQuery aq;
+	private Display display;
+	private Point size;
 
-	Display display;
-	Point size;
+	public static Invitations newInstance() {
+		return new Invitations();
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.invitation, container, false);
 		display = getActivity().getWindowManager().getDefaultDisplay();
 		size = new Point();
@@ -46,16 +45,11 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-
-		
 		aq.id(R.id.header_logo_inivit).clicked(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
 				getFragmentManager().popBackStack();
 			}
 		});
@@ -67,22 +61,6 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 		pager = (ViewPager) getActivity().findViewById(R.id.pager_invit);
 
 		tabPagerAdapter = new TabPagerAdapter1(getChildFragmentManager());
-		tabPagerAdapter.setTabHolderScrollingContent(new InvitationScrollHolder() {
-			
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount, int pagePosition) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void adjustScroll(int scrollHeight) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-
 		pager.setAdapter(tabPagerAdapter);
 
 		// Bind the tabs to the ViewPager
@@ -110,29 +88,22 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 
 	public class TabPagerAdapter1 extends FragmentPagerAdapter {
 
-		private SparseArrayCompat<InvitationScrollHolder> mScrollTabHolders;
-		private InvitationScrollHolder mListener;
 
 		public TabPagerAdapter1(FragmentManager fm) {
 			super(fm);
-			mScrollTabHolders = new SparseArrayCompat<InvitationScrollHolder>();
 		}
 
-		public void setTabHolderScrollingContent(InvitationScrollHolder listener) {
-			mListener = listener;
-		}
 
 		@Override
 		public int getCount() {
 			return 2;
-			// return 3; // no. of tabs are Today, Tomorrow & Upcoming
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return "RECIEVED";
+				return "RECEIVED";
 			case 1:
 				return "SENT";
 			default:
@@ -142,37 +113,11 @@ public class Invitations extends Fragment implements InvitationScrollHolder {
 
 		}
 
-	
-
-		public SparseArrayCompat<InvitationScrollHolder> getScrollTabHolders() {
-			return mScrollTabHolders;
-		}
-
 		@Override
 		public Fragment getItem(int position) {
-			Invitationtabholder fragment = 
-					(Invitationtabholder) InvitationFragment.newInstance(position);
-
-			mScrollTabHolders.put(position, fragment);
-			if (mListener != null) {
-				fragment.setScrollTabHolder(mListener);
-			}
-			return fragment;
+			return InvitationFragment.newInstance(position);
 		}
 
-	}
-
-	@Override
-	public void adjustScroll(int scrollHeight) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onScroll(AbsListView view, int firstVisibleItem,
-			int visibleItemCount, int totalItemCount, int pagePosition) {
-		// TODO Auto-generated method stub
-		
 	}
 
 

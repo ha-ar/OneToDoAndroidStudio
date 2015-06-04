@@ -179,6 +179,12 @@ public class Calender extends Fragment {
             case R.id.action_goto:
                 showNumberDialog();
                 return true;
+            case R.id.action_invitation:
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, Invitations.newInstance())
+                        .commit();
         }
         return super.onOptionsItemSelected(item);
     }
